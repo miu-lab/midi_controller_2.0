@@ -1,0 +1,2 @@
+// OpticalEncoder impl.
+

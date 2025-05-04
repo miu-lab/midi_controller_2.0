@@ -1,0 +1,2 @@
+// UpdateDisplay – rafraîchit UI
+
