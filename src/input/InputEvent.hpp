@@ -3,7 +3,7 @@
 
 struct EncoderTurnedEvent {
     EncoderId id;
-    int8_t delta;
+    int32_t absolutePosition;  // Seule la position absolue est transmise
 };
 
 struct EncoderButtonEvent {
