@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "utils/Scheduler.hpp"
 #include "utils/EventBus.hpp"
-#include "input/InputEvent.hpp"          // pour EncoderMoved, ButtonPressed, ButtonReleased
+#include "input/InputEvent.hpp" // pour EncoderMoved, ButtonPressed, ButtonReleased
 
 // Config des encodeurs
 #include "config/ControlEncodersConfig.hpp"
@@ -11,39 +11,47 @@
 #include "config/ControlButtonsConfig.hpp"
 
 ControllerApp::ControllerApp()
-    : encoderManager_(controlEncoderConfigs)
-    , processEncoders_(encoderManager_.getEncoders())
-    , buttonManager_(controlButtonConfigs)
-    , processButtons_(buttonManager_.getButtons())
-{}
+    : encoderManager_(controlEncoderConfigs), processEncoders_(encoderManager_.getEncoders()), buttonManager_(controlButtonConfigs), processButtons_(buttonManager_.getButtons())
+{
+}
 
-void ControllerApp::begin() {
-    while (!Serial) { /* attente du port série pour Teensy */ }
+void ControllerApp::begin()
+{
+    while (!Serial)
+    { /* attente du port série pour Teensy */
+    }
 
     // 2) Souscriptions pour debug
-    EventBus<EncoderTurnedEvent>::subscribe([](const EncoderTurnedEvent& e) {
+    EventBus<EncoderTurnedEvent>::subscribe([](const EncoderTurnedEvent &e)
+                                            {
         Serial.print("ENC ");
         Serial.print(e.id);
-        Serial.print(" Δ ");
-        Serial.println(e.delta);
+        Serial.print(" abs:");
+        Serial.println(e.absolutePosition);
     });
-    EventBus<ButtonPressed>::subscribe([](const ButtonPressed& b) {
+    EventBus<EncoderButtonEvent>::subscribe([](const EncoderButtonEvent &e)
+                                            {
+        Serial.print("ENC_BTN ");
+        Serial.print(e.id);
+        Serial.println(e.pressed ? " PRESSED" : " RELEASED"); });
+    EventBus<ButtonPressed>::subscribe([](const ButtonPressed &b)
+                                       {
         Serial.print("BTN ");
         Serial.print(b.id);
-        Serial.println(" PRESSED");
-    });
-    EventBus<ButtonReleased>::subscribe([](const ButtonReleased& b) {
+        Serial.println(" PRESSED"); });
+    EventBus<ButtonReleased>::subscribe([](const ButtonReleased &b)
+                                        {
         Serial.print("BTN ");
         Serial.print(b.id);
-        Serial.println(" RELEASED");
-    });
+        Serial.println(" RELEASED"); });
 
     // 3) Initialise l'état initial des encodeurs et boutons
     encoderManager_.updateAll();
     buttonManager_.updateAll();
 }
 
-void ControllerApp::tick() {
+void ControllerApp::tick()
+{
     // 1) Lecture et publication des mouvements d'encodeurs
     encoderManager_.updateAll();
     processEncoders_.update();
