@@ -3,42 +3,49 @@
 
 #include "domain/IEncoder.hpp"
 #include "interface_adapters/encoders/EncoderConfig.hpp"
-#include "interface_adapters/buttons/DigitalButtonConfig.hpp"
-#include "interface_adapters/buttons/DigitalButton.hpp"
+#include "config/debug/DebugConfig.hpp"  // Configuration des modes de debug
 #include <Arduino.h>
-#include <vector>
-#include <algorithm>
+#include <Encoder.h>  // Ajout de la bibliothèque Encoder
 
 /**
- * @brief Encodeur quadrature interrupt-driven + bouton optionnel + PPR.
+ * @brief Encodeur quadrature utilisant la bibliothèque Encoder + bouton optionnel + PPR.
  *
- * Utilise interruption RISING sur pinA, filtre rebonds via double lecture et debounce logiciel.
+ * Utilise la bibliothèque Encoder pour une lecture fiable des rotations
+ * avec gestion automatique des interruptions et du debounce.
  */
 class InterruptQuadratureEncoder : public IEncoder {
 public:
     explicit InterruptQuadratureEncoder(const EncoderConfig& cfg);
-    ~InterruptQuadratureEncoder();
+    ~InterruptQuadratureEncoder() override;
 
     int8_t    readDelta() override;
     bool      isPressed() const override;
     EncoderId getId() const override;
     uint16_t  getPpr() const override;
+    
+    // Méthodes pour la position absolue
+    int32_t   getAbsolutePosition() const override;
+    int32_t   getPhysicalPosition() const override;
+    void      resetPosition() override;
 
 private:
-    EncoderId        id_;
-    uint8_t          pinA_, pinB_;
-    volatile int16_t count_;
-    volatile int32_t position_;  ///< Position cumulée pour debug
-    uint8_t          lastAB_;
-    uint16_t         ppr_;
-    bool             hasButton_;
-    ButtonConfig     btnCfg_;
-
-    // Debounce logiciel
-    uint32_t         lastPublishUs_;
-    static constexpr uint32_t debounceUs_ = 500; // µs
-
-    static std::vector<InterruptQuadratureEncoder*>& instances();
-    static void handleAllInterrupts();
-    void handleInterrupt(uint8_t newAB);
+    EncoderId id_;
+    Encoder   encoder_;  // Utilisation de la classe Encoder au lieu de la gestion manuelle
+    uint16_t  ppr_;      // Pulses Par Revolution
+    bool      hasButton_;
+    uint8_t   buttonPin_;
+    bool      activeLowButton_;
+    
+    // Variables pour le calcul du delta
+    int32_t   lastPosition_;
+    
+    // Position physique totale (non normalisée)
+    int32_t   physicalPosition_;
+    
+    // Position absolue normalisée (cumulative)
+    int32_t   absolutePosition_;
+    
+    // Variables pour les options d'accélération
+    uint32_t  lastReadTime_;
+    static constexpr uint32_t ACCELERATION_THRESHOLD_MS = 50; // Seuil pour l'accélération
 };

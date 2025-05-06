@@ -1,90 +1,150 @@
-
 // interface_adapters/encoders/InterruptQuadratureEncoder.cpp
-#ifdef UNIT_TEST_NATIVE
-#include <ArduinoFake.h>
-#else
-#include <Arduino.h>
-#endif
 #include "interface_adapters/encoders/InterruptQuadratureEncoder.hpp"
+#include <Arduino.h>
 
-// Stocke instances pour ISR
-std::vector<InterruptQuadratureEncoder*>& InterruptQuadratureEncoder::instances() {
-    static std::vector<InterruptQuadratureEncoder*> inst;
-    return inst;
-}
-
-InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig& cfg)
-    : id_(cfg.id)
-    , pinA_(cfg.pinA)
-    , pinB_(cfg.pinB)
-    , count_(0)
-    , position_(0)
-    , lastAB_((uint8_t)((digitalRead(pinA_)<<1) | digitalRead(pinB_)))
-    , ppr_(cfg.ppr)
-    , hasButton_(cfg.hasButton)
-    , btnCfg_{static_cast<ButtonId>(cfg.id), cfg.pinButton, cfg.activeLowButton}
-    , lastPublishUs_(0)
+InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig &cfg)
+    : id_(cfg.id), encoder_(cfg.pinA, cfg.pinB) // Initialisation de l'objet Encoder
+      ,
+      ppr_(cfg.ppr), hasButton_(cfg.hasButton), buttonPin_(cfg.hasButton ? cfg.pinButton : 0), 
+      activeLowButton_(cfg.activeLowButton), lastPosition_(0), physicalPosition_(0), absolutePosition_(0), lastReadTime_(0)
 {
-    pinMode(pinA_, INPUT_PULLUP);
-    pinMode(pinB_, INPUT_PULLUP);
-
-    // Enregistre pour ISR
-    instances().push_back(this);
-    attachInterrupt(digitalPinToInterrupt(pinA_), handleAllInterrupts, CHANGE);
-}
-
-InterruptQuadratureEncoder::~InterruptQuadratureEncoder() {
-    detachInterrupt(digitalPinToInterrupt(pinA_));
-    auto &inst = instances();
-    inst.erase(std::remove(inst.begin(), inst.end(), this), inst.end());
-}
-
-void InterruptQuadratureEncoder::handleAllInterrupts() {
-    for (auto *enc : instances()) {
-        // Double lecture pour filtrer rebonds
-        uint8_t a1 = digitalRead(enc->pinA_);
-        delayMicroseconds(50);
-        uint8_t a2 = digitalRead(enc->pinA_);
-        if (a1 != a2) continue;
-        uint8_t b = digitalRead(enc->pinB_);
-        uint8_t newAB = (uint8_t)((a1 << 1) | b);
-        enc->handleInterrupt(newAB);
+    // Configuration du bouton si présent
+    if (hasButton_)
+    {
+        pinMode(buttonPin_, activeLowButton_ ? INPUT_PULLUP : INPUT);
     }
 }
 
-void InterruptQuadratureEncoder::handleInterrupt(uint8_t newAB) {
-    if (newAB != lastAB_) {
-        // Gray-code: incr/decr
-        bool positive = (lastAB_ == 0 && newAB == 1) ||
-                        (lastAB_ == 1 && newAB == 3) ||
-                        (lastAB_ == 3 && newAB == 2) ||
-                        (lastAB_ == 2 && newAB == 0);
-        count_ += positive ? 1 : -1;
-        lastAB_ = newAB;
-    }
+InterruptQuadratureEncoder::~InterruptQuadratureEncoder()
+{
+    // La bibliothèque Encoder gère le nettoyage des interruptions
 }
 
-int8_t InterruptQuadratureEncoder::readDelta() {
-    noInterrupts();
-    int16_t val = count_;
-    count_ = 0;
-    interrupts();
-    if (val == 0) return 0;
-    uint32_t now = micros();
-    if ((uint32_t)(now - lastPublishUs_) < debounceUs_) {
+int8_t InterruptQuadratureEncoder::readDelta()
+{
+    // Lire la position actuelle de l'encodeur
+    int32_t newPosition = encoder_.read();
+    int32_t delta = newPosition - lastPosition_;
+
+    // Si pas de changement, retourner 0
+    if (delta == 0)
         return 0;
+
+    // Facteur de normalisation commun : 24 correspond au PPR standard des encodeurs mécaniques
+    const int32_t REFERENCE_PPR = 24;
+    
+    // Calculer l'angle de rotation en unités de référence
+    // (delta / ppr_) donne la fraction de tour
+    // * REFERENCE_PPR convertit cette fraction en équivalent pour un encodeur de référence
+    int32_t normalizedDelta = (delta * REFERENCE_PPR) / ppr_;
+    
+    // S'assurer qu'un mouvement physique réel produise toujours au moins 1 delta
+    if (delta != 0 && normalizedDelta == 0) {
+        normalizedDelta = (delta > 0) ? 1 : -1;
     }
-    lastPublishUs_ = now;
-    if      (val > INT8_MAX) val = INT8_MAX;
-    else if (val < INT8_MIN) val = INT8_MIN;
-    return static_cast<int8_t>(val);
+
+    // Option d'accélération: si l'encodeur est tourné rapidement, multiplier le delta
+    uint32_t now = millis();
+    uint32_t elapsed = now - lastReadTime_;
+    float accelerationFactor = 1.0f;
+
+    if (elapsed < ACCELERATION_THRESHOLD_MS)
+    {
+        // Facteur d'accélération proportionnel à la vitesse
+        accelerationFactor = 2.0f * (ACCELERATION_THRESHOLD_MS - elapsed) / ACCELERATION_THRESHOLD_MS;
+        normalizedDelta = normalizedDelta * accelerationFactor;
+    }
+    lastReadTime_ = now;
+
+    // Mettre à jour la dernière position
+    lastPosition_ = newPosition;
+    
+    // Mettre à jour la position physique totale
+    physicalPosition_ += delta;
+    
+    // Calculer la position absolue directement à partir de la position physique totale
+    // pour garantir une cohérence parfaite entre les encodeurs de différents PPR
+    absolutePosition_ = (physicalPosition_ * REFERENCE_PPR) / ppr_;
+
+    // Limiter le delta à la plage d'un int8_t
+    int8_t result = 0;
+    if (normalizedDelta > INT8_MAX)
+        result = INT8_MAX;
+    else if (normalizedDelta < INT8_MIN)
+        result = INT8_MIN;
+    else
+        result = static_cast<int8_t>(normalizedDelta);
+
+    // Débogage de niveau 1 (léger - pour les mouvements significatifs)
+#if defined(DEBUG) && defined(DEBUG_RAW_CONTROLS) && (DEBUG_RAW_CONTROLS == 1) && (delta != 0)
+    Serial.print("ENC_RAW ");
+    Serial.print(id_);
+    Serial.print(" raw:");
+    Serial.print(delta);
+    Serial.print(" ppr:");
+    Serial.print(ppr_);
+    Serial.print(" norm:");
+    Serial.print(normalizedDelta);
+    Serial.print(" result:");
+    Serial.print(result);
+    Serial.print(" abs_pos:");
+    Serial.println(absolutePosition_);
+#endif
+    
+    // Débogage de niveau 2 (complet - pour tous les appels)
+#if defined(DEBUG) && defined(DEBUG_RAW_CONTROLS) && (DEBUG_RAW_CONTROLS >= 2)
+    Serial.print("ENC_RAW ");
+    Serial.print(id_);
+    Serial.print(" raw:");
+    Serial.print(delta);
+    Serial.print(" norm:");
+    Serial.print(normalizedDelta);
+    Serial.print(" accel:");
+    Serial.print(accelerationFactor);
+    Serial.print(" result:");
+    Serial.print(result);
+    Serial.print(" abs_pos:");
+    Serial.println(absolutePosition_);
+#endif
+
+    return result;
 }
 
-bool InterruptQuadratureEncoder::isPressed() const {
-    if (!hasButton_) return false;
-    int raw = digitalRead(btnCfg_.pin);          // Debug visuel
-    return btnCfg_.activeLow ? (raw == LOW) : (raw == HIGH);
+bool InterruptQuadratureEncoder::isPressed() const
+{
+    if (!hasButton_)
+        return false;
+    // Lire l'état du bouton
+    int raw = digitalRead(buttonPin_);
+    return activeLowButton_ ? (raw == LOW) : (raw == HIGH);
 }
 
-EncoderId InterruptQuadratureEncoder::getId() const { return id_; }
-uint16_t InterruptQuadratureEncoder::getPpr() const { return ppr_; }
+EncoderId InterruptQuadratureEncoder::getId() const
+{
+    return id_;
+}
+
+uint16_t InterruptQuadratureEncoder::getPpr() const
+{
+    return ppr_;
+}
+
+int32_t InterruptQuadratureEncoder::getAbsolutePosition() const
+{
+    return absolutePosition_;
+}
+
+int32_t InterruptQuadratureEncoder::getPhysicalPosition() const
+{
+    return physicalPosition_;
+}
+
+void InterruptQuadratureEncoder::resetPosition()
+{
+    // Réinitialiser la position physique et la position absolue à zéro
+    physicalPosition_ = 0;
+    absolutePosition_ = 0;
+    
+    // Garder la dernière position physique, sinon cela pourrait générer des deltas indésirables
+    // Nous réinitialisons seulement le compteur de position absolue
+}
