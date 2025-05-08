@@ -3,10 +3,10 @@
 #include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
 #include "core/domain/types.hpp"
 #include "app/services/NavigationConfigService.hpp"
-#include "config/NavigationMappingConfig.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
+#include "config/ApplicationConfiguration.hpp"
 #include <vector>
-#include <cstddef>
+#include <memory>
 
 /**
  * @brief Service centralisant la gestion des configurations
@@ -19,13 +19,9 @@ class ConfigurationService {
 public:
     /**
      * @brief Construit un nouveau service de configuration
+     * @param appConfig Configuration de l'application
      */
-    ConfigurationService();
-    
-    /**
-     * @brief Charge toutes les configurations par défaut
-     */
-    void loadDefaultConfigurations();
+    ConfigurationService(const ApplicationConfiguration& appConfig);
     
     /**
      * @brief Applique les configurations aux différents services
@@ -48,15 +44,6 @@ public:
     const std::vector<ButtonConfig>& getButtonConfigs() const;
     
 private:
-    // Stockage des configurations
-    std::vector<EncoderConfig> encoderConfigs_;
-    std::vector<ButtonConfig> buttonConfigs_;
-    std::vector<MidiControlMapping> midiMappings_;
-    std::vector<NavigationControl> navigationControls_;
-    
-    // Méthodes privées de chargement
-    void loadEncoderConfigs();
-    void loadButtonConfigs();
-    void loadMidiMappings();
-    void loadNavigationControls();
+    // Référence à la configuration de l'application
+    const ApplicationConfiguration& appConfig_;
 };
