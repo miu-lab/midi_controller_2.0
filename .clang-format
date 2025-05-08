@@ -15,4 +15,8 @@ NamespaceIndentation: None
 PointerAlignment: Left
 SpacesBeforeTrailingComments: 2
 TabWidth: 4
-SeparateDefinitionBlocks: Always 
+SeparateDefinitionBlocks: Always
+# Nouveaux paramètres
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
