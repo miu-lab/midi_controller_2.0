@@ -1,6 +1,6 @@
 #pragma once
 
-#include "interface_adapters/encoders/EncoderConfig.hpp"
+#include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
 #include <vector>
 
 /// Configuration matérielle de tous les encodeurs du contrôleur

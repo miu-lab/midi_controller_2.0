@@ -5,9 +5,9 @@
 #else
 #include <Arduino.h>
 #endif
-#include "app/ControllerApp.hpp"
+#include "app/MidiControllerApp.hpp"
 
-ControllerApp app;
+MidiControllerApp app;
 
 void setup() {
     Serial.begin(115200);  // Initialiser le série, mais ne pas attendre qu'il soit prêt

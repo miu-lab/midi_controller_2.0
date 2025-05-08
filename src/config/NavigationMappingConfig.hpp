@@ -1,5 +1,5 @@
 #pragma once
-#include "domain/types.hpp"
+#include "core/domain/types.hpp"
 #include <vector>
 #include <cstddef>  // Pour size_t
 

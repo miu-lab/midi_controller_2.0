@@ -1,45 +1,54 @@
 #include <unity.h>
-#include "use_cases/ProcessEncoders.hpp"
-#include "utils/EventBus.hpp"
-#include "input/InputEvent.hpp"
-
+#include "core/use_cases/ProcessEncoders.hpp"
+#include "core/domain/EventBus.hpp"
+#include "core/domain/events/InputEvent.hpp"
 
 // Implémentation complète de MockEncoder
-struct MockEncoder : public IEncoder {
+struct MockEncoder : public IEncoder
+{
     EncoderId id;
-    int8_t   delta;
-    bool     pressed;
-    int32_t  absolutePosition = 0;
-    int32_t  physicalPosition = 0;
+    int8_t delta;
+    bool pressed;
+    int32_t absolutePosition = 0;
+    int32_t physicalPosition = 0;
 
-    int8_t    readDelta() override        { return delta; }
-    bool      isPressed()  const override { return pressed; }
-    EncoderId getId()      const override { return id; }
-    uint16_t  getPpr()     const override { return 1; }  // Valeur factice
+    int8_t readDelta() override { return delta; }
+    bool isPressed() const override { return pressed; }
+    EncoderId getId() const override { return id; }
+    uint16_t getPpr() const override { return 1; } // Valeur factice
 
     // Implémentation des méthodes manquantes
-    int32_t   getAbsolutePosition() const override { return absolutePosition; }
-    int32_t   getPhysicalPosition() const override { return physicalPosition; }
-    void      resetPosition() override { absolutePosition = 0; physicalPosition = 0; }
+    int32_t getAbsolutePosition() const override { return absolutePosition; }
+    int32_t getPhysicalPosition() const override { return physicalPosition; }
+    void resetPosition() override
+    {
+        absolutePosition = 0;
+        physicalPosition = 0;
+    }
 };
 
 static int turnedPositionSum = 0;
 static bool lastButtonPressed = false;
 
-void onTurned(const EncoderTurnedEvent& e) {
+void onTurned(const EncoderTurnedEvent &e)
+{
     // Utiliser absolutePosition au lieu de delta
     turnedPositionSum += e.absolutePosition;
 }
 
-void onPressed(const EncoderButtonEvent& e) {
+void onPressed(const EncoderButtonEvent &e)
+{
     lastButtonPressed = e.pressed;
 }
 
-void test_process_encoders_event_bus() {
-    MockEncoder enc1; enc1.id = 1;
-    MockEncoder enc2; enc2.id = 2;
+void test_process_encoders_event_bus()
+{
+    MockEncoder enc1;
+    enc1.id = 1;
+    MockEncoder enc2;
+    enc2.id = 2;
 
-    std::vector<IEncoder*> encoders = { &enc1, &enc2 };
+    std::vector<IEncoder *> encoders = {&enc1, &enc2};
     ProcessEncoders processor(encoders);
 
     EventBus<EncoderTurnedEvent>::subscribe(onTurned);
@@ -60,6 +69,7 @@ void test_process_encoders_event_bus() {
     TEST_ASSERT_TRUE(lastButtonPressed);
 }
 
-void run_process_encoders_tests() {
+void run_process_encoders_tests()
+{
     RUN_TEST(test_process_encoders_event_bus);
 }

@@ -1,18 +1,21 @@
 #include <unity.h>
-#include "utils/EventBus.hpp"
+#include "core/domain/EventBus.hpp"
 
-struct Dummy {
+struct Dummy
+{
     int v;
 };
 
 static int sum = 0;
 
-static void dummyCallback(const Dummy& d) {
+static void dummyCallback(const Dummy &d)
+{
     sum += d.v;
 }
 
-void test_event_publish() {
-    sum = 0;  // réinitialiser avant chaque test
+void test_event_publish()
+{
+    sum = 0; // réinitialiser avant chaque test
 
     EventBus<Dummy>::subscribe(dummyCallback);
     EventBus<Dummy>::publish({42});
@@ -20,6 +23,7 @@ void test_event_publish() {
     TEST_ASSERT_EQUAL(42, sum);
 }
 
-void run_event_bus_tests() {
+void run_event_bus_tests()
+{
     RUN_TEST(test_event_publish);
 }

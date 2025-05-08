@@ -1,11 +1,12 @@
 #include <unity.h>
-#include "storage/ProfileManager.hpp"
+#include "adapters/secondary/storage/ProfileManager.hpp"
 
-void test_profile_manager_basic() {
+void test_profile_manager_basic()
+{
     ProfileManager manager;
     ControlId id = 7;
     MidiControl binding{1, 42, true};
-    
+
     manager.setBinding(id, binding);
 
     auto loaded = manager.getBinding(id);
@@ -15,6 +16,7 @@ void test_profile_manager_basic() {
     TEST_ASSERT_TRUE(loaded->relative);
 }
 
-void run_profile_manager_tests() {
+void run_profile_manager_tests()
+{
     RUN_TEST(test_profile_manager_basic);
 }
