@@ -14,6 +14,14 @@ class DigitalButtonManager {
 public:
     explicit DigitalButtonManager(const std::vector<ButtonConfig>& configs);
     ~DigitalButtonManager();
+    
+    // Désactiver la copie
+    DigitalButtonManager(const DigitalButtonManager&) = delete;
+    DigitalButtonManager& operator=(const DigitalButtonManager&) = delete;
+    
+    // Permettre le déplacement si nécessaire
+    DigitalButtonManager(DigitalButtonManager&&) = default;
+    DigitalButtonManager& operator=(DigitalButtonManager&&) = default;
 
     void updateAll();
     const std::vector<IButton*>& getButtons() const;
