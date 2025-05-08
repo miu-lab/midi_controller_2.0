@@ -14,9 +14,14 @@ public:
     void update() override;
     bool isPressed() const override;
     ButtonId getId() const override;
+    
+    // Nouvelle méthode pour réinitialiser l'état des boutons en mode toggle
+    void resetState();
 
 private:
     ButtonConfig cfg_;
     Bounce       button_;
-    bool         pressed_;
+    bool         pressed_;     // État physique du bouton
+    bool         toggleState_; // État logique pour les boutons en mode toggle
+    bool         prevPressed_; // État précédent pour détecter les changements
 };
