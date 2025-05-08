@@ -4,7 +4,6 @@
 #include "adapters/secondary/midi/MidiMapper.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/controllers/MenuController.hpp"
-#include "core/controllers/MidiController.hpp"
 #include "core/controllers/ProfileController.hpp"
 #include "core/controllers/UIController.hpp"
 #include "core/domain/IMidiOut.hpp"

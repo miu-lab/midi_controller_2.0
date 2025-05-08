@@ -1,7 +1,8 @@
 #include "app/services/ControllerService.hpp"
 
 #include "app/services/ServiceLocator.hpp"
-#include "core/domain/events/EventTypes.hpp"
+#include "core/domain/events/EventSystem.hpp"
+#include "app/services/ControllerServiceListener.hpp"
 
 ControllerService::ControllerService(ViewManager& viewManager, IMidiOut& midiOut,
                                      IProfileManager& profileManager)
@@ -27,75 +28,10 @@ void ControllerService::init() {
     initializeMidiMappings();
 
     // S'abonner aux événements d'entrée pour le MIDI
-    auto& encoderEventBus = ServiceLocator::getEncoderTurnedEventBus();
-    auto& encoderButtonEventBus = ServiceLocator::getEncoderButtonEventBus();
-    auto& buttonPressedEventBus = ServiceLocator::getButtonPressedEventBus();
-    auto& buttonReleasedEventBus = ServiceLocator::getButtonReleasedEventBus();
-
-    // S'abonner aux événements d'encodeur
-    encoderEventBus.subscribe([this](const EventTypes::EncoderTurned& event) {
-        // TODO: Déterminer si c'est un encodeur de navigation ou MIDI
-        // Pour l'instant, on suppose que l'encodeur 79 est pour la navigation
-        if (event.id == 79) {
-            // Encodeur de navigation
-            if (menuController_.isInMenu()) {
-                // Si on est dans un menu, naviguer
-                if (event.absolutePosition > 0) {
-                    menuController_.selectNextItem();
-                } else {
-                    menuController_.selectPreviousItem();
-                }
-            }
-        } else {
-            // Encodeur MIDI
-            midiMapper_.processEncoderChange(event.id, event.absolutePosition);
-        }
-    });
-
-    // S'abonner aux événements de bouton d'encodeur
-    encoderButtonEventBus.subscribe([this](const EventTypes::EncoderButton& event) {
-        // TODO: Déterminer si c'est un bouton de navigation ou MIDI
-        // Pour l'instant, on suppose que le bouton d'encodeur 79 est pour la navigation
-        if (event.id == 79) {
-            // Bouton de navigation
-            if (event.pressed) {
-                if (menuController_.isInMenu()) {
-                    // Si on est dans un menu, sélectionner l'élément
-                    // TODO: Action spécifique selon l'élément sélectionné
-                } else {
-                    // Sinon, entrer dans le menu
-                    menuController_.enterMenu();
-                }
-            }
-        } else {
-            // Bouton MIDI
-            midiMapper_.processEncoderButton(event.id, event.pressed);
-        }
-    });
-
-    // S'abonner aux événements de bouton pressé
-    buttonPressedEventBus.subscribe([this](const EventTypes::ButtonPressed& event) {
-        // TODO: Déterminer si c'est un bouton de navigation ou MIDI
-        // Pour l'instant, on suppose que les boutons 51 et 52 sont pour la navigation
-        if (event.id == 51) {
-            // Bouton Menu
-            menuController_.enterMenu();
-        } else if (event.id == 52) {
-            // Bouton Valider
-            // Action selon le contexte
-        } else {
-            // Bouton MIDI
-            midiMapper_.processButtonPress(event.id, true);
-        }
-    });
-
-    // S'abonner aux événements de bouton relâché
-    buttonReleasedEventBus.subscribe([this](const EventTypes::ButtonReleased& event) {
-        // Pour les boutons MIDI uniquement
-        if (event.id != 51 && event.id != 52) {
-            midiMapper_.processButtonPress(event.id, false);
-        }
-    });
+    auto& eventBus = EventBus::getInstance();
+    
+    // S'abonner au bus d'événements
+    eventBus.subscribe(new ControllerServiceEventListener(*this));
 }
 
 void ControllerService::update() {
