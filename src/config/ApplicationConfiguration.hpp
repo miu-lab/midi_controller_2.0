@@ -28,7 +28,22 @@ public:
      */
     const MappingConfiguration& getMappingConfiguration() const;
 
+    /**
+     * @brief Définit le facteur de sensibilité global pour les encodeurs
+     * @param value Nouveau facteur de sensibilité (1.0 = normal, >1.0 = plus sensible, <1.0 = moins sensible)
+     */
+    void setEncoderSensitivity(float value);
+
+    /**
+     * @brief Obtient le facteur de sensibilité global pour les encodeurs
+     * @return Facteur de sensibilité actuel
+     */
+    float getEncoderSensitivity() const;
+
 private:
     HardwareConfiguration hardwareConfiguration;
     MappingConfiguration mappingConfiguration;
+    
+    // Paramètres globaux (anciennement dans GlobalSettings)
+    float encoderSensitivity_;  // Facteur de sensibilité pour les encodeurs (1.0 = normal)
 };
