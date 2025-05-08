@@ -4,19 +4,12 @@
 #include <Arduino.h>
 #include <vector>
 
-#include "interface_adapters/encoders/EncoderManager.hpp"
-#include "use_cases/ProcessEncoders.hpp"
-#include "interface_adapters/buttons/DigitalButtonManager.hpp"
-#include "use_cases/ProcessButtons.hpp"
-#include "interface_adapters/midi/TeensyUsbMidiOut.hpp"
-#include "interface_adapters/midi/BufferedMidiOut.hpp"
-#include "interface_adapters/midi/MidiInHandler.hpp"
 #include "storage/ProfileManager.hpp"
-#include "input/InputRouter.hpp"
-
-// Config externes
-#include "config/ControlEncodersConfig.hpp"
-#include "config/ControlButtonsConfig.hpp"
+#include "app/NavigationConfigService.hpp"
+#include "app/UiEventService.hpp"
+#include "app/MidiSystem.hpp"
+#include "app/InputSystem.hpp"
+#include "app/ConfigurationService.hpp"
 
 
 /**
@@ -31,22 +24,35 @@ public:
     /// alias pour loop()
     void update() { tick(); }
 
+    /**
+     * @brief Définit un contrôle comme étant dédié à la navigation
+     * @param id Identifiant du contrôle
+     * @param isNavigation true pour dédier à la navigation, false pour MIDI normal
+     */
+    void setControlForNavigation(ControlId id, bool isNavigation = true);
+
+    /**
+     * @brief Vérifie si un contrôle est dédié à la navigation
+     * @param id Identifiant du contrôle à vérifier
+     * @return true si le contrôle est dédié à la navigation, false sinon
+     */
+    bool isNavigationControl(ControlId id) const;
+
     void begin();
     void tick();
 
 private:
-    // Gestionnaires des contrôles physiques
-    EncoderManager       encoderManager_;
-    ProcessEncoders      processEncoders_;
-    DigitalButtonManager buttonManager_;
-    ProcessButtons       processButtons_;
+    // Service de configuration centralisée
+    ConfigurationService    configService_;    // Gestion de toutes les configurations
     
-    // Composants MIDI
-    TeensyUsbMidiOut    rawMidiOut_;     // Sortie MIDI USB native
-    BufferedMidiOut     bufferedMidiOut_; // Sortie MIDI avec buffer
-    MidiInHandler       midiInHandler_;   // Gestion des messages MIDI entrants
+    // Gestion des profils et navigation
+    ProfileManager          profileManager_;   // Stockage des mappings MIDI
+    NavigationConfigService navigationConfig_; // Configuration des contrôles de navigation
     
-    // Gestion des profils et routage
-    ProfileManager      profileManager_;  // Stockage des mappings MIDI
-    InputRouter         inputRouter_;     // Routage des événements vers MIDI
+    // Systèmes
+    InputSystem             inputSystem_;      // Système d'entrée
+    MidiSystem              midiSystem_;       // Système MIDI
+    UiEventService          uiService_;        // Gestion des événements d'UI
 };
+
+
