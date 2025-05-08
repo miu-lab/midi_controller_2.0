@@ -2,16 +2,12 @@
 #include <Arduino.h>
 
 #include "app/services/NavigationConfigService.hpp"
-#include "core/domain/events/EventTypes.hpp"
+#include "core/domain/events/EventSystem.hpp"
 
 /**
  * @brief Service gérant les abonnements aux événements d'interface utilisateur
- *
- * Ce service est responsable de la configuration des abonnements aux événements
- * liés à l'interface utilisateur, comme les mouvements d'encodeurs et les pressions de boutons.
- * Il gère également l'affichage des messages de débogage pour ces événements.
  */
-class UiEventService {
+class UiEventService : public EventListener {
 public:
     /**
      * @brief Initialise le service avec le service de navigation
@@ -23,14 +19,24 @@ public:
      * @brief Configure les abonnements pour le débogage des événements
      */
     void setupDebugSubscriptions();
+    
+    /**
+     * @brief Traite les événements reçus
+     * @param event Événement à traiter
+     * @return true si l'événement a été traité, false sinon
+     */
+    virtual bool onEvent(const Event& event) override;
 
 private:
     // Méthodes pour afficher les messages de débogage
-    void printEncoderEvent(const EventTypes::EncoderTurned& e);
-    void printEncoderButtonEvent(const EventTypes::EncoderButton& e);
-    void printButtonPressedEvent(const EventTypes::ButtonPressed& e);
-    void printButtonReleasedEvent(const EventTypes::ButtonReleased& e);
+    void printEncoderEvent(const EncoderTurnedEvent& e);
+    void printEncoderButtonEvent(const EncoderButtonEvent& e);
+    void printButtonPressedEvent(const ButtonPressedEvent& e);
+    void printButtonReleasedEvent(const ButtonReleasedEvent& e);
 
     // Service de navigation pour vérifier si un contrôle est dédié à la navigation
     NavigationConfigService* navService_ = nullptr;
+    
+    // ID de souscription
+    SubscriptionId subscriptionId_ = 0;
 };

@@ -1,7 +1,5 @@
 #include "app/services/UiEventService.hpp"
 
-#include "core/domain/EventBus.hpp"
-
 void UiEventService::init(NavigationConfigService& navService) {
     // Stocker la référence au service de navigation
     navService_ = &navService;
@@ -11,24 +9,40 @@ void UiEventService::init(NavigationConfigService& navService) {
 }
 
 void UiEventService::setupDebugSubscriptions() {
-    // Abonnement aux événements d'encodeurs
-    EventBus<EventTypes::EncoderTurned>::subscribe(
-        [this](const EventTypes::EncoderTurned& e) { printEncoderEvent(e); });
-
-    // Abonnement aux événements de boutons d'encodeurs
-    EventBus<EventTypes::EncoderButton>::subscribe(
-        [this](const EventTypes::EncoderButton& e) { printEncoderButtonEvent(e); });
-
-    // Abonnement aux événements de pression de boutons
-    EventBus<EventTypes::ButtonPressed>::subscribe(
-        [this](const EventTypes::ButtonPressed& e) { printButtonPressedEvent(e); });
-
-    // Abonnement aux événements de relâchement de boutons
-    EventBus<EventTypes::ButtonReleased>::subscribe(
-        [this](const EventTypes::ButtonReleased& e) { printButtonReleasedEvent(e); });
+    // S'abonner à tous les événements
+    subscriptionId_ = EventBus::getInstance().subscribe(this);
 }
 
-void UiEventService::printEncoderEvent(const EventTypes::EncoderTurned& e) {
+bool UiEventService::onEvent(const Event& event) {
+    // Traiter les événements en fonction de leur type
+    switch (event.getType()) {
+        case EventTypes::EncoderTurned:
+            printEncoderEvent(static_cast<const EncoderTurnedEvent&>(event));
+            break;
+            
+        case EventTypes::EncoderButton:
+            printEncoderButtonEvent(static_cast<const EncoderButtonEvent&>(event));
+            break;
+            
+        case EventTypes::ButtonPressed:
+            printButtonPressedEvent(static_cast<const ButtonPressedEvent&>(event));
+            break;
+            
+        case EventTypes::ButtonReleased:
+            printButtonReleasedEvent(static_cast<const ButtonReleasedEvent&>(event));
+            break;
+            
+        default:
+            // Événement non géré
+            return false;
+    }
+    
+    // L'événement a été traité (pour l'affichage), mais on ne le marque pas comme entièrement géré
+    // pour permettre à d'autres écouteurs de le traiter également
+    return false;
+}
+
+void UiEventService::printEncoderEvent(const EncoderTurnedEvent& e) {
     // Distinguer les encodeurs de navigation des encodeurs MIDI
     if (navService_ && navService_->isNavigationControl(e.id)) {
         Serial.print("NAV_ENC ");
@@ -37,10 +51,12 @@ void UiEventService::printEncoderEvent(const EventTypes::EncoderTurned& e) {
     }
     Serial.print(e.id);
     Serial.print(" abs:");
-    Serial.println(e.absolutePosition);
+    Serial.print(e.position);
+    Serial.print(" delta:");
+    Serial.println(e.delta);
 }
 
-void UiEventService::printEncoderButtonEvent(const EventTypes::EncoderButton& e) {
+void UiEventService::printEncoderButtonEvent(const EncoderButtonEvent& e) {
     // Distinguer les boutons d'encodeur de navigation
     if (navService_ && navService_->isNavigationControl(e.id)) {
         Serial.print("NAV_ENC_BTN ");
@@ -51,7 +67,7 @@ void UiEventService::printEncoderButtonEvent(const EventTypes::EncoderButton& e)
     Serial.println(e.pressed ? " PRESSED" : " RELEASED");
 }
 
-void UiEventService::printButtonPressedEvent(const EventTypes::ButtonPressed& e) {
+void UiEventService::printButtonPressedEvent(const ButtonPressedEvent& e) {
     // Distinguer les boutons de navigation
     if (navService_ && navService_->isNavigationControl(e.id)) {
         Serial.print("NAV_BTN ");
@@ -62,7 +78,7 @@ void UiEventService::printButtonPressedEvent(const EventTypes::ButtonPressed& e)
     Serial.println(" PRESSED");
 }
 
-void UiEventService::printButtonReleasedEvent(const EventTypes::ButtonReleased& e) {
+void UiEventService::printButtonReleasedEvent(const ButtonReleasedEvent& e) {
     // Distinguer les boutons de navigation
     if (navService_ && navService_->isNavigationControl(e.id)) {
         Serial.print("NAV_BTN ");
