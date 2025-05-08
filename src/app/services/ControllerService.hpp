@@ -2,8 +2,11 @@
 
 #include "adapters/primary/ui/ViewManager.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
+#include "core/controllers/InputController.hpp"
 #include "core/controllers/MenuController.hpp"
+#include "core/controllers/MidiController.hpp"
 #include "core/controllers/ProfileController.hpp"
+#include "core/controllers/UIController.hpp"
 #include "core/domain/IMidiOut.hpp"
 #include "core/domain/IProfileManager.hpp"
 #include "core/domain/commands/CommandManager.hpp"
@@ -51,6 +54,18 @@ public:
      * @return Référence au contrôleur de profil
      */
     ProfileController& getProfileController();
+    
+    /**
+     * @brief Obtient le contrôleur d'interface utilisateur
+     * @return Référence au contrôleur d'interface utilisateur
+     */
+    UIController& getUIController();
+    
+    /**
+     * @brief Obtient le contrôleur d'entrées
+     * @return Référence au contrôleur d'entrées
+     */
+    InputController& getInputController();
 
 private:
     ViewManager& viewManager_;
@@ -58,9 +73,13 @@ private:
     IProfileManager& profileManager_;
 
     CommandManager commandManager_;
+    
+    // Contrôleurs principaux
     MenuController menuController_;
     MidiMapper midiMapper_;
     ProfileController profileController_;
+    UIController* uiController_;
+    InputController* inputController_;
 
     /**
      * @brief Initialise les mappings MIDI

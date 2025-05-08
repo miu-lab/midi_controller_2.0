@@ -11,9 +11,18 @@ ControllerService::ControllerService(ViewManager& viewManager, IMidiOut& midiOut
       commandManager_(),
       menuController_(viewManager_, commandManager_),
       midiMapper_(midiOut_, commandManager_),
-      profileController_(profileManager_) {}
+      profileController_(profileManager_),
+      uiController_(nullptr),
+      inputController_(nullptr) {}
 
 void ControllerService::init() {
+    // Récupérer les contrôleurs depuis le ServiceLocator
+    uiController_ = &ServiceLocator::getUIController();
+    inputController_ = &ServiceLocator::getInputController();
+    
+    // Configurer les interactions entre contrôleurs
+    inputController_->setUIController(uiController_);
+    
     // Initialiser les mappings MIDI
     initializeMidiMappings();
 
@@ -92,6 +101,9 @@ void ControllerService::init() {
 void ControllerService::update() {
     // Mettre à jour le contrôleur MIDI pour les commandes temporisées
     midiMapper_.update();
+    
+    // Mettre à jour le contrôleur UI si nécessaire
+    // Cette méthode pourrait être ajoutée dans le futur
 }
 
 MenuController& ControllerService::getMenuController() {
@@ -104,6 +116,20 @@ MidiMapper& ControllerService::getMidiMapper() {
 
 ProfileController& ControllerService::getProfileController() {
     return profileController_;
+}
+
+UIController& ControllerService::getUIController() {
+    if (!uiController_) {
+        uiController_ = &ServiceLocator::getUIController();
+    }
+    return *uiController_;
+}
+
+InputController& ControllerService::getInputController() {
+    if (!inputController_) {
+        inputController_ = &ServiceLocator::getInputController();
+    }
+    return *inputController_;
 }
 
 void ControllerService::initializeMidiMappings() {
