@@ -9,9 +9,22 @@
 #include "config/ControlEncodersConfig.hpp"
 // Config des boutons simples
 #include "config/ControlButtonsConfig.hpp"
+// Config des mappings MIDI
+#include "config/MidiMappingConfig.hpp"
 
 ControllerApp::ControllerApp()
-    : encoderManager_(controlEncoderConfigs), processEncoders_(encoderManager_.getEncoders()), buttonManager_(controlButtonConfigs), processButtons_(buttonManager_.getButtons())
+    // Gestionnaires des contrôles physiques
+    : encoderManager_(controlEncoderConfigs)
+    , processEncoders_(encoderManager_.getEncoders())
+    , buttonManager_(controlButtonConfigs)
+    , processButtons_(buttonManager_.getButtons())
+    // Composants MIDI
+    , rawMidiOut_()
+    , bufferedMidiOut_(rawMidiOut_)
+    , midiInHandler_()
+    // Gestion des profils et routage
+    , profileManager_()
+    , inputRouter_(bufferedMidiOut_, profileManager_)
 {
 }
 
@@ -20,6 +33,16 @@ void ControllerApp::begin()
     while (!Serial)
     { /* attente du port série pour Teensy */
     }
+
+    // 1) Initialiser le système MIDI
+    // Charger les mappings MIDI par défaut depuis la configuration
+    for (size_t i = 0; i < defaultMidiMappingCount; i++) {
+        const auto& mapping = defaultMidiMappings[i];
+        profileManager_.setBinding(mapping.controlId, mapping.midiControl);
+    }
+    
+    // Initialiser le routeur d'entrée (s'abonne aux événements)
+    inputRouter_.init();
 
     // 2) Souscriptions pour debug
     EventBus<EncoderTurnedEvent>::subscribe([](const EncoderTurnedEvent &e)
@@ -48,6 +71,7 @@ void ControllerApp::begin()
     // 3) Initialise l'état initial des encodeurs et boutons
     encoderManager_.updateAll();
     buttonManager_.updateAll();
+    processButtons_.initStates(); // Initialiser les états sans déclencher d'événements
 }
 
 void ControllerApp::tick()
@@ -60,5 +84,11 @@ void ControllerApp::tick()
     buttonManager_.updateAll();
     processButtons_.update();
 
-    // 3) TODO : Scheduler.update(millis()), rafraîchissement UI, flush MIDI
+    // 3) Traitement MIDI
+    // Lire les messages MIDI entrants
+    midiInHandler_.update();
+    
+    // Envoyer les messages MIDI en attente
+    bufferedMidiOut_.flush();
+    rawMidiOut_.flush();  // Traiter les messages USB
 }

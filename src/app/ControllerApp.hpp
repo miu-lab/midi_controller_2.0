@@ -8,6 +8,11 @@
 #include "use_cases/ProcessEncoders.hpp"
 #include "interface_adapters/buttons/DigitalButtonManager.hpp"
 #include "use_cases/ProcessButtons.hpp"
+#include "interface_adapters/midi/TeensyUsbMidiOut.hpp"
+#include "interface_adapters/midi/BufferedMidiOut.hpp"
+#include "interface_adapters/midi/MidiInHandler.hpp"
+#include "storage/ProfileManager.hpp"
+#include "input/InputRouter.hpp"
 
 // Config externes
 #include "config/ControlEncodersConfig.hpp"
@@ -30,9 +35,18 @@ public:
     void tick();
 
 private:
+    // Gestionnaires des contrôles physiques
     EncoderManager       encoderManager_;
     ProcessEncoders      processEncoders_;
-
     DigitalButtonManager buttonManager_;
     ProcessButtons       processButtons_;
+    
+    // Composants MIDI
+    TeensyUsbMidiOut    rawMidiOut_;     // Sortie MIDI USB native
+    BufferedMidiOut     bufferedMidiOut_; // Sortie MIDI avec buffer
+    MidiInHandler       midiInHandler_;   // Gestion des messages MIDI entrants
+    
+    // Gestion des profils et routage
+    ProfileManager      profileManager_;  // Stockage des mappings MIDI
+    InputRouter         inputRouter_;     // Routage des événements vers MIDI
 };
