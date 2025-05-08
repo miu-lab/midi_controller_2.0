@@ -10,8 +10,12 @@
 ControllerApp app;
 
 void setup() {
-    Serial.begin(115200);
-    app.init();  // méthode à créer (même vide)
+    Serial.begin(115200);  // Initialiser le série, mais ne pas attendre qu'il soit prêt
+    // Décommenter si vous avez besoin de debug via Serial, mais avec un timeout
+    // unsigned long startTime = millis();
+    // while (!Serial && (millis() - startTime < 1000)) { /* attend max 1s */ }
+    
+    app.init();  // initialiser l'application
 }
 
 void loop() {
