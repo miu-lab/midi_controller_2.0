@@ -27,25 +27,31 @@ void InputSystem::init() {
     buttonManager_.updateAll();
     processButtons_.initStates();  // Initialiser les états sans déclencher d'événements
 
+    // Aucun adaptateur de compatibilité nécessaire avec le nouveau système
+    // LegacyEventAdapter::initialize();
+
 #ifndef DISABLE_CONTROLLERS
     // Configurer le contrôleur d'entrée avec les callbacks par défaut
-    // Ces callbacks utilisent l'EventBus traditionnel pour maintenir la compatibilité
+    // Ces callbacks utilisent le nouveau système d'événements
     inputController_->setNavigationEncoderCallback(
         [](EncoderId id, int32_t absPos, int8_t relChange) {
-            // Publier l'événement pour les encodeurs de navigation
-            EventBus<EventTypes::EncoderTurned>::publish({.id = id, .absolutePosition = absPos});
+            // Publier l'événement pour les encodeurs de navigation dans le nouveau système
+            EncoderTurnedEvent event(id, absPos, relChange);
+            EventBus::getInstance().publish(event);
         });
 
     inputController_->setMidiEncoderCallback([](EncoderId id, int32_t absPos, int8_t relChange) {
-        // Publier l'événement pour les encodeurs MIDI
+        // Publier l'événement pour les encodeurs MIDI dans le nouveau système
         // MidiMapper se chargera de gérer les cas où absPos est hors limites (0-127)
         // et de détecter les changements de direction
-        EventBus<EventTypes::EncoderTurned>::publish({.id = id, .absolutePosition = absPos});
+        EncoderTurnedEvent event(id, absPos, relChange);
+        EventBus::getInstance().publish(event);
     });
 
     // Callbacks pour les boutons d'encodeurs (navigation et MIDI)
     auto encoderButtonCallback = [](EncoderId id, bool pressed) {
-        EventBus<EventTypes::EncoderButton>::publish({id, pressed});
+        EncoderButtonEvent event(id, pressed);
+        EventBus::getInstance().publish(event);
     };
     inputController_->setNavigationEncoderButtonCallback(encoderButtonCallback);
     inputController_->setMidiEncoderButtonCallback(encoderButtonCallback);
@@ -53,9 +59,11 @@ void InputSystem::init() {
     // Callbacks pour les boutons (navigation et MIDI)
     auto buttonCallback = [](ButtonId id, bool pressed) {
         if (pressed) {
-            EventBus<EventTypes::ButtonPressed>::publish({id});
+            ButtonPressedEvent event(id);
+            EventBus::getInstance().publish(event);
         } else {
-            EventBus<EventTypes::ButtonReleased>::publish({id});
+            ButtonReleasedEvent event(id);
+            EventBus::getInstance().publish(event);
         }
     };
     inputController_->setNavigationButtonCallback(buttonCallback);

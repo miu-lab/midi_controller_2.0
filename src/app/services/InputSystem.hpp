@@ -5,6 +5,7 @@
 #include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/controllers/UIController.hpp"
+#include "core/domain/events/EventSystem.hpp"
 #include "core/use_cases/ProcessButtons.hpp"
 #include "core/use_cases/ProcessEncoders.hpp"
 

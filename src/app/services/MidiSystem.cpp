@@ -1,8 +1,9 @@
 #include "app/services/MidiSystem.hpp"
 
 #include "app/services/ServiceLocator.hpp"
-#include "core/domain/events/EventTypes.hpp"
+#include "core/domain/events/EventSystem.hpp"
 #include "core/domain/strategies/MidiMappingFactory.hpp"
+#include "app/services/MidiSystemListener.hpp"
 
 MidiSystem::MidiSystem(ProfileManager& profileManager)
     : rawMidiOut_(),
@@ -40,51 +41,10 @@ void MidiSystem::init(NavigationConfigService& navService) {
     init();  // Appel à l'initialisation de base
 
     // S'abonner aux événements d'entrée
-    auto& encoderEventBus = ServiceLocator::getEncoderTurnedEventBus();
-    auto& encoderButtonEventBus = ServiceLocator::getEncoderButtonEventBus();
-    auto& buttonPressedEventBus = ServiceLocator::getButtonPressedEventBus();
-    auto& buttonReleasedEventBus = ServiceLocator::getButtonReleasedEventBus();
-
-    // S'abonner aux événements d'encodeur
-    encoderEventBus.subscribe([this, &navService](const EventTypes::EncoderTurned& event) {
-        // Débogage
-        Serial.print("MIDISYSTEM: EncoderTurned event received for encoder ");
-        Serial.print(event.id);
-        Serial.print(" pos:");
-        Serial.println(event.absolutePosition);
-
-        // Ne traiter l'événement que si ce n'est pas un contrôle de navigation
-        if (!navService.isNavigationControl(event.id)) {
-            Serial.println("Calling MidiMapper::processEncoderChange");
-            midiMapper_.processEncoderChange(event.id, event.absolutePosition);
-        } else {
-            Serial.println("Skipping navigation control");
-        }
-    });
-
-    // S'abonner aux événements de bouton d'encodeur
-    encoderButtonEventBus.subscribe([this, &navService](const EventTypes::EncoderButton& event) {
-        // Ne traiter l'événement que si ce n'est pas un contrôle de navigation
-        if (!navService.isNavigationControl(event.id)) {
-            midiMapper_.processEncoderButton(event.id, event.pressed);
-        }
-    });
-
-    // S'abonner aux événements de bouton pressé
-    buttonPressedEventBus.subscribe([this, &navService](const EventTypes::ButtonPressed& event) {
-        // Ne traiter l'événement que si ce n'est pas un contrôle de navigation
-        if (!navService.isNavigationControl(event.id)) {
-            midiMapper_.processButtonPress(event.id, true);
-        }
-    });
-
-    // S'abonner aux événements de bouton relâché
-    buttonReleasedEventBus.subscribe([this, &navService](const EventTypes::ButtonReleased& event) {
-        // Ne traiter l'événement que si ce n'est pas un contrôle de navigation
-        if (!navService.isNavigationControl(event.id)) {
-            midiMapper_.processButtonPress(event.id, false);
-        }
-    });
+    auto& eventBus = EventBus::getInstance();
+    
+    // S'abonner au bus d'événements
+    eventBus.subscribe(new MidiSystemEventListener(*this, navService));
 }
 
 void MidiSystem::update() {
@@ -113,29 +73,8 @@ MidiMapper& MidiSystem::getMidiMapper() {
 void MidiSystem::initSubscriptions() {
     Serial.println("MidiSystem::initSubscriptions() called");
     // S'abonner aux événements d'entrée pour le routage MIDI
-    auto& encoderEventBus = ServiceLocator::getEncoderTurnedEventBus();
-    auto& encoderButtonEventBus = ServiceLocator::getEncoderButtonEventBus();
-    auto& buttonPressedEventBus = ServiceLocator::getButtonPressedEventBus();
-    auto& buttonReleasedEventBus = ServiceLocator::getButtonReleasedEventBus();
-
-    // S'abonner à tous les événements d'entrée
-    encoderEventBus.subscribe([this](const EventTypes::EncoderTurned& event) {
-        Serial.print("MIDISYSTEM (initSubscriptions): EncoderTurned event for encoder ");
-        Serial.print(event.id);
-        Serial.print(" pos:");
-        Serial.println(event.absolutePosition);
-        midiMapper_.processEncoderChange(event.id, event.absolutePosition);
-    });
-
-    encoderButtonEventBus.subscribe([this](const EventTypes::EncoderButton& event) {
-        midiMapper_.processEncoderButton(event.id, event.pressed);
-    });
-
-    buttonPressedEventBus.subscribe([this](const EventTypes::ButtonPressed& event) {
-        midiMapper_.processButtonPress(event.id, true);
-    });
-
-    buttonReleasedEventBus.subscribe([this](const EventTypes::ButtonReleased& event) {
-        midiMapper_.processButtonPress(event.id, false);
-    });
+    auto& eventBus = EventBus::getInstance();
+    
+    // S'abonner au bus d'événements
+    eventBus.subscribe(new MidiSystemSimpleListener(*this));
 }
