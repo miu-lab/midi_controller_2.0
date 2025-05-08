@@ -1,21 +1,33 @@
+#define DISABLE_LEGACY_EVENTBUS
+
 // app/MidiControllerApp.cpp
 #include "app/MidiControllerApp.hpp"
 
 #include <Arduino.h>
 
 #include "adapters/primary/Scheduler.hpp"
-#include "core/domain/events/InputEvent.hpp"
+#include "core/controllers/UIController.hpp"
+#include "core/listeners/UIControllerEventListener.hpp"
+#include "core/domain/events/EventSystem.hpp"
 
 MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
     // Service de configuration
     : configService_(appConfig)
       // Gestion des profils et navigation
       ,
-      profileManager_()
+      navigationConfig_()
       // Systèmes
       ,
-      inputSystem_(),
-      midiSystem_(profileManager_) {
+      profileManager_()
+      ,
+      midiSystem_(profileManager_)
+      ,
+      eventInputSystem_()
+      ,
+      uiEventService_()
+      ,
+      uiControllerEventListener_(nullptr),
+      uiEventListener_(nullptr) {
     // Initialiser le ServiceLocator avec la configuration
     ServiceLocator::initialize(appConfig);
 
@@ -23,8 +35,12 @@ MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
     ServiceLocator::registerNavigationConfigService(&navigationConfig_);
     ServiceLocator::registerProfileManager(&profileManager_);
     ServiceLocator::registerMidiSystem(&midiSystem_);
-    ServiceLocator::registerInputSystem(&inputSystem_);
-    ServiceLocator::registerUiEventService(&uiService_);
+    
+    // Convertir EventInputSystem en InputSystem pour la compatibilité avec ServiceLocator
+    InputSystem* inputSystem = &eventInputSystem_;
+    ServiceLocator::registerInputSystem(inputSystem);
+    
+    ServiceLocator::registerUiEventService(&uiEventService_);
     ServiceLocator::registerConfigurationService(&configService_);
 }
 
@@ -46,23 +62,55 @@ void MidiControllerApp::init() {
     configService_.applyConfigurations(profileManager_, navigationConfig_);
 
     // 2) Initialiser les systèmes
-    inputSystem_.init(configService_.getEncoderConfigs(), configService_.getButtonConfigs());
+    eventInputSystem_.init(configService_.getEncoderConfigs(), configService_.getButtonConfigs());
     midiSystem_.init(navigationConfig_);
 
     // 3) Initialiser le service d'interface utilisateur
-    uiService_.init(navigationConfig_);
-    uiService_.setupDebugSubscriptions();
+    uiEventService_.init(navigationConfig_);
+    uiEventService_.setupDebugSubscriptions();
     
-    // Note: Les contrôleurs sont gérés par le ServiceLocator
+    // 4) Initialiser la chaîne UI : ViewManager, MenuController, UIController et UIControllerEventListener
+    
+    // Note: Pour l'instant, nous ne créons pas réellement ces composants car ils nécessitent
+    // des implémentations supplémentaires. Ce commentaire sert de guide pour la mise en œuvre future.
+    
+    /*
+    // Créer le ViewManager
+    ViewManager* viewManager = new ViewManager();
+    ServiceLocator::registerViewManager(viewManager);
+    
+    // Créer le MenuController
+    MenuController* menuController = new MenuController();
+    ServiceLocator::registerMenuController(menuController);
+    
+    // Créer l'instance du UIController
+    UIController* uiController = new UIController(*viewManager, *menuController);
+    
+    // Enregistrer le UIController dans le ServiceLocator
+    ServiceLocator::registerUIController(uiController);
+    
+    // Créer et enregistrer l'écouteur d'événements
+    uiControllerEventListener_ = new UIControllerEventListener(*uiController, navigationConfig_);
+    
+    // S'abonner au bus d'événements avec priorité élevée
+    EventBus::getInstance().subscribe(uiControllerEventListener_, 10); // Priorité élevée (10) pour les événements UI
+    
+    // Enregistrer l'écouteur dans le ServiceLocator
+    ServiceLocator::registerUIControllerEventListener(uiControllerEventListener_);
+    */
+    
+#ifdef DEBUG
+    Serial.println(F("Note: L'initialisation de UIController est commentée pour l'instant et sera implémentée dans une étape ultérieure"));
+#endif
 }
 
 void MidiControllerApp::update() {
     // 1) Mise à jour des entrées
-    inputSystem_.update();
+    eventInputSystem_.update();
 
     // 2) Traitement MIDI
     midiSystem_.update();
     
-    // 3) Note: La mise à jour des contrôleurs sera gérée plus tard
-    // quand ils seront correctement implémentés
+    // 3) Note: La mise à jour des contrôleurs est gérée via les événements
+    // Notre écouteur UIControllerEventListener se charge de router les événements
 }
