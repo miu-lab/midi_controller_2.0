@@ -7,11 +7,29 @@ InputRouter::InputRouter(IMidiOut& midiOut, IProfileManager& profileManager)
     : midiOut_(midiOut), profileManager_(profileManager) {}
 
 void InputRouter::init() {
+    // Initialisation sans service de navigation
+    navigationService_ = nullptr;
+    subscribeToEvents();
+}
+
+void InputRouter::init(NavigationConfigService& navService) {
+    // Initialisation avec service de navigation
+    navigationService_ = &navService;
+    subscribeToEvents();
+}
+
+void InputRouter::subscribeToEvents() {
     // Tables pour mémoriser les états des encodeurs
     static std::map<ControlId, int32_t> lastEncoderPos;  // Dernière position absolue
     static std::map<ControlId, int16_t> lastMidiValues;  // Dernière valeur MIDI envoyée
     
     EventBus<EncoderTurnedEvent>::subscribe([this](const EncoderTurnedEvent& e) {
+        // Vérifier si l'encodeur est utilisé pour la navigation
+        if (navigationService_ && navigationService_->isNavigationControl(e.id)) {
+            // Ne pas envoyer d'événement MIDI pour les contrôles de navigation
+            return;
+        }
+        
         auto binding = profileManager_.getBinding(e.id);
         if (binding) {
             // Récupérer la dernière position connue de cet encodeur
@@ -55,6 +73,12 @@ void InputRouter::init() {
     });
 
     EventBus<ButtonPressed>::subscribe([this](const ButtonPressed& e) {
+        // Vérifier si le bouton est utilisé pour la navigation
+        if (navigationService_ && navigationService_->isNavigationControl(e.id)) {
+            // Ne pas envoyer d'événement MIDI pour les contrôles de navigation
+            return;
+        }
+        
         auto binding = profileManager_.getBinding(e.id);
         if (binding) {
             midiOut_.sendNoteOn(binding->channel, binding->control, 127);
@@ -62,6 +86,12 @@ void InputRouter::init() {
     });
 
     EventBus<ButtonReleased>::subscribe([this](const ButtonReleased& e) {
+        // Vérifier si le bouton est utilisé pour la navigation
+        if (navigationService_ && navigationService_->isNavigationControl(e.id)) {
+            // Ne pas envoyer d'événement MIDI pour les contrôles de navigation
+            return;
+        }
+        
         auto binding = profileManager_.getBinding(e.id);
         if (binding) {
             midiOut_.sendNoteOff(binding->channel, binding->control, 0);
