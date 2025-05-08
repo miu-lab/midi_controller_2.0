@@ -7,14 +7,14 @@
  */
 struct EncoderConfig {
     EncoderId id;
-    uint8_t  pinA;
-    uint8_t  pinB;
+    uint8_t pinA;
+    uint8_t pinB;
 
     // Pulses per revolution : résolution de l'encodeur
     uint16_t ppr = 600;
 
     // Switch optionnel :
-    bool     hasButton       = false;
-    uint8_t  pinButton       = 0;
-    bool     activeLowButton = true;
+    bool hasButton = false;
+    uint8_t pinButton = 0;
+    bool activeLowButton = true;
 };
