@@ -36,7 +36,7 @@ bool MidiControllerApp::isNavigationControl(ControlId id) const {
     return navigationConfig_.isNavigationControl(id);
 }
 
-void MidiControllerApp::begin() {
+void MidiControllerApp::init() {
     // Ne pas attendre le port série pour ne pas bloquer le MIDI
     // Optionnel: ajouter un timeout pour permettre une connexion série si disponible rapidement
     // unsigned long startTime = millis();
@@ -52,12 +52,17 @@ void MidiControllerApp::begin() {
     // 3) Initialiser le service d'interface utilisateur
     uiService_.init(navigationConfig_);
     uiService_.setupDebugSubscriptions();
+    
+    // Note: Les contrôleurs sont gérés par le ServiceLocator
 }
 
-void MidiControllerApp::tick() {
+void MidiControllerApp::update() {
     // 1) Mise à jour des entrées
     inputSystem_.update();
 
     // 2) Traitement MIDI
     midiSystem_.update();
+    
+    // 3) Note: La mise à jour des contrôleurs sera gérée plus tard
+    // quand ils seront correctement implémentés
 }

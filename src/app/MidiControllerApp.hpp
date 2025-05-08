@@ -1,4 +1,4 @@
-// app/MidiControllerApp.hpp
+#include "core/domain/commands/CommandManager.hpp"// app/MidiControllerApp.hpp
 #pragma once
 
 #include <Arduino.h>
@@ -12,10 +12,22 @@
 #include "app/services/NavigationConfigService.hpp"
 #include "app/services/ServiceLocator.hpp"
 #include "app/services/UiEventService.hpp"
+#include "app/services/ControllerService.hpp"
+#include "core/controllers/InputController.hpp"
+#include "core/controllers/UIController.hpp"
+#include "core/domain/commands/CommandManager.hpp"
+#include "adapters/primary/ui/ViewManager.hpp"
+#include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
+#include "core/controllers/MenuController.hpp"
 #include "config/ApplicationConfiguration.hpp"
 
 /**
  * @brief Application principale du contrôleur MIDI
+ *
+ * Cette classe est le point d'entrée de l'application. Elle initialise et coordonne
+ * tous les systèmes, services et contrôleurs nécessaires au fonctionnement du
+ * contrôleur MIDI. L'architecture suit un modèle hexagonal avec une séparation
+ * claire des responsabilités et une injection de dépendances.
  */
 class MidiControllerApp {
 public:
@@ -25,15 +37,15 @@ public:
      */
     MidiControllerApp(const ApplicationConfiguration& appConfig);
 
-    /// alias pour setup()
-    void init() {
-        begin();
-    }
+    /**
+     * @brief Initialise l'application
+     */
+    void init();
 
-    /// alias pour loop()
-    void update() {
-        tick();
-    }
+    /**
+     * @brief Met à jour l'application à chaque cycle
+     */
+    void update();
 
     /**
      * @brief Définit un contrôle comme étant dédié à la navigation
@@ -48,10 +60,6 @@ public:
      * @return true si le contrôle est dédié à la navigation, false sinon
      */
     bool isNavigationControl(ControlId id) const;
-
-    void begin();
-    void tick();
-
 private:
     // Service de configuration centralisée
     ConfigurationService configService_;  // Gestion de toutes les configurations
@@ -64,4 +72,6 @@ private:
     InputSystem inputSystem_;   // Système d'entrée
     MidiSystem midiSystem_;     // Système MIDI
     UiEventService uiService_;  // Gestion des événements d'UI
+
+    // Note: Les contrôleurs sont gérés par le ServiceLocator - pas besoin de les stocker ici
 };
