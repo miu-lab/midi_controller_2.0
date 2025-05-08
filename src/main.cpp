@@ -6,8 +6,13 @@
 #include <Arduino.h>
 #endif
 #include "app/MidiControllerApp.hpp"
+#include "config/ApplicationConfiguration.hpp"
 
-MidiControllerApp app;
+// Création de la configuration de l'application
+ApplicationConfiguration appConfig;
+
+// Création de l'application avec la configuration
+MidiControllerApp app(appConfig);
 
 void setup() {
     Serial.begin(115200);  // Initialiser le série, mais ne pas attendre qu'il soit prêt
@@ -19,7 +24,7 @@ void setup() {
 }
 
 void loop() {
-    app.update();  // méthode à créer (même vide)
+    app.update();  // mise à jour de l'application
     delay(4);     // éviter de saturer le CPU
 }
 #endif
