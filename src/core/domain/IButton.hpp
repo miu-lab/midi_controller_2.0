@@ -1,26 +1,9 @@
 #pragma once
 
-#include "types.hpp"
+#include "core/ports/input/ButtonPort.hpp"
 
 /**
- * @brief Interface pour un bouton
+ * @brief Alias pour maintenir la compatibilité
+ * @deprecated Utiliser ButtonPort à la place
  */
-class IButton {
-public:
-    virtual ~IButton() = default;
-
-    /**
-     * @brief Met à jour l'état du bouton (lecture du hardware)
-     */
-    virtual void update() = 0;
-
-    /**
-     * @brief Retourne true si le bouton est pressé
-     */
-    virtual bool isPressed() const = 0;
-
-    /**
-     * @brief Identifiant unique du contrôle
-     */
-    virtual ControlId getId() const = 0;
-};
+using IButton = ButtonPort;

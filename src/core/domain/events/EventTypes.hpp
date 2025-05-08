@@ -4,8 +4,8 @@
 
 // Type alias centralisé pour tous les types d'événements
 namespace EventTypes {
-    using EncoderTurned = EncoderTurnedEvent;
-    using EncoderButton = EncoderButtonEvent;
-    using ButtonPressed = ButtonPressed;
-    using ButtonReleased = ButtonReleased;
-}
+using EncoderTurned = EncoderTurnedEvent;
+using EncoderButton = EncoderButtonEvent;
+using ButtonPressed = ButtonPressedEvent;
+using ButtonReleased = ButtonReleasedEvent;
+}  // namespace EventTypes

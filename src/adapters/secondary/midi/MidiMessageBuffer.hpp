@@ -1,7 +1,6 @@
 #pragma once
-#include <cstdint>
 #include <cstddef>
-
+#include <cstdint>
 
 struct MidiMessage {
     uint8_t status;

@@ -11,10 +11,10 @@ struct EncoderButtonEvent {
     bool pressed;
 };
 
-struct ButtonPressed {
+struct ButtonPressedEvent {
     ButtonId id;
 };
 
-struct ButtonReleased {
+struct ButtonReleasedEvent {
     ButtonId id;
 };

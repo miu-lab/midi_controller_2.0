@@ -1,8 +1,8 @@
 #pragma once
-#include "core/domain/types.hpp"
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
 
+#include "core/domain/types.hpp"
 
 /**
  * Simule un stockage persistant pour les mappings (en RAM).

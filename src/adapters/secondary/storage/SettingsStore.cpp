@@ -1,4 +1,5 @@
 #include "adapters/secondary/storage/SettingsStore.hpp"
+
 #include <optional>
 
 void SettingsStore::saveMapping(ControlId id, MidiControl binding) {

@@ -1,10 +1,19 @@
 #pragma once
-#include "types.hpp"
 
-class IMidiOut {
+#include "core/ports/output/MidiOutputPort.hpp"
+
+/**
+ * @brief Alias pour maintenir la compatibilité
+ * @deprecated Utiliser MidiOutputPort à la place
+ */
+class IMidiOut : public MidiOutputPort {
 public:
-    virtual ~IMidiOut() = default;
-    virtual void sendCc(MidiChannel ch, MidiCC cc, uint8_t value) = 0;
-    virtual void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity) = 0;
-    virtual void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity) = 0;
+    // Méthodes virtuelles pour maintenir la compatibilité avec l'ancienne interface
+    virtual void sendProgramChange(MidiChannel ch, uint8_t program) override {}
+
+    virtual void sendPitchBend(MidiChannel ch, uint16_t value) override {}
+
+    virtual void sendChannelPressure(MidiChannel ch, uint8_t pressure) override {}
+
+    virtual void sendSysEx(const uint8_t* data, uint16_t length) override {}
 };

@@ -1,2 +1,1 @@
 // ControlMonitorView impl.
-

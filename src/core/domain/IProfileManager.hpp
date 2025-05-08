@@ -1,13 +1,29 @@
 #pragma once
-#include "types.hpp"
-#include <optional>
+
+#include "core/ports/output/ProfileStoragePort.hpp"
 
 /**
- * Interface pour accéder aux liaisons MIDI.
+ * @brief Alias pour maintenir la compatibilité
+ * @deprecated Utiliser ProfileStoragePort à la place
  */
-class IProfileManager {
+class IProfileManager : public ProfileStoragePort {
 public:
-    virtual std::optional<MidiControl> getBinding(ControlId id) const = 0;
-    virtual void setBinding(ControlId id, MidiControl binding) = 0;
-    virtual ~IProfileManager() = default;
+    // Méthodes virtuelles pour maintenir la compatibilité avec l'ancienne interface
+    virtual std::vector<MidiControlMapping> getAllMappings() const override {
+        return {};
+    }
+
+    virtual bool saveProfile() override {
+        return false;
+    }
+
+    virtual bool loadProfile() override {
+        return false;
+    }
+
+    virtual void resetToDefaults() override {}
+
+    virtual bool removeBinding(ControlId id) override {
+        return false;
+    }
 };
