@@ -111,20 +111,19 @@ UiEventService& ServiceLocator::getUiEventService() {
 }
 
 ControllerService& ServiceLocator::getControllerService() {
-    // Cette méthode n'est pas utilisée dans notre code actuel
-    // Nous la désactivons temporairement pour éviter les erreurs de compilation
-    // liées aux vues qui ne sont pas complètement implémentées
-
-    // Note: Dans une application complète, nous devrions implémenter les classes manquantes
-    // ou fournir des mocks appropriés. Pour cette démonstration, nous allons
-    // simplement lancer une exception si cette méthode est appelée.
-
-    // Juste pour éviter les erreurs de compilation, nous retournons une référence vers un service
-    // statique
-    static ControllerService* staticService = nullptr;
-
-    // Cette ligne ne sera jamais exécutée dans le code final
-    return *staticService;
+    auto& instance = getInstance();
+    
+    // Vérification de sécurité - si le service n'est pas enregistré
+    if (!instance.controllerService_) {
+#ifdef DEBUG
+        Serial.println(F("ERREUR: ControllerService non enregistré !!"));
+#endif
+    }
+    
+    // Note: Cette ligne va provoquer un crash si le service n'est pas enregistré
+    // C'est intentionnel - il ne faut pas utiliser ce service avant qu'il ne soit disponible
+    static ControllerService* nullService = nullptr;
+    return instance.controllerService_ ? *instance.controllerService_ : *nullService;
 }
 
 InputController& ServiceLocator::getInputController() {
@@ -139,14 +138,18 @@ InputController& ServiceLocator::getInputController() {
 
 UIController& ServiceLocator::getUIController() {
     auto& instance = getInstance();
-    // Nous ne pouvons pas renvoyer un contrôleur par défaut car il nécessite un ViewManager
-    // qui est une classe abstraite
+    
+    // Vérification de sécurité - si le service n'est pas enregistré
     if (!instance.uiController_) {
-        // Juste pour éviter les erreurs de compilation
-        static UIController* staticController = nullptr;
-        return *staticController;
+#ifdef DEBUG
+        Serial.println(F("ERREUR: UIController non enregistré !!"));
+#endif
     }
-    return *instance.uiController_;
+    
+    // Note: Cette ligne va provoquer un crash si le service n'est pas enregistré
+    // C'est intentionnel - il ne faut pas utiliser ce service avant qu'il ne soit disponible
+    static UIController* nullController = nullptr;
+    return instance.uiController_ ? *instance.uiController_ : *nullController;
 }
 
 void ServiceLocator::registerConfigurationService(ConfigurationService* service) {
