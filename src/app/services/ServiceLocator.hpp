@@ -5,13 +5,15 @@
 #include <string>
 
 #include "config/ApplicationConfiguration.hpp"
-#include "core/domain/EventBus.hpp"
+#include "config/common/CommonIncludes.hpp"
 #include "core/domain/IButton.hpp"
 #include "core/domain/IDisplay.hpp"
 #include "core/domain/IEncoder.hpp"
 #include "core/domain/IMidiOut.hpp"
 #include "core/domain/IProfileManager.hpp"
-#include "core/domain/events/EventTypes.hpp"
+#include "core/domain/events/EventSystem.hpp"
+#include "adapters/primary/ui/ViewManager.hpp"
+#include "core/controllers/MenuController.hpp"
 
 // Forward declarations
 class ConfigurationService;
@@ -23,6 +25,9 @@ class UiEventService;
 class ControllerService;
 class InputController;
 class UIController;
+class UIEventListener;
+class ViewManager;
+class MenuController;
 
 /**
  * @brief Service d'injection de dépendances
@@ -99,6 +104,12 @@ public:
     static UIController& getUIController();
 
     /**
+     * @brief Récupère l'écouteur d'événements du UIController
+     * @return Une référence à l'écouteur d'événements
+     */
+    static UIEventListener& getUIControllerEventListener();
+
+    /**
      * @brief Enregistre le service ConfigurationService
      * @param service Pointeur vers le service à enregistrer
      */
@@ -153,28 +164,40 @@ public:
     static void registerUIController(UIController* controller);
 
     /**
-     * @brief Obtient le bus d'événements pour les encodeurs
-     * @return Une référence au bus d'événements
+     * @brief Enregistre l'écouteur d'événements du UIController
+     * @param listener Pointeur vers l'écouteur à enregistrer
      */
-    static EventBus<EventTypes::EncoderTurned>& getEncoderTurnedEventBus();
+    static void registerUIControllerEventListener(UIEventListener* listener);
 
     /**
-     * @brief Obtient le bus d'événements pour les boutons d'encodeurs
-     * @return Une référence au bus d'événements
+     * @brief Enregistre le gestionnaire de vues
+     * @param viewManager Pointeur vers le gestionnaire à enregistrer
      */
-    static EventBus<EventTypes::EncoderButton>& getEncoderButtonEventBus();
+    static void registerViewManager(ViewManager* viewManager);
 
     /**
-     * @brief Obtient le bus d'événements pour les boutons pressés
-     * @return Une référence au bus d'événements
+     * @brief Enregistre le contrôleur de menu
+     * @param menuController Pointeur vers le contrôleur à enregistrer
      */
-    static EventBus<EventTypes::ButtonPressed>& getButtonPressedEventBus();
+    static void registerMenuController(MenuController* menuController);
 
     /**
-     * @brief Obtient le bus d'événements pour les boutons relâchés
-     * @return Une référence au bus d'événements
+     * @brief Obtient le bus d'événements centralisé
+     * @return Une référence au bus d'événements centralisé
      */
-    static EventBus<EventTypes::ButtonReleased>& getButtonReleasedEventBus();
+    static EventBus& getEventBus();
+
+    /**
+     * @brief Obtient le gestionnaire de vues
+     * @return Une référence au gestionnaire de vues
+     */
+    static ViewManager& getViewManager();
+
+    /**
+     * @brief Obtient le contrôleur de menu
+     * @return Une référence au contrôleur de menu
+     */
+    static MenuController& getMenuController();
 
 private:
     // Singleton pattern
@@ -190,6 +213,9 @@ private:
     ControllerService* controllerService_;
     InputController* inputController_;
     UIController* uiController_;
+    UIEventListener* uiControllerEventListener_;
+    ViewManager* viewManager_;
+    MenuController* menuController_;
 
     // Configuration
     std::unique_ptr<ApplicationConfiguration> configuration_;

@@ -14,6 +14,7 @@
 #include "app/services/UiEventService.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/controllers/UIController.hpp"
+#include "core/listeners/UIEventListener.hpp"
 
 ServiceLocator::ServiceLocator()
     : configurationService_(nullptr),
@@ -25,6 +26,9 @@ ServiceLocator::ServiceLocator()
       controllerService_(nullptr),
       inputController_(nullptr),
       uiController_(nullptr),
+      uiControllerEventListener_(nullptr),
+      viewManager_(nullptr),
+      menuController_(nullptr),
       configuration_(nullptr) {}
 
 ServiceLocator::~ServiceLocator() = default;
@@ -152,6 +156,22 @@ UIController& ServiceLocator::getUIController() {
     return instance.uiController_ ? *instance.uiController_ : *nullController;
 }
 
+UIEventListener& ServiceLocator::getUIControllerEventListener() {
+    auto& instance = getInstance();
+    
+    // Vérification de sécurité - si l'écouteur n'est pas enregistré
+    if (!instance.uiControllerEventListener_) {
+#ifdef DEBUG
+        Serial.println(F("ERREUR: UIControllerEventListener non enregistré !!"));
+#endif
+    }
+    
+    // Note: Cette ligne va provoquer un crash si l'écouteur n'est pas enregistré
+    // C'est intentionnel - il ne faut pas utiliser cet écouteur avant qu'il ne soit disponible
+    static UIEventListener* nullListener = nullptr;
+    return instance.uiControllerEventListener_ ? *instance.uiControllerEventListener_ : *nullListener;
+}
+
 void ServiceLocator::registerConfigurationService(ConfigurationService* service) {
     auto& instance = getInstance();
     instance.configurationService_ = service;
@@ -197,22 +217,54 @@ void ServiceLocator::registerUIController(UIController* controller) {
     instance.uiController_ = controller;
 }
 
-EventBus<EventTypes::EncoderTurned>& ServiceLocator::getEncoderTurnedEventBus() {
-    static EventBus<EventTypes::EncoderTurned> bus;
-    return bus;
+void ServiceLocator::registerUIControllerEventListener(UIEventListener* listener) {
+    auto& instance = getInstance();
+    instance.uiControllerEventListener_ = listener;
 }
 
-EventBus<EventTypes::EncoderButton>& ServiceLocator::getEncoderButtonEventBus() {
-    static EventBus<EventTypes::EncoderButton> bus;
-    return bus;
+void ServiceLocator::registerViewManager(ViewManager* viewManager) {
+    auto& instance = getInstance();
+    instance.viewManager_ = viewManager;
 }
 
-EventBus<EventTypes::ButtonPressed>& ServiceLocator::getButtonPressedEventBus() {
-    static EventBus<EventTypes::ButtonPressed> bus;
-    return bus;
+void ServiceLocator::registerMenuController(MenuController* menuController) {
+    auto& instance = getInstance();
+    instance.menuController_ = menuController;
 }
 
-EventBus<EventTypes::ButtonReleased>& ServiceLocator::getButtonReleasedEventBus() {
-    static EventBus<EventTypes::ButtonReleased> bus;
-    return bus;
+
+EventBus& ServiceLocator::getEventBus() {
+    return EventBus::getInstance();
+}
+
+ViewManager& ServiceLocator::getViewManager() {
+    auto& instance = getInstance();
+    
+    // Vérification de sécurité - si le gestionnaire n'est pas enregistré
+    if (!instance.viewManager_) {
+#ifdef DEBUG
+        Serial.println(F("ERREUR: ViewManager non enregistré !!"));
+#endif
+    }
+    
+    // Note: Cette ligne va provoquer un crash si le gestionnaire n'est pas enregistré
+    // C'est intentionnel - il ne faut pas utiliser ce gestionnaire avant qu'il ne soit disponible
+    static ViewManager* nullManager = nullptr;
+    return instance.viewManager_ ? *instance.viewManager_ : *nullManager;
+}
+
+MenuController& ServiceLocator::getMenuController() {
+    auto& instance = getInstance();
+    
+    // Vérification de sécurité - si le contrôleur n'est pas enregistré
+    if (!instance.menuController_) {
+#ifdef DEBUG
+        Serial.println(F("ERREUR: MenuController non enregistré !!"));
+#endif
+    }
+    
+    // Note: Cette ligne va provoquer un crash si le contrôleur n'est pas enregistré
+    // C'est intentionnel - il ne faut pas utiliser ce contrôleur avant qu'il ne soit disponible
+    static MenuController* nullController = nullptr;
+    return instance.menuController_ ? *instance.menuController_ : *nullController;
 }
