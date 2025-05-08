@@ -9,6 +9,7 @@
 #include "core/domain/commands/midi/SendMidiNoteCommand.hpp"
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
+#include "config/MappingConfiguration.hpp"
 
 /**
  * @brief Mapper qui gère la transformation des événements en commandes MIDI
@@ -89,8 +90,7 @@ private:
         std::unique_ptr<IMidiMappingStrategy> strategy;
         uint8_t lastMidiValue;
         int32_t lastEncoderPosition;
-        int32_t rangeMinPosition = 0;
-        int32_t rangeMaxPosition = 127;
+        int32_t midiOffset = 0;   // Offset simple à appliquer aux positions d'encodeur
         bool rangeMapped = false;
         bool movingUp = false;
         bool movingDown = false;
@@ -100,6 +100,9 @@ private:
     CommandManager& commandManager_;
     std::unordered_map<ControlId, MappingInfo> mappings_;
     std::unordered_map<ControlId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
-
+    
     MidiControl defaultControl_;  // Contrôle par défaut retourné si non trouvé
+    
+    // Vérifie si un contrôle est dédié à la navigation en le consultant auprès de MappingConfiguration
+    bool isNavigationControl(ControlId controlId) const;
 };

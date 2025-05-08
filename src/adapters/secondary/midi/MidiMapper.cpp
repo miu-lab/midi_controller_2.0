@@ -1,4 +1,5 @@
 #include "adapters/secondary/midi/MidiMapper.hpp"
+#include "config/GlobalSettings.hpp"
 
 #include <Arduino.h>  // Pour la fonction constrain
 
@@ -16,8 +17,7 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
     info.strategy = std::move(strategy);
     info.lastMidiValue = 0;
     info.lastEncoderPosition = 0;  // Initialisation à 0
-    info.rangeMinPosition = 0;
-    info.rangeMaxPosition = 127;
+    info.midiOffset = 0;
     info.rangeMapped = false;
     info.movingUp = false;
     info.movingDown = false;
@@ -65,23 +65,46 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Calculer le delta de mouvement
     int32_t delta = position - info.lastEncoderPosition;
     if (delta == 0) return;  // Pas de changement
+    
+    // Appliquer le facteur de sensibilité global si ce n'est pas un contrôle de navigation
+    if (!isNavigationControl(encoderId) && delta != 0) {
+        float sensitivity = GlobalSettings::getInstance().getEncoderSensitivity();
+        if (sensitivity != 1.0f) {
+            // Appliquer la sensibilité tout en préservant le signe
+            int32_t delta_sign = (delta > 0) ? 1 : -1;
+            int32_t delta_abs = abs(delta);
+            
+            // Appliquer la sensibilité et assurer qu'un mouvement réel produit au moins 1 delta
+            int32_t scaled_delta_abs = static_cast<int32_t>(delta_abs * sensitivity);
+            if (scaled_delta_abs == 0 && delta_abs > 0) scaled_delta_abs = 1;
+            
+            // Reconstruire delta avec son signe
+            delta = delta_sign * scaled_delta_abs;
+        }
+    }
 
     // Détecter changement de direction
-    bool wasMovingUp = info.movingUp;
-    bool wasMovingDown = info.movingDown;
-    info.movingUp = (delta > 0);
-    info.movingDown = (delta < 0);
-    bool directionChanged = (wasMovingUp && info.movingDown) || (wasMovingDown && info.movingUp);
+    // (ne depends que du signe du delta actuel et précédent)
+    bool currentlyMovingUp = (delta > 0);
+    bool currentlyMovingDown = (delta < 0);
+    bool directionChanged = (info.movingUp && currentlyMovingDown) || 
+                           (info.movingDown && currentlyMovingUp);
+    
+    // Mise à jour des états de direction
+    info.movingUp = currentlyMovingUp;
+    info.movingDown = currentlyMovingDown;
 
     // Remapper la plage si changement de direction hors limites MIDI
     if (directionChanged) {
-        if (position < 0) {  // Changement de direction en zone négative
-            info.rangeMinPosition = position;
-            info.rangeMaxPosition = 127 + (0 - position);
+        if (position < 0) {
+            // Changement de direction en zone négative
+            // La position actuelle devient le nouveau zéro (offset simple)
+            info.midiOffset = -position; // Valeur positive pour décaler vers le haut
             info.rangeMapped = true;
-        } else if (position > 127) {  // Changement de direction au-delà de 127
-            info.rangeMaxPosition = position;
-            info.rangeMinPosition = 0 - (position - 127);
+        } else if (position > 127) {
+            // Changement de direction en zone haute
+            // La position actuelle devient 127 (offset simple)
+            info.midiOffset = 127 - position; // Valeur négative pour décaler vers le bas
             info.rangeMapped = true;
         }
     }
@@ -93,25 +116,16 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     int16_t newValue;
 
     if (control.relative) {
-        // Mode relatif: ajustement direct par le delta
+        // Mode relatif: chaque pas d'encodeur = un pas MIDI (sensibilité constante)
         newValue = info.lastMidiValue + delta;
     } else {
         // Mode absolu avec gestion des plages
         if (info.rangeMapped) {
-            // Utiliser la plage remappée
-            if (position <= info.rangeMinPosition) {
-                newValue = 0;
-            } else if (position >= info.rangeMaxPosition) {
-                newValue = 127;
-            } else {
-                // Conversion proportionnelle
-                float ratio = (float)(position - info.rangeMinPosition) /
-                              (info.rangeMaxPosition - info.rangeMinPosition);
-                newValue = static_cast<int16_t>(ratio * 127.0f);
-            }
+            // Appliquer simplement l'offset et clamper
+            newValue = position + info.midiOffset;
         } else {
             // Utiliser la plage standard 0-127
-            newValue = constrain(position, 0, 127);
+            newValue = position;
         }
     }
 
@@ -208,4 +222,10 @@ void MidiMapper::update() {
             ++it;
         }
     }
+}
+
+bool MidiMapper::isNavigationControl(ControlId controlId) const {
+    // Utiliser MappingConfiguration pour savoir si c'est un contrôle de navigation
+    static MappingConfiguration mappingConfig;
+    return mappingConfig.isNavigationControl(controlId);
 }
