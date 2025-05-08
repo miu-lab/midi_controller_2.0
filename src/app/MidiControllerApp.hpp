@@ -10,14 +10,19 @@
 #include "app/services/MidiSystem.hpp"
 #include "app/services/InputSystem.hpp"
 #include "app/services/ConfigurationService.hpp"
-
+#include "app/services/ServiceLocator.hpp"
+#include "config/ApplicationConfiguration.hpp"
 
 /**
  * @brief Application principale du contrôleur MIDI
  */
 class MidiControllerApp {
 public:
-    MidiControllerApp();
+    /**
+     * @brief Construit l'application avec la configuration spécifiée
+     * @param appConfig Configuration de l'application
+     */
+    MidiControllerApp(const ApplicationConfiguration& appConfig);
 
     /// alias pour setup()
     void init()   { begin(); }
@@ -54,5 +59,3 @@ private:
     MidiSystem              midiSystem_;       // Système MIDI
     UiEventService          uiService_;        // Gestion des événements d'UI
 };
-
-
