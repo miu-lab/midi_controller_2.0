@@ -13,8 +13,7 @@ InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig &cfg)
       activeLowButton_(cfg.activeLowButton),
       lastPosition_(0),
       physicalPosition_(0),
-      absolutePosition_(0),
-      lastReadTime_(0) {
+      absolutePosition_(0) {
     // Configuration du bouton si présent
     if (hasButton_) {
         pinMode(buttonPin_, activeLowButton_ ? INPUT_PULLUP : INPUT);
@@ -46,18 +45,7 @@ int8_t InterruptQuadratureEncoder::readDelta() {
         normalizedDelta = (delta > 0) ? 1 : -1;
     }
 
-    // Option d'accélération: si l'encodeur est tourné rapidement, multiplier le delta
-    uint32_t now = millis();
-    uint32_t elapsed = now - lastReadTime_;
-    float accelerationFactor = 1.0f;
-
-    if (elapsed < ACCELERATION_THRESHOLD_MS) {
-        // Facteur d'accélération proportionnel à la vitesse
-        accelerationFactor =
-            2.0f * (ACCELERATION_THRESHOLD_MS - elapsed) / ACCELERATION_THRESHOLD_MS;
-        normalizedDelta = normalizedDelta * accelerationFactor;
-    }
-    lastReadTime_ = now;
+    // Aucun facteur d'accélération appliqué - sensibilité constante
 
     // Mettre à jour la dernière position
     lastPosition_ = newPosition;
@@ -102,8 +90,6 @@ int8_t InterruptQuadratureEncoder::readDelta() {
     Serial.print(delta);
     Serial.print(" norm:");
     Serial.print(normalizedDelta);
-    Serial.print(" accel:");
-    Serial.print(accelerationFactor);
     Serial.print(" result:");
     Serial.print(result);
     Serial.print(" abs_pos:");

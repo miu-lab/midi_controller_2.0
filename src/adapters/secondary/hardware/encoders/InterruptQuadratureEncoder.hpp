@@ -45,8 +45,4 @@ private:
 
     // Position absolue normalisée (cumulative)
     int32_t absolutePosition_;
-
-    // Variables pour les options d'accélération
-    uint32_t lastReadTime_;
-    static constexpr uint32_t ACCELERATION_THRESHOLD_MS = 50;  // Seuil pour l'accélération
 };
