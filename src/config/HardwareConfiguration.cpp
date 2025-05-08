@@ -16,10 +16,12 @@ const std::vector<EncoderConfig>& HardwareConfiguration::getEncoderConfiguration
 void HardwareConfiguration::initializeControlButtonConfigurations() {
     // Reprise des configurations actuelles avec des commentaires plus clairs
     controlButtonConfigurations = {
+
         {.id = 51,
          .pin = 32,
          .activeLow = true,
          .mode = ButtonMode::TOGGLE},  // Bouton de Menu (Mode Toggle)
+
         {.id = 52,
          .pin = 31,
          .activeLow = true,
@@ -30,6 +32,7 @@ void HardwareConfiguration::initializeControlButtonConfigurations() {
 void HardwareConfiguration::initializeEncoderConfigurations() {
     // Reprise des configurations actuelles avec des commentaires plus descriptifs
     encoderConfigurations = {
+
         // Encodeurs de contrôle (Mécaniques)
         {.id = 71,
          .pinA = 22,
@@ -38,6 +41,7 @@ void HardwareConfiguration::initializeEncoderConfigurations() {
          .hasButton = true,
          .pinButton = 21,
          .activeLowButton = true},  // Encodeur 1
+
         {.id = 72,
          .pinA = 19,
          .pinB = 20,
@@ -45,6 +49,7 @@ void HardwareConfiguration::initializeEncoderConfigurations() {
          .hasButton = true,
          .pinButton = 18,
          .activeLowButton = true},  // Encodeur 2
+
         {.id = 73,
          .pinA = 16,
          .pinB = 17,
@@ -52,6 +57,7 @@ void HardwareConfiguration::initializeEncoderConfigurations() {
          .hasButton = true,
          .pinButton = 15,
          .activeLowButton = true},  // Encodeur 3
+
         {.id = 74,
          .pinA = 13,
          .pinB = 14,
@@ -59,6 +65,7 @@ void HardwareConfiguration::initializeEncoderConfigurations() {
          .hasButton = true,
          .pinButton = 41,
          .activeLowButton = true},  // Encodeur 4
+
         {.id = 75,
          .pinA = 39,
          .pinB = 40,
@@ -66,6 +73,7 @@ void HardwareConfiguration::initializeEncoderConfigurations() {
          .hasButton = true,
          .pinButton = 38,
          .activeLowButton = true},  // Encodeur 5
+
         {.id = 76,
          .pinA = 36,
          .pinB = 37,
@@ -73,6 +81,7 @@ void HardwareConfiguration::initializeEncoderConfigurations() {
          .hasButton = true,
          .pinButton = 35,
          .activeLowButton = true},  // Encodeur 6
+
         {.id = 77,
          .pinA = 33,
          .pinB = 34,
@@ -80,6 +89,7 @@ void HardwareConfiguration::initializeEncoderConfigurations() {
          .hasButton = true,
          .pinButton = 30,
          .activeLowButton = true},  // Encodeur 7
+
         {.id = 78,
          .pinA = 28,
          .pinB = 29,
