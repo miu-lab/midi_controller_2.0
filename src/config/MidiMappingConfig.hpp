@@ -1,8 +1,7 @@
-// src/config/MidiMappingConfig.hpp
 #pragma once
-
 #include "domain/types.hpp"
-#include <vector>
+#include <cstddef>  // Pour size_t
 
-/// Table de mapping par défaut entre ControlId et MidiControl
-extern const std::vector<MidiControlMapping> defaultMidiMappings;
+// Déclaration du tableau de mappings par défaut
+extern const MidiControlMapping defaultMidiMappings[];
+extern const size_t defaultMidiMappingCount;
