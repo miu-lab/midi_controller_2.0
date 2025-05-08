@@ -21,3 +21,7 @@ void test_manager_creation() {
     TEST_ASSERT_EQUAL_UINT8(1, encs[0]->getId());
     TEST_ASSERT_EQUAL_UINT8(2, encs[1]->getId());
 }
+
+void run_encoder_manager_tests() {
+    RUN_TEST(test_manager_creation);
+}
