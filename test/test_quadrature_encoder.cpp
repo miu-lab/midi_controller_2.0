@@ -29,3 +29,10 @@ void test_get_id_and_ppr_and_no_change() {
     TEST_ASSERT_EQUAL_UINT16(42, enc.getPpr());
     TEST_ASSERT_EQUAL_INT8(0, enc.readDelta());
 }
+
+void run_quadrature_encoder_tests() {
+    RUN_TEST(test_read_delta_forward_step);
+    RUN_TEST(test_read_delta_backward_step);
+    RUN_TEST(test_read_multiple_steps);
+    RUN_TEST(test_get_id_and_ppr_and_no_change);
+}
