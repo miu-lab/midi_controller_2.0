@@ -28,3 +28,18 @@ void DigitalButtonManager::updateAll() {
 const std::vector<IButton*>& DigitalButtonManager::getButtons() const {
     return buttons_;
 }
+
+void DigitalButtonManager::resetAllToggleStates() {
+    for (auto& btn : ownedButtons_) {
+        btn->resetState();
+    }
+}
+
+void DigitalButtonManager::resetToggleState(ButtonId buttonId) {
+    for (auto& btn : ownedButtons_) {
+        if (btn->getId() == buttonId) {
+            btn->resetState();
+            break;
+        }
+    }
+}

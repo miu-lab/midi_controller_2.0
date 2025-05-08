@@ -17,6 +17,10 @@ public:
 
     void updateAll();
     const std::vector<IButton*>& getButtons() const;
+    
+    // Nouvelles méthodes pour contrôler les boutons
+    void resetAllToggleStates();               // Réinitialiser tous les boutons toggle
+    void resetToggleState(ButtonId buttonId);  // Réinitialiser un bouton toggle spécifique
 
 private:
     std::vector<std::unique_ptr<DigitalButton>> ownedButtons_;  // possession des boutons
