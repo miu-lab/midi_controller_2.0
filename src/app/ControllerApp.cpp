@@ -30,9 +30,10 @@ ControllerApp::ControllerApp()
 
 void ControllerApp::begin()
 {
-    while (!Serial)
-    { /* attente du port série pour Teensy */
-    }
+    // Ne pas attendre le port série pour ne pas bloquer le MIDI
+    // Optionnel: ajouter un timeout pour permettre une connexion série si disponible rapidement
+    // unsigned long startTime = millis();
+    // while (!Serial && (millis() - startTime < 1000)) { /* attend jusqu'à 1 seconde */ }
 
     // 1) Initialiser le système MIDI
     // Charger les mappings MIDI par défaut depuis la configuration
