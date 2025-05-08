@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint> // Pour uint8_t
+#include <cstdint>  // Pour uint8_t
 
 /**
  * @brief Inclusions et définitions unifiées pour l'interface USB MIDI de Teensy
@@ -16,27 +16,42 @@
 
 // La variable usbMIDI est déjà définie par la bibliothèque
 
-#else // Pour toutes les autres plateformes
+#else  // Pour toutes les autres plateformes
 
 #warning "La bibliothèque TeensyUsbMidi requiert une carte Teensy. Utilisation d'un stub."
 
 /**
  * @brief Stub pour remplacer l'objet usbMIDI sur les plateformes non-Teensy
  */
-class TeensyUsbMidiStub
-{
+class TeensyUsbMidiStub {
 public:
     // Méthodes de base
-    bool read() { return false; }
+    bool read() {
+        return false;
+    }
+
     void sendControlChange(uint8_t cc, uint8_t value, uint8_t channel) {}
+
     void sendNoteOn(uint8_t note, uint8_t velocity, uint8_t channel) {}
+
     void sendNoteOff(uint8_t note, uint8_t velocity, uint8_t channel) {}
 
     // Méthodes pour la récupération des données
-    uint8_t getType() { return 0; }
-    uint8_t getChannel() { return 0; }
-    uint8_t getData1() { return 0; }
-    uint8_t getData2() { return 0; }
+    uint8_t getType() {
+        return 0;
+    }
+
+    uint8_t getChannel() {
+        return 0;
+    }
+
+    uint8_t getData1() {
+        return 0;
+    }
+
+    uint8_t getData2() {
+        return 0;
+    }
 
     // Constantes pour les types de messages MIDI
     static const uint8_t ControlChange = 0xB0;
@@ -47,4 +62,4 @@ public:
 // Définir une variable globale qui sera utilisée comme usbMIDI
 extern TeensyUsbMidiStub usbMIDI;
 
-#endif // CORE_TEENSY
+#endif  // CORE_TEENSY
