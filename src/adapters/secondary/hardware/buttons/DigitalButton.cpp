@@ -2,16 +2,11 @@
 #include "adapters/secondary/hardware/buttons/DigitalButton.hpp"
 
 DigitalButton::DigitalButton(const ButtonConfig& cfg)
-    : cfg_(cfg)
-    , button_()
-    , pressed_(false)
-    , toggleState_(false)
-    , prevPressed_(false)
-{
+    : cfg_(cfg), button_(), pressed_(false), toggleState_(false), prevPressed_(false) {
     pinMode(cfg_.pin, cfg_.activeLow ? INPUT_PULLUP : INPUT);
     button_.attach(cfg_.pin, cfg_.activeLow ? INPUT_PULLUP : INPUT);
-    button_.interval(5); // debounce interval (ms)
-    
+    button_.interval(5);  // debounce interval (ms)
+
     // Lire l'état initial du bouton sans déclencher d'événement
     button_.update();
     prevPressed_ = cfg_.activeLow ? (button_.read() == LOW) : (button_.read() == HIGH);
@@ -27,14 +22,14 @@ DigitalButton::DigitalButton(const ButtonConfig& cfg)
 
 void DigitalButton::update() {
     button_.update();
-    
+
     // Mettre à jour l'état physique du bouton
     bool rawPressed = cfg_.activeLow ? (button_.read() == LOW) : (button_.read() == HIGH);
-    
+
     // Détecter les changements d'état physique (front montant)
     bool rising = rawPressed && !prevPressed_;
     prevPressed_ = rawPressed;
-    
+
     // Mettre à jour l'état logique selon le mode du bouton
     if (cfg_.mode == ButtonMode::TOGGLE) {
         // En mode toggle, inverser l'état logique sur le front montant
