@@ -1,13 +1,16 @@
 #pragma once
-#include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
-#include "core/use_cases/ProcessEncoders.hpp"
-#include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
-#include "core/use_cases/ProcessButtons.hpp"
 #include <vector>
+
+#include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
+#include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
+#include "core/controllers/InputController.hpp"
+#include "core/controllers/UIController.hpp"
+#include "core/use_cases/ProcessButtons.hpp"
+#include "core/use_cases/ProcessEncoders.hpp"
 
 /**
  * @brief Système gérant toutes les entrées physiques
- * 
+ *
  * Ce système regroupe les gestionnaires d'encodeurs et de boutons,
  * ainsi que le traitement des entrées en événements.
  */
@@ -17,30 +20,37 @@ public:
      * @brief Construit un nouveau système d'entrée
      */
     InputSystem();
-    
+
     /**
      * @brief Initialise le système d'entrée
      */
     void init();
-    
+
     /**
      * @brief Initialise le système d'entrée avec les configurations spécifiées
      * @param encoderConfigs Configuration des encodeurs
      * @param buttonConfigs Configuration des boutons
      */
-    void init(const std::vector<EncoderConfig>& encoderConfigs, 
+    void init(const std::vector<EncoderConfig>& encoderConfigs,
               const std::vector<ButtonConfig>& buttonConfigs);
-    
+
     /**
      * @brief Met à jour le système d'entrée
-     * 
+     *
      * Lit les états des encodeurs et des boutons et génère les événements correspondants.
      */
     void update();
-    
+
+    /**
+     * @brief Obtient le contrôleur d'entrée
+     * @return Référence au contrôleur d'entrée
+     */
+    InputController& getInputController();
+
 private:
-    EncoderManager       encoderManager_;   // Gestionnaire des encodeurs
-    ProcessEncoders      processEncoders_;  // Traitement des encodeurs
-    DigitalButtonManager buttonManager_;    // Gestionnaire des boutons
-    ProcessButtons       processButtons_;   // Traitement des boutons
+    EncoderManager encoderManager_;       // Gestionnaire des encodeurs
+    ProcessEncoders processEncoders_;     // Traitement des encodeurs
+    DigitalButtonManager buttonManager_;  // Gestionnaire des boutons
+    ProcessButtons processButtons_;       // Traitement des boutons
+    InputController* inputController_;    // Contrôleur d'entrée
 };
