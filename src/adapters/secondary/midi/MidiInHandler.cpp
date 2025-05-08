@@ -1,6 +1,8 @@
 #include "adapters/secondary/midi/MidiInHandler.hpp"
-#include "adapters/secondary/midi/TeensyUsbMidi.hpp"
+
 #include <Arduino.h>
+
+#include "adapters/secondary/midi/TeensyUsbMidi.hpp"
 
 MidiInHandler::MidiInHandler() {
     // Rien à initialiser
@@ -24,29 +26,30 @@ void MidiInHandler::update() {
         // Type de message
         uint8_t type = usbMIDI.getType();
         // Canal MIDI (0-15)
-        uint8_t channel = usbMIDI.getChannel() - 1; // Lib Teensy utilise canaux 1-16, nous utilisons 0-15
-        
+        uint8_t channel =
+            usbMIDI.getChannel() - 1;  // Lib Teensy utilise canaux 1-16, nous utilisons 0-15
+
         switch (type) {
-            case usbMIDI.ControlChange:
-                handleCcMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
-                break;
-                
-            case usbMIDI.NoteOn:
-                if (usbMIDI.getData2() == 0) {
-                    // NoteOn avec vélocité 0 est traité comme NoteOff
-                    handleNoteOffMessage(channel, usbMIDI.getData1(), 0);
-                } else {
-                    handleNoteOnMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
-                }
-                break;
-                
-            case usbMIDI.NoteOff:
-                handleNoteOffMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
-                break;
-                
-            default:
-                // Ignorer les autres types de messages
-                break;
+        case usbMIDI.ControlChange:
+            handleCcMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
+            break;
+
+        case usbMIDI.NoteOn:
+            if (usbMIDI.getData2() == 0) {
+                // NoteOn avec vélocité 0 est traité comme NoteOff
+                handleNoteOffMessage(channel, usbMIDI.getData1(), 0);
+            } else {
+                handleNoteOnMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
+            }
+            break;
+
+        case usbMIDI.NoteOff:
+            handleNoteOffMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
+            break;
+
+        default:
+            // Ignorer les autres types de messages
+            break;
         }
     }
 }
