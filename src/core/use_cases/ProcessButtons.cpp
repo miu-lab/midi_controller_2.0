@@ -1,12 +1,12 @@
 #include "core/use_cases/ProcessButtons.hpp"
 
-#include "core/domain/EventBus.hpp"
-#include "core/domain/events/InputEvent.hpp"
+#include "core/domain/events/EventSystem.hpp"
 
 ProcessButtons::ProcessButtons(const std::vector<IButton*>& buttons)
     : buttons_(buttons),
       lastPressed_(buttons.size(), false),
       initialized_(false),
+      onButtonStateChangedCallback_(nullptr),
       inputController_(nullptr),
       useInputController_(false) {}
 
@@ -17,6 +17,10 @@ void ProcessButtons::initStates() {
         lastPressed_[i] = btn->isPressed();
     }
     initialized_ = true;
+}
+
+void ProcessButtons::setOnButtonStateChangedCallback(ButtonStateChangedCallback callback) {
+    onButtonStateChangedCallback_ = callback;
 }
 
 void ProcessButtons::setInputController(InputController* inputController) {
@@ -37,16 +41,16 @@ void ProcessButtons::update() {
         if (pressed != lastPressed_[i]) {
             lastPressed_[i] = pressed;
 
-            if (useInputController_) {
+            // Ordre de priorité pour traiter l'événement:
+            // 1. Nouveau callback (onButtonStateChangedCallback_)
+            // 2. Ancien contrôleur d'entrée (inputController_)
+            if (onButtonStateChangedCallback_) {
+                onButtonStateChangedCallback_(btn->getId(), pressed);
+            } else if (useInputController_) {
                 // Utiliser le contrôleur d'entrée
                 inputController_->processButtonPress(btn->getId(), pressed);
-            } else {
-                // Utiliser l'EventBus classique
-                if (pressed)
-                    EventBus<EventTypes::ButtonPressed>::publish({btn->getId()});
-                else
-                    EventBus<EventTypes::ButtonReleased>::publish({btn->getId()});
             }
+            // Les EventBus ne sont plus utilisés dans la nouvelle version
         }
     }
 }

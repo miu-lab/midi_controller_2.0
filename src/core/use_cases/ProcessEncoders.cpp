@@ -1,14 +1,23 @@
 #include "core/use_cases/ProcessEncoders.hpp"
 
-#include "core/domain/EventBus.hpp"
-#include "core/domain/events/InputEvent.hpp"
+#include "core/domain/events/EventSystem.hpp"
 
 ProcessEncoders::ProcessEncoders(const std::vector<IEncoder *> &encoders)
     : encoders_(encoders),
       lastPressed_(encoders.size(), false),
       lastAbsPos_(encoders.size(), 0),
+      onEncoderTurnedCallback_(nullptr),
+      onEncoderButtonCallback_(nullptr),
       inputController_(nullptr),
       useInputController_(false) {}
+
+void ProcessEncoders::setOnEncoderTurnedCallback(EncoderTurnedCallback callback) {
+    onEncoderTurnedCallback_ = callback;
+}
+
+void ProcessEncoders::setOnEncoderButtonCallback(EncoderButtonCallback callback) {
+    onEncoderButtonCallback_ = callback;
+}
 
 void ProcessEncoders::setInputController(InputController *inputController) {
     inputController_ = inputController;
@@ -39,26 +48,30 @@ void ProcessEncoders::update() {
             // Mettre à jour la dernière position absolue connue
             lastAbsPos_[i] = absPos;
 
-            // Utiliser le contrôleur d'entrée si disponible, sinon publier via l'EventBus
-            if (useInputController_) {
+            // Ordre de priorité pour traiter l'événement:
+            // 1. Nouveau callback (onEncoderTurnedCallback_)
+            // 2. Ancien contrôleur d'entrée (inputController_)
+            if (onEncoderTurnedCallback_) {
+                onEncoderTurnedCallback_(encoder->getId(), absPos, delta);
+            } else if (useInputController_) {
                 inputController_->processEncoderTurn(encoder->getId(), absPos, delta);
-            } else {
-                // Publier l'événement avec uniquement la position absolue
-                EventBus<EventTypes::EncoderTurned>::publish(
-                    {.id = encoder->getId(), .absolutePosition = absPos});
             }
+            // Les EventBus ne sont plus utilisés dans la nouvelle version
         }
 
         bool pressed = encoder->isPressed();
         if (pressed != lastPressed_[i]) {
             lastPressed_[i] = pressed;
 
-            // Utiliser le contrôleur d'entrée si disponible, sinon publier via l'EventBus
-            if (useInputController_) {
+            // Ordre de priorité pour traiter l'événement:
+            // 1. Nouveau callback (onEncoderButtonCallback_)
+            // 2. Ancien contrôleur d'entrée (inputController_)
+            if (onEncoderButtonCallback_) {
+                onEncoderButtonCallback_(encoder->getId(), pressed);
+            } else if (useInputController_) {
                 inputController_->processEncoderButton(encoder->getId(), pressed);
-            } else {
-                EventBus<EventTypes::EncoderButton>::publish({encoder->getId(), pressed});
             }
+            // Les EventBus ne sont plus utilisés dans la nouvelle version
         }
     }
 }
