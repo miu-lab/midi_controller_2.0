@@ -4,22 +4,31 @@
 #include "input/InputEvent.hpp"
 
 
-// Après :
+// Implémentation complète de MockEncoder
 struct MockEncoder : public IEncoder {
     EncoderId id;
     int8_t   delta;
     bool     pressed;
+    int32_t  absolutePosition = 0;
+    int32_t  physicalPosition = 0;
 
     int8_t    readDelta() override        { return delta; }
     bool      isPressed()  const override { return pressed; }
     EncoderId getId()      const override { return id; }
-    uint16_t  getPpr()     const override { return 0; }  // <— valeur factice
+    uint16_t  getPpr()     const override { return 1; }  // Valeur factice
+
+    // Implémentation des méthodes manquantes
+    int32_t   getAbsolutePosition() const override { return absolutePosition; }
+    int32_t   getPhysicalPosition() const override { return physicalPosition; }
+    void      resetPosition() override { absolutePosition = 0; physicalPosition = 0; }
 };
-static int turnedSum = 0;
+
+static int turnedPositionSum = 0;
 static bool lastButtonPressed = false;
 
 void onTurned(const EncoderTurnedEvent& e) {
-    turnedSum += e.delta;
+    // Utiliser absolutePosition au lieu de delta
+    turnedPositionSum += e.absolutePosition;
 }
 
 void onPressed(const EncoderButtonEvent& e) {
@@ -36,15 +45,18 @@ void test_process_encoders_event_bus() {
     EventBus<EncoderTurnedEvent>::subscribe(onTurned);
     EventBus<EncoderButtonEvent>::subscribe(onPressed);
 
+    // Configurer les encodeurs pour le test
     enc1.delta = 3;
+    enc1.absolutePosition = 3; // Ajouter une position absolue
     enc2.pressed = true;
 
-    turnedSum = 0;
+    turnedPositionSum = 0;
     lastButtonPressed = false;
 
     processor.update();
 
-    TEST_ASSERT_EQUAL(3, turnedSum);
+    // Vérifier que l'événement est bien transmis
+    TEST_ASSERT_EQUAL(3, turnedPositionSum);
     TEST_ASSERT_TRUE(lastButtonPressed);
 }
 

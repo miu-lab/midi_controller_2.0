@@ -29,7 +29,6 @@ struct MockProfileManager : public IProfileManager {
         return std::nullopt;
     }
     
-
     void setBinding(ControlId, MidiControl) override {}
 };
 
@@ -40,14 +39,25 @@ void test_input_router_basic() {
     InputRouter router(midi, profiles);
     router.init();
 
-    EventBus<EncoderTurnedEvent>::publish({ .id = 1, .delta = 3 });
-    EventBus<ButtonPressed>::publish({ .id = 2 });
-    EventBus<ButtonReleased>::publish({ .id = 2 });
+    // Créer un objet EncoderTurnedEvent avec le bon champ (absolutePosition au lieu de delta)
+    EncoderTurnedEvent encoderEvent;
+    encoderEvent.id = 1;
+    encoderEvent.absolutePosition = 3;
+    
+    EventBus<EncoderTurnedEvent>::publish(encoderEvent);
+    
+    ButtonPressed pressEvent;
+    pressEvent.id = 2;
+    EventBus<ButtonPressed>::publish(pressEvent);
+    
+    ButtonReleased releaseEvent;
+    releaseEvent.id = 2;
+    EventBus<ButtonReleased>::publish(releaseEvent);
 
     TEST_ASSERT_EQUAL(3, midi.sent.size());
     TEST_ASSERT_EQUAL_HEX8(0xB1, midi.sent[0].status);  // CC on channel 1
     TEST_ASSERT_EQUAL(10, midi.sent[0].data1);
-    TEST_ASSERT_EQUAL(6, midi.sent[0].data2);  // 3 * 2 (relative)
+    TEST_ASSERT_EQUAL(6, midi.sent[0].data2);  // Valeur attendue selon le traitement (peut varier selon votre implémentation)
 
     TEST_ASSERT_EQUAL_HEX8(0x92, midi.sent[1].status);  // Note On on channel 2
     TEST_ASSERT_EQUAL(60, midi.sent[1].data1);
