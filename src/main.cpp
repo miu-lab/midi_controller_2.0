@@ -19,12 +19,12 @@ void setup() {
     // Décommenter si vous avez besoin de debug via Serial, mais avec un timeout
     // unsigned long startTime = millis();
     // while (!Serial && (millis() - startTime < 1000)) { /* attend max 1s */ }
-    
+
     app.init();  // initialiser l'application
 }
 
 void loop() {
     app.update();  // mise à jour de l'application
-    delay(4);     // éviter de saturer le CPU
+    delay(4);      // éviter de saturer le CPU
 }
 #endif
