@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+
 #include "adapters/secondary/midi/BufferedMidiOut.hpp"
 #include "adapters/secondary/midi/MidiInHandler.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
@@ -76,9 +78,9 @@ private:
     MidiMapper midiMapper_;            // Mapper d'événements vers commandes MIDI
     ProfileManager& profileManager_;   // Référence au gestionnaire de profils
     
-    // Écouteurs d'événements statiques pour éviter des allocations dynamiques
-    MidiSystemSimpleListener* simpleListener_;
-    MidiSystemEventListener* eventListener_;
+    // Écouteurs d'événements gérés par des smart pointers
+    std::unique_ptr<MidiSystemSimpleListener> simpleListener_;
+    std::unique_ptr<MidiSystemEventListener> eventListener_;
     
     // ID d'abonnements pour pouvoir se désabonner
     SubscriptionId simpleListenerSubId_;
