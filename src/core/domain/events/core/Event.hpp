@@ -29,7 +29,7 @@ public:
      * @param category Catégorie d'événement
      */
     Event(EventType type, EventCategory category)
-        : type_(type), category_(static_cast<uint8_t>(category)), handled_(false) {}
+        : type_(type), category_(static_cast<uint8_t>(category)), handled_(false), propagate_(true) {}
     
     /**
      * @brief Destructeur virtuel
@@ -60,6 +60,17 @@ public:
     void setHandled() { handled_ = true; }
     
     /**
+     * @brief Vérifie si l'événement doit continuer à être propagé
+     * @return true si l'événement doit être propagé, false sinon
+     */
+    bool shouldPropagate() const { return propagate_; }
+    
+    /**
+     * @brief Arrête la propagation de l'événement aux autres écouteurs
+     */
+    void stopPropagation() { propagate_ = false; }
+    
+    /**
      * @brief Obtient le nom de l'événement (pour le débogage)
      * @return Nom de l'événement
      */
@@ -69,4 +80,5 @@ protected:
     EventType type_;   // Type d'événement
     uint8_t category_; // Catégorie d'événement (stockée comme uint8_t pour économiser de la mémoire)
     bool handled_;     // Indique si l'événement a été traité
+    bool propagate_;   // Indique si l'événement doit continuer à être propagé
 };
