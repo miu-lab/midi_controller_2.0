@@ -1,7 +1,8 @@
 #include "adapters/secondary/midi/MidiMapper.hpp"
-#include "config/GlobalSettings.hpp"
 
 #include <Arduino.h>  // Pour la fonction constrain
+
+#include "config/GlobalSettings.hpp"
 
 MidiMapper::MidiMapper(IMidiOut& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
@@ -65,7 +66,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Calculer le delta de mouvement
     int32_t delta = position - info.lastEncoderPosition;
     if (delta == 0) return;  // Pas de changement
-    
+
     // Appliquer le facteur de sensibilité global si ce n'est pas un contrôle de navigation
     if (!isNavigationControl(encoderId) && delta != 0) {
         float sensitivity = GlobalSettings::getInstance().getEncoderSensitivity();
@@ -73,11 +74,11 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
             // Appliquer la sensibilité tout en préservant le signe
             int32_t delta_sign = (delta > 0) ? 1 : -1;
             int32_t delta_abs = abs(delta);
-            
+
             // Appliquer la sensibilité et assurer qu'un mouvement réel produit au moins 1 delta
             int32_t scaled_delta_abs = static_cast<int32_t>(delta_abs * sensitivity);
             if (scaled_delta_abs == 0 && delta_abs > 0) scaled_delta_abs = 1;
-            
+
             // Reconstruire delta avec son signe
             delta = delta_sign * scaled_delta_abs;
         }
@@ -87,9 +88,9 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // (ne depends que du signe du delta actuel et précédent)
     bool currentlyMovingUp = (delta > 0);
     bool currentlyMovingDown = (delta < 0);
-    bool directionChanged = (info.movingUp && currentlyMovingDown) || 
-                           (info.movingDown && currentlyMovingUp);
-    
+    bool directionChanged =
+        (info.movingUp && currentlyMovingDown) || (info.movingDown && currentlyMovingUp);
+
     // Mise à jour des états de direction
     info.movingUp = currentlyMovingUp;
     info.movingDown = currentlyMovingDown;
@@ -99,12 +100,12 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         if (position < 0) {
             // Changement de direction en zone négative
             // La position actuelle devient le nouveau zéro (offset simple)
-            info.midiOffset = -position; // Valeur positive pour décaler vers le haut
+            info.midiOffset = -position;  // Valeur positive pour décaler vers le haut
             info.rangeMapped = true;
         } else if (position > 127) {
             // Changement de direction en zone haute
             // La position actuelle devient 127 (offset simple)
-            info.midiOffset = 127 - position; // Valeur négative pour décaler vers le bas
+            info.midiOffset = 127 - position;  // Valeur négative pour décaler vers le bas
             info.rangeMapped = true;
         }
     }
@@ -137,7 +138,9 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 
     // Mettre à jour et envoyer la nouvelle valeur
     info.lastMidiValue = static_cast<uint8_t>(newValue);
-    auto command = std::make_unique<SendMidiCCCommand>(midiOut_, control.channel, control.control,
+    auto command = std::make_unique<SendMidiCCCommand>(midiOut_,
+                                                       control.channel,
+                                                       control.control,
                                                        static_cast<uint8_t>(newValue));
     commandManager_.execute(std::move(command));
 }
