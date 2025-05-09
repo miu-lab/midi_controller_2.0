@@ -23,8 +23,19 @@ void setup() {
     app.init();  // initialiser l'application
 }
 
+unsigned long lastUpdateTime = 0;
+const unsigned long minUpdateInterval = 1; // 1ms (1000Hz) au lieu de 4ms (250Hz)
+
 void loop() {
-    app.update();  // mise à jour de l'application
-    delay(4);      // éviter de saturer le CPU
+    unsigned long currentTime = micros() / 1000; // Temps en millisecondes
+    
+    // Limiter la fréquence maximale des mises à jour
+    if (currentTime - lastUpdateTime >= minUpdateInterval) {
+        app.update();
+        lastUpdateTime = currentTime;
+    }
+    
+    // Utiliser yield() au lieu de delay pour permettre le multitâche
+    yield();
 }
 #endif
