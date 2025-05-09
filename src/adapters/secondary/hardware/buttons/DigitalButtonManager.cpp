@@ -1,10 +1,7 @@
 // adapters/secondary/hardware/buttons/DigitalButtonManager.cpp
-#ifdef UNIT_TEST_NATIVE
-#include <ArduinoFake.h>
-#else
-#include <Arduino.h>
-#endif
 #include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
+
+#include <Arduino.h>
 
 DigitalButtonManager::DigitalButtonManager(const std::vector<ButtonConfig>& configs) {
     ownedButtons_.reserve(configs.size());
