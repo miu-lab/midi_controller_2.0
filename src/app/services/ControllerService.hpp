@@ -1,5 +1,10 @@
 #pragma once
 
+// Forward declaration de la classe d'écouteur
+class ControllerServiceEventListener;
+
+#include <memory>
+
 #include "adapters/primary/ui/ViewManager.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
 #include "core/controllers/InputController.hpp"
@@ -9,6 +14,7 @@
 #include "core/domain/IMidiOut.hpp"
 #include "core/domain/IProfileManager.hpp"
 #include "core/domain/commands/CommandManager.hpp"
+#include "core/domain/events/EventSystem.hpp"
 
 /**
  * @brief Service coordonnant les différents contrôleurs
@@ -79,6 +85,9 @@ private:
     ProfileController profileController_;
     UIController* uiController_;
     InputController* inputController_;
+    
+    // Écouteur d'événements (nous en sommes propriétaires)
+    std::unique_ptr<ControllerServiceEventListener> eventListener_;
 
     /**
      * @brief Initialise les mappings MIDI

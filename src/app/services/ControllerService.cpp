@@ -31,7 +31,8 @@ void ControllerService::init() {
     auto& eventBus = EventBus::getInstance();
     
     // S'abonner au bus d'événements
-    eventBus.subscribe(new ControllerServiceEventListener(*this));
+    eventListener_ = std::make_unique<ControllerServiceEventListener>(*this);
+    eventBus.subscribe(eventListener_.get());
 }
 
 void ControllerService::update() {
