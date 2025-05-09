@@ -19,9 +19,6 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
     info.lastMidiValue = 0;
     info.lastEncoderPosition = 0;  // Initialisation à 0
     info.midiOffset = 0;
-    info.rangeMapped = false;
-    info.movingUp = false;
-    info.movingDown = false;
 
     // Supprimer l'ancien mapping s'il existe
     auto it = mappings_.find(controlId);
@@ -55,6 +52,26 @@ const MidiControl& MidiMapper::getMidiControl(ControlId controlId) const {
 }
 
 void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
+    // On utilise une variable statique pour suivre les derniers encodeurs traités
+    // afin d'éviter les duplications
+    static EncoderId lastEncoderId = 255;  // Valeur impossible
+    static int32_t lastPosition = -9999;   // Valeur impossible
+    static unsigned long lastProcessTime = 0;
+
+    // Si le même encodeur avec la même position a été traité récemment (dans les 20ms),
+    // on ignore ce traitement pour éviter les duplications
+    unsigned long currentTime = millis();
+    if (encoderId == lastEncoderId && position == lastPosition &&
+        currentTime - lastProcessTime < 20) {
+        return;  // Ignorer ce traitement car c'est un doublon
+    }
+
+    // Mettre à jour les variables de tracking
+    lastEncoderId = encoderId;
+    lastPosition = position;
+    lastProcessTime = currentTime;
+
+    // Continuer avec le traitement normal
     auto it = mappings_.find(encoderId);
     if (it == mappings_.end()) {
         return;  // Pas de mapping pour cet encodeur
@@ -84,32 +101,6 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         }
     }
 
-    // Détecter changement de direction
-    // (ne depends que du signe du delta actuel et précédent)
-    bool currentlyMovingUp = (delta > 0);
-    bool currentlyMovingDown = (delta < 0);
-    bool directionChanged =
-        (info.movingUp && currentlyMovingDown) || (info.movingDown && currentlyMovingUp);
-
-    // Mise à jour des états de direction
-    info.movingUp = currentlyMovingUp;
-    info.movingDown = currentlyMovingDown;
-
-    // Remapper la plage si changement de direction hors limites MIDI
-    if (directionChanged) {
-        if (position < 0) {
-            // Changement de direction en zone négative
-            // La position actuelle devient le nouveau zéro (offset simple)
-            info.midiOffset = -position;  // Valeur positive pour décaler vers le haut
-            info.rangeMapped = true;
-        } else if (position > 127) {
-            // Changement de direction en zone haute
-            // La position actuelle devient 127 (offset simple)
-            info.midiOffset = 127 - position;  // Valeur négative pour décaler vers le bas
-            info.rangeMapped = true;
-        }
-    }
-
     // Mettre à jour la dernière position
     info.lastEncoderPosition = position;
 
@@ -120,17 +111,24 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         // Mode relatif: chaque pas d'encodeur = un pas MIDI (sensibilité constante)
         newValue = info.lastMidiValue + delta;
     } else {
-        // Mode absolu avec gestion des plages
-        if (info.rangeMapped) {
-            // Appliquer simplement l'offset et clamper
-            newValue = position + info.midiOffset;
-        } else {
-            // Utiliser la plage standard 0-127
-            newValue = position;
+        // Mode absolu avec référentiel flottant
+        int32_t adjustedPosition = position - info.midiOffset;
+
+        // Si la position ajustée sort des limites MIDI, mettre à jour l'offset
+        if (adjustedPosition < 0) {
+            // Mettre à jour l'offset pour ramener la position à 0
+            info.midiOffset += adjustedPosition;  // adjustedPosition est négatif
+            adjustedPosition = 0;
+        } else if (adjustedPosition > 127) {
+            // Mettre à jour l'offset pour ramener la position à 127
+            info.midiOffset += (adjustedPosition - 127);
+            adjustedPosition = 127;
         }
+
+        newValue = adjustedPosition;
     }
 
-    // Garantir que la valeur est dans la plage MIDI valide
+    // Garantir que la valeur est dans la plage MIDI valide (0-127)
     newValue = constrain(newValue, 0, 127);
 
     // Ne rien faire si la valeur n'a pas changé
@@ -138,6 +136,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 
     // Mettre à jour et envoyer la nouvelle valeur
     info.lastMidiValue = static_cast<uint8_t>(newValue);
+
     auto command = std::make_unique<SendMidiCCCommand>(midiOut_,
                                                        control.channel,
                                                        control.control,

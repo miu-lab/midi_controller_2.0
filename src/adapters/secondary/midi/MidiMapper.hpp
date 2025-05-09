@@ -90,10 +90,7 @@ private:
         std::unique_ptr<IMidiMappingStrategy> strategy;
         uint8_t lastMidiValue;
         int32_t lastEncoderPosition;
-        int32_t midiOffset = 0;   // Offset simple à appliquer aux positions d'encodeur
-        bool rangeMapped = false;
-        bool movingUp = false;
-        bool movingDown = false;
+        int32_t midiOffset = 0;   // Offset pour le référentiel flottant
     };
 
     IMidiOut& midiOut_;
