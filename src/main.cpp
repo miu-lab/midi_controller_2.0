@@ -16,9 +16,18 @@ MidiControllerApp app(appConfig);
 
 void setup() {
     Serial.begin(115200);  // Initialiser le série, mais ne pas attendre qu'il soit prêt
-    // Décommenter si vous avez besoin de debug via Serial, mais avec un timeout
-    // unsigned long startTime = millis();
-    // while (!Serial && (millis() - startTime < 1000)) { /* attend max 1s */ }
+    
+    // Définir un temps limite pour l'initialisation de Serial
+    constexpr unsigned long SERIAL_TIMEOUT_MS = 50; // Limite de 50ms seulement
+    unsigned long startTime = millis();
+    
+    // Attendre Serial mais avec un timeout court
+    while (!Serial && (millis() - startTime < SERIAL_TIMEOUT_MS)) {
+        // Attente limitée
+    }
+    
+    // Message de débogage 
+    DEBUG_PRINTLN_FLASH("[INIT] MidiController - Démarrage...");
 
     app.init();  // initialiser l'application
 }

@@ -25,6 +25,11 @@ public:
      * @param appConfig Configuration de l'application
      */
     explicit MidiControllerApp(const ApplicationConfiguration& appConfig);
+    
+    /**
+     * @brief Destructeur - libère les ressources et se désabonne du bus d'événements
+     */
+    virtual ~MidiControllerApp();
 
     /**
      * @brief Définit si un contrôle est utilisé pour la navigation
@@ -64,4 +69,8 @@ private:
     // Écouteurs d'événements
     UIControllerEventListener* uiControllerEventListener_ = nullptr;
     UIEventListener* uiEventListener_ = nullptr;
+    
+    // IDs d'abonnements
+    SubscriptionId uiControllerEventListenerSubId_ = 0;
+    SubscriptionId uiEventListenerSubId_ = 0;
 };

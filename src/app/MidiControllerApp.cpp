@@ -27,7 +27,9 @@ MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
       uiEventService_()
       ,
       uiControllerEventListener_(nullptr),
-      uiEventListener_(nullptr) {
+      uiEventListener_(nullptr),
+      uiControllerEventListenerSubId_(0),
+      uiEventListenerSubId_(0) {
     // Initialiser le ServiceLocator avec la configuration
     ServiceLocator::initialize(appConfig);
 
@@ -42,6 +44,24 @@ MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
     
     ServiceLocator::registerUiEventService(&uiEventService_);
     ServiceLocator::registerConfigurationService(&configService_);
+}
+
+MidiControllerApp::~MidiControllerApp() {
+    // Se désabonner du bus d'événements
+    auto& eventBus = EventBus::getInstance();
+    
+    // Désabonnement et libération des écouteurs
+    if (uiControllerEventListenerSubId_ != 0) {
+        eventBus.unsubscribe(uiControllerEventListenerSubId_);
+    }
+    
+    if (uiEventListenerSubId_ != 0) {
+        eventBus.unsubscribe(uiEventListenerSubId_);
+    }
+    
+    // Libérer les écouteurs
+    delete uiControllerEventListener_;
+    delete uiEventListener_;
 }
 
 void MidiControllerApp::setControlForNavigation(ControlId id, bool isNavigation) {
@@ -67,7 +87,7 @@ void MidiControllerApp::init() {
 
     // 3) Initialiser le service d'interface utilisateur
     uiEventService_.init(navigationConfig_);
-    uiEventService_.setupDebugSubscriptions();
+    // Note: setupDebugSubscriptions() est déjà appelé dans init(), pas besoin de l'appeler à nouveau
     
     // 4) Initialiser la chaîne UI : ViewManager, MenuController, UIController et UIControllerEventListener
     
@@ -89,11 +109,19 @@ void MidiControllerApp::init() {
     // Enregistrer le UIController dans le ServiceLocator
     ServiceLocator::registerUIController(uiController);
     
+    // S'il existe déjà un écouteur, le désabonner et le libérer
+    if (uiControllerEventListener_ != nullptr) {
+        if (uiControllerEventListenerSubId_ != 0) {
+            EventBus::getInstance().unsubscribe(uiControllerEventListenerSubId_);
+        }
+        delete uiControllerEventListener_;
+    }
+    
     // Créer et enregistrer l'écouteur d'événements
     uiControllerEventListener_ = new UIControllerEventListener(*uiController, navigationConfig_);
     
     // S'abonner au bus d'événements avec priorité élevée
-    EventBus::getInstance().subscribe(uiControllerEventListener_, 10); // Priorité élevée (10) pour les événements UI
+    uiControllerEventListenerSubId_ = EventBus::getInstance().subscribe(uiControllerEventListener_, 10); // Priorité élevée (10) pour les événements UI
     
     // Enregistrer l'écouteur dans le ServiceLocator
     ServiceLocator::registerUIControllerEventListener(uiControllerEventListener_);
