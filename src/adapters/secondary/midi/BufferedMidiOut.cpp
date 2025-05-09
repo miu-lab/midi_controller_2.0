@@ -11,7 +11,8 @@ BufferedMidiOut::BufferedMidiOut(IMidiOut& output, uint16_t bufferSize)
       
     // Utiliser le buffer statique si possible, sinon allouer dynamiquement
     if (usingDynamicBuffer_) {
-        buffer_ = new MidiMessage[bufferSize_];
+        dynamicBuffer_ = std::make_unique<MidiMessage[]>(bufferSize_);
+        buffer_ = dynamicBuffer_.get();
         DEBUG_MIDI("Allocation dynamique du buffer MIDI : %u octets", 
                   bufferSize_ * sizeof(MidiMessage));
     } else {
@@ -29,11 +30,8 @@ BufferedMidiOut::BufferedMidiOut(IMidiOut& output, uint16_t bufferSize)
 }
 
 BufferedMidiOut::~BufferedMidiOut() {
-    // Libérer la mémoire allouée dynamiquement
-    if (usingDynamicBuffer_ && buffer_ != nullptr) {
-        delete[] buffer_;
-        buffer_ = nullptr;
-    }
+    // Le destructeur de std::unique_ptr se charge de libérer la mémoire si nécessaire
+    // buffer_ est également mis à nullptr automatiquement
 }
 
 void BufferedMidiOut::sendCc(MidiChannel ch, MidiCC cc, uint8_t value) {

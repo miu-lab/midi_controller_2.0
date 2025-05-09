@@ -1,5 +1,7 @@
 #pragma once
 #include <Arduino.h>
+#include <memory>
+#include <vector>
 
 #include "core/domain/IMidiOut.hpp"
 
@@ -73,6 +75,7 @@ private:
     
     MidiMessage* buffer_;                   // Buffer de messages MIDI
     MidiMessage staticBuffer_[STATIC_BUFFER_SIZE]; // Buffer statique pour éviter l'allocation dynamique
+    std::unique_ptr<MidiMessage[]> dynamicBuffer_; // Buffer dynamique géré par un smart pointer
     uint16_t bufferSize_;                   // Taille du buffer
     uint16_t nextIndex_;                    // Prochain index à utiliser dans le buffer
     uint16_t dirtyCount_;                   // Nombre de messages à envoyer
