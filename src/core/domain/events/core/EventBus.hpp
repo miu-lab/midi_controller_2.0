@@ -3,6 +3,7 @@
 #include "config/common/CommonIncludes.hpp"
 #include "core/domain/events/core/Event.hpp"
 #include "config/debug/DebugConfig.hpp"
+#include <vector>
 
 // Identifiant d'abonnement
 using SubscriptionId = uint16_t;
@@ -60,11 +61,7 @@ public:
      * @brief Destructeur
      */
     ~EventBus() {
-        // Libérer la mémoire allouée
-        if (subscriptions_) {
-            delete[] subscriptions_;
-            subscriptions_ = nullptr;
-        }
+        // Le vecteur subscriptions_ sera automatiquement libéré
     }
     
     /**
@@ -78,41 +75,27 @@ public:
             return 0;  // Listener invalide
         }
         
-        // Si on a atteint la capacité actuelle, agrandir le tableau
-        if (count_ >= capacity_) {
-            if (!growCapacity()) {
-                return 0;  // Impossible d'agrandir la capacité
-            }
+        // Vérifier si on a atteint la limite maximale
+        if (subscriptions_.size() >= MAX_EVENT_LISTENERS) {
+            return 0;  // Trop d'abonnements
         }
         
-        // Trouver un emplacement approprié basé sur la priorité
-        int insertIndex = count_;
-        for (int i = 0; i < count_; i++) {
-            if (subscriptions_[i].priority < priority) {
-                insertIndex = i;
-                break;
-            }
-        }
+        // Créer un nouvel abonnement
+        Subscription newSubscription;
+        newSubscription.listener = listener;
+        newSubscription.priority = priority;
+        newSubscription.id = nextId_;
+        newSubscription.active = true;
         
-        // Déplacer les éléments existants pour faire de la place
-        if (insertIndex < count_) {
-            memmove(&subscriptions_[insertIndex + 1], 
-                    &subscriptions_[insertIndex], 
-                    (count_ - insertIndex) * sizeof(Subscription));
-        }
+        // Ajouter l'abonnement au vecteur
+        subscriptions_.push_back(newSubscription);
         
-        // Insérer le nouvel abonnement
-        subscriptions_[insertIndex].listener = listener;
-        subscriptions_[insertIndex].priority = priority;
-        subscriptions_[insertIndex].id = nextId_;
-        subscriptions_[insertIndex].active = true;
-        
-        // Incrémenter le compteur
-        count_++;
+        // Trier par priorité pour que les plus prioritaires soient traités en premier
+        sortByPriority();
         
         // Débogage
-        DEBUG_EVENT_BUS("Nouvelle souscription ID=%d - Total: %d (Capacité: %d)\n", 
-                       nextId_, count_, capacity_);
+        DEBUG_EVENT_BUS("Nouvelle souscription ID=%d - Total: %zu (Capacité: %zu)\n", 
+                       nextId_, subscriptions_.size(), subscriptions_.capacity());
         
         return nextId_++;  // Retourner l'ID actuel et incrémenter pour le prochain
     }
@@ -125,22 +108,12 @@ public:
     bool unsubscribe(SubscriptionId id) {
         int index = findSubscriptionIndex(id);
         if (index >= 0) {
-            // Décaler tous les éléments suivants
-            if (index < count_ - 1) {
-                memmove(&subscriptions_[index], 
-                        &subscriptions_[index + 1], 
-                        (count_ - index - 1) * sizeof(Subscription));
-            }
-            
-            // Réduire le compteur
-            count_--;
-            
-            // Réduire la capacité si nécessaire pour économiser de la mémoire
-            shrinkCapacityIfNeeded();
+            // Supprimer l'élément à l'index spécifié
+            subscriptions_.erase(subscriptions_.begin() + index);
             
             // Débogage
-            DEBUG_EVENT_BUS("Désinscription ID=%d - Restants: %d (Capacité: %d)\n", 
-                           id, count_, capacity_);
+            DEBUG_EVENT_BUS("Désinscription ID=%d - Restants: %zu (Capacité: %zu)\n", 
+                           id, subscriptions_.size(), subscriptions_.capacity());
             
             return true;
         }
@@ -194,14 +167,14 @@ public:
     bool publish(Event& event) {
         // Débogage
         DEBUG_EVENT_BUS("Publication d'un événement de type %s - Destinataires: %d\n", 
-                      event.getEventName(), count_);
+                      event.getEventName(), subscriptions_.size());
         
         bool handled = false;
         
         // Parcourir tous les abonnements (déjà triés par priorité)
-        for (int i = 0; i < count_; i++) {
-            if (subscriptions_[i].active && subscriptions_[i].listener) {
-                if (subscriptions_[i].listener->onEvent(event)) {
+        for (const auto& subscription : subscriptions_) {
+            if (subscription.active && subscription.listener) {
+                if (subscription.listener->onEvent(event)) {
                     handled = true;
                     event.setHandled();
                 }
@@ -232,10 +205,10 @@ public:
      * @brief Supprime tous les abonnements
      */
     void clear() {
-        count_ = 0;
+        subscriptions_.clear();
         
-        // Réduire la capacité au minimum
-        resizeCapacity(INITIAL_EVENT_LISTENERS);
+        // Remettre à la capacité initiale
+        subscriptions_.reserve(INITIAL_EVENT_LISTENERS);
         
         // Débogage
         DEBUG_EVENT_BUS("Effacement de tous les abonnements\n");
@@ -265,7 +238,7 @@ public:
      * @return Nombre d'abonnements
      */
     int getCount() const {
-        return count_;
+        return subscriptions_.size();
     }
     
     /**
@@ -273,7 +246,7 @@ public:
      * @return Capacité du tableau
      */
     int getCapacity() const {
-        return capacity_;
+        return subscriptions_.capacity();
     }
 
 private:
@@ -283,98 +256,34 @@ private:
      * @return Index de l'abonnement, ou -1 si non trouvé
      */
     int findSubscriptionIndex(SubscriptionId id) const {
-        // Recherche binaire pour les performances
-        // (le tableau est maintenu trié par priorité, mais les IDs sont attribués séquentiellement)
-        // Pour de petits tableaux, une recherche linéaire est souvent plus rapide qu'une recherche binaire
-        for (int i = 0; i < count_; i++) {
+        // Pour de petits tableaux, une recherche linéaire est souvent plus efficace
+        for (size_t i = 0; i < subscriptions_.size(); i++) {
             if (subscriptions_[i].id == id) {
-                return i;
+                return static_cast<int>(i);
             }
         }
         return -1; // Non trouvé
     }
     
     /**
-     * @brief Agrandit la capacité du tableau
-     * @return true si l'opération a réussi, false sinon
+     * @brief Trie les abonnements par priorité
      */
-    bool growCapacity() {
-        // Nouvelle capacité = capacité actuelle * 1.5, mais limitée au maximum
-        int newCapacity = min(static_cast<int>(capacity_ * 1.5f), MAX_EVENT_LISTENERS);
-        
-        // Si déjà à la capacité maximale, échouer
-        if (newCapacity <= capacity_) {
-            return false;
-        }
-        
-        return resizeCapacity(newCapacity);
-    }
-    
-    /**
-     * @brief Réduit la capacité si nécessaire pour économiser de la mémoire
-     */
-    void shrinkCapacityIfNeeded() {
-        // Si le tableau est utilisé à moins de 50% et qu'on a plus que la capacité initiale
-        if (count_ < capacity_ / 2 && capacity_ > INITIAL_EVENT_LISTENERS) {
-            // Nouvelle capacité = max(capacité initiale, count_ * 2)
-            int newCapacity = max(INITIAL_EVENT_LISTENERS, count_ * 2);
-            resizeCapacity(newCapacity);
-        }
-    }
-    
-    /**
-     * @brief Redimensionne la capacité du tableau
-     * @param newCapacity Nouvelle capacité
-     * @return true si l'opération a réussi, false sinon
-     */
-    bool resizeCapacity(int newCapacity) {
-        if (newCapacity < count_) {
-            // Ne pas réduire en dessous du nombre d'éléments actuel
-            newCapacity = count_;
-        }
-        
-        if (newCapacity == capacity_) {
-            return true;  // Rien à faire
-        }
-        
-        // Allouer un nouveau tableau
-        Subscription* newSubscriptions = new (std::nothrow) Subscription[newCapacity];
-        if (!newSubscriptions) {
-            return false;  // Échec d'allocation
-        }
-        
-        // Copier les abonnements existants
-        if (count_ > 0 && subscriptions_) {
-            memcpy(newSubscriptions, subscriptions_, count_ * sizeof(Subscription));
-        }
-        
-        // Libérer l'ancien tableau
-        if (subscriptions_) {
-            delete[] subscriptions_;
-        }
-        
-        // Mettre à jour les membres
-        subscriptions_ = newSubscriptions;
-        capacity_ = newCapacity;
-        
-        // Débogage
-        DEBUG_EVENT_BUS("Redimensionnement de la capacité à %d\n", capacity_);
-        
-        return true;
+    void sortByPriority() {
+        std::sort(subscriptions_.begin(), subscriptions_.end(), [](const Subscription& a, const Subscription& b) {
+            return a.priority > b.priority; // Plus grande priorité en premier
+        });
     }
     
     // Constructeur privé (singleton)
-    EventBus() : subscriptions_(nullptr), count_(0), capacity_(0), nextId_(1) {
+    EventBus() : nextId_(1) {
         // Initialiser avec la capacité de départ
-        resizeCapacity(INITIAL_EVENT_LISTENERS);
+        subscriptions_.reserve(INITIAL_EVENT_LISTENERS);
     }
     
     // Empêcher la copie
     EventBus(const EventBus&) = delete;
     EventBus& operator=(const EventBus&) = delete;
     
-    Subscription* subscriptions_;  // Tableau dynamique des abonnements
-    int count_;                   // Nombre d'abonnements
-    int capacity_;                // Capacité du tableau
+    std::vector<Subscription> subscriptions_;  // Vecteur des abonnements
     SubscriptionId nextId_;       // Prochain ID d'abonnement
 };
