@@ -1,11 +1,9 @@
-#define DISABLE_LEGACY_EVENTBUS
-
 // app/MidiControllerApp.cpp
 #include "app/MidiControllerApp.hpp"
 
 #include <Arduino.h>
 
-#include "adapters/primary/Scheduler.hpp"
+#include "core/TaskScheduler.hpp"
 #include "core/controllers/UIController.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
 #include "core/domain/events/EventSystem.hpp"

@@ -23,6 +23,7 @@
 #define DEBUG_ENCODER_LEVEL   DEBUG_LEVEL_INFO
 #define DEBUG_BUTTONS_LEVEL   DEBUG_LEVEL_INFO
 #define DEBUG_UI_LEVEL        DEBUG_LEVEL_INFO
+#define DEBUG_SCHEDULER_LEVEL DEBUG_LEVEL_INFO
 
 // Vérifie si Serial est disponible (avec un timeout de 0ms)
 inline bool isSerialReady() {
@@ -72,6 +73,13 @@ inline bool isSerialReady() {
 
 #define DEBUG_MIDI(format, ...) DEBUG_LOG(DEBUG_MIDI_LEVEL, "[MIDI] " format, ##__VA_ARGS__)
 #define DEBUG_UI(format, ...) DEBUG_LOG(DEBUG_UI_LEVEL, "[UI] " format, ##__VA_ARGS__)
+
+// Débogage pour l'ordonnanceur de tâches
+#if defined(DEBUG_TASK_SCHEDULER) && DEBUG_TASK_SCHEDULER > 0
+    #define DEBUG_SCHEDULER(format, ...) DEBUG_LOG(DEBUG_SCHEDULER_LEVEL, "[SCHED] " format, ##__VA_ARGS__)
+#else
+    #define DEBUG_SCHEDULER(format, ...) do {} while(0)
+#endif
 
 // Macros pour stocker les chaînes en mémoire Flash et les utiliser plus efficacement
 #define DEBUG_PRINTLN_FLASH(str) \
