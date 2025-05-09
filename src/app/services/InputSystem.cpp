@@ -9,15 +9,15 @@ InputSystem::InputSystem()
       processButtons_(buttonManager_.getButtons()),
       inputController_(nullptr) {
 #ifndef DISABLE_CONTROLLERS
-    // Créer et initialiser l'InputController
-    inputController_ = new InputController(ServiceLocator::getNavigationConfigService());
+    // Créer et initialiser l'InputController avec un smart pointer
+    inputController_ = std::make_unique<InputController>(ServiceLocator::getNavigationConfigService());
 
     // Enregistrer le contrôleur dans le ServiceLocator
-    ServiceLocator::registerInputController(inputController_);
+    ServiceLocator::registerInputController(inputController_.get());
 
     // Configurer les processeurs pour utiliser l'InputController
-    processEncoders_.setInputController(inputController_);
-    processButtons_.setInputController(inputController_);
+    processEncoders_.setInputController(inputController_.get());
+    processButtons_.setInputController(inputController_.get());
 #endif
 }
 
@@ -81,8 +81,8 @@ void InputSystem::init(const std::vector<EncoderConfig>& encoderConfigs,
 
 #ifndef DISABLE_CONTROLLERS
     // Reconfigurer les processeurs pour utiliser l'InputController
-    processEncoders_.setInputController(inputController_);
-    processButtons_.setInputController(inputController_);
+    processEncoders_.setInputController(inputController_.get());
+    processButtons_.setInputController(inputController_.get());
 #endif
 
     // Initialiser l'état initial
@@ -94,8 +94,8 @@ InputController& InputSystem::getInputController() {
     return *inputController_;
 #else
     // Ceci ne devrait jamais être appelé en mode DISABLE_CONTROLLERS
-    static InputController* nullController = nullptr;
-    return *nullController; // Provoquerait un crash si appelé
+    static InputController nullController(ServiceLocator::getNavigationConfigService());
+    return nullController; // Contrôleur par défaut en cas de besoin
 #endif
 }
 

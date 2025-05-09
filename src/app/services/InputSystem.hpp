@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <memory>
 
 #include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
@@ -53,5 +54,5 @@ private:
     ProcessEncoders processEncoders_;     // Traitement des encodeurs
     DigitalButtonManager buttonManager_;  // Gestionnaire des boutons
     ProcessButtons processButtons_;       // Traitement des boutons
-    InputController* inputController_;    // Contrôleur d'entrée
+    std::unique_ptr<InputController> inputController_;    // Contrôleur d'entrée
 };
