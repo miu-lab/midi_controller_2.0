@@ -14,6 +14,13 @@ InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig &cfg)
       lastPosition_(0),
       physicalPosition_(0),
       absolutePosition_(0) {
+    // Pre-calcul du facteur de normalisation
+    // REFERENCE_PPR correspond au PPR standard des encodeurs mécaniques
+    const int32_t REFERENCE_PPR = 24;
+
+    // Calculer avec un facteur d'échelle pour une meilleure précision
+    // Shift de 8 bits pour avoir un facteur d'échelle de 256 (comme une virgule fixe)
+    normalizationFactor_ = (REFERENCE_PPR << 8) / ppr_;
     // Configuration du bouton si présent
     if (hasButton_) {
         pinMode(buttonPin_, activeLowButton_ ? INPUT_PULLUP : INPUT);
@@ -29,42 +36,31 @@ int8_t InterruptQuadratureEncoder::readDelta() {
     int32_t newPosition = encoder_.read();
     int32_t delta = newPosition - lastPosition_;
 
-    // Si pas de changement, retourner 0
+    // Si pas de changement, retourner immédiatement
     if (delta == 0) return 0;
 
-    // Facteur de normalisation commun : 24 correspond au PPR standard des encodeurs mécaniques
-    const int32_t REFERENCE_PPR = 24;
-
-    // Calculer l'angle de rotation en unités de référence
-    // (delta / ppr_) donne la fraction de tour
-    // * REFERENCE_PPR convertit cette fraction en équivalent pour un encodeur de référence
-    int32_t normalizedDelta = (delta * REFERENCE_PPR) / ppr_;
-
+    // Mettre à jour la dernière position immédiatement
+    lastPosition_ = newPosition;
+    
+    // Mettre à jour la position physique totale
+    physicalPosition_ += delta;
+    
+    // Calculer le delta normalisé avec facteur d'échelle pour éviter la perte de précision
+    int32_t normalizedDelta = (delta * normalizationFactor_) >> 8;
+    
     // S'assurer qu'un mouvement physique réel produise toujours au moins 1 delta
     if (delta != 0 && normalizedDelta == 0) {
         normalizedDelta = (delta > 0) ? 1 : -1;
     }
 
-    // Aucun facteur d'accélération appliqué - sensibilité constante
-
-    // Mettre à jour la dernière position
-    lastPosition_ = newPosition;
-
-    // Mettre à jour la position physique totale
-    physicalPosition_ += delta;
-
-    // Calculer la position absolue directement à partir de la position physique totale
+    // Limiter le delta à la plage d'un int8_t en une seule opération
+    int8_t result = (normalizedDelta > INT8_MAX) ? INT8_MAX : 
+                   (normalizedDelta < INT8_MIN) ? INT8_MIN : 
+                   static_cast<int8_t>(normalizedDelta);
+    
+    // Recalculer la position absolue directement à partir de la position physique totale
     // pour garantir une cohérence parfaite entre les encodeurs de différents PPR
-    absolutePosition_ = (physicalPosition_ * REFERENCE_PPR) / ppr_;
-
-    // Limiter le delta à la plage d'un int8_t
-    int8_t result = 0;
-    if (normalizedDelta > INT8_MAX)
-        result = INT8_MAX;
-    else if (normalizedDelta < INT8_MIN)
-        result = INT8_MIN;
-    else
-        result = static_cast<int8_t>(normalizedDelta);
+    absolutePosition_ = (physicalPosition_ * normalizationFactor_) >> 8;
 
     // Débogage de niveau 1 (léger - pour les mouvements significatifs)
 #if defined(DEBUG) && defined(DEBUG_RAW_CONTROLS) && (DEBUG_RAW_CONTROLS == 1) && (delta != 0)

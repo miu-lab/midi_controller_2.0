@@ -45,4 +45,7 @@ private:
 
     // Position absolue normalisée (cumulative)
     int32_t absolutePosition_;
+    
+    // Facteur de normalisation pré-calculé
+    int32_t normalizationFactor_;
 };
