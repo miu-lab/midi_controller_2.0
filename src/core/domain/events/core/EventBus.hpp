@@ -61,14 +61,15 @@ public:
             }
         }
         
-        // Déplacer les éléments existants pour faire de la place
+        // Déplacer les éléments existants pour faire de la place en utilisant memmove
         if (insertIndex < count_) {
-            for (int i = count_; i > insertIndex; i--) {
-                listeners_[i] = listeners_[i-1];
-                priorities_[i] = priorities_[i-1];
-                ids_[i] = ids_[i-1];
-                active_[i] = active_[i-1];
-            }
+            int elementsToMove = count_ - insertIndex;
+            
+            // memmove est plus efficace qu'une boucle pour déplacer plusieurs éléments consécutifs
+            memmove(&listeners_[insertIndex + 1], &listeners_[insertIndex], elementsToMove * sizeof(EventListener*));
+            memmove(&priorities_[insertIndex + 1], &priorities_[insertIndex], elementsToMove * sizeof(uint8_t));
+            memmove(&ids_[insertIndex + 1], &ids_[insertIndex], elementsToMove * sizeof(SubscriptionId));
+            memmove(&active_[insertIndex + 1], &active_[insertIndex], elementsToMove * sizeof(bool));
         }
         
         // Insérer le nouvel abonnement
@@ -97,29 +98,31 @@ public:
      * @return true si désabonnement réussi, false sinon
      */
     bool unsubscribe(SubscriptionId id) {
-        for (int i = 0; i < count_; i++) {
-            if (ids_[i] == id) {
-                // Décaler tous les éléments suivants
-                for (int j = i; j < count_-1; j++) {
-                    listeners_[j] = listeners_[j+1];
-                    priorities_[j] = priorities_[j+1];
-                    ids_[j] = ids_[j+1];
-                    active_[j] = active_[j+1];
-                }
-                
-                // Réduire le compteur
-                count_--;
-                
-                // Débogage
-#if defined(DEBUG) && defined(DEBUG_EVENT_BUS) && DEBUG_EVENT_BUS
-                Serial.print(F("EVENT_BUS: Désinscription ID="));
-                Serial.print(id);
-                Serial.print(F(" - Restants: "));
-                Serial.println(count_);
-#endif
-                
-                return true;
+        int index = findSubscriptionIndex(id);
+        if (index >= 0) {
+            // Calculer le nombre d'éléments à décaler
+            int elementsToMove = count_ - index - 1;
+            
+            // Décaler tous les éléments suivants avec memmove
+            if (elementsToMove > 0) {
+                memmove(&listeners_[index], &listeners_[index+1], elementsToMove * sizeof(EventListener*));
+                memmove(&priorities_[index], &priorities_[index+1], elementsToMove * sizeof(uint8_t));
+                memmove(&ids_[index], &ids_[index+1], elementsToMove * sizeof(SubscriptionId));
+                memmove(&active_[index], &active_[index+1], elementsToMove * sizeof(bool));
             }
+            
+            // Réduire le compteur
+            count_--;
+            
+            // Débogage
+#if defined(DEBUG) && defined(DEBUG_EVENT_BUS) && DEBUG_EVENT_BUS
+            Serial.print(F("EVENT_BUS: Désinscription ID="));
+            Serial.print(id);
+            Serial.print(F(" - Restants: "));
+            Serial.println(count_);
+#endif
+            
+            return true;
         }
         
         return false;  // ID non trouvé
@@ -131,18 +134,17 @@ public:
      * @return true si mise en pause réussie, false sinon
      */
     bool pause(SubscriptionId id) {
-        for (int i = 0; i < count_; i++) {
-            if (ids_[i] == id) {
-                active_[i] = false;
-                
-                // Débogage
+        int index = findSubscriptionIndex(id);
+        if (index >= 0) {
+            active_[index] = false;
+            
+            // Débogage
 #if defined(DEBUG) && defined(DEBUG_EVENT_BUS) && DEBUG_EVENT_BUS
-                Serial.print(F("EVENT_BUS: Mise en pause ID="));
-                Serial.println(id);
+            Serial.print(F("EVENT_BUS: Mise en pause ID="));
+            Serial.println(id);
 #endif
-                
-                return true;
-            }
+            
+            return true;
         }
         
         return false;  // ID non trouvé
@@ -154,18 +156,17 @@ public:
      * @return true si reprise réussie, false sinon
      */
     bool resume(SubscriptionId id) {
-        for (int i = 0; i < count_; i++) {
-            if (ids_[i] == id) {
-                active_[i] = true;
-                
-                // Débogage
+        int index = findSubscriptionIndex(id);
+        if (index >= 0) {
+            active_[index] = true;
+            
+            // Débogage
 #if defined(DEBUG) && defined(DEBUG_EVENT_BUS) && DEBUG_EVENT_BUS
-                Serial.print(F("EVENT_BUS: Reprise ID="));
-                Serial.println(id);
+            Serial.print(F("EVENT_BUS: Reprise ID="));
+            Serial.println(id);
 #endif
-                
-                return true;
-            }
+            
+            return true;
         }
         
         return false;  // ID non trouvé
@@ -193,7 +194,11 @@ public:
                 if (listeners_[i]->onEvent(event)) {
                     handled = true;
                     event.setHandled();
-                    // On continue de propager l'événement même s'il est traité
+                }
+                
+                // Arrêter la propagation si demandé
+                if (!event.shouldPropagate()) {
+                    break;
                 }
             }
         }
@@ -231,13 +236,7 @@ public:
      * @return true si l'abonnement existe, false sinon
      */
     bool exists(SubscriptionId id) const {
-        for (int i = 0; i < count_; i++) {
-            if (ids_[i] == id) {
-                return true;
-            }
-        }
-        
-        return false;  // ID non trouvé
+        return findSubscriptionIndex(id) >= 0;
     }
     
     /**
@@ -246,13 +245,8 @@ public:
      * @return true si l'abonnement est actif, false sinon
      */
     bool isActive(SubscriptionId id) const {
-        for (int i = 0; i < count_; i++) {
-            if (ids_[i] == id) {
-                return active_[i];
-            }
-        }
-        
-        return false;  // ID non trouvé
+        int index = findSubscriptionIndex(id);
+        return (index >= 0) ? active_[index] : false;
     }
     
     /**
@@ -264,6 +258,24 @@ public:
     }
 
 private:
+    /**
+     * @brief Recherche l'index d'un abonnement par son ID
+     * @param id Identifiant d'abonnement à rechercher
+     * @return Index de l'abonnement, ou -1 si non trouvé
+     * 
+     * Cette fonction optimise la recherche d'abonnements par ID.
+     */
+    int findSubscriptionIndex(SubscriptionId id) const {
+        // Recherche linéaire optimisée
+        // Pour de petits tableaux, c'est plus rapide qu'une recherche par hachage
+        for (int i = 0; i < count_; i++) {
+            if (ids_[i] == id) {
+                return i;
+            }
+        }
+        return -1; // Non trouvé
+    }
+    
     // Constructeur privé (singleton)
     EventBus() : count_(0), nextId_(1) {}
     
