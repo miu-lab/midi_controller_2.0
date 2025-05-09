@@ -6,6 +6,11 @@
 #include "adapters/secondary/storage/ProfileManager.hpp"
 #include "app/services/NavigationConfigService.hpp"
 #include "core/domain/commands/CommandManager.hpp"
+#include "core/domain/events/EventSystem.hpp"
+
+// Forward declarations
+class MidiSystemEventListener;
+class MidiSystemSimpleListener;
 
 /**
  * @brief Système gérant toutes les fonctionnalités MIDI
@@ -21,6 +26,11 @@ public:
      * @param profileManager Gestionnaire de profils pour les mappings MIDI
      */
     MidiSystem(ProfileManager& profileManager);
+
+    /**
+     * @brief Destructeur - libère les ressources et se désabonne du bus d'événements
+     */
+    ~MidiSystem();
 
     /**
      * @brief Initialise le système MIDI sans gestion de navigation
@@ -65,6 +75,14 @@ private:
     CommandManager commandManager_;    // Gestionnaire de commandes MIDI
     MidiMapper midiMapper_;            // Mapper d'événements vers commandes MIDI
     ProfileManager& profileManager_;   // Référence au gestionnaire de profils
+    
+    // Écouteurs d'événements statiques pour éviter des allocations dynamiques
+    MidiSystemSimpleListener* simpleListener_;
+    MidiSystemEventListener* eventListener_;
+    
+    // ID d'abonnements pour pouvoir se désabonner
+    SubscriptionId simpleListenerSubId_;
+    SubscriptionId eventListenerSubId_;
 
     // Méthode d'initialisation commune
     void initSubscriptions();

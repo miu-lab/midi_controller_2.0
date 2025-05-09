@@ -11,8 +11,29 @@ MidiSystem::MidiSystem(ProfileManager& profileManager)
       midiInHandler_(),
       commandManager_(),
       midiMapper_(bufferedMidiOut_, commandManager_),
-      profileManager_(profileManager) {
+      profileManager_(profileManager),
+      simpleListener_(nullptr),
+      eventListener_(nullptr),
+      simpleListenerSubId_(0),
+      eventListenerSubId_(0) {
     // Note: InputRouter n'est plus utilisé directement, on utilise MidiMapper à la place
+}
+
+MidiSystem::~MidiSystem() {
+    // Se désabonner du bus d'événements
+    auto& eventBus = EventBus::getInstance();
+    
+    if (simpleListenerSubId_ != 0) {
+        eventBus.unsubscribe(simpleListenerSubId_);
+    }
+    
+    if (eventListenerSubId_ != 0) {
+        eventBus.unsubscribe(eventListenerSubId_);
+    }
+    
+    // Libérer les écouteurs (peuvent être nullptr si non initialisés)
+    delete simpleListener_;
+    delete eventListener_;
 }
 
 void MidiSystem::init() {
@@ -38,13 +59,49 @@ void MidiSystem::init() {
 
 void MidiSystem::init(NavigationConfigService& navService) {
     Serial.println("MidiSystem::init(NavigationConfigService&) called");
-    init();  // Appel à l'initialisation de base
-
-    // S'abonner aux événements d'entrée
+    
+    // D'abord se désabonner de tout écouteur existant, y compris le simpleListener
     auto& eventBus = EventBus::getInstance();
     
-    // S'abonner au bus d'événements
-    eventBus.subscribe(new MidiSystemEventListener(*this, navService));
+    // Désabonner et libérer l'écouteur simple
+    if (simpleListener_ != nullptr) {
+        if (simpleListenerSubId_ != 0) {
+            eventBus.unsubscribe(simpleListenerSubId_);
+            simpleListenerSubId_ = 0;
+        }
+        delete simpleListener_;
+        simpleListener_ = nullptr;
+    }
+    
+    // Désabonner et libérer l'écouteur existant avec navigation
+    if (eventListener_ != nullptr) {
+        if (eventListenerSubId_ != 0) {
+            eventBus.unsubscribe(eventListenerSubId_);
+            eventListenerSubId_ = 0;
+        }
+        delete eventListener_;
+        eventListener_ = nullptr;
+    }
+    
+    // Initialiser les mappings comme dans init() mais sans créer un simple listener
+    for (const auto& mapping : profileManager_.getAllMappings()) {
+        bool isRelative = mapping.midiControl.relative;
+
+        std::unique_ptr<IMidiMappingStrategy> strategy;
+        if (isRelative) {
+            strategy = MidiMappingFactory::createRelative();
+        } else {
+            strategy = MidiMappingFactory::createAbsolute(0, 127);
+        }
+
+        midiMapper_.setMapping(mapping.controlId, mapping.midiControl, std::move(strategy));
+    }
+    
+    // Créer uniquement l'écouteur avec navigation
+    eventListener_ = new MidiSystemEventListener(*this, navService);
+    
+    // S'abonner au bus d'événements avec l'objet et enregistrer l'ID
+    eventListenerSubId_ = eventBus.subscribe(eventListener_);
 }
 
 void MidiSystem::update() {
@@ -72,9 +129,20 @@ MidiMapper& MidiSystem::getMidiMapper() {
 
 void MidiSystem::initSubscriptions() {
     Serial.println("MidiSystem::initSubscriptions() called");
-    // S'abonner aux événements d'entrée pour le routage MIDI
-    auto& eventBus = EventBus::getInstance();
     
-    // S'abonner au bus d'événements
-    eventBus.subscribe(new MidiSystemSimpleListener(*this));
+    // Libérer l'écouteur existant s'il y en a un
+    if (simpleListener_ != nullptr) {
+        auto& eventBus = EventBus::getInstance();
+        if (simpleListenerSubId_ != 0) {
+            eventBus.unsubscribe(simpleListenerSubId_);
+        }
+        delete simpleListener_;
+    }
+    
+    // Créer une instance statique de l'écouteur
+    simpleListener_ = new MidiSystemSimpleListener(*this);
+    
+    // S'abonner au bus d'événements et enregistrer l'ID d'abonnement
+    auto& eventBus = EventBus::getInstance();
+    simpleListenerSubId_ = eventBus.subscribe(simpleListener_);
 }
