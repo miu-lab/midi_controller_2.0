@@ -1,6 +1,12 @@
 #include "app/services/UiEventService.hpp"
 
 void UiEventService::init(NavigationConfigService& navService) {
+    // Désabonner l'écouteur existant s'il existe
+    if (subscriptionId_ != 0) {
+        EventBus::getInstance().unsubscribe(subscriptionId_);
+        subscriptionId_ = 0;
+    }
+
     // Stocker la référence au service de navigation
     navService_ = &navService;
 
@@ -9,6 +15,12 @@ void UiEventService::init(NavigationConfigService& navService) {
 }
 
 void UiEventService::setupDebugSubscriptions() {
+    // Annuler l'abonnement existant s'il y en a un
+    if (subscriptionId_ != 0) {
+        EventBus::getInstance().unsubscribe(subscriptionId_);
+        subscriptionId_ = 0;
+    }
+
     // S'abonner à tous les événements
     subscriptionId_ = EventBus::getInstance().subscribe(this);
 }
@@ -16,27 +28,27 @@ void UiEventService::setupDebugSubscriptions() {
 bool UiEventService::onEvent(const Event& event) {
     // Traiter les événements en fonction de leur type
     switch (event.getType()) {
-        case EventTypes::EncoderTurned:
-            printEncoderEvent(static_cast<const EncoderTurnedEvent&>(event));
-            break;
-            
-        case EventTypes::EncoderButton:
-            printEncoderButtonEvent(static_cast<const EncoderButtonEvent&>(event));
-            break;
-            
-        case EventTypes::ButtonPressed:
-            printButtonPressedEvent(static_cast<const ButtonPressedEvent&>(event));
-            break;
-            
-        case EventTypes::ButtonReleased:
-            printButtonReleasedEvent(static_cast<const ButtonReleasedEvent&>(event));
-            break;
-            
-        default:
-            // Événement non géré
-            return false;
+    case EventTypes::EncoderTurned:
+        // printEncoderEvent(static_cast<const EncoderTurnedEvent&>(event));
+        break;
+
+    case EventTypes::EncoderButton:
+        // printEncoderButtonEvent(static_cast<const EncoderButtonEvent&>(event));
+        break;
+
+    case EventTypes::ButtonPressed:
+        // printButtonPressedEvent(static_cast<const ButtonPressedEvent&>(event));
+        break;
+
+    case EventTypes::ButtonReleased:
+        // printButtonReleasedEvent(static_cast<const ButtonReleasedEvent&>(event));
+        break;
+
+    default:
+        // Événement non géré
+        return false;
     }
-    
+
     // L'événement a été traité (pour l'affichage), mais on ne le marque pas comme entièrement géré
     // pour permettre à d'autres écouteurs de le traiter également
     return false;
