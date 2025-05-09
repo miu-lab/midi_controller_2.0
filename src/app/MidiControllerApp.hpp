@@ -14,6 +14,7 @@
 #include "app/services/EventInputSystem.hpp"
 #include "core/listeners/UIEventListener.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
+#include <memory> // Pour std::unique_ptr et std::make_unique
 
 /**
  * @brief Application principale du contrôleur MIDI
@@ -67,8 +68,8 @@ private:
     UiEventService uiEventService_;
     
     // Écouteurs d'événements
-    UIControllerEventListener* uiControllerEventListener_ = nullptr;
-    UIEventListener* uiEventListener_ = nullptr;
+    std::unique_ptr<UIControllerEventListener> uiControllerEventListener_;
+    std::unique_ptr<UIEventListener> uiEventListener_;
     
     // IDs d'abonnements
     SubscriptionId uiControllerEventListenerSubId_ = 0;

@@ -5,25 +5,16 @@
 
 #include "core/TaskScheduler.hpp"
 #include "core/controllers/UIController.hpp"
-#include "core/listeners/UIControllerEventListener.hpp"
 #include "core/domain/events/EventSystem.hpp"
+#include "core/listeners/UIControllerEventListener.hpp"
 
 MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
-    // Service de configuration
-    : configService_(appConfig)
-      // Gestion des profils et navigation
-      ,
-      navigationConfig_()
-      // Systèmes
-      ,
-      profileManager_()
-      ,
-      midiSystem_(profileManager_)
-      ,
-      eventInputSystem_()
-      ,
-      uiEventService_()
-      ,
+    : configService_(appConfig),
+      navigationConfig_(),
+      profileManager_(),
+      midiSystem_(profileManager_),
+      eventInputSystem_(),
+      uiEventService_(),
       uiControllerEventListener_(nullptr),
       uiEventListener_(nullptr),
       uiControllerEventListenerSubId_(0),
@@ -35,11 +26,11 @@ MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
     ServiceLocator::registerNavigationConfigService(&navigationConfig_);
     ServiceLocator::registerProfileManager(&profileManager_);
     ServiceLocator::registerMidiSystem(&midiSystem_);
-    
+
     // Convertir EventInputSystem en InputSystem pour la compatibilité avec ServiceLocator
     InputSystem* inputSystem = &eventInputSystem_;
     ServiceLocator::registerInputSystem(inputSystem);
-    
+
     ServiceLocator::registerUiEventService(&uiEventService_);
     ServiceLocator::registerConfigurationService(&configService_);
 }
@@ -47,19 +38,18 @@ MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
 MidiControllerApp::~MidiControllerApp() {
     // Se désabonner du bus d'événements
     auto& eventBus = EventBus::getInstance();
-    
+
     // Désabonnement et libération des écouteurs
     if (uiControllerEventListenerSubId_ != 0) {
         eventBus.unsubscribe(uiControllerEventListenerSubId_);
     }
-    
+
     if (uiEventListenerSubId_ != 0) {
         eventBus.unsubscribe(uiEventListenerSubId_);
     }
-    
-    // Libérer les écouteurs
-    delete uiControllerEventListener_;
-    delete uiEventListener_;
+
+    // Les smart pointers uiControllerEventListener_ et uiEventListener_ 
+    // seront automatiquement libérés par leur destructeur
 }
 
 void MidiControllerApp::setControlForNavigation(ControlId id, bool isNavigation) {
@@ -85,48 +75,54 @@ void MidiControllerApp::init() {
 
     // 3) Initialiser le service d'interface utilisateur
     uiEventService_.init(navigationConfig_);
-    // Note: setupDebugSubscriptions() est déjà appelé dans init(), pas besoin de l'appeler à nouveau
-    
-    // 4) Initialiser la chaîne UI : ViewManager, MenuController, UIController et UIControllerEventListener
-    
+    // Note: setupDebugSubscriptions() est déjà appelé dans init(), pas besoin de l'appeler à
+    // nouveau
+
+    // 4) Initialiser la chaîne UI : ViewManager, MenuController, UIController et
+    // UIControllerEventListener
+
     // Note: Pour l'instant, nous ne créons pas réellement ces composants car ils nécessitent
-    // des implémentations supplémentaires. Ce commentaire sert de guide pour la mise en œuvre future.
-    
+    // des implémentations supplémentaires. Ce commentaire sert de guide pour la mise en œuvre
+    // future.
+
     /*
-    // Créer le ViewManager
-    ViewManager* viewManager = new ViewManager();
-    ServiceLocator::registerViewManager(viewManager);
-    
-    // Créer le MenuController
-    MenuController* menuController = new MenuController();
-    ServiceLocator::registerMenuController(menuController);
-    
-    // Créer l'instance du UIController
-    UIController* uiController = new UIController(*viewManager, *menuController);
-    
+    // Créer le ViewManager avec un smart pointer
+    auto viewManager = std::make_unique<ViewManager>();
+    ServiceLocator::registerViewManager(viewManager.get());
+
+    // Créer le MenuController avec un smart pointer
+    auto menuController = std::make_unique<MenuController>();
+    ServiceLocator::registerMenuController(menuController.get());
+
+    // Créer l'instance du UIController avec un smart pointer
+    auto uiController = std::make_unique<UIController>(*viewManager, *menuController);
+
     // Enregistrer le UIController dans le ServiceLocator
-    ServiceLocator::registerUIController(uiController);
-    
-    // S'il existe déjà un écouteur, le désabonner et le libérer
-    if (uiControllerEventListener_ != nullptr) {
+    ServiceLocator::registerUIController(uiController.get());
+
+    // S'il existe déjà un écouteur, le désabonner et le libérer automatiquement (via unique_ptr)
+    if (uiControllerEventListener_) {
         if (uiControllerEventListenerSubId_ != 0) {
             EventBus::getInstance().unsubscribe(uiControllerEventListenerSubId_);
+            uiControllerEventListenerSubId_ = 0;
         }
-        delete uiControllerEventListener_;
     }
-    
-    // Créer et enregistrer l'écouteur d'événements
-    uiControllerEventListener_ = new UIControllerEventListener(*uiController, navigationConfig_);
-    
+
+    // Créer et enregistrer l'écouteur d'événements avec un smart pointer
+    uiControllerEventListener_ = std::make_unique<UIControllerEventListener>(*uiController, navigationConfig_);
+
     // S'abonner au bus d'événements avec priorité élevée
-    uiControllerEventListenerSubId_ = EventBus::getInstance().subscribe(uiControllerEventListener_, 10); // Priorité élevée (10) pour les événements UI
-    
+    uiControllerEventListenerSubId_ = EventBus::getInstance().subscribe(uiControllerEventListener_.get(),
+    10); // Priorité élevée (10) pour les événements UI
+
     // Enregistrer l'écouteur dans le ServiceLocator
-    ServiceLocator::registerUIControllerEventListener(uiControllerEventListener_);
+    ServiceLocator::registerUIControllerEventListener(uiControllerEventListener_.get());
     */
-    
+
 #ifdef DEBUG
-    Serial.println(F("Note: L'initialisation de UIController est commentée pour l'instant et sera implémentée dans une étape ultérieure"));
+    Serial.println(
+        F("Note: L'initialisation de UIController est commentée pour l'instant et sera implémentée "
+          "dans une étape ultérieure"));
 #endif
 }
 
@@ -136,7 +132,7 @@ void MidiControllerApp::update() {
 
     // 2) Traitement MIDI
     midiSystem_.update();
-    
+
     // 3) Note: La mise à jour des contrôleurs est gérée via les événements
     // Notre écouteur UIControllerEventListener se charge de router les événements
 }
