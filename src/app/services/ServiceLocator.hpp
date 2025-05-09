@@ -4,16 +4,16 @@
 #include <memory>
 #include <string>
 
+#include "adapters/primary/ui/ViewManager.hpp"
 #include "config/ApplicationConfiguration.hpp"
 #include "config/common/CommonIncludes.hpp"
+#include "core/controllers/MenuController.hpp"
 #include "core/domain/IButton.hpp"
 #include "core/domain/IDisplay.hpp"
 #include "core/domain/IEncoder.hpp"
 #include "core/domain/IMidiOut.hpp"
 #include "core/domain/IProfileManager.hpp"
 #include "core/domain/events/EventSystem.hpp"
-#include "adapters/primary/ui/ViewManager.hpp"
-#include "core/controllers/MenuController.hpp"
 
 // Forward declarations
 class ConfigurationService;
