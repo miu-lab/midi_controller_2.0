@@ -83,6 +83,29 @@ public:
      * @return Nombre de tâches
      */
     size_t getTaskCount() const;
+    
+    /**
+     * @brief Renvoie le nombre de cycles d'exécution
+     * @return Nombre total de cycles
+     */
+    uint32_t getCycleCount() const { return cycleCount; }
+    
+    /**
+     * @brief Renvoie le nombre de dépassements de budget CPU
+     * @return Nombre de dépassements
+     */
+    uint32_t getOverruns() const { return overruns; }
+
+    /**
+     * @brief Affiche les statistiques de performance en mode debug
+     */
+    void printDebugStats();
+    
+    /**
+     * @brief Affiche les statistiques sur le port série
+     * @param showDetailedStats Afficher les détails des tâches
+     */
+    void printStats(bool showDetailedStats = false);
 
 private:
     std::vector<Task> tasks;
@@ -105,11 +128,6 @@ private:
      * @return Temps d'exécution en microsecondes
      */
     uint32_t executeTask(int taskIndex);
-    
-    /**
-     * @brief Affiche les statistiques de performance en mode debug
-     */
-    void printDebugStats();
 };
 
 // Singleton global pour faciliter l'accès

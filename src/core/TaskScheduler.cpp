@@ -7,6 +7,9 @@ TaskScheduler scheduler;
 TaskScheduler::TaskScheduler() 
     : cycleStartTime(0), totalExecutionTime(0), cpuUsage(0),
       overruns(0), cycleCount(0) {
+#ifdef DEBUG
+    DEBUG_SCHEDULER("TaskScheduler initialise - Niveau de debug: %d", DEBUG_TASK_SCHEDULER_LEVEL);
+#endif
 }
 
 int TaskScheduler::addTask(TaskFunction func, uint32_t intervalMicros, uint8_t priority, const char* name) {
@@ -47,7 +50,9 @@ void TaskScheduler::update(uint32_t maxMicros) {
             // Vérifie si on a assez de temps dans le budget
             if (elapsedTime > maxMicros) {
                 overruns++;
-                DEBUG_SCHEDULER("Budget CPU dépassé, tâche '%s' reportée", task.name);
+#ifdef DEBUG
+                DEBUG_SCHEDULER_VERBOSE("Budget CPU dépassé, tâche '%s' reportée", task.name);
+#endif
                 break;
             }
             
@@ -66,10 +71,13 @@ void TaskScheduler::update(uint32_t maxMicros) {
         cpuUsage = cpuUsage * 0.95 + usage * 0.05;
     }
     
-    // Affichage des statistiques de debug (toutes les 100 itérations)
-    if (DEBUG_TASK_SCHEDULER && cycleCount % 100 == 0) {
+    // Affichage des statistiques de debug (toutes les 10 secondes)
+    // Cycle count est incrémenté environ 1000 fois par seconde, donc 10000 = 10 secondes
+#ifdef DEBUG
+    if (DEBUG_TASK_SCHEDULER_LEVEL >= 1 && cycleCount % 10000 == 0) {
         printDebugStats();
     }
+#endif
 }
 
 void TaskScheduler::enableTask(int taskIndex, bool enabled) {
@@ -125,19 +133,80 @@ uint32_t TaskScheduler::executeTask(int taskIndex) {
         task.executionTime = task.executionTime * 0.9 + executionTime * 0.1;
     }
     
-    DEBUG_SCHEDULER("Tâche '%s' exécutée en %u µs", task.name, executionTime);
+#ifdef DEBUG
+    DEBUG_SCHEDULER_VERBOSE("Tâche '%s' exécutée en %u µs", task.name, executionTime);
+#endif
     
     return executionTime;
 }
 
 void TaskScheduler::printDebugStats() {
-    DEBUG_SCHEDULER("Stats CPU: %.2f%% utilisation", getCpuUsage());
-    DEBUG_SCHEDULER("Overruns: %u/%u cycles", overruns, cycleCount);
+#ifdef DEBUG
+    // Ajout d'un séparateur pour améliorer la lisibilité
+    DEBUG_SCHEDULER("========== STATISTIQUES SCHEDULER ===========");
     
-    DEBUG_SCHEDULER("Tâches:");
-    for (size_t i = 0; i < tasks.size(); i++) {
-        DEBUG_SCHEDULER("  [%u] %s: P%u, %u µs/cycle, interval %u µs, %s", 
-            i, tasks[i].name, tasks[i].priority, tasks[i].executionTime, 
-            tasks[i].interval, tasks[i].enabled ? "ON" : "OFF");
+    // Informations de base (toujours disponibles si DEBUG_TASK_SCHEDULER est activé)
+    DEBUG_SCHEDULER("CPU: %.2f%% | Cycles: %u | Overruns: %u", 
+                  getCpuUsage(), cycleCount, overruns);
+                  
+    // Pour le mode verbose, afficher les détails des tâches
+    if (DEBUG_TASK_SCHEDULER_LEVEL >= 2) {
+        DEBUG_SCHEDULER_VERBOSE("Détails des tâches actives:");
+        for (size_t i = 0; i < tasks.size(); i++) {
+            if (tasks[i].enabled) {
+                DEBUG_SCHEDULER_VERBOSE("  [%u] %s: P%u, %u µs/cycle, interval %u µs", 
+                    i, tasks[i].name, tasks[i].priority, tasks[i].executionTime, 
+                    tasks[i].interval);
+            }
+        }
+        
+        // Afficher les tâches désactivées séparément
+        bool hasDisabledTasks = false;
+        for (size_t i = 0; i < tasks.size(); i++) {
+            if (!tasks[i].enabled) {
+                if (!hasDisabledTasks) {
+                    DEBUG_SCHEDULER_VERBOSE("Tâches désactivées:");
+                    hasDisabledTasks = true;
+                }
+                DEBUG_SCHEDULER_VERBOSE("  [%u] %s", i, tasks[i].name);
+            }
+        }
     }
+    
+    // Terminateur
+    DEBUG_SCHEDULER("============================================");
+#endif
+}
+
+void TaskScheduler::printStats(bool showDetailedStats) {
+    // Affiche les statistiques CPU de base sur le port série (fonctionne même en mode non-DEBUG)
+    Serial.println("========== STATISTIQUES SCHEDULER ===========");
+    Serial.printf("CPU: %.2f%% | Cycles: %u | Overruns: %u\n", 
+                getCpuUsage(), cycleCount, overruns);
+    
+    // Pour le mode verbose, afficher les détails des tâches
+    if (showDetailedStats || (DEBUG_TASK_SCHEDULER_LEVEL >= 2)) {
+        Serial.println("Détails des tâches actives:");
+        for (size_t i = 0; i < tasks.size(); i++) {
+            if (tasks[i].enabled) {
+                Serial.printf("  [%u] %s: P%u, %u µs/cycle, interval %u µs\n", 
+                    i, tasks[i].name, tasks[i].priority, tasks[i].executionTime, 
+                    tasks[i].interval);
+            }
+        }
+        
+        // Afficher les tâches désactivées séparément
+        bool hasDisabledTasks = false;
+        for (size_t i = 0; i < tasks.size(); i++) {
+            if (!tasks[i].enabled) {
+                if (!hasDisabledTasks) {
+                    Serial.println("Tâches désactivées:");
+                    hasDisabledTasks = true;
+                }
+                Serial.printf("  [%u] %s\n", i, tasks[i].name);
+            }
+        }
+    }
+    
+    Serial.println("============================================");
 }
