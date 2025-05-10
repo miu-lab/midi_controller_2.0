@@ -1,6 +1,7 @@
 #include "core/use_cases/ProcessEncoders.hpp"
 
 #include "core/domain/events/EventSystem.hpp"
+#include "tools/Diagnostics.hpp"
 
 ProcessEncoders::ProcessEncoders(const std::vector<IEncoder *> &encoders)
     : encoders_(encoders),
@@ -36,6 +37,13 @@ void ProcessEncoders::update() {
 
         // N'envoyer un événement que si la position absolue a changé
         if (absPos != lastAbsPos_[i]) {
+            // Diagnostic pour le changement d'encodeur
+            char diagEvent[60];
+            snprintf(diagEvent, sizeof(diagEvent), 
+                    "ProcessEncoders: ID=%d absPos=%ld->%ld delta=%d", 
+                    encoder->getId(), lastAbsPos_[i], absPos, delta);
+            DIAG_ON_EVENT(diagEvent);
+            
             // Déboguer uniquement les changements de position absolue
 #if defined(DEBUG) && defined(DEBUG_RAW_CONTROLS) && (DEBUG_RAW_CONTROLS >= 1)
             Serial.print("ENC_ABS_CHANGED ");
@@ -61,6 +69,13 @@ void ProcessEncoders::update() {
 
         bool pressed = encoder->isPressed();
         if (pressed != lastPressed_[i]) {
+            // Diagnostic pour le changement d'état du bouton d'encodeur
+            char diagEvent[60];
+            snprintf(diagEvent, sizeof(diagEvent), 
+                    "ProcessEncoders: Bouton ID=%d %s", 
+                    encoder->getId(), pressed ? "pressé" : "relâché");
+            DIAG_ON_EVENT(diagEvent);
+            
             lastPressed_[i] = pressed;
 
             // Ordre de priorité pour traiter l'événement:

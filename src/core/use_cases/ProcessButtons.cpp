@@ -1,6 +1,7 @@
 #include "core/use_cases/ProcessButtons.hpp"
 
 #include "core/domain/events/EventSystem.hpp"
+#include "tools/Diagnostics.hpp"
 
 ProcessButtons::ProcessButtons(const std::vector<IButton*>& buttons)
     : buttons_(buttons),
@@ -17,6 +18,12 @@ void ProcessButtons::initStates() {
         lastPressed_[i] = btn->isPressed();
     }
     initialized_ = true;
+    
+    // Diagnostic d'initialisation - utiliser un buffer plus grand pour éviter la troncature
+    char diagEvent[50]; // Augmentation de la taille du buffer
+    snprintf(diagEvent, sizeof(diagEvent), 
+             "ProcessButtons: %d boutons initialisés", (int)buttons_.size());
+    DIAG_ON_EVENT(diagEvent);
 }
 
 void ProcessButtons::setOnButtonStateChangedCallback(ButtonStateChangedCallback callback) {
@@ -39,6 +46,13 @@ void ProcessButtons::update() {
         IButton* btn = buttons_[i];
         bool pressed = btn->isPressed();
         if (pressed != lastPressed_[i]) {
+            // Diagnostic pour le changement d'état du bouton
+            char diagEvent[50];
+            snprintf(diagEvent, sizeof(diagEvent), 
+                     "ProcessButtons: Bouton ID=%d %s", 
+                     btn->getId(), pressed ? "pressé" : "relâché");
+            DIAG_ON_EVENT(diagEvent);
+            
             lastPressed_[i] = pressed;
 
             // Ordre de priorité pour traiter l'événement:
