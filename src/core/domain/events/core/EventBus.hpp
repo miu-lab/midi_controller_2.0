@@ -8,6 +8,15 @@
 // Identifiant d'abonnement
 using SubscriptionId = uint16_t;
 
+// Assurer que DEBUG_EVENT_BUS est défini même si DebugMacros.hpp n'est pas inclus
+#ifndef DEBUG_EVENT_BUS
+#ifdef DEBUG
+#define DEBUG_EVENT_BUS(format, ...) do { if (Serial) { Serial.printf_P(PSTR(format), ##__VA_ARGS__); } } while(0)
+#else
+#define DEBUG_EVENT_BUS(format, ...) do {} while(0)
+#endif
+#endif
+
 // Nombre initial et maximum d'abonnements (configurable)
 #ifndef INITIAL_EVENT_LISTENERS
 #define INITIAL_EVENT_LISTENERS 8
