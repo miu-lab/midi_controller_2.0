@@ -3,6 +3,7 @@
 #include <Arduino.h>  // Pour la fonction constrain
 
 #include "config/GlobalSettings.hpp"
+#include "tools/Diagnostics.hpp"
 
 MidiMapper::MidiMapper(IMidiOut& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
@@ -28,11 +29,22 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
 
     // Ajouter le nouveau mapping
     mappings_[controlId] = std::move(info);
+    
+    // Diagnostic d'ajout de mapping
+    char eventName[40];
+    snprintf(eventName, sizeof(eventName), "Mapping ajouté: ID=%d CH=%d CC=%d",
+             controlId, midiControl.channel, midiControl.control);
+    DIAG_ON_EVENT(eventName);
 }
 
 bool MidiMapper::removeMapping(ControlId controlId) {
     auto it = mappings_.find(controlId);
     if (it != mappings_.end()) {
+        // Diagnostic de suppression de mapping
+        char eventName[40];
+        snprintf(eventName, sizeof(eventName), "Mapping supprimé: ID=%d", controlId);
+        DIAG_ON_EVENT(eventName);
+        
         mappings_.erase(it);
         return true;
     }
@@ -84,6 +96,12 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     int32_t delta = position - info.lastEncoderPosition;
     if (delta == 0) return;  // Pas de changement
 
+    // Diagnostic avant application de la sensibilité
+    char preSensitivityEvent[50];
+    snprintf(preSensitivityEvent, sizeof(preSensitivityEvent), 
+             "Pre-sensibilité: Enc=%d Delta=%ld", encoderId, delta);
+    DIAG_ON_EVENT(preSensitivityEvent);
+
     // Appliquer le facteur de sensibilité global si ce n'est pas un contrôle de navigation
     if (!isNavigationControl(encoderId) && delta != 0) {
         float sensitivity = GlobalSettings::getInstance().getEncoderSensitivity();
@@ -97,7 +115,16 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
             if (scaled_delta_abs == 0 && delta_abs > 0) scaled_delta_abs = 1;
 
             // Reconstruire delta avec son signe
-            delta = delta_sign * scaled_delta_abs;
+            int32_t new_delta = delta_sign * scaled_delta_abs;
+            
+            // Diagnostic après application de la sensibilité
+            char sensitivityEvent[60];
+            snprintf(sensitivityEvent, sizeof(sensitivityEvent), 
+                     "Post-sensibilité: Enc=%d Delta=%ld->%ld Sens=%.2f", 
+                     encoderId, delta, new_delta, sensitivity);
+            DIAG_ON_EVENT(sensitivityEvent);
+            
+            delta = new_delta;
         }
     }
 
@@ -134,6 +161,14 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Ne rien faire si la valeur n'a pas changé
     if (newValue == info.lastMidiValue) return;
 
+    // Diagnostic de la valeur MIDI envoyée
+    char midiEvent[60];
+    snprintf(midiEvent, sizeof(midiEvent), 
+             "Envoi MIDI: Enc=%d CH=%d CC=%d Val=%d (mode %s)", 
+             encoderId, control.channel, control.control, newValue,
+             control.relative ? "relatif" : "absolu");
+    DIAG_ON_EVENT(midiEvent);
+
     // Mettre à jour et envoyer la nouvelle valeur
     info.lastMidiValue = static_cast<uint8_t>(newValue);
 
@@ -155,6 +190,13 @@ void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
 
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
+
+    // Diagnostic du bouton d'encodeur
+    char buttonEvent[60];
+    snprintf(buttonEvent, sizeof(buttonEvent), 
+             "Bouton encodeur MIDI: ID=%d CH=%d Note=%d Vel=%d", 
+             encoderId, control.channel, control.control, velocity);
+    DIAG_ON_EVENT(buttonEvent);
 
     // Créer et exécuter la commande
     auto command =
@@ -189,6 +231,13 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
 
+    // Diagnostic du bouton
+    char buttonEvent[50];
+    snprintf(buttonEvent, sizeof(buttonEvent), 
+             "Bouton MIDI: ID=%d CH=%d Note=%d Vel=%d", 
+             buttonId, control.channel, control.control, velocity);
+    DIAG_ON_EVENT(buttonEvent);
+
     // Créer et exécuter la commande
     auto command =
         std::make_unique<SendMidiNoteCommand>(midiOut_, control.channel, control.control, velocity);
@@ -219,6 +268,12 @@ void MidiMapper::update() {
     // Supprimer les notes qui ne sont plus actives
     for (auto it = activeNotes_.begin(); it != activeNotes_.end();) {
         if (!it->second->isNoteActive()) {
+            // Diagnostic de suppression de note
+            char noteEvent[50];
+            snprintf(noteEvent, sizeof(noteEvent), 
+                     "Note supprimée: ID=%d", it->first);
+            DIAG_ON_EVENT(noteEvent);
+            
             it = activeNotes_.erase(it);
         } else {
             ++it;
