@@ -1,5 +1,6 @@
 #include "app/services/EventInputSystem.hpp"
 #include "config/debug/DebugConfig.hpp"
+#include "tools/Diagnostics.hpp"
 
 EventInputSystem::EventInputSystem()
     : InputSystem(),  // Appeler le constructeur de la classe de base
@@ -56,6 +57,11 @@ void EventInputSystem::update() {
 }
 
 void EventInputSystem::handleEncoderTurn(uint8_t id, int32_t position, int8_t delta) {
+    // Déclencher les diagnostics sur l'événement
+    char eventName[32];
+    snprintf(eventName, sizeof(eventName), "Encodeur %d tourne (%d)", id, delta);
+    DIAG_ON_EVENT(eventName);
+    
     // Créer et publier l'événement sur le bus d'événements
     EncoderTurnedEvent event(id, position, delta);
     EventBus::getInstance().publish(event);
@@ -71,6 +77,11 @@ void EventInputSystem::handleEncoderTurn(uint8_t id, int32_t position, int8_t de
 }
 
 void EventInputSystem::handleEncoderButton(uint8_t id, bool pressed) {
+    // Déclencher les diagnostics sur l'événement
+    char eventName[32];
+    snprintf(eventName, sizeof(eventName), "Bouton encodeur %d %s", id, pressed ? "pressé" : "relâché");
+    DIAG_ON_EVENT(eventName);
+    
     // Créer et publier l'événement sur le bus d'événements
     EncoderButtonEvent event(id, pressed);
     EventBus::getInstance().publish(event);
@@ -84,6 +95,11 @@ void EventInputSystem::handleEncoderButton(uint8_t id, bool pressed) {
 }
 
 void EventInputSystem::handleButton(uint8_t id, bool pressed) {
+    // Déclencher les diagnostics sur l'événement
+    char eventName[32];
+    snprintf(eventName, sizeof(eventName), "Bouton %d %s", id, pressed ? "pressé" : "relâché");
+    DIAG_ON_EVENT(eventName);
+    
     // Créer et publier l'événement sur le bus d'événements
     if (pressed) {
         ButtonPressedEvent event(id);
