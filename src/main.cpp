@@ -1,74 +1,98 @@
-#ifndef UNIT_TEST  // <- Ne compile pas cette partie pendant les tests
-
 #include <Arduino.h>
 
 #include "app/MidiControllerApp.hpp"
 #include "config/ApplicationConfiguration.hpp"
+#include "config/debug/SerialBuffer.hpp"
 #include "core/TaskScheduler.hpp"
+#include "tools/Diagnostics.hpp"
 
-// Création de la configuration de l'application
+// Variables globales
 ApplicationConfiguration appConfig;
-
-// Création de l'application avec la configuration
 MidiControllerApp app(appConfig);
-
-// Les IDs des tâches pour référence (global)
 int appUpdateTaskId = -1;
-int ledsUpdateTaskId = -1;  // Pour une éventuelle gestion des LEDs
-int diagnosticTaskId = -1;  // Tâche de diagnostic
 
-// Fonctions de rappel pour les tâches
+// Callback pour la mise à jour de l'application
 void appUpdateCallback() {
     app.update();
 }
 
-void diagnosticCallback() {
-    // Tâche de diagnostic pour monitorer les performances
+// Gestion des commandes du moniteur série
+void handleSerialCommands() {
+    if (Serial.available() <= 0) {
+        return;
+    }
 
-    // Afficher les statistiques de performance si débogage activé
-#if defined(DEBUG) && defined(DEBUG_TASK_SCHEDULER)
-    DEBUG_SCHEDULER("Charge CPU: %.2f%%", scheduler.getCpuUsage());
-    DEBUG_SCHEDULER("Nombre de tâches: %u", scheduler.getTaskCount());
-#endif
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    // Priorité aux commandes de diagnostics
+    if (DiagnosticsManager::handleCommand(command)) {
+        return;
+    }
+
+    // Commandes standard
+    if (command == "clear") {
+        SerialBuffer::clear();
+        Serial.write(27);     // ESC
+        Serial.print("[2J");  // Efface l'écran
+        Serial.write(27);     // ESC
+        Serial.print("[H");   // Curseur en haut à gauche
+        Serial.println("Moniteur effacé");
+    } else if (command == "dump") {
+        Serial.println("\n===== CONTENU DU TAMPON =====\n");
+        SerialBuffer::flush();
+        Serial.println("\n============================\n");
+    } else if (command == "help") {
+        Serial.println("\nCommandes disponibles:");
+        Serial.println("  clear - Efface le moniteur et le tampon");
+        Serial.println("  dump  - Affiche tout le contenu du tampon");
+        Serial.println("  help  - Affiche cette aide");
+
+        // Commandes de diagnostics
+        Serial.println("\nCommandes de diagnostics:");
+        Serial.println("  stats            - Affiche les statistiques du système");
+        Serial.println("  stats detailed   - Affiche les statistiques détaillées");
+        Serial.println("  stats on/off     - Active/désactive l'affichage régulier");
+        Serial.println("  event on/off     - Active/désactive le diagnostic sur événements");
+        Serial.println("  stats interval N - Définit l'intervalle à N secondes");
+        Serial.println("  memory           - Affiche les statistiques de mémoire");
+    } else if (command.length() > 0) {
+        Serial.println("Commande non reconnue. Tapez 'help' pour voir les commandes disponibles.");
+    }
 }
 
 void setup() {
-    Serial.begin(115200);  // Initialiser le série, mais ne pas attendre qu'il soit prêt
-
-    // Définir un temps limite pour l'initialisation de Serial
-    constexpr unsigned long SERIAL_TIMEOUT_MS = 50;  // Limite de 50ms seulement
+    // Initialisation du port série
+    Serial.begin(9600);
+    constexpr unsigned long SERIAL_TIMEOUT_MS = 50;
     unsigned long startTime = millis();
-
-    // Attendre Serial mais avec un timeout court
     while (!Serial && (millis() - startTime < SERIAL_TIMEOUT_MS)) {
-        // Attente limitée
+        // Attente avec timeout
     }
 
-    // Message de débogage
+    // Initialisation du tampon série et de l'application
+    SerialBuffer::init(300);
     DEBUG_PRINTLN_FLASH("[INIT] MidiController - Démarrage...");
-
-    // Initialiser l'application
     app.init();
 
-    // Configurer l'ordonnanceur de tâches
-
-    // Tâche principale de l'application - haute priorité (1)
-    // Exécute app.update() toutes les 1ms (1000Hz)
+    // Configuration de l'ordonnanceur
     appUpdateTaskId = scheduler.addTask(appUpdateCallback, 1000, 1, "AppUpdate");
-
-    // Tâche de diagnostic - basse priorité (10)
-    // Exécute la fonction de diagnostic toutes les 3 secondes
-    diagnosticTaskId = scheduler.addTask(diagnosticCallback, 3000000, 10, "Diagnostic");
-
     DEBUG_PRINTLN_FLASH("[INIT] Configuration de l'ordonnanceur terminée");
+
+    // Initialisation du module de diagnostics (0.1 seconde d'intervalle)
+    INIT_DIAGNOSTICS(scheduler, .1);
 }
 
 void loop() {
-    // Exécuter l'ordonnanceur de tâches avec un budget CPU de 5ms par cycle
-    // Il gère automatiquement l'exécution des tâches selon leur priorité
-    scheduler.update(5000);
-
-    // Donner du temps au système pour d'autres tâches (Watchdog, etc.)
+    // Mise à jour de l'ordonnanceur (budget CPU de 4000µs)
+    scheduler.update(4000);
+    
+    // Gestion des commandes série
+    handleSerialCommands();
+    
+    // Mise à jour des diagnostics (mode événementiel)
+    UPDATE_DIAGNOSTICS();
+    
+    // Permet aux autres tâches système de s'exécuter
     yield();
 }
-#endif
