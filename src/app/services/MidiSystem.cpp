@@ -4,6 +4,8 @@
 #include "core/domain/events/EventSystem.hpp"
 #include "core/domain/strategies/MidiMappingFactory.hpp"
 #include "app/services/MidiSystemListener.hpp"
+#include "tools/Diagnostics.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 MidiSystem::MidiSystem(ProfileManager& profileManager)
     : rawMidiOut_(),
@@ -17,9 +19,12 @@ MidiSystem::MidiSystem(ProfileManager& profileManager)
       simpleListenerSubId_(0),
       eventListenerSubId_(0) {
     // Note: InputRouter n'est plus utilisé directement, on utilise MidiMapper à la place
+    DIAG_ON_EVENT("MidiSystem: Constructeur appelé");
 }
 
 MidiSystem::~MidiSystem() {
+    DIAG_ON_EVENT("MidiSystem: Destructeur appelé");
+    
     // Se désabonner du bus d'événements
     auto& eventBus = EventBus::getInstance();
     
@@ -35,7 +40,11 @@ MidiSystem::~MidiSystem() {
 }
 
 void MidiSystem::init() {
-    Serial.println("MidiSystem::init() called");
+#if defined(DEBUG) && defined(DEBUG_MIDI_SYSTEM)
+    Serial.println(F("MidiSystem::init() called"));
+#endif
+    DIAG_ON_EVENT("MidiSystem: Initialisation simple");
+    
     initSubscriptions();
 
     // Initialiser les mappings à partir du ProfileManager
@@ -56,7 +65,10 @@ void MidiSystem::init() {
 }
 
 void MidiSystem::init(NavigationConfigService& navService) {
-    Serial.println("MidiSystem::init(NavigationConfigService&) called");
+#if defined(DEBUG) && defined(DEBUG_MIDI_SYSTEM)
+    Serial.println(F("MidiSystem::init(NavigationConfigService&) called"));
+#endif
+    DIAG_ON_EVENT("MidiSystem: Initialisation avec navigation");
     
     // D'abord se désabonner de tout écouteur existant, y compris le simpleListener
     auto& eventBus = EventBus::getInstance();
@@ -80,6 +92,7 @@ void MidiSystem::init(NavigationConfigService& navService) {
     }
     
     // Initialiser les mappings comme dans init() mais sans créer un simple listener
+    int mappingCount = 0;
     for (const auto& mapping : profileManager_.getAllMappings()) {
         bool isRelative = mapping.midiControl.relative;
 
@@ -91,13 +104,26 @@ void MidiSystem::init(NavigationConfigService& navService) {
         }
 
         midiMapper_.setMapping(mapping.controlId, mapping.midiControl, std::move(strategy));
+        mappingCount++;
     }
+    
+    // Diagnostic du nombre de mappings
+    char mappingEvent[50];
+    snprintf(mappingEvent, sizeof(mappingEvent), 
+             "MidiSystem: %d mappings configurés", mappingCount);
+    DIAG_ON_EVENT(mappingEvent);
     
     // Créer uniquement l'écouteur avec navigation
     eventListener_ = std::make_unique<MidiSystemEventListener>(*this, navService);
     
     // S'abonner au bus d'événements avec l'objet et enregistrer l'ID
     eventListenerSubId_ = eventBus.subscribe(eventListener_.get());
+    
+    // Diagnostic de l'abonnement
+    char subscriptionEvent[50];
+    snprintf(subscriptionEvent, sizeof(subscriptionEvent), 
+             "MidiSystem: Abonnement ID=%d (avec navigation)", eventListenerSubId_);
+    DIAG_ON_EVENT(subscriptionEvent);
 }
 
 void MidiSystem::update() {
@@ -124,7 +150,10 @@ MidiMapper& MidiSystem::getMidiMapper() {
 }
 
 void MidiSystem::initSubscriptions() {
-    Serial.println("MidiSystem::initSubscriptions() called");
+#if defined(DEBUG) && defined(DEBUG_MIDI_SYSTEM)
+    Serial.println(F("MidiSystem::initSubscriptions() called"));
+#endif
+    DIAG_ON_EVENT("MidiSystem: Initialisation des abonnements");
     
     // Libérer l'écouteur existant s'il y en a un
     if (simpleListener_) {
@@ -141,4 +170,10 @@ void MidiSystem::initSubscriptions() {
     // S'abonner au bus d'événements et enregistrer l'ID d'abonnement
     auto& eventBus = EventBus::getInstance();
     simpleListenerSubId_ = eventBus.subscribe(simpleListener_.get());
+    
+    // Diagnostic de l'abonnement
+    char subscriptionEvent[50];
+    snprintf(subscriptionEvent, sizeof(subscriptionEvent), 
+             "MidiSystem: Abonnement ID=%d (simple)", simpleListenerSubId_);
+    DIAG_ON_EVENT(subscriptionEvent);
 }
