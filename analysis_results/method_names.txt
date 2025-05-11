@@ -1,0 +1,21 @@
+=== Analyse des noms de méthodes ===
+=== Getters avec préfixe 'get' ===
+
+=== Méthodes de type setter non conformes ===
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/core/domain/interfaces/IInputSystem.hpp:    virtual void update() = 0;
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/core/domain/interfaces/IMidiSystem.hpp:    virtual void update() = 0;
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/core/domain/interfaces/IUISystem.hpp:    virtual void update() = 0;
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/app/subsystems/InputSubsystem.hpp:    void update() override;
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/app/subsystems/InputSubsystem.hpp:    void configureEncoders(const std::vector<EncoderConfig>& encoderConfigs);
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/app/subsystems/InputSubsystem.hpp:    void configureButtons(const std::vector<ButtonConfig>& buttonConfigs);
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/app/subsystems/MidiSubsystem.hpp:    void update() override;
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/app/subsystems/MockDisplay.hpp:    void update() override {
+/c/Users/miu-lab/Documents/PlatformIO/Projects/midi_controller/src/app/subsystems/UISubsystem.hpp:    void update() override;
+
+=== Méthodes commençant par une majuscule ===
+
+=== Suggestions de renommage ===
+Si 'getProperty()' -> Renommer en 'property()'
+Si 'getValue()' -> Renommer en 'value()'
+Si 'modifyProperty()' -> Renommer en 'setProperty()'
+Si 'updateConfig()' -> Renommer en 'setConfig()'

@@ -12,12 +12,12 @@ void test_input_subsystem_initialization() {
     auto mockConfig = std::make_shared<MockConfiguration>();
     
     // Configurer les encodeurs et boutons de test
-    mockConfig->encoderConfigs = {
+    mockConfig->encoderConfigs_ = {
         EncoderConfig{1, 2, 3, 1},
         EncoderConfig{4, 5, 6, 2}
     };
     
-    mockConfig->buttonConfigs = {
+    mockConfig->buttonConfigs_ = {
         ButtonConfig{10, 3},
         ButtonConfig{11, 4}
     };
@@ -42,12 +42,12 @@ void test_input_subsystem_configure() {
     auto mockConfig = std::make_shared<MockConfiguration>();
     
     // Configurer les encodeurs et boutons de test
-    mockConfig->encoderConfigs = {
+    mockConfig->encoderConfigs_ = {
         EncoderConfig{1, 2, 3, 1},
         EncoderConfig{4, 5, 6, 2}
     };
     
-    mockConfig->buttonConfigs = {
+    mockConfig->buttonConfigs_ = {
         ButtonConfig{10, 3},
         ButtonConfig{11, 4}
     };

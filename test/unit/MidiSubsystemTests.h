@@ -72,7 +72,7 @@ void test_midi_subsystem_default_channel() {
     auto mockMidi = std::make_shared<MockMidiOut>();
     
     // Configurer le canal MIDI par défaut
-    mockConfig->midiChannel = 5;
+    mockConfig->midiChannel_ = 5;
     mockConfig->hardwareInitEnabled = false;
     
     // Enregistrer les mocks dans le conteneur

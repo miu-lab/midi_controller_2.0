@@ -47,32 +47,47 @@ void MidiSubsystem::update() {
     // Pour l'instant, pas de logique de mise à jour périodique nécessaire
 }
 
-void MidiSubsystem::sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
-    if (!initialized_ || !midiOut_) {
-        std::cout << "MidiSubsystem: Not initialized or midiOut is null" << std::endl;
-        return;
+Result<bool, std::string> MidiSubsystem::sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+    if (!initialized_) {
+        return Result<bool, std::string>::error("MidiSubsystem: Not initialized");
+    }
+    
+    if (!midiOut_) {
+        return Result<bool, std::string>::error("MidiSubsystem: No MIDI output available");
     }
     
     std::cout << "MidiSubsystem: Sending NoteOn " << (int)channel << ", " << (int)note << ", " << (int)velocity << std::endl;
     
     // Conversion des types pour correspondre à la signature attendue
+    // Pas d'utilisation d'exceptions en environnement embarqué
     midiOut_->sendNoteOn(MidiChannel(channel), MidiNote(note), velocity);
+    return Result<bool, std::string>::success(true);
 }
 
-void MidiSubsystem::sendNoteOff(uint8_t channel, uint8_t note) {
-    if (!initialized_ || !midiOut_) {
-        return;
+Result<bool, std::string> MidiSubsystem::sendNoteOff(uint8_t channel, uint8_t note) {
+    if (!initialized_) {
+        return Result<bool, std::string>::error("MidiSubsystem: Not initialized");
+    }
+    
+    if (!midiOut_) {
+        return Result<bool, std::string>::error("MidiSubsystem: No MIDI output available");
     }
     
     // sendNoteOff attend un troisième paramètre (velocity)
     midiOut_->sendNoteOff(MidiChannel(channel), MidiNote(note), 0);
+    return Result<bool, std::string>::success(true);
 }
 
-void MidiSubsystem::sendControlChange(uint8_t channel, uint8_t controller, uint8_t value) {
-    if (!initialized_ || !midiOut_) {
-        return;
+Result<bool, std::string> MidiSubsystem::sendControlChange(uint8_t channel, uint8_t controller, uint8_t value) {
+    if (!initialized_) {
+        return Result<bool, std::string>::error("MidiSubsystem: Not initialized");
+    }
+    
+    if (!midiOut_) {
+        return Result<bool, std::string>::error("MidiSubsystem: No MIDI output available");
     }
     
     // La méthode s'appelle sendCc et non sendControlChange
     midiOut_->sendCc(MidiChannel(channel), MidiCC(controller), value);
+    return Result<bool, std::string>::success(true);
 }

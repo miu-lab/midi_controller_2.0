@@ -35,13 +35,13 @@ public:
      * @brief Accès à la configuration des encodeurs
      * @return Référence constante au vecteur de configurations d'encodeurs
      */
-    const std::vector<EncoderConfig>& getEncoderConfigs() const;
+    const std::vector<EncoderConfig>& encoderConfigs() const;
 
     /**
      * @brief Accès à la configuration des boutons
      * @return Référence constante au vecteur de configurations de boutons
      */
-    const std::vector<ButtonConfig>& getButtonConfigs() const;
+    const std::vector<ButtonConfig>& buttonConfigs() const;
 
 private:
     // Référence à la configuration de l'application

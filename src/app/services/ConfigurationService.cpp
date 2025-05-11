@@ -18,10 +18,10 @@ void ConfigurationService::applyConfigurations(ProfileManager& profileManager,
     }
 }
 
-const std::vector<EncoderConfig>& ConfigurationService::getEncoderConfigs() const {
+const std::vector<EncoderConfig>& ConfigurationService::encoderConfigs() const {
     return appConfig_.getHardwareConfiguration().getEncoderConfigurations();
 }
 
-const std::vector<ButtonConfig>& ConfigurationService::getButtonConfigs() const {
+const std::vector<ButtonConfig>& ConfigurationService::buttonConfigs() const {
     return appConfig_.getHardwareConfiguration().getControlButtonConfigurations();
 }

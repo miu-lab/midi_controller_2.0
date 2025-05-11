@@ -8,6 +8,7 @@
 #include "core/domain/IMidiOut.hpp"
 #include "adapters/secondary/midi/DummyUsbMidi.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidi.hpp"
+#include "core/utils/Result.hpp"
 
 /**
  * @brief Sous-système MIDI
@@ -44,16 +45,18 @@ public:
      * @param channel Canal MIDI (0-15)
      * @param note Numéro de note (0-127)
      * @param velocity Vélocité (0-127)
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override;
+    Result<bool, std::string> sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override;
     
     /**
      * @brief Envoie un message MIDI Note Off
      * 
      * @param channel Canal MIDI (0-15)
      * @param note Numéro de note (0-127)
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void sendNoteOff(uint8_t channel, uint8_t note) override;
+    Result<bool, std::string> sendNoteOff(uint8_t channel, uint8_t note) override;
     
     /**
      * @brief Envoie un message MIDI Control Change
@@ -61,8 +64,9 @@ public:
      * @param channel Canal MIDI (0-15)
      * @param controller Numéro de contrôleur (0-127)
      * @param value Valeur (0-127)
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void sendControlChange(uint8_t channel, uint8_t controller, uint8_t value) override;
+    Result<bool, std::string> sendControlChange(uint8_t channel, uint8_t controller, uint8_t value) override;
     
 private:
     std::shared_ptr<DependencyContainer> container_;

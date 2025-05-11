@@ -5,7 +5,7 @@ ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContain
     navService_ = std::make_shared<NavigationConfigService>();
 }
 
-void ConfigurationSubsystem::init() {
+bool ConfigurationSubsystem::init() {
     // Récupérer la configuration de l'application depuis le conteneur
     config_ = container_->resolve<ApplicationConfiguration>();
     if (!config_) {
@@ -13,17 +13,18 @@ void ConfigurationSubsystem::init() {
         config_ = std::make_shared<ApplicationConfiguration>();
         container_->registerDependency<ApplicationConfiguration>(config_);
     }
-    
+
     // Charger les configurations d'encodeurs et de boutons
     loadEncoderConfigs();
     loadButtonConfigs();
-    
+
     // Enregistrer ce sous-système comme implémentation de IConfiguration
     container_->registerImplementation<IConfiguration, ConfigurationSubsystem>(
         std::shared_ptr<ConfigurationSubsystem>(this, [](ConfigurationSubsystem*) {
             // Ne rien faire lors de la destruction (le conteneur ne possède pas cet objet)
-        })
-    );
+        }));
+    
+    return true;
 }
 
 bool ConfigurationSubsystem::isNavigationControl(ControlId id) const {
@@ -34,11 +35,11 @@ void ConfigurationSubsystem::setControlForNavigation(ControlId id, bool isNaviga
     navService_->setControlForNavigation(id, isNavigation);
 }
 
-const std::vector<EncoderConfig>& ConfigurationSubsystem::getEncoderConfigs() const {
+const std::vector<EncoderConfig>& ConfigurationSubsystem::encoderConfigs() const {
     return encoderConfigs_;
 }
 
-const std::vector<ButtonConfig>& ConfigurationSubsystem::getButtonConfigs() const {
+const std::vector<ButtonConfig>& ConfigurationSubsystem::buttonConfigs() const {
     return buttonConfigs_;
 }
 
@@ -48,7 +49,7 @@ bool ConfigurationSubsystem::isDebugEnabled() const {
     return true;
 }
 
-int ConfigurationSubsystem::getMidiChannel() const {
+int ConfigurationSubsystem::midiChannel() const {
     // TODO: Accéder au canal MIDI via la structure appropriée
     // Pour l'instant, renvoyer le canal 1 par défaut
     return 1;
@@ -60,18 +61,22 @@ bool ConfigurationSubsystem::isHardwareInitEnabled() const {
     return true;
 }
 
-void ConfigurationSubsystem::loadEncoderConfigs() {
+bool ConfigurationSubsystem::loadEncoderConfigs() {
     // Charger les configurations des encodeurs depuis la configuration matérielle
     // Pour l'instant, utiliser des configurations par défaut
     encoderConfigs_.clear();
     encoderConfigs_.push_back(EncoderConfig{1, 2, 3, 1});  // Pins A, B, Bouton, ID
     encoderConfigs_.push_back(EncoderConfig{4, 5, 6, 2});
+    
+    return true;
 }
 
-void ConfigurationSubsystem::loadButtonConfigs() {
+bool ConfigurationSubsystem::loadButtonConfigs() {
     // Charger les configurations des boutons depuis la configuration matérielle
     // Pour l'instant, utiliser des configurations par défaut
     buttonConfigs_.clear();
     buttonConfigs_.push_back(ButtonConfig{10, 3});  // Pin, ID
     buttonConfigs_.push_back(ButtonConfig{11, 4});
+    
+    return true;
 }

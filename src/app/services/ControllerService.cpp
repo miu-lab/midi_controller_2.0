@@ -18,8 +18,9 @@ ControllerService::ControllerService(ViewManager& viewManager, IMidiOut& midiOut
 
 void ControllerService::init() {
     // Récupérer les contrôleurs depuis le ServiceLocator avec des shared_ptr
-    std::shared_ptr<UIController> uiControllerSp(ServiceLocator::getUIController(), [](UIController*){});
-    std::shared_ptr<InputController> inputControllerSp(ServiceLocator::getInputController(), [](InputController*){});
+    // Créer des shared_ptr avec le pointeur de l'objet (et non la référence) et un deleter qui ne fait rien
+    std::shared_ptr<UIController> uiControllerSp(&ServiceLocator::getUIController(), [](UIController*){});
+    std::shared_ptr<InputController> inputControllerSp(&ServiceLocator::getInputController(), [](InputController*){});
     
     // Stocker les références directes aux contrôleurs
     uiController_ = &ServiceLocator::getUIController();

@@ -20,16 +20,22 @@ MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
       uiEventListenerSubId_(0) {
     // Initialisation des services et dépendances
     ServiceLocator::initialize(appConfig);
-    
+
     // Création de shared_ptr avec des deleters personnalisés pour éviter les problèmes
     // de destruction (ces objets sont des membres de MidiControllerApp)
-    auto configServicePtr = std::shared_ptr<ConfigurationService>(&configService_, [](ConfigurationService*) {});
-    auto navigationConfigPtr = std::shared_ptr<NavigationConfigService>(&navigationConfig_, [](NavigationConfigService*) {});
-    auto profileManagerPtr = std::shared_ptr<ProfileManager>(&profileManager_, [](ProfileManager*) {});
+    auto configServicePtr =
+        std::shared_ptr<ConfigurationService>(&configService_, [](ConfigurationService*) {});
+    auto navigationConfigPtr =
+        std::shared_ptr<NavigationConfigService>(&navigationConfig_,
+                                                 [](NavigationConfigService*) {});
+    auto profileManagerPtr =
+        std::shared_ptr<ProfileManager>(&profileManager_, [](ProfileManager*) {});
     auto midiSystemPtr = std::shared_ptr<MidiSystem>(&midiSystem_, [](MidiSystem*) {});
-    auto eventInputSystemPtr = std::shared_ptr<InputSystem>(&eventInputSystem_, [](InputSystem*) {});
-    auto uiEventServicePtr = std::shared_ptr<UiEventService>(&uiEventService_, [](UiEventService*) {});
-    
+    auto eventInputSystemPtr =
+        std::shared_ptr<InputSystem>(&eventInputSystem_, [](InputSystem*) {});
+    auto uiEventServicePtr =
+        std::shared_ptr<UiEventService>(&uiEventService_, [](UiEventService*) {});
+
     // Enregistrement des services avec des pointeurs partagés
     ServiceLocator::registerNavigationConfigService(navigationConfigPtr);
     ServiceLocator::registerProfileManager(profileManagerPtr);
@@ -63,7 +69,7 @@ bool MidiControllerApp::isNavigationControl(ControlId id) const {
 void MidiControllerApp::init() {
     // Application des configurations et initialisation des systèmes
     configService_.applyConfigurations(profileManager_, navigationConfig_);
-    eventInputSystem_.init(configService_.getEncoderConfigs(), configService_.getButtonConfigs());
+    eventInputSystem_.init(configService_.encoderConfigs(), configService_.buttonConfigs());
     midiSystem_.init(navigationConfig_);
     uiEventService_.init(navigationConfig_);
 
