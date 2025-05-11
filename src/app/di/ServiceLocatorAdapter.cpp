@@ -2,7 +2,6 @@
 #include "app/di/ServiceLocatorAdapter.hpp"
 
 #include "app/services/ConfigurationService.hpp"
-// ServiceLocator est remplacé par ServiceLocatorAdapter
 #include "app/services/ControllerService.hpp"
 #include "app/services/EventInputSystem.hpp"
 #include "app/services/InputSystem.hpp"
@@ -248,6 +247,10 @@ void ServiceLocatorAdapter::registerMenuController(MenuController* menuControlle
 // Méthodes statiques
 void ServiceLocatorAdapter::setDefaultInstance(std::shared_ptr<ServiceLocatorAdapter> adapter) {
     defaultInstance_ = adapter;
+}
+
+std::shared_ptr<ServiceLocatorAdapter> ServiceLocatorAdapter::getDefaultInstance() {
+    return defaultInstance_;
 }
 
 UIController& ServiceLocatorAdapter::getUIControllerStatic() {

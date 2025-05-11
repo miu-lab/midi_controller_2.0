@@ -1,7 +1,6 @@
 #include "app/services/InputSystem.hpp"
 
 #include "app/di/DependencyContainer.hpp"
-#include "app/services/ServiceLocator.hpp"
 #include "app/di/ServiceLocatorAdapter.hpp"
 #include "app/services/NavigationConfigService.hpp"
 
@@ -53,17 +52,20 @@ void InputSystem::initializeDependencies() {
     // Créer InputController
     inputController_ = std::make_shared<InputController>(*navConfigService);
 
-    // Enregistrer dans le ServiceLocator pour compatibilité
-    // On continue à utiliser ServiceLocator ici car c'est pour la compatibilité arrière
-    // Désactiver temporairement les avertissements
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    ServiceLocator::registerInputController(inputController_);
-    #pragma GCC diagnostic pop
-    
-    // Si nous utilisons le container, enregistrer aussi là
     if (usingContainer_ && container_) {
+        // Créer une instance de ServiceLocatorAdapter avec le container
+        auto adapter = std::make_shared<ServiceLocatorAdapter>(container_);
+        ServiceLocatorAdapter::setDefaultInstance(adapter);
+        adapter->registerInputController(inputController_);
+        
+        // Enregistrer également dans le container
         container_->registerDependency<InputController>(inputController_);
+    } else {
+        // Si nous n'avons pas de container, essayer d'utiliser l'instance par défaut
+        auto defaultAdapter = ServiceLocatorAdapter::getDefaultInstance();
+        if (defaultAdapter) {
+            defaultAdapter->registerInputController(inputController_);
+        }
     }
 
     // Configurer les processeurs

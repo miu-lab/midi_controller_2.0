@@ -25,10 +25,13 @@ class IMidiOut;
 class IProfileManager;
 
 /**
- * @brief Adaptateur pour ServiceLocator qui utilise DependencyContainer
+ * @brief Adaptateur qui fournit une API centralisée pour l'accès aux services
  * 
- * Cette classe permet de maintenir la compatibilité avec le code existant
- * tout en utilisant la nouvelle architecture d'injection de dépendances.
+ * Cette classe permet de maintenir un point d'accès central aux services
+ * tout en utilisant l'architecture d'injection de dépendances en interne.
+ * 
+ * @deprecated Cette classe sera dépréciée dans une version future. Migrez vers l'utilisation
+ * directe de DependencyContainer.
  */
 class ServiceLocatorAdapter {
 public:
@@ -40,6 +43,12 @@ public:
      * @param adapter Instance de ServiceLocatorAdapter à utiliser comme défaut
      */
     static void setDefaultInstance(std::shared_ptr<ServiceLocatorAdapter> adapter);
+    
+    /**
+     * @brief Obtient l'instance par défaut
+     * @return Un pointeur partagé vers l'instance par défaut
+     */
+    static std::shared_ptr<ServiceLocatorAdapter> getDefaultInstance();
     
     /**
      * @brief Accès statique à UIController
