@@ -4,6 +4,10 @@
 #include "di_tests.h"
 #include "mock_tests.h"
 #include "service_locator_adapter_tests.h"
+#include "unit/ConfigurationSubsystemTests.h"
+#include "unit/InputSubsystemTests.h"
+#include "unit/MidiSubsystemTests.h"
+#include "unit/UISubsystemTests.h"
 
 // Fonctions de configuration communes
 void setUp(void) {
@@ -32,6 +36,26 @@ int main(void) {
     RUN_TEST(test_service_locator_adapter_initialize);
     RUN_TEST(test_service_locator_adapter_container);
     RUN_TEST(test_service_locator_adapter_simple_service);
+    
+    // Tests pour le ConfigurationSubsystem
+    RUN_TEST(test_configuration_subsystem_initialization);
+    RUN_TEST(test_configuration_navigation_controls);
+    RUN_TEST(test_configuration_accessors);
+    
+    // Tests pour InputSubsystem
+    RUN_TEST(test_input_subsystem_initialization);
+    RUN_TEST(test_input_subsystem_configure);
+    RUN_TEST(test_input_subsystem_update);
+    
+    // Tests pour MidiSubsystem
+    RUN_TEST(test_midi_subsystem_initialization);
+    RUN_TEST(test_midi_subsystem_send_messages);
+    RUN_TEST(test_midi_subsystem_default_channel);
+    
+    // Tests pour UISubsystem
+    RUN_TEST(test_ui_subsystem_initialization);
+    RUN_TEST(test_ui_subsystem_display_methods);
+    RUN_TEST(test_ui_subsystem_full_ui);
     
     return UNITY_END();
 }
