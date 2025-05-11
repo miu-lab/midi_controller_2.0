@@ -7,25 +7,32 @@
 InputSubsystem::InputSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {}
 
-void InputSubsystem::init() {
+Result<bool, std::string> InputSubsystem::init() {
     if (initialized_) {
-        return;
+        return Result<bool, std::string>::success(true);
     }
 
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        // Si aucune configuration n'est trouvée, on ne peut pas initialiser correctement
-        return;
+        return Result<bool, std::string>::error("Failed to resolve IConfiguration");
     }
 
     // Obtenir les configurations des périphériques
     auto encoderConfigs = configuration_->encoderConfigs();
     auto buttonConfigs = configuration_->buttonConfigs();
 
+    // Dans un environnement sans exceptions, nous vérifions simplement les erreurs directement
     // Créer les gestionnaires de périphériques avec les configurations
     encoderManager_ = std::make_shared<EncoderManager>(encoderConfigs);
+    if (!encoderManager_) {
+        return Result<bool, std::string>::error("Failed to create EncoderManager");
+    }
+    
     buttonManager_ = std::make_shared<DigitalButtonManager>(buttonConfigs);
+    if (!buttonManager_) {
+        return Result<bool, std::string>::error("Failed to create DigitalButtonManager");
+    }
 
     // Pas besoin d'appeler configureEncoders et configureButtons séparément
     // car nous avons déjà fourni les configurations aux constructeurs
@@ -39,6 +46,7 @@ void InputSubsystem::init() {
         }));
 
     initialized_ = true;
+    return Result<bool, std::string>::success(true);
 }
 
 void InputSubsystem::update() {
@@ -57,22 +65,26 @@ void InputSubsystem::update() {
     }
 }
 
-void InputSubsystem::configureEncoders(const std::vector<EncoderConfig>& encoderConfigs) {
+Result<bool, std::string> InputSubsystem::configureEncoders(const std::vector<EncoderConfig>& encoderConfigs) {
     if (!encoderManager_) {
-        return;
+        return Result<bool, std::string>::error("EncoderManager is not initialized");
     }
 
     // Note: cette méthode n'est plus utilisée car les encodeurs sont configurés dans le
     // constructeur Mais nous la conservons pour l'API publique
     // TODO: Implémenter la reconfiguration des encodeurs si nécessaire
+    
+    return Result<bool, std::string>::success(true);
 }
 
-void InputSubsystem::configureButtons(const std::vector<ButtonConfig>& buttonConfigs) {
+Result<bool, std::string> InputSubsystem::configureButtons(const std::vector<ButtonConfig>& buttonConfigs) {
     if (!buttonManager_) {
-        return;
+        return Result<bool, std::string>::error("ButtonManager is not initialized");
     }
 
     // Note: cette méthode n'est plus utilisée car les boutons sont configurés dans le constructeur
     // Mais nous la conservons pour l'API publique
     // TODO: Implémenter la reconfiguration des boutons si nécessaire
+    
+    return Result<bool, std::string>::success(true);
 }

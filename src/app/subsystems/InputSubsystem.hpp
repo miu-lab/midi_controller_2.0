@@ -7,6 +7,7 @@
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
 #include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
+#include "core/utils/Result.hpp"
 
 class EncoderManager;
 class DigitalButtonManager;
@@ -32,8 +33,10 @@ public:
     
     /**
      * @brief Initialise le sous-système d'entrée
+     * 
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void init() override;
+    Result<bool, std::string> init();
     
     /**
      * @brief Met à jour l'état des entrées
@@ -43,14 +46,16 @@ public:
     /**
      * @brief Configure les encodeurs avec les paramètres fournis
      * @param encoderConfigs Configurations des encodeurs
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void configureEncoders(const std::vector<EncoderConfig>& encoderConfigs);
+    Result<bool, std::string> configureEncoders(const std::vector<EncoderConfig>& encoderConfigs);
     
     /**
      * @brief Configure les boutons avec les paramètres fournis
      * @param buttonConfigs Configurations des boutons
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void configureButtons(const std::vector<ButtonConfig>& buttonConfigs);
+    Result<bool, std::string> configureButtons(const std::vector<ButtonConfig>& buttonConfigs);
     
 private:
     std::shared_ptr<DependencyContainer> container_;

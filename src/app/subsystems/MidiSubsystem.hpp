@@ -31,8 +31,10 @@ public:
     
     /**
      * @brief Initialise le sous-système MIDI
+     * 
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void init() override;
+    Result<bool, std::string> init() override;
     
     /**
      * @brief Met à jour l'état du sous-système MIDI

@@ -6,6 +6,7 @@
 #include "app/services/NavigationConfigService.hpp"
 #include "config/ApplicationConfiguration.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
+#include "core/utils/Result.hpp"
 
 /**
  * @brief Sous-système de gestion des configurations
@@ -40,9 +41,9 @@ public:
      * - Chargeant les configurations des encodeurs et boutons
      * - Appliquant les configurations par défaut si nécessaire
      *
-     * @return true si l'initialisation s'est bien déroulée, false sinon
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    bool init();
+    Result<bool, std::string> init();
 
     /**
      * @brief Vérifie si un contrôle est dédié à la navigation
@@ -110,14 +111,14 @@ public:
     /**
      * @brief Charge les configurations des encodeurs depuis ApplicationConfiguration
      *
-     * @return true si le chargement s'est bien déroulé, false sinon
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    bool loadEncoderConfigs();
+    Result<bool, std::string> loadEncoderConfigs();
 
     /**
      * @brief Charge les configurations des boutons depuis ApplicationConfiguration
      *
-     * @return true si le chargement s'est bien déroulé, false sinon
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    bool loadButtonConfigs();
+    Result<bool, std::string> loadButtonConfigs();
 };

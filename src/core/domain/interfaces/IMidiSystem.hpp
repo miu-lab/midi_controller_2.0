@@ -14,8 +14,10 @@ public:
     
     /**
      * @brief Initialise le système MIDI
+     * 
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    virtual void init() = 0;
+    virtual Result<bool, std::string> init() = 0;
     
     /**
      * @brief Met à jour l'état du système MIDI

@@ -5,16 +5,15 @@ MidiSubsystem::MidiSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {
 }
 
-void MidiSubsystem::init() {
+Result<bool, std::string> MidiSubsystem::init() {
     if (initialized_) {
-        return;
+        return Result<bool, std::string>::success(true);
     }
     
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        // Si aucune configuration n'est trouvée, on ne peut pas initialiser correctement
-        return;
+        return Result<bool, std::string>::error("Failed to resolve IConfiguration");
     }
     
     // Récupérer un IMidiOut existant ou en créer un nouveau si nécessaire
@@ -24,9 +23,15 @@ void MidiSubsystem::init() {
         if (configuration_->isHardwareInitEnabled()) {
             // Utiliser TeensyUsbMidiOut qui implémente IMidiOut
             midiOut_ = std::make_shared<TeensyUsbMidiOut>();
+            if (!midiOut_) {
+                return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
+            }
         } else {
             // Pour l'instant, utiliser TeensyUsbMidiOut même en mode test
             midiOut_ = std::make_shared<TeensyUsbMidiOut>();
+            if (!midiOut_) {
+                return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
+            }
         }
         
         // Enregistrer l'implémentation que nous venons de créer
@@ -41,6 +46,7 @@ void MidiSubsystem::init() {
     );
     
     initialized_ = true;
+    return Result<bool, std::string>::success(true);
 }
 
 void MidiSubsystem::update() {

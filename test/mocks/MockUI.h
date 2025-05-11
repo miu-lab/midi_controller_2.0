@@ -7,19 +7,22 @@
  */
 class MockUI : public IUISystem {
 public:
-    void init(bool enableFullUI = false) override { 
+    Result<bool, std::string> init(bool enableFullUI = false) override { 
         initialized = true; 
         fullUIEnabled = enableFullUI;
+        return Result<bool, std::string>::success(true);
     }
     
     void update() override { updateCount++; }
     
-    void showMessage(const std::string& message) override {
+    Result<bool, std::string> showMessage(const std::string& message) override {
         messages.push_back(message);
+        return Result<bool, std::string>::success(true);
     }
     
-    void clearDisplay() override {
+    Result<bool, std::string> clearDisplay() override {
         displayCleared = true;
+        return Result<bool, std::string>::success(true);
     }
     
     // Variables pour vérifier l'état

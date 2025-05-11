@@ -8,7 +8,10 @@
  */
 class MockMidi : public IMidiSystem {
 public:
-    void init() override { initialized = true; }
+    Result<bool, std::string> init() override { 
+        initialized = true; 
+        return Result<bool, std::string>::success(true);
+    }
     void update() override { updateCount++; }
     
     Result<bool, std::string> sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override {

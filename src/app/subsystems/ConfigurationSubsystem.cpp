@@ -5,7 +5,7 @@ ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContain
     navService_ = std::make_shared<NavigationConfigService>();
 }
 
-bool ConfigurationSubsystem::init() {
+Result<bool, std::string> ConfigurationSubsystem::init() {
     // Récupérer la configuration de l'application depuis le conteneur
     config_ = container_->resolve<ApplicationConfiguration>();
     if (!config_) {
@@ -15,8 +15,15 @@ bool ConfigurationSubsystem::init() {
     }
 
     // Charger les configurations d'encodeurs et de boutons
-    loadEncoderConfigs();
-    loadButtonConfigs();
+    auto encoderResult = loadEncoderConfigs();
+    if (encoderResult.isError()) {
+        return encoderResult;
+    }
+    
+    auto buttonResult = loadButtonConfigs();
+    if (buttonResult.isError()) {
+        return buttonResult;
+    }
 
     // Enregistrer ce sous-système comme implémentation de IConfiguration
     container_->registerImplementation<IConfiguration, ConfigurationSubsystem>(
@@ -24,7 +31,7 @@ bool ConfigurationSubsystem::init() {
             // Ne rien faire lors de la destruction (le conteneur ne possède pas cet objet)
         }));
     
-    return true;
+    return Result<bool, std::string>::success(true);
 }
 
 bool ConfigurationSubsystem::isNavigationControl(ControlId id) const {
@@ -61,22 +68,26 @@ bool ConfigurationSubsystem::isHardwareInitEnabled() const {
     return true;
 }
 
-bool ConfigurationSubsystem::loadEncoderConfigs() {
+Result<bool, std::string> ConfigurationSubsystem::loadEncoderConfigs() {
     // Charger les configurations des encodeurs depuis la configuration matérielle
     // Pour l'instant, utiliser des configurations par défaut
     encoderConfigs_.clear();
+    
+    // Dans un environnement sans exceptions, nous vérifions simplement les erreurs directement
     encoderConfigs_.push_back(EncoderConfig{1, 2, 3, 1});  // Pins A, B, Bouton, ID
     encoderConfigs_.push_back(EncoderConfig{4, 5, 6, 2});
     
-    return true;
+    return Result<bool, std::string>::success(true);
 }
 
-bool ConfigurationSubsystem::loadButtonConfigs() {
+Result<bool, std::string> ConfigurationSubsystem::loadButtonConfigs() {
     // Charger les configurations des boutons depuis la configuration matérielle
     // Pour l'instant, utiliser des configurations par défaut
     buttonConfigs_.clear();
+    
+    // Dans un environnement sans exceptions, nous vérifions simplement les erreurs directement
     buttonConfigs_.push_back(ButtonConfig{10, 3});  // Pin, ID
     buttonConfigs_.push_back(ButtonConfig{11, 4});
     
-    return true;
+    return Result<bool, std::string>::success(true);
 }

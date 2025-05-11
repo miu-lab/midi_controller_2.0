@@ -12,12 +12,16 @@ void test_mock_initialization() {
     MockMidi midi;
     MockUI ui;
     
-    // Initialiser les mocks
-    input.init();
-    midi.init();
-    ui.init(true);
+    // Initialiser les mocks et vérifier les résultats
+    auto inputResult = input.init();
+    auto midiResult = midi.init();
+    auto uiResult = ui.init(true);
     
     // Vérifier que l'initialisation a fonctionné avec Unity
+    TEST_ASSERT_TRUE(inputResult.isSuccess());
+    TEST_ASSERT_TRUE(midiResult.isSuccess());
+    TEST_ASSERT_TRUE(uiResult.isSuccess());
+    
     TEST_ASSERT_TRUE(input.initialized);
     TEST_ASSERT_TRUE(midi.initialized);
     TEST_ASSERT_TRUE(ui.initialized);
@@ -43,10 +47,15 @@ void test_mock_updates() {
 void test_midi_messages() {
     MockMidi midi;
     
-    // Envoyer quelques messages MIDI
-    midi.sendNoteOn(0, 60, 100);
-    midi.sendNoteOff(0, 60);
-    midi.sendControlChange(0, 7, 127);
+    // Envoyer quelques messages MIDI et vérifier les résultats
+    auto noteOnResult = midi.sendNoteOn(0, 60, 100);
+    auto noteOffResult = midi.sendNoteOff(0, 60);
+    auto ccResult = midi.sendControlChange(0, 7, 127);
+    
+    // Vérifier que les opérations ont réussi
+    TEST_ASSERT_TRUE(noteOnResult.isSuccess());
+    TEST_ASSERT_TRUE(noteOffResult.isSuccess());
+    TEST_ASSERT_TRUE(ccResult.isSuccess());
     
     // Vérifier que les messages ont été enregistrés
     TEST_ASSERT_EQUAL_INT(1, midi.noteOnMessages.size());
@@ -69,10 +78,15 @@ void test_midi_messages() {
 void test_ui_messages() {
     MockUI ui;
     
-    // Envoyer des messages à l'UI
-    ui.showMessage("Test message 1");
-    ui.showMessage("Test message 2");
-    ui.clearDisplay();
+    // Envoyer des messages à l'UI et vérifier les résultats
+    auto msg1Result = ui.showMessage("Test message 1");
+    auto msg2Result = ui.showMessage("Test message 2");
+    auto clearResult = ui.clearDisplay();
+    
+    // Vérifier que les opérations ont réussi
+    TEST_ASSERT_TRUE(msg1Result.isSuccess());
+    TEST_ASSERT_TRUE(msg2Result.isSuccess());
+    TEST_ASSERT_TRUE(clearResult.isSuccess());
     
     // Vérifier que les messages ont été enregistrés
     TEST_ASSERT_EQUAL_INT(2, ui.messages.size());

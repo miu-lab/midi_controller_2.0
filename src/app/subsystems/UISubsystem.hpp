@@ -7,6 +7,7 @@
 #include "app/di/DependencyContainer.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/IDisplay.hpp"
+#include "core/utils/Result.hpp"
 
 class ViewManager;
 
@@ -33,8 +34,9 @@ public:
      * @brief Initialise le sous-système d'interface utilisateur
      * 
      * @param enableFullUI Indique si l'interface complète doit être activée
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void init(bool enableFullUI = false) override;
+    Result<bool, std::string> init(bool enableFullUI = false);
     
     /**
      * @brief Met à jour l'état du sous-système d'interface utilisateur
@@ -45,13 +47,16 @@ public:
      * @brief Affiche un message sur l'écran
      * 
      * @param message Le message à afficher
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void showMessage(const std::string& message) override;
+    Result<bool, std::string> showMessage(const std::string& message);
     
     /**
      * @brief Efface l'écran
+     * 
+     * @return Result<bool, std::string> Succès ou message d'erreur
      */
-    void clearDisplay() override;
+    Result<bool, std::string> clearDisplay();
     
 private:
     std::shared_ptr<DependencyContainer> container_;

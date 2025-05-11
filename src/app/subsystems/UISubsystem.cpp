@@ -6,9 +6,9 @@ UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {
 }
 
-void UISubsystem::init(bool enableFullUI) {
+Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
     if (initialized_) {
-        return;
+        return Result<bool, std::string>::success(true);
     }
     
     fullUIEnabled_ = enableFullUI;
@@ -16,8 +16,7 @@ void UISubsystem::init(bool enableFullUI) {
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        // Si aucune configuration n'est trouvée, on ne peut pas initialiser correctement
-        return;
+        return Result<bool, std::string>::error("Failed to resolve IConfiguration");
     }
     
     // Pour l'instant, utiliser toujours un MockDisplay pour les tests
@@ -25,6 +24,9 @@ void UISubsystem::init(bool enableFullUI) {
     if (!display_) {
         // Si aucun display n'est disponible, en créer un pour les tests
         display_ = std::make_shared<MockDisplay>();
+        if (!display_) {
+            return Result<bool, std::string>::error("Failed to create MockDisplay");
+        }
         // Enregistrer ce display dans le conteneur
         container_->registerImplementation<IDisplay, MockDisplay>(std::static_pointer_cast<MockDisplay>(display_));
     }
@@ -47,6 +49,7 @@ void UISubsystem::init(bool enableFullUI) {
     );
     
     initialized_ = true;
+    return Result<bool, std::string>::success(true);
 }
 
 void UISubsystem::update() {
@@ -61,10 +64,13 @@ void UISubsystem::update() {
     }
 }
 
-void UISubsystem::showMessage(const std::string& message) {
-    if (!initialized_ || !display_) {
-        std::cout << "UISubsystem: Not initialized or display is null" << std::endl;
-        return;
+Result<bool, std::string> UISubsystem::showMessage(const std::string& message) {
+    if (!initialized_) {
+        return Result<bool, std::string>::error("UISubsystem not initialized");
+    }
+    
+    if (!display_) {
+        return Result<bool, std::string>::error("Display not available");
     }
     
     std::cout << "UISubsystem: Showing message: '" << message << "'" << std::endl;
@@ -74,7 +80,7 @@ void UISubsystem::showMessage(const std::string& message) {
         display_->clear();
         display_->drawText(0, 0, message.c_str());
         display_->update();
-        return;
+        return Result<bool, std::string>::success(true);
     }
     
     // Sinon, utiliser le gestionnaire de vues pour afficher le message
@@ -92,13 +98,21 @@ void UISubsystem::showMessage(const std::string& message) {
         display_->drawText(0, 0, message.c_str());
         display_->update();
     }
+    
+    return Result<bool, std::string>::success(true);
 }
 
-void UISubsystem::clearDisplay() {
-    if (!initialized_ || !display_) {
-        return;
+Result<bool, std::string> UISubsystem::clearDisplay() {
+    if (!initialized_) {
+        return Result<bool, std::string>::error("UISubsystem not initialized");
     }
     
+    if (!display_) {
+        return Result<bool, std::string>::error("Display not available");
+    }
+    
+    // Dans un environnement sans exceptions, nous vérifions simplement les erreurs directement
     display_->clear();
     display_->update();
+    return Result<bool, std::string>::success(true);
 }
