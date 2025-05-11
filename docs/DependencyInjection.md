@@ -1,118 +1,129 @@
-# Architecture d'injection de dépendances
+# Injection de Dépendances
 
 Ce document explique l'architecture d'injection de dépendances utilisée dans le projet MIDI Controller.
 
-## Principes fondamentaux
+## Vue d'ensemble
 
-L'architecture du MIDI Controller est basée sur les principes SOLID, et particulièrement sur l'inversion de dépendance (le 'D' de SOLID). Cela signifie que:
+Le projet utilise un système d'injection de dépendances (DI) moderne pour découpler les composants et faciliter les tests. Cette architecture remplace l'ancien système basé sur le patron de conception ServiceLocator.
 
-1. Les modules de haut niveau ne dépendent pas des modules de bas niveau. Les deux dépendent d'abstractions.
-2. Les abstractions ne dépendent pas des détails. Les détails dépendent des abstractions.
+![Architecture DI](../assets/di_architecture.png)
 
-## Structure du système
+## Composants principaux
 
-### Conteneur de dépendances
+### DependencyContainer
 
-Le cœur de notre système d'injection de dépendances est la classe `DependencyContainer`. Cette classe:
-
-- Permet d'enregistrer des instances partagées
-- Supporte l'enregistrement d'implémentations d'interfaces
-- Permet la création paresseuse d'instances via des factories
-- Gère le cycle de vie des objets avec des smart pointers
+Le `DependencyContainer` est le cœur du système d'injection de dépendances:
 
 ```cpp
-// Exemple d'utilisation du conteneur de dépendances
-auto container = std::make_shared<DependencyContainer>();
+// Enregistrement d'une dépendance
+container->registerDependency<IInputSystem>(inputSystem);
 
-// Enregistrer une instance
-auto config = std::make_shared<ApplicationConfiguration>();
-container->registerDependency<ApplicationConfiguration>(config);
-
-// Enregistrer une implémentation d'interface
-auto midiOut = std::make_shared<TeensyUsbMidiOut>();
-container->registerDependency<IMidiOut>(midiOut);
-
-// Résoudre une dépendance
-auto resolvedConfig = container->resolve<ApplicationConfiguration>();
+// Résolution d'une dépendance
+auto inputSystem = container->resolve<IInputSystem>();
 ```
 
-### Script d'initialisation
+Caractéristiques:
+- Gestion du cycle de vie des objets avec smart pointers
+- Support pour les interfaces et les classes concrètes
+- Création paresseuse via des factories
+- Thread-safe
 
-Le script d'initialisation (`InitializationScript`) configure le conteneur de dépendances avec toutes les instances nécessaires à l'application.
+### Interfaces et Abstractions
 
-```cpp
-// Exemple d'utilisation du script d'initialisation
-ApplicationConfiguration config;
-auto container = std::make_shared<DependencyContainer>();
-InitializationScript::initializeContainer(container, config);
-```
+Le système repose fortement sur les interfaces pour découpler les composants:
 
-### Interfaces sous-systèmes
+- `IConfiguration` - Configuration et paramètres
+- `IInputSystem` - Système d'entrée
+- `IMidiSystem` - Système MIDI
+- `IUISystem` - Système d'interface utilisateur
 
-L'application est organisée en sous-systèmes, chacun ayant une interface bien définie:
+### InitializationScript
 
-- `IConfiguration` - Gestion des paramètres et configurations
-- `IInputSystem` - Gestion des entrées utilisateur
-- `IMidiSystem` - Communication MIDI
-- `IUISystem` - Interface utilisateur
-
-Ces interfaces permettent un couplage faible entre les composants et facilitent les tests unitaires.
-
-## Cycle de vie des objets
-
-### Initialisation
-
-Les objets sont initialisés dans un ordre qui respecte leurs dépendances:
-
-1. Configuration (pas de dépendances)
-2. Input (dépend de Configuration)
-3. MIDI (peut dépendre de Configuration)
-4. UI (peut dépendre de tous les autres)
-
-### Destruction
-
-Les objets sont détruits dans l'ordre inverse de leur création:
-
-1. UI
-2. MIDI
-3. Input
-4. Configuration
-
-## Gestion des erreurs
-
-Le projet utilise le pattern `Result<T, E>` pour la gestion des erreurs sans exceptions:
+Le fichier `InitializationScript.hpp` centralise la configuration des dépendances:
 
 ```cpp
-// Exemple d'utilisation du pattern Result
-Result<bool, std::string> init() {
-    if (!configSystem_) {
-        return Result<bool, std::string>::error("ConfigSystem not initialized");
-    }
-    return Result<bool, std::string>::success(true);
+static bool initializeContainer(std::shared_ptr<DependencyContainer> container,
+                              const ApplicationConfiguration& config) {
+    // Enregistrement des dépendances
+    auto configSystem = std::make_shared<ConfigurationSubsystem>(container);
+    container->registerDependency<IConfiguration>(configSystem);
+    
+    // ...
 }
 ```
 
-## Tests
+## Gestion des dépendances circulaires
 
-L'architecture d'injection de dépendances facilite les tests unitaires en permettant de remplacer les dépendances par des mocks:
+Les dépendances circulaires sont gérées de deux façons:
+
+1. **Interfaces**: L'utilisation d'interfaces réduit naturellement les cycles
+2. **std::weak_ptr**: Pour les relations qui doivent être bidirectionnelles
 
 ```cpp
-// Exemple de test avec mocks
-auto container = std::make_shared<DependencyContainer>();
-auto displayMock = std::make_shared<IDisplayMock>();
-container->registerDependency<IDisplay>(displayMock);
+// Exemple de gestion de dépendances circulaires
+class ComponentA {
+private:
+    std::shared_ptr<ComponentB> b_;
+};
 
-auto uiSystem = std::make_shared<UISubsystem>(container);
-uiSystem->init();
-
-// Vérifier que le display a été correctement initialisé
-assert(displayMock->initialized);
+class ComponentB {
+private:
+    std::weak_ptr<ComponentA> a_; // Utilisation de weak_ptr pour éviter les cycles
+};
 ```
 
-## Bonnes pratiques
+## Utilisation dans les tests
 
-- Utilisez l'injection par constructeur plutôt que l'accès direct au conteneur
-- Préférez les interfaces aux implémentations concrètes
-- Utilisez `std::shared_ptr` pour les dépendances partagées
-- Utilisez `std::weak_ptr` pour briser les cycles de dépendances
-- Documentez clairement les dépendances de chaque classe
+Le système d'injection de dépendances facilite les tests unitaires:
+
+```cpp
+// Test avec mock
+auto mockInput = std::make_shared<MockInputSystem>();
+container->registerDependency<IInputSystem>(mockInput);
+
+// L'objet testé recevra automatiquement le mock
+auto app = std::make_shared<MidiControllerApp>(container);
+```
+
+## Migration depuis ServiceLocator
+
+### Avant
+```cpp
+// Ancien code utilisant ServiceLocator
+auto& inputSystem = ServiceLocator::getInputSystem();
+inputSystem.process();
+```
+
+### Après
+```cpp
+// Avec injection de dépendances
+explicit MyClass(std::shared_ptr<IInputSystem> inputSystem)
+  : inputSystem_(inputSystem) {
+}
+
+void process() {
+    inputSystem_->process();
+}
+```
+
+## Meilleures pratiques
+
+1. **Injecter les interfaces** plutôt que les implémentations concrètes
+2. **Préférer l'injection par constructeur** aux autres formes d'injection
+3. **Nommer clairement les dépendances** avec des suffixes `_`
+4. **Minimiser les dépendances** de chaque classe
+5. **Utiliser des smart pointers** pour clarifier l'intention
+   - `std::shared_ptr` - Durée de vie partagée
+   - `std::unique_ptr` - Propriété exclusive
+   - `std::weak_ptr` - Référence non-propriétaire
+
+## FAQ
+
+**Q: Pourquoi utiliser l'injection de dépendances plutôt que ServiceLocator?**
+R: L'injection de dépendances rend les dépendances explicites, facilite les tests et améliore la modularité.
+
+**Q: Comment éviter la "soupe de paramètres" dans les constructeurs?**
+R: Regrouper les paramètres logiquement liés dans des structures, et suivre le principe de responsabilité unique.
+
+**Q: Comment faire pour les plateformes embarquées avec ressources limitées?**
+R: Notre implémentation est légère et adaptée à la plateforme Teensy avec des optimisations pour la performance.
