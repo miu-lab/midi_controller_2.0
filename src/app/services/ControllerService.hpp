@@ -1,7 +1,8 @@
 #pragma once
 
-// Forward declaration de la classe d'écouteur
+// Forward declarations
 class ControllerServiceEventListener;
+class DependencyContainer;
 
 #include <memory>
 
@@ -25,12 +26,18 @@ class ControllerServiceEventListener;
 class ControllerService {
 public:
     /**
-     * @brief Constructeur
+     * @brief Constructeur original
      * @param viewManager Gestionnaire de vues
      * @param midiOut Interface de sortie MIDI
      * @param profileManager Gestionnaire de profils
      */
     ControllerService(ViewManager& viewManager, IMidiOut& midiOut, IProfileManager& profileManager);
+    
+    /**
+     * @brief Nouveau constructeur avec injection de dépendances
+     * @param container Conteneur de dépendances
+     */
+    explicit ControllerService(std::shared_ptr<DependencyContainer> container);
 
     /**
      * @brief Initialise le service
@@ -73,9 +80,16 @@ public:
     InputController& getInputController();
 
 private:
+    // Conteneur de dépendances (peut être nullptr pour l'ancien constructeur)
+    std::shared_ptr<DependencyContainer> container_;
+    
+    // Dépendances directes pour l'ancien constructeur
     ViewManager& viewManager_;
     IMidiOut& midiOut_;
     IProfileManager& profileManager_;
+    
+    // Flag pour savoir si on utilise le container
+    bool usingContainer_ = false;
 
     CommandManager commandManager_;
     
@@ -93,4 +107,9 @@ private:
      * @brief Initialise les mappings MIDI
      */
     void initializeMidiMappings();
+    
+    /**
+     * @brief Initialise les dépendances (UIController et InputController)
+     */
+    void initializeDependencies();
 };

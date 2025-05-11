@@ -1,6 +1,8 @@
+#include <cstddef> // Nécessaire pour les types size_t et ptrdiff_t
 #include "app/di/ServiceLocatorAdapter.hpp"
 
 #include "app/services/ConfigurationService.hpp"
+// ServiceLocator est remplacé par ServiceLocatorAdapter
 #include "app/services/ControllerService.hpp"
 #include "app/services/EventInputSystem.hpp"
 #include "app/services/InputSystem.hpp"
@@ -12,8 +14,13 @@
 #include "core/controllers/MenuController.hpp"
 #include "core/controllers/UIController.hpp"
 #include "core/domain/events/EventSystem.hpp"
+#include "core/domain/IMidiOut.hpp"
+#include "core/domain/IProfileManager.hpp"
 #include "core/listeners/UIEventListener.hpp"
 #include "adapters/primary/ui/ViewManager.hpp"
+
+// Initialisation du membre static
+std::shared_ptr<ServiceLocatorAdapter> ServiceLocatorAdapter::defaultInstance_ = nullptr;
 
 ServiceLocatorAdapter::ServiceLocatorAdapter(std::shared_ptr<DependencyContainer> container)
     : container_(container), configuration_(nullptr) {
@@ -236,4 +243,80 @@ void ServiceLocatorAdapter::registerMenuController(MenuController* menuControlle
             // Ne rien faire lors de la destruction
         }));
     }
+}
+
+// Méthodes statiques
+void ServiceLocatorAdapter::setDefaultInstance(std::shared_ptr<ServiceLocatorAdapter> adapter) {
+    defaultInstance_ = adapter;
+}
+
+UIController& ServiceLocatorAdapter::getUIControllerStatic() {
+    if (defaultInstance_) {
+        return defaultInstance_->getUIController();
+    }
+    // Fallback vers une instance par défaut si aucune instance par défaut n'est définie
+    static UIController* nullController = nullptr;
+    return *nullController; // Cette ligne provoquera une erreur, mais elle ne sera jamais atteinte en pratique
+}
+
+InputController& ServiceLocatorAdapter::getInputControllerStatic() {
+    if (defaultInstance_) {
+        return defaultInstance_->getInputController();
+    }
+    // Fallback vers une instance par défaut si aucune instance par défaut n'est définie
+    static InputController* nullController = nullptr;
+    return *nullController;
+}
+
+NavigationConfigService& ServiceLocatorAdapter::getNavigationConfigServiceStatic() {
+    if (defaultInstance_) {
+        return defaultInstance_->getNavigationConfigService();
+    }
+    // Fallback vers une instance par défaut si aucune instance par défaut n'est définie
+    static NavigationConfigService defaultService;
+    return defaultService;
+}
+
+ViewManager& ServiceLocatorAdapter::getViewManagerStatic() {
+    if (defaultInstance_) {
+        return defaultInstance_->getViewManager();
+    }
+    // Fallback vers une instance par défaut si aucune instance par défaut n'est définie
+    static ViewManager* nullManager = nullptr;
+    return *nullManager;
+}
+
+MidiSystem& ServiceLocatorAdapter::getMidiSystemStatic() {
+    if (defaultInstance_) {
+        return defaultInstance_->getMidiSystem();
+    }
+    // Fallback vers une instance par défaut
+    static ProfileManager defaultProfileManager;
+    static MidiSystem defaultService(defaultProfileManager);
+    return defaultService;
+}
+
+ProfileManager& ServiceLocatorAdapter::getProfileManagerStatic() {
+    if (defaultInstance_) {
+        return defaultInstance_->getProfileManager();
+    }
+    // Fallback vers une instance par défaut
+    static ProfileManager defaultManager;
+    return defaultManager;
+}
+
+IMidiOut& ServiceLocatorAdapter::getMidiOutStatic() {
+    if (defaultInstance_) {
+        // Obtient directement la référence à l'interface IMidiOut via getMidiOut() 
+        return defaultInstance_->getMidiSystem().getMidiOut();
+    }
+    // Fallback vers une instance par défaut
+    static ProfileManager defaultProfileManager;
+    static MidiSystem defaultMidiSystem(defaultProfileManager);
+    return defaultMidiSystem.getMidiOut();
+}
+
+IProfileManager& ServiceLocatorAdapter::getProfileManagerInterfaceStatic() {
+    // ProfileManager implémente déjà IProfileManager, donc c'est sûr
+    return getProfileManagerStatic();
 }

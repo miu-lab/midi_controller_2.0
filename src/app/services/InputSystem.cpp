@@ -1,21 +1,72 @@
 #include "app/services/InputSystem.hpp"
 
+#include "app/di/DependencyContainer.hpp"
 #include "app/services/ServiceLocator.hpp"
+#include "app/di/ServiceLocatorAdapter.hpp"
+#include "app/services/NavigationConfigService.hpp"
 
 InputSystem::InputSystem()
     : encoderManager_({}),
       processEncoders_(encoderManager_.getEncoders()),
       buttonManager_({}),
       processButtons_(buttonManager_.getButtons()),
-      inputController_(nullptr) {
+      inputController_(nullptr),
+      container_(nullptr),
+      usingContainer_(false) {
+      
+    initializeDependencies();
+}
+
+InputSystem::InputSystem(std::shared_ptr<DependencyContainer> container)
+    : encoderManager_({}),
+      processEncoders_(encoderManager_.getEncoders()),
+      buttonManager_({}),
+      processButtons_(buttonManager_.getButtons()),
+      inputController_(nullptr),
+      container_(container),
+      usingContainer_(true) {
+      
+    initializeDependencies();
+}
+
+void InputSystem::initializeDependencies() {
 #ifndef DISABLE_CONTROLLERS
-    // Créer et initialiser l'InputController avec un shared pointer
-    inputController_ = std::make_shared<InputController>(ServiceLocator::getNavigationConfigService());
+    // Récupérer NavigationConfigService
+    std::shared_ptr<NavigationConfigService> navConfigService;
+    
+    if (usingContainer_ && container_) {
+        // Essayer de récupérer depuis le container
+        navConfigService = container_->resolve<NavigationConfigService>();
+        
+        // Si le service n'est pas dans le container, créer une nouvelle instance
+        if (!navConfigService) {
+            auto& legacyService = ServiceLocatorAdapter::getNavigationConfigServiceStatic();
+            // Création d'un shared_ptr avec un deleter personnalisé
+            navConfigService = std::shared_ptr<NavigationConfigService>(&legacyService, [](NavigationConfigService*){});
+        }
+    } else {
+        // Ancien comportement - utiliser ServiceLocatorAdapter
+        auto& legacyService = ServiceLocatorAdapter::getNavigationConfigServiceStatic();
+        navConfigService = std::shared_ptr<NavigationConfigService>(&legacyService, [](NavigationConfigService*){});
+    }
+    
+    // Créer InputController
+    inputController_ = std::make_shared<InputController>(*navConfigService);
 
-    // Enregistrer le contrôleur dans le ServiceLocator
+    // Enregistrer dans le ServiceLocator pour compatibilité
+    // On continue à utiliser ServiceLocator ici car c'est pour la compatibilité arrière
+    // Désactiver temporairement les avertissements
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     ServiceLocator::registerInputController(inputController_);
+    #pragma GCC diagnostic pop
+    
+    // Si nous utilisons le container, enregistrer aussi là
+    if (usingContainer_ && container_) {
+        container_->registerDependency<InputController>(inputController_);
+    }
 
-    // Configurer les processeurs pour utiliser l'InputController
+    // Configurer les processeurs
     processEncoders_.setInputController(inputController_.get());
     processButtons_.setInputController(inputController_.get());
 #endif
@@ -94,7 +145,20 @@ InputController& InputSystem::getInputController() {
     return *inputController_;
 #else
     // Ceci ne devrait jamais être appelé en mode DISABLE_CONTROLLERS
-    static InputController nullController(ServiceLocator::getNavigationConfigService());
+    if (usingContainer_ && container_) {
+        auto navConfigService = container_->resolve<NavigationConfigService>();
+        if (navConfigService) {
+            static InputController nullController(*navConfigService);
+            return nullController;
+        }
+    }
+    
+    // Fallback vers ServiceLocatorAdapter
+    // Désactiver l'avertissement de dépréciation - c'est un fallback temporaire
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    static InputController nullController(ServiceLocatorAdapter::getNavigationConfigServiceStatic());
+    #pragma GCC diagnostic pop
     return nullController; // Contrôleur par défaut en cas de besoin
 #endif
 }

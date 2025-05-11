@@ -1,98 +1,93 @@
-#ifndef MOCK_TESTS_H
-#define MOCK_TESTS_H
+#pragma once
 
 #include <unity.h>
-#include "mocks/MockInput.h"
-#include "mocks/MockMidi.h"
-#include "mocks/MockUI.h"
+#include "mocks/MockConfigurationSubsystem.h"
+#include "mocks/MockInputSubsystem.h"
+#include "mocks/MockMidiSubsystem.h"
+#include "mocks/MockUISubsystem.h"
 
 // Tests pour les mocks
 void test_mock_initialization() {
-    MockInput input;
-    MockMidi midi;
-    MockUI ui;
+    // Tester l'initialisation des mocks
+    MockConfigurationSubsystem mockConfig;
+    MockInputSubsystem mockInput;
+    MockMidiSubsystem mockMidi;
+    MockUISubsystem mockUI;
     
-    // Initialiser les mocks et vérifier les résultats
-    auto inputResult = input.init();
-    auto midiResult = midi.init();
-    auto uiResult = ui.init(true);
+    // Vérifier l'état initial
+    TEST_ASSERT_FALSE(mockConfig.initCalled);
+    TEST_ASSERT_FALSE(mockInput.initCalled);
+    TEST_ASSERT_FALSE(mockMidi.initCalled);
+    TEST_ASSERT_FALSE(mockUI.initCalled);
     
-    // Vérifier que l'initialisation a fonctionné avec Unity
-    TEST_ASSERT_TRUE(inputResult.isSuccess());
-    TEST_ASSERT_TRUE(midiResult.isSuccess());
-    TEST_ASSERT_TRUE(uiResult.isSuccess());
+    // Initialiser les mocks
+    mockInput.init();
+    mockMidi.init();
+    mockUI.init();
     
-    TEST_ASSERT_TRUE(input.initialized);
-    TEST_ASSERT_TRUE(midi.initialized);
-    TEST_ASSERT_TRUE(ui.initialized);
-    TEST_ASSERT_TRUE(ui.fullUIEnabled);
+    // Vérifier qu'ils ont été initialisés
+    TEST_ASSERT_TRUE(mockInput.initCalled);
+    TEST_ASSERT_TRUE(mockMidi.initCalled);
+    TEST_ASSERT_TRUE(mockUI.initCalled);
 }
 
 void test_mock_updates() {
-    MockInput input;
-    MockMidi midi;
-    MockUI ui;
+    // Tester les mises à jour des mocks
+    MockInputSubsystem mockInput;
+    MockMidiSubsystem mockMidi;
+    MockUISubsystem mockUI;
     
-    // Faire une mise à jour
-    input.update();
-    midi.update();
-    ui.update();
+    // Vérifier l'état initial
+    TEST_ASSERT_FALSE(mockInput.updateCalled);
+    TEST_ASSERT_FALSE(mockMidi.updateCalled);
+    TEST_ASSERT_FALSE(mockUI.updateCalled);
     
-    // Vérifier que les compteurs ont été incrémentés
-    TEST_ASSERT_EQUAL_INT(1, input.updateCount);
-    TEST_ASSERT_EQUAL_INT(1, midi.updateCount);
-    TEST_ASSERT_EQUAL_INT(1, ui.updateCount);
+    // Mettre à jour les mocks
+    mockInput.update();
+    mockMidi.update();
+    mockUI.update();
+    
+    // Vérifier qu'ils ont été mis à jour
+    TEST_ASSERT_TRUE(mockInput.updateCalled);
+    TEST_ASSERT_TRUE(mockMidi.updateCalled);
+    TEST_ASSERT_TRUE(mockUI.updateCalled);
 }
 
 void test_midi_messages() {
-    MockMidi midi;
+    // Tester l'envoi de messages MIDI
+    MockMidiSubsystem mockMidi;
     
-    // Envoyer quelques messages MIDI et vérifier les résultats
-    auto noteOnResult = midi.sendNoteOn(0, 60, 100);
-    auto noteOffResult = midi.sendNoteOff(0, 60);
-    auto ccResult = midi.sendControlChange(0, 7, 127);
+    // Envoyer des messages MIDI
+    mockMidi.sendNoteOn(1, 60, 100);
+    mockMidi.sendNoteOff(1, 60);
+    mockMidi.sendControlChange(1, 7, 127);
     
-    // Vérifier que les opérations ont réussi
-    TEST_ASSERT_TRUE(noteOnResult.isSuccess());
-    TEST_ASSERT_TRUE(noteOffResult.isSuccess());
-    TEST_ASSERT_TRUE(ccResult.isSuccess());
+    // Vérifier que les messages ont été envoyés
+    TEST_ASSERT_EQUAL(3, mockMidi.sentMessages.size());
     
-    // Vérifier que les messages ont été enregistrés
-    TEST_ASSERT_EQUAL_INT(1, midi.noteOnMessages.size());
-    TEST_ASSERT_EQUAL_INT(1, midi.noteOffMessages.size());
-    TEST_ASSERT_EQUAL_INT(1, midi.ccMessages.size());
-    
-    // Vérifier le contenu des messages
-    TEST_ASSERT_EQUAL_INT(0, midi.noteOnMessages[0].channel);
-    TEST_ASSERT_EQUAL_INT(60, midi.noteOnMessages[0].note);
-    TEST_ASSERT_EQUAL_INT(100, midi.noteOnMessages[0].velocity);
-    
-    TEST_ASSERT_EQUAL_INT(0, midi.noteOffMessages[0].channel);
-    TEST_ASSERT_EQUAL_INT(60, midi.noteOffMessages[0].note);
-    
-    TEST_ASSERT_EQUAL_INT(0, midi.ccMessages[0].channel);
-    TEST_ASSERT_EQUAL_INT(7, midi.ccMessages[0].controller);
-    TEST_ASSERT_EQUAL_INT(127, midi.ccMessages[0].value);
+    // Vérifier les messages
+    TEST_ASSERT_TRUE(mockMidi.hasMessage(MockMidiSubsystem::MidiMessage::Type::NoteOn, 1, 60, 100));
+    TEST_ASSERT_TRUE(mockMidi.hasMessage(MockMidiSubsystem::MidiMessage::Type::NoteOff, 1, 60));
+    TEST_ASSERT_TRUE(mockMidi.hasMessage(MockMidiSubsystem::MidiMessage::Type::ControlChange, 1, 7, 127));
 }
 
 void test_ui_messages() {
-    MockUI ui;
+    // Tester l'affichage de messages UI
+    MockUISubsystem mockUI;
     
-    // Envoyer des messages à l'UI et vérifier les résultats
-    auto msg1Result = ui.showMessage("Test message 1");
-    auto msg2Result = ui.showMessage("Test message 2");
-    auto clearResult = ui.clearDisplay();
+    // Afficher des messages
+    mockUI.showMessage("Test Message 1");
+    mockUI.showMessage("Test Message 2");
     
-    // Vérifier que les opérations ont réussi
-    TEST_ASSERT_TRUE(msg1Result.isSuccess());
-    TEST_ASSERT_TRUE(msg2Result.isSuccess());
-    TEST_ASSERT_TRUE(clearResult.isSuccess());
+    // Vérifier que les messages ont été affichés
+    TEST_ASSERT_EQUAL(2, mockUI.displayedMessages.size());
+    TEST_ASSERT_TRUE(mockUI.hasDisplayedMessage("Test Message 1"));
+    TEST_ASSERT_TRUE(mockUI.hasDisplayedMessage("Test Message 2"));
     
-    // Vérifier que les messages ont été enregistrés
-    TEST_ASSERT_EQUAL_INT(2, ui.messages.size());
-    TEST_ASSERT_EQUAL_STRING("Test message 1", ui.messages[0].c_str());
-    TEST_ASSERT_EQUAL_STRING("Test message 2", ui.messages[1].c_str());
-    TEST_ASSERT_TRUE(ui.displayCleared);
+    // Effacer l'affichage
+    mockUI.clearDisplay();
+    
+    // Vérifier que l'affichage a été effacé
+    TEST_ASSERT_TRUE(mockUI.displayCleared);
+    TEST_ASSERT_EQUAL(0, mockUI.displayedMessages.size());
 }
-
-#endif // MOCK_TESTS_H

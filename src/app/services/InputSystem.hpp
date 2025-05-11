@@ -2,6 +2,10 @@
 #include <vector>
 #include <memory>
 
+// Forward declarations
+class DependencyContainer;
+class NavigationConfigService;
+
 #include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
 #include "core/controllers/InputController.hpp"
@@ -19,9 +23,15 @@
 class InputSystem {
 public:
     /**
-     * @brief Construit un nouveau système d'entrée
+     * @brief Construit un nouveau système d'entrée (original)
      */
     InputSystem();
+    
+    /**
+     * @brief Construit un nouveau système d'entrée avec injection de dépendances
+     * @param container Conteneur de dépendances
+     */
+    explicit InputSystem(std::shared_ptr<DependencyContainer> container);
 
     /**
      * @brief Initialise le système d'entrée
@@ -55,4 +65,15 @@ private:
     DigitalButtonManager buttonManager_;  // Gestionnaire des boutons
     ProcessButtons processButtons_;       // Traitement des boutons
     std::shared_ptr<InputController> inputController_;    // Contrôleur d'entrée
+    
+    // Conteneur de dépendances (peut être nullptr pour l'ancien constructeur)
+    std::shared_ptr<DependencyContainer> container_;
+    
+    // Flag pour savoir si on utilise le container
+    bool usingContainer_ = false;
+    
+    /**
+     * @brief Initialise les dépendances internes
+     */
+    void initializeDependencies();
 };

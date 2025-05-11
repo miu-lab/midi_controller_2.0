@@ -34,13 +34,18 @@ class MenuController;
  *
  * Cette classe centralise la création et l'accès aux objets du système.
  * Elle implémente le pattern Service Locator pour faciliter l'injection de dépendances.
+ * 
+ * @deprecated Cette classe est dépréciée. Utilisez DependencyContainer et ServiceLocatorAdapter à la place.
  */
-class ServiceLocator {
+class [[deprecated("Use DependencyContainer and ServiceLocatorAdapter instead")]] ServiceLocator {
 public:
     /**
      * @brief Initialise le ServiceLocator avec les dépendances principales
      * @param config La configuration de l'application
+     * 
+     * @deprecated Utilisez ServiceLocatorAdapter::initialize à la place
      */
+    [[deprecated("Use ServiceLocatorAdapter::initialize instead")]]
     static void initialize(const ApplicationConfiguration& config);
 
     /**
@@ -58,7 +63,10 @@ public:
     /**
      * @brief Récupère le service NavigationConfigService
      * @return Une référence au service de configuration de navigation
+     * 
+     * @deprecated Utilisez ServiceLocatorAdapter::getNavigationConfigServiceStatic à la place
      */
+    [[deprecated("Use ServiceLocatorAdapter::getNavigationConfigServiceStatic instead")]]
     static NavigationConfigService& getNavigationConfigService();
 
     /**
@@ -94,13 +102,19 @@ public:
     /**
      * @brief Récupère le contrôleur d'entrées
      * @return Une référence au contrôleur d'entrées
+     * 
+     * @deprecated Utilisez ServiceLocatorAdapter::getInputControllerStatic à la place
      */
+    [[deprecated("Use ServiceLocatorAdapter::getInputControllerStatic instead")]]
     static InputController& getInputController();
 
     /**
      * @brief Récupère le contrôleur d'interface utilisateur
      * @return Une référence au contrôleur d'interface utilisateur
+     * 
+     * @deprecated Utilisez ServiceLocatorAdapter::getUIControllerStatic à la place
      */
+    [[deprecated("Use ServiceLocatorAdapter::getUIControllerStatic instead")]]
     static UIController& getUIController();
 
     /**

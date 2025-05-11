@@ -20,6 +20,10 @@ class ViewManager;
 class MenuController;
 class EventBus;
 
+// Forward declarations des interfaces
+class IMidiOut;
+class IProfileManager;
+
 /**
  * @brief Adaptateur pour ServiceLocator qui utilise DependencyContainer
  * 
@@ -30,6 +34,60 @@ class ServiceLocatorAdapter {
 public:
     explicit ServiceLocatorAdapter(std::shared_ptr<DependencyContainer> container);
     ~ServiceLocatorAdapter() = default;
+    
+    /**
+     * @brief Définit l'instance par défaut pour les appels statiques
+     * @param adapter Instance de ServiceLocatorAdapter à utiliser comme défaut
+     */
+    static void setDefaultInstance(std::shared_ptr<ServiceLocatorAdapter> adapter);
+    
+    /**
+     * @brief Accès statique à UIController
+     * @return Une référence au contrôleur UI
+     */
+    static UIController& getUIControllerStatic();
+    
+    /**
+     * @brief Accès statique à InputController
+     * @return Une référence au contrôleur d'entrée
+     */
+    static InputController& getInputControllerStatic();
+    
+    /**
+     * @brief Accès statique à ViewManager
+     * @return Une référence au gestionnaire de vues
+     */
+    static ViewManager& getViewManagerStatic();
+    
+    /**
+     * @brief Accès statique à MidiSystem
+     * @return Une référence au système MIDI
+     */
+    static MidiSystem& getMidiSystemStatic();
+    
+    /**
+     * @brief Accès statique à ProfileManager
+     * @return Une référence au gestionnaire de profils
+     */
+    static ProfileManager& getProfileManagerStatic();
+    
+    /**
+     * @brief Accès statique à IMidiOut
+     * @return Une référence à l'interface de sortie MIDI
+     */
+    static IMidiOut& getMidiOutStatic();
+    
+    /**
+     * @brief Accès statique à IProfileManager
+     * @return Une référence au gestionnaire de profils en tant qu'interface
+     */
+    static IProfileManager& getProfileManagerInterfaceStatic();
+    
+    /**
+     * @brief Accès statique à NavigationConfigService
+     * @return Une référence au service de config de navigation
+     */
+    static NavigationConfigService& getNavigationConfigServiceStatic();
     
     /**
      * @brief Initialise l'adaptateur avec la configuration
@@ -304,4 +362,7 @@ public:
 private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<ApplicationConfiguration> configuration_;
+    
+    // Instance par défaut pour les appels statiques
+    static std::shared_ptr<ServiceLocatorAdapter> defaultInstance_;
 };

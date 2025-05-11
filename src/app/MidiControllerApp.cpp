@@ -1,88 +1,177 @@
-#include "app/MidiControllerApp.hpp"
+#include "MidiControllerApp.hpp"
 
+#include "app/di/DependencyContainer.hpp"
+#include "app/subsystems/ConfigurationSubsystem.hpp"
+#include "app/subsystems/InputSubsystem.hpp"
+#include "app/subsystems/MidiSubsystem.hpp"
+#include "app/subsystems/UISubsystem.hpp"
+
+#ifdef DEBUG
 #include <Arduino.h>
+#endif
 
-#include "core/TaskScheduler.hpp"
-#include "core/controllers/UIController.hpp"
-#include "core/domain/events/EventSystem.hpp"
-#include "core/listeners/UIControllerEventListener.hpp"
-
-MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
-    : configService_(appConfig),
-      navigationConfig_(),
-      profileManager_(),
-      midiSystem_(profileManager_),
-      eventInputSystem_(),
-      uiEventService_(),
-      uiControllerEventListener_(nullptr),
-      uiEventListener_(nullptr),
-      uiControllerEventListenerSubId_(0),
-      uiEventListenerSubId_(0) {
-    // Initialisation des services et dépendances
-    ServiceLocator::initialize(appConfig);
-
-    // Création de shared_ptr avec des deleters personnalisés pour éviter les problèmes
-    // de destruction (ces objets sont des membres de MidiControllerApp)
-    auto configServicePtr =
-        std::shared_ptr<ConfigurationService>(&configService_, [](ConfigurationService*) {});
-    auto navigationConfigPtr =
-        std::shared_ptr<NavigationConfigService>(&navigationConfig_,
-                                                 [](NavigationConfigService*) {});
-    auto profileManagerPtr =
-        std::shared_ptr<ProfileManager>(&profileManager_, [](ProfileManager*) {});
-    auto midiSystemPtr = std::shared_ptr<MidiSystem>(&midiSystem_, [](MidiSystem*) {});
-    auto eventInputSystemPtr =
-        std::shared_ptr<InputSystem>(&eventInputSystem_, [](InputSystem*) {});
-    auto uiEventServicePtr =
-        std::shared_ptr<UiEventService>(&uiEventService_, [](UiEventService*) {});
-
-    // Enregistrement des services avec des pointeurs partagés
-    ServiceLocator::registerNavigationConfigService(navigationConfigPtr);
-    ServiceLocator::registerProfileManager(profileManagerPtr);
-    ServiceLocator::registerMidiSystem(midiSystemPtr);
-    ServiceLocator::registerInputSystem(eventInputSystemPtr);
-    ServiceLocator::registerUiEventService(uiEventServicePtr);
-    ServiceLocator::registerConfigurationService(configServicePtr);
+MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& config, 
+                                     std::shared_ptr<DependencyContainer> externalContainer) {
+    // Si un conteneur externe est fourni, essayer de résoudre les sous-systèmes existants
+    if (externalContainer) {
+        m_dependencies = externalContainer;
+        
+        // Ajouter la configuration au conteneur si elle n'existe pas déjà
+        if (!m_dependencies->resolve<ApplicationConfiguration>()) {
+            m_dependencies->registerDependency<ApplicationConfiguration>(
+                std::make_shared<ApplicationConfiguration>(config));
+        }
+        
+        // Utiliser les interfaces déjà injectées
+        auto configInterface = m_dependencies->resolve<IConfiguration>();
+        auto inputInterface = m_dependencies->resolve<IInputSystem>();
+        auto midiInterface = m_dependencies->resolve<IMidiSystem>();
+        auto uiInterface = m_dependencies->resolve<IUISystem>();
+        
+        // Ces interfaces sont injectées par les tests
+        if (configInterface && inputInterface && midiInterface && uiInterface) {
+            // Nous n'avons pas besoin de créer nos propres sous-systèmes
+            // Nous utiliserons directement les interfaces injectées lors de init() et update()
+            return;
+        }
+    }
+    
+    // Si nous sommes ici, soit nous n'avons pas de conteneur externe,
+    // soit il ne contient pas toutes les interfaces nécessaires
+    
+    // Créer un nouveau conteneur si nécessaire
+    if (!m_dependencies) {
+        m_dependencies = std::make_shared<DependencyContainer>();
+    }
+    
+    // Enregistrer la configuration
+    if (!m_dependencies->resolve<ApplicationConfiguration>()) {
+        m_dependencies->registerDependency<ApplicationConfiguration>(
+            std::make_shared<ApplicationConfiguration>(config));
+    }
+    
+    // Créer et enregistrer les sous-systèmes
+    m_configSystem = std::make_shared<ConfigurationSubsystem>(m_dependencies);
+    m_inputSystem = std::make_shared<InputSubsystem>(m_dependencies);
+    m_midiSystem = std::make_shared<MidiSubsystem>(m_dependencies);
+    m_uiSystem = std::make_shared<UISubsystem>(m_dependencies);
+    
+    // Enregistrer les sous-systèmes comme implémentations d'interfaces
+    m_dependencies->registerDependency<IConfiguration>(m_configSystem);
+    m_dependencies->registerDependency<IInputSystem>(m_inputSystem);
+    m_dependencies->registerDependency<IMidiSystem>(m_midiSystem);
+    m_dependencies->registerDependency<IUISystem>(m_uiSystem);
 }
 
 MidiControllerApp::~MidiControllerApp() {
-    // Désabonnement des écouteurs
-    auto& eventBus = EventBus::getInstance();
+    // Nettoyer les ressources
+    m_uiSystem.reset();
+    m_midiSystem.reset();
+    m_inputSystem.reset();
+    m_configSystem.reset();
+    m_dependencies.reset();
+}
 
-    if (uiControllerEventListenerSubId_ != 0) {
-        eventBus.unsubscribe(uiControllerEventListenerSubId_);
+Result<bool, std::string> MidiControllerApp::init() {
+    // Obtenir les interfaces pour l'initialisation
+    auto configInterface = m_dependencies->resolve<IConfiguration>();
+    auto inputInterface = m_dependencies->resolve<IInputSystem>();
+    auto midiInterface = m_dependencies->resolve<IMidiSystem>();
+    auto uiInterface = m_dependencies->resolve<IUISystem>();
+    
+    // Vérifier que toutes les interfaces sont disponibles
+    if (!configInterface || !inputInterface || !midiInterface || !uiInterface) {
+        return Result<bool, std::string>::error("Certaines interfaces nécessaires sont manquantes");
     }
-
-    if (uiEventListenerSubId_ != 0) {
-        eventBus.unsubscribe(uiEventListenerSubId_);
-    }
-}
-
-void MidiControllerApp::setControlForNavigation(ControlId id, bool isNavigation) {
-    navigationConfig_.setControlForNavigation(id, isNavigation);
-}
-
-bool MidiControllerApp::isNavigationControl(ControlId id) const {
-    return navigationConfig_.isNavigationControl(id);
-}
-
-void MidiControllerApp::init() {
-    // Application des configurations et initialisation des systèmes
-    configService_.applyConfigurations(profileManager_, navigationConfig_);
-    eventInputSystem_.init(configService_.encoderConfigs(), configService_.buttonConfigs());
-    midiSystem_.init(navigationConfig_);
-    uiEventService_.init(navigationConfig_);
-
-    // Note: L'UI sera implémentée ultérieurement (ViewManager, MenuController, UIController)
+    
+    // 1. Configuration (indépendant)
 #ifdef DEBUG
-    Serial.println(
-        F("Note: L'initialisation de UIController est commentée pour l'instant et sera implémentée "
-          "dans une étape ultérieure"));
+    Serial.println(F("MidiControllerApp: Initialisation du sous-système de configuration"));
 #endif
+    auto configResult = configInterface->init();
+    if (configResult.isError()) {
+        return Result<bool, std::string>::error(
+            "Échec de l'initialisation du sous-système de configuration: " + 
+            *(configResult.error()));
+    }
+    
+    // 2. Input (dépend de Configuration)
+#ifdef DEBUG
+    Serial.println(F("MidiControllerApp: Initialisation du sous-système d'entrée"));
+#endif
+    auto inputResult = inputInterface->init();
+    if (inputResult.isError()) {
+        return Result<bool, std::string>::error(
+            "Échec de l'initialisation du sous-système d'entrée: " + 
+            *(inputResult.error()));
+    }
+    
+    // 3. MIDI (peut dépendre de Configuration)
+#ifdef DEBUG
+    Serial.println(F("MidiControllerApp: Initialisation du sous-système MIDI"));
+#endif
+    auto midiResult = midiInterface->init();
+    if (midiResult.isError()) {
+        return Result<bool, std::string>::error(
+            "Échec de l'initialisation du sous-système MIDI: " + 
+            *(midiResult.error()));
+    }
+    
+    // 4. UI (peut dépendre de tous les autres)
+#ifdef DEBUG
+    Serial.println(F("MidiControllerApp: Initialisation du sous-système d'interface utilisateur"));
+#endif
+    auto uiResult = uiInterface->init(/* enableFullUI */ true);
+    if (uiResult.isError()) {
+        return Result<bool, std::string>::error(
+            "Échec de l'initialisation du sous-système d'interface utilisateur: " + 
+            *(uiResult.error()));
+    }
+    
+    return Result<bool, std::string>::success(true);
 }
 
 void MidiControllerApp::update() {
-    // Mise à jour des systèmes principaux
-    eventInputSystem_.update();
-    midiSystem_.update();
+    // Obtenir les interfaces pour la mise à jour
+    auto inputInterface = m_dependencies->resolve<IInputSystem>();
+    auto midiInterface = m_dependencies->resolve<IMidiSystem>();
+    auto uiInterface = m_dependencies->resolve<IUISystem>();
+    
+    // Mise à jour des sous-systèmes dans l'ordre logique
+    if (inputInterface) inputInterface->update();
+    if (midiInterface) midiInterface->update();
+    if (uiInterface) uiInterface->update();
+}
+
+// Implémentation de l'API publique
+void MidiControllerApp::setControlForNavigation(ControlId id, bool isNavigation) {
+    auto configInterface = m_dependencies->resolve<IConfiguration>();
+    if (configInterface) {
+        configInterface->setControlForNavigation(id, isNavigation);
+    }
+}
+
+bool MidiControllerApp::isNavigationControl(ControlId id) const {
+    auto configInterface = m_dependencies->resolve<IConfiguration>();
+    if (configInterface) {
+        return configInterface->isNavigationControl(id);
+    }
+    return false;
+}
+
+// Implémentation des accesseurs d'interfaces
+std::shared_ptr<IConfiguration> MidiControllerApp::getConfiguration() const {
+    return m_dependencies->resolve<IConfiguration>();
+}
+
+std::shared_ptr<IInputSystem> MidiControllerApp::getInputInterface() const {
+    return m_dependencies->resolve<IInputSystem>();
+}
+
+std::shared_ptr<IMidiSystem> MidiControllerApp::getMidiInterface() const {
+    return m_dependencies->resolve<IMidiSystem>();
+}
+
+std::shared_ptr<IUISystem> MidiControllerApp::getUIInterface() const {
+    return m_dependencies->resolve<IUISystem>();
 }

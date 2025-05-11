@@ -5,6 +5,10 @@
 #include "config/debug/SerialBuffer.hpp"
 #include "core/TaskScheduler.hpp"
 #include "tools/Diagnostics.hpp"
+// Phase 7 - Migration en cours
+// Inclusion de l'adaptateur pour la transition
+#include "app/di/DependencyContainer.hpp"
+#include "app/di/ServiceLocatorAdapter.hpp"
 
 // Variables globales
 ApplicationConfiguration appConfig;
@@ -70,10 +74,22 @@ void setup() {
         // Attente avec timeout
     }
 
+    // Phase 7 - Initialisation du container de dépendances et de l'adaptateur
+    auto container = std::make_shared<DependencyContainer>();
+    auto adapter = std::make_shared<ServiceLocatorAdapter>(container);
+    ServiceLocatorAdapter::setDefaultInstance(adapter);
+    adapter->initialize(appConfig);
+    
     // Initialisation du tampon série et de l'application
     SerialBuffer::init(300);
     DEBUG_PRINTLN_FLASH("[INIT] MidiController - Démarrage...");
-    app.init();
+    auto result = app.init();
+    if (result.isError()) {
+        DEBUG_PRINTLN_FLASH("[INIT] Erreur d'initialisation: ");
+        DEBUG_PRINTLN_FLASH(result.error()->c_str());
+    } else {
+        DEBUG_PRINTLN_FLASH("[INIT] Initialisation réussie");
+    }
 
     // Configuration de l'ordonnanceur
     appUpdateTaskId = scheduler.addTask(appUpdateCallback, 1000, 1, "AppUpdate");

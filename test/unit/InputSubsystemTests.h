@@ -1,89 +1,80 @@
-#ifndef INPUT_SUBSYSTEM_TESTS_H
-#define INPUT_SUBSYSTEM_TESTS_H
+#pragma once
 
 #include <unity.h>
 #include "app/subsystems/InputSubsystem.hpp"
 #include "app/di/DependencyContainer.hpp"
-#include "../mocks/MockConfiguration.hpp"
+#include "mocks/MockConfigurationSubsystem.h"
 
-// Tests d'initialisation du sous-système d'entrée
+// Tests pour InputSubsystem
 void test_input_subsystem_initialization() {
+    // Créer un conteneur de dépendances
     auto container = std::make_shared<DependencyContainer>();
-    auto mockConfig = std::make_shared<MockConfiguration>();
     
-    // Configurer les encodeurs et boutons de test
-    mockConfig->encoderConfigs_ = {
-        EncoderConfig{1, 2, 3, 1},
-        EncoderConfig{4, 5, 6, 2}
-    };
+    // Enregistrer les dépendances nécessaires
+    auto mockConfig = std::make_shared<MockConfigurationSubsystem>();
+    container->registerDependency<IConfiguration>(mockConfig);
     
-    mockConfig->buttonConfigs_ = {
-        ButtonConfig{10, 3},
-        ButtonConfig{11, 4}
-    };
+    // Créer le sous-système
+    InputSubsystem inputSystem(container);
     
-    container->registerImplementation<IConfiguration, MockConfiguration>(mockConfig);
+    // Initialiser le sous-système
+    auto result = inputSystem.init();
     
-    auto inputSystem = std::make_shared<InputSubsystem>(container);
-    inputSystem->init();
-    
-    // Vérifier que le système est correctement initialisé
-    // Note: comme EncoderManager et DigitalButtonManager sont des dépendances externes,
-    // nous ne pouvons pas facilement tester leur état interne ici
-    // On pourrait plutôt vérifier que le système est bien enregistré dans le conteneur
-    
-    auto resolvedSystem = container->resolve<IInputSystem>();
-    TEST_ASSERT_NOT_NULL(resolvedSystem.get());
+    // Vérifier que l'initialisation a réussi
+    TEST_ASSERT_TRUE(result.isSuccess());
 }
 
-// Tests de configuration des encodeurs
 void test_input_subsystem_configure() {
+    // Créer un conteneur de dépendances
     auto container = std::make_shared<DependencyContainer>();
-    auto mockConfig = std::make_shared<MockConfiguration>();
     
-    // Configurer les encodeurs et boutons de test
-    mockConfig->encoderConfigs_ = {
-        EncoderConfig{1, 2, 3, 1},
-        EncoderConfig{4, 5, 6, 2}
+    // Enregistrer les dépendances nécessaires
+    auto mockConfig = std::make_shared<MockConfigurationSubsystem>();
+    container->registerDependency<IConfiguration>(mockConfig);
+    
+    // Créer le sous-système
+    InputSubsystem inputSystem(container);
+    
+    // Initialiser le sous-système
+    inputSystem.init();
+    
+    // Créer des configurations d'encodeur et de bouton
+    std::vector<EncoderConfig> encoderConfigs = {
+        {0, 1, 2, 600, true, 4, true}  // Paramètres fictifs: id, pinA, pinB, ppr, hasButton, pinButton, activeLowButton
     };
     
-    mockConfig->buttonConfigs_ = {
-        ButtonConfig{10, 3},
-        ButtonConfig{11, 4}
+    std::vector<ButtonConfig> buttonConfigs = {
+        {0, 1, false}  // Paramètres fictifs
     };
     
-    container->registerImplementation<IConfiguration, MockConfiguration>(mockConfig);
+    // Configurer les encodeurs et les boutons
+    auto resultEncoders = inputSystem.configureEncoders(encoderConfigs);
+    auto resultButtons = inputSystem.configureButtons(buttonConfigs);
     
-    auto inputSystem = std::make_shared<InputSubsystem>(container);
-    inputSystem->init();
-    
-    // Reconfigurer avec de nouvelles valeurs
-    std::vector<EncoderConfig> newEncoderConfigs = {
-        EncoderConfig{7, 8, 9, 3}
-    };
-    
-    inputSystem->configureEncoders(newEncoderConfigs);
-    
-    // Idéalement, on vérifierait que les encodeurs ont été correctement reconfigurés
-    // Mais comme EncoderManager est une dépendance externe, nous ne pouvons pas
-    // facilement vérifier son état interne dans ce test
+    // Vérifier que la configuration a réussi
+    TEST_ASSERT_TRUE(resultEncoders.isSuccess());
+    TEST_ASSERT_TRUE(resultButtons.isSuccess());
 }
 
-// Test de mise à jour du sous-système d'entrée
 void test_input_subsystem_update() {
+    // Créer un conteneur de dépendances
     auto container = std::make_shared<DependencyContainer>();
-    auto mockConfig = std::make_shared<MockConfiguration>();
     
-    container->registerImplementation<IConfiguration, MockConfiguration>(mockConfig);
+    // Enregistrer les dépendances nécessaires
+    auto mockConfig = std::make_shared<MockConfigurationSubsystem>();
+    container->registerDependency<IConfiguration>(mockConfig);
     
-    auto inputSystem = std::make_shared<InputSubsystem>(container);
-    inputSystem->init();
+    // Créer le sous-système
+    InputSubsystem inputSystem(container);
     
-    // Appeler update() ne devrait pas provoquer d'erreur
-    inputSystem->update();
+    // Initialiser le sous-système
+    inputSystem.init();
     
-    // Ici aussi, nous ne pouvons pas facilement vérifier l'état interne des gestionnaires
-    // dans ce test, car ce sont des dépendances externes
+    // Mettre à jour le sous-système plusieurs fois
+    for (int i = 0; i < 5; i++) {
+        inputSystem.update();
+    }
+    
+    // Pas de test spécifique, juste vérifier que les mises à jour ne provoquent pas d'erreurs
+    TEST_ASSERT_TRUE(true);
 }
-
-#endif // INPUT_SUBSYSTEM_TESTS_H

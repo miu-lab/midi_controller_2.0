@@ -5,6 +5,7 @@
 #include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
 #include "core/domain/types.hpp"
+#include "core/utils/Result.hpp"
 
 /**
  * @brief Interface pour la gestion des configurations
@@ -15,6 +16,12 @@
 class IConfiguration {
 public:
     virtual ~IConfiguration() = default;
+    
+    /**
+     * @brief Initialise la configuration
+     * @return Résultat de l'initialisation
+     */
+    virtual Result<bool, std::string> init() = 0;
 
     // Méthodes de NavigationConfigService
     virtual bool isNavigationControl(ControlId id) const = 0;
