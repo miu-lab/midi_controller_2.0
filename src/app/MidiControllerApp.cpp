@@ -20,15 +20,23 @@ MidiControllerApp::MidiControllerApp(const ApplicationConfiguration& appConfig)
       uiEventListenerSubId_(0) {
     // Initialisation des services et dépendances
     ServiceLocator::initialize(appConfig);
-    ServiceLocator::registerNavigationConfigService(&navigationConfig_);
-    ServiceLocator::registerProfileManager(&profileManager_);
-    ServiceLocator::registerMidiSystem(&midiSystem_);
-
-    InputSystem* inputSystem = &eventInputSystem_;
-    ServiceLocator::registerInputSystem(inputSystem);
-
-    ServiceLocator::registerUiEventService(&uiEventService_);
-    ServiceLocator::registerConfigurationService(&configService_);
+    
+    // Création de shared_ptr avec des deleters personnalisés pour éviter les problèmes
+    // de destruction (ces objets sont des membres de MidiControllerApp)
+    auto configServicePtr = std::shared_ptr<ConfigurationService>(&configService_, [](ConfigurationService*) {});
+    auto navigationConfigPtr = std::shared_ptr<NavigationConfigService>(&navigationConfig_, [](NavigationConfigService*) {});
+    auto profileManagerPtr = std::shared_ptr<ProfileManager>(&profileManager_, [](ProfileManager*) {});
+    auto midiSystemPtr = std::shared_ptr<MidiSystem>(&midiSystem_, [](MidiSystem*) {});
+    auto eventInputSystemPtr = std::shared_ptr<InputSystem>(&eventInputSystem_, [](InputSystem*) {});
+    auto uiEventServicePtr = std::shared_ptr<UiEventService>(&uiEventService_, [](UiEventService*) {});
+    
+    // Enregistrement des services avec des pointeurs partagés
+    ServiceLocator::registerNavigationConfigService(navigationConfigPtr);
+    ServiceLocator::registerProfileManager(profileManagerPtr);
+    ServiceLocator::registerMidiSystem(midiSystemPtr);
+    ServiceLocator::registerInputSystem(eventInputSystemPtr);
+    ServiceLocator::registerUiEventService(uiEventServicePtr);
+    ServiceLocator::registerConfigurationService(configServicePtr);
 }
 
 MidiControllerApp::~MidiControllerApp() {

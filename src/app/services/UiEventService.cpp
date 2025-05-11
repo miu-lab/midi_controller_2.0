@@ -1,4 +1,5 @@
 #include "app/services/UiEventService.hpp"
+#include <memory>
 
 void UiEventService::init(NavigationConfigService& navService) {
     // Désabonner l'écouteur existant s'il existe
@@ -8,7 +9,7 @@ void UiEventService::init(NavigationConfigService& navService) {
     }
 
     // Stocker la référence au service de navigation
-    navService_ = &navService;
+    navService_ = std::shared_ptr<NavigationConfigService>(&navService, [](NavigationConfigService*) {});
 
     // Configurer les abonnements pour le débogage
     setupDebugSubscriptions();

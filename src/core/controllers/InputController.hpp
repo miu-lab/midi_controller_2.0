@@ -26,9 +26,16 @@ public:
 
     /**
      * @brief Configure le contrôleur d'interface utilisateur à utiliser
-     * @param uiController Contrôleur d'interface utilisateur
+     * @param uiController Contrôleur d'interface utilisateur (pointeur brut - déprécié)
+     * @deprecated Utilisez la version avec std::shared_ptr à la place
      */
     void setUIController(UIController* uiController);
+    
+    /**
+     * @brief Configure le contrôleur d'interface utilisateur à utiliser
+     * @param uiController Contrôleur d'interface utilisateur (pointeur partagé)
+     */
+    void setUIController(std::shared_ptr<UIController> uiController);
 
     /**
      * @brief Traite la rotation d'un encodeur
@@ -90,7 +97,7 @@ public:
 
 private:
     NavigationConfigService& navigationConfig_;
-    UIController* uiController_;
+    std::shared_ptr<UIController> uiController_;
 
     // Stockage des callbacks
     std::function<void(EncoderId, int32_t, int8_t)> navigationEncoderCallback_;

@@ -19,7 +19,7 @@ InputController::InputController(NavigationConfigService& navigationConfig)
     midiButtonCallback_ = emptyButtonCallback;
 }
 
-void InputController::setUIController(UIController* uiController) {
+void InputController::setUIController(std::shared_ptr<UIController> uiController) {
     uiController_ = uiController;
 
     // Si l'UIController est défini, nous pouvons configurer les callbacks par défaut
@@ -36,6 +36,16 @@ void InputController::setUIController(UIController* uiController) {
         navigationButtonCallback_ = [this](ButtonId id, bool pressed) {
             handleNavigationButton(id, pressed);
         };
+    }
+}
+
+void InputController::setUIController(UIController* uiController) {
+    // Méthode dépréciée - convertir le pointeur brut en shared_ptr avec un deleter spécial
+    // qui ne détruit pas l'objet (puisque nous ne sommes pas propriétaires)
+    if (uiController) {
+        setUIController(std::shared_ptr<UIController>(uiController, [](UIController*) {}));
+    } else {
+        uiController_ = nullptr;
     }
 }
 

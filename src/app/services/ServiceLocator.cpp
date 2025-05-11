@@ -40,7 +40,7 @@ ServiceLocator& ServiceLocator::getInstance() {
 
 void ServiceLocator::initialize(const ApplicationConfiguration& config) {
     auto& instance = getInstance();
-    instance.configuration_ = std::make_unique<ApplicationConfiguration>(config);
+    instance.configuration_ = std::make_shared<ApplicationConfiguration>(config);
 }
 
 const ApplicationConfiguration& ServiceLocator::getConfiguration() {
@@ -172,62 +172,62 @@ UIEventListener& ServiceLocator::getUIControllerEventListener() {
     return instance.uiControllerEventListener_ ? *instance.uiControllerEventListener_ : *nullListener;
 }
 
-void ServiceLocator::registerConfigurationService(ConfigurationService* service) {
+void ServiceLocator::registerConfigurationService(std::shared_ptr<ConfigurationService> service) {
     auto& instance = getInstance();
     instance.configurationService_ = service;
 }
 
-void ServiceLocator::registerNavigationConfigService(NavigationConfigService* service) {
+void ServiceLocator::registerNavigationConfigService(std::shared_ptr<NavigationConfigService> service) {
     auto& instance = getInstance();
     instance.navigationConfigService_ = service;
 }
 
-void ServiceLocator::registerProfileManager(ProfileManager* service) {
+void ServiceLocator::registerProfileManager(std::shared_ptr<ProfileManager> service) {
     auto& instance = getInstance();
     instance.profileManager_ = service;
 }
 
-void ServiceLocator::registerMidiSystem(MidiSystem* service) {
+void ServiceLocator::registerMidiSystem(std::shared_ptr<MidiSystem> service) {
     auto& instance = getInstance();
     instance.midiSystem_ = service;
 }
 
-void ServiceLocator::registerInputSystem(InputSystem* service) {
+void ServiceLocator::registerInputSystem(std::shared_ptr<InputSystem> service) {
     auto& instance = getInstance();
     instance.inputSystem_ = service;
 }
 
-void ServiceLocator::registerUiEventService(UiEventService* service) {
+void ServiceLocator::registerUiEventService(std::shared_ptr<UiEventService> service) {
     auto& instance = getInstance();
     instance.uiEventService_ = service;
 }
 
-void ServiceLocator::registerControllerService(ControllerService* service) {
+void ServiceLocator::registerControllerService(std::shared_ptr<ControllerService> service) {
     auto& instance = getInstance();
     instance.controllerService_ = service;
 }
 
-void ServiceLocator::registerInputController(InputController* controller) {
+void ServiceLocator::registerInputController(std::shared_ptr<InputController> controller) {
     auto& instance = getInstance();
     instance.inputController_ = controller;
 }
 
-void ServiceLocator::registerUIController(UIController* controller) {
+void ServiceLocator::registerUIController(std::shared_ptr<UIController> controller) {
     auto& instance = getInstance();
     instance.uiController_ = controller;
 }
 
-void ServiceLocator::registerUIControllerEventListener(UIEventListener* listener) {
+void ServiceLocator::registerUIControllerEventListener(std::shared_ptr<UIEventListener> listener) {
     auto& instance = getInstance();
     instance.uiControllerEventListener_ = listener;
 }
 
-void ServiceLocator::registerViewManager(ViewManager* viewManager) {
+void ServiceLocator::registerViewManager(std::shared_ptr<ViewManager> viewManager) {
     auto& instance = getInstance();
     instance.viewManager_ = viewManager;
 }
 
-void ServiceLocator::registerMenuController(MenuController* menuController) {
+void ServiceLocator::registerMenuController(std::shared_ptr<MenuController> menuController) {
     auto& instance = getInstance();
     instance.menuController_ = menuController;
 }

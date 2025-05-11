@@ -9,11 +9,11 @@ InputSystem::InputSystem()
       processButtons_(buttonManager_.getButtons()),
       inputController_(nullptr) {
 #ifndef DISABLE_CONTROLLERS
-    // Créer et initialiser l'InputController avec un smart pointer
-    inputController_ = std::make_unique<InputController>(ServiceLocator::getNavigationConfigService());
+    // Créer et initialiser l'InputController avec un shared pointer
+    inputController_ = std::make_shared<InputController>(ServiceLocator::getNavigationConfigService());
 
     // Enregistrer le contrôleur dans le ServiceLocator
-    ServiceLocator::registerInputController(inputController_.get());
+    ServiceLocator::registerInputController(inputController_);
 
     // Configurer les processeurs pour utiliser l'InputController
     processEncoders_.setInputController(inputController_.get());

@@ -7,6 +7,16 @@
 #include <unordered_map>
 #include <any>
 
+// Helper pour générer un ID de type sans utiliser typeid
+class TypeIdGenerator {
+public:
+    template <typename T>
+    static const void* getTypeId() {
+        static char typeId;
+        return &typeId;
+    }
+};
+
 /**
  * @brief Conteneur pour l'injection de dépendances
  * 
@@ -27,7 +37,7 @@ public:
      */
     template<typename T>
     void registerDependency(std::shared_ptr<T> instance) {
-        dependencies_[typeid(T)] = instance;
+        dependencies_[TypeIdGenerator::getTypeId<T>()] = instance;
     }
 
     /**
@@ -41,7 +51,7 @@ public:
     void registerImplementation(std::shared_ptr<TImplementation> instance) {
         static_assert(std::is_base_of<TInterface, TImplementation>::value, 
                     "TImplementation must derive from TInterface");
-        dependencies_[typeid(TInterface)] = std::static_pointer_cast<void>(instance);
+        dependencies_[TypeIdGenerator::getTypeId<TInterface>()] = std::static_pointer_cast<void>(instance);
     }
 
     /**
@@ -52,13 +62,13 @@ public:
      */
     template<typename T>
     std::shared_ptr<T> resolve() {
-        auto it = dependencies_.find(typeid(T));
+        auto it = dependencies_.find(TypeIdGenerator::getTypeId<T>());
         if (it != dependencies_.end()) {
             return std::static_pointer_cast<T>(it->second);
         }
 
         // Vérifier les factories
-        auto factoryIt = factories_.find(typeid(T));
+        auto factoryIt = factories_.find(TypeIdGenerator::getTypeId<T>());
         if (factoryIt != factories_.end()) {
             auto factory = std::any_cast<std::function<std::shared_ptr<T>()>>(&factoryIt->second);
             if (factory) {
@@ -79,7 +89,7 @@ public:
      */
     template<typename T>
     void registerFactory(std::function<std::shared_ptr<T>()> factory) {
-        factories_[typeid(T)] = factory;
+        factories_[TypeIdGenerator::getTypeId<T>()] = factory;
     }
 
     /**
@@ -91,8 +101,8 @@ public:
      */
     template<typename T>
     bool has() const {
-        return dependencies_.find(typeid(T)) != dependencies_.end() || 
-               factories_.find(typeid(T)) != factories_.end();
+        return dependencies_.find(TypeIdGenerator::getTypeId<T>()) != dependencies_.end() || 
+               factories_.find(TypeIdGenerator::getTypeId<T>()) != factories_.end();
     }
 
     /**
@@ -106,13 +116,13 @@ public:
     bool remove() {
         bool removed = false;
         
-        auto depIt = dependencies_.find(typeid(T));
+        auto depIt = dependencies_.find(TypeIdGenerator::getTypeId<T>());
         if (depIt != dependencies_.end()) {
             dependencies_.erase(depIt);
             removed = true;
         }
         
-        auto factIt = factories_.find(typeid(T));
+        auto factIt = factories_.find(TypeIdGenerator::getTypeId<T>());
         if (factIt != factories_.end()) {
             factories_.erase(factIt);
             removed = true;
@@ -130,6 +140,6 @@ public:
     }
 
 private:
-    std::unordered_map<std::type_index, std::shared_ptr<void>> dependencies_;
-    std::unordered_map<std::type_index, std::any> factories_;
+    std::unordered_map<const void*, std::shared_ptr<void>> dependencies_;
+    std::unordered_map<const void*, std::any> factories_;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <memory>
 
 #include "app/services/NavigationConfigService.hpp"
 #include "core/domain/events/EventSystem.hpp"
@@ -9,6 +10,10 @@
  */
 class UiEventService : public EventListener {
 public:
+    /**
+     * @brief Constructeur par défaut
+     */
+    UiEventService() : navService_(nullptr), subscriptionId_(0) {}
     /**
      * @brief Initialise le service avec le service de navigation
      * @param navService Service de configuration de navigation
@@ -35,7 +40,7 @@ private:
     void printButtonReleasedEvent(const ButtonReleasedEvent& e);
 
     // Service de navigation pour vérifier si un contrôle est dédié à la navigation
-    NavigationConfigService* navService_ = nullptr;
+    std::shared_ptr<NavigationConfigService> navService_;
     
     // ID de souscription
     SubscriptionId subscriptionId_ = 0;

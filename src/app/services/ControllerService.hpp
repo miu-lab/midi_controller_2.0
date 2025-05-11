@@ -83,11 +83,11 @@ private:
     MenuController menuController_;
     MidiMapper midiMapper_;
     ProfileController profileController_;
-    UIController* uiController_;
-    InputController* inputController_;
+    UIController* uiController_;            // Pointeur vers le contrôleur UI
+    InputController* inputController_;      // Pointeur vers le contrôleur d'entrées
     
     // Écouteur d'événements (nous en sommes propriétaires)
-    std::unique_ptr<ControllerServiceEventListener> eventListener_;
+    std::shared_ptr<ControllerServiceEventListener> eventListener_;
 
     /**
      * @brief Initialise les mappings MIDI

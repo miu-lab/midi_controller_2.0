@@ -54,5 +54,5 @@ private:
     ProcessEncoders processEncoders_;     // Traitement des encodeurs
     DigitalButtonManager buttonManager_;  // Gestionnaire des boutons
     ProcessButtons processButtons_;       // Traitement des boutons
-    std::unique_ptr<InputController> inputController_;    // Contrôleur d'entrée
+    std::shared_ptr<InputController> inputController_;    // Contrôleur d'entrée
 };

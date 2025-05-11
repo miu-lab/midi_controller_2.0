@@ -17,12 +17,16 @@ ControllerService::ControllerService(ViewManager& viewManager, IMidiOut& midiOut
       inputController_(nullptr) {}
 
 void ControllerService::init() {
-    // Récupérer les contrôleurs depuis le ServiceLocator
+    // Récupérer les contrôleurs depuis le ServiceLocator avec des shared_ptr
+    std::shared_ptr<UIController> uiControllerSp(ServiceLocator::getUIController(), [](UIController*){});
+    std::shared_ptr<InputController> inputControllerSp(ServiceLocator::getInputController(), [](InputController*){});
+    
+    // Stocker les références directes aux contrôleurs
     uiController_ = &ServiceLocator::getUIController();
     inputController_ = &ServiceLocator::getInputController();
     
-    // Configurer les interactions entre contrôleurs
-    inputController_->setUIController(uiController_);
+    // Configurer les interactions entre contrôleurs avec des shared_ptr
+    inputController_->setUIController(uiControllerSp);
     
     // Initialiser les mappings MIDI
     initializeMidiMappings();
@@ -31,7 +35,7 @@ void ControllerService::init() {
     auto& eventBus = EventBus::getInstance();
     
     // S'abonner au bus d'événements
-    eventListener_ = std::make_unique<ControllerServiceEventListener>(*this);
+    eventListener_ = std::make_shared<ControllerServiceEventListener>(*this);
     eventBus.subscribe(eventListener_.get());
 }
 

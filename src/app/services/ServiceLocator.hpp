@@ -111,75 +111,75 @@ public:
 
     /**
      * @brief Enregistre le service ConfigurationService
-     * @param service Pointeur vers le service à enregistrer
+     * @param service Pointeur partagé vers le service à enregistrer
      */
-    static void registerConfigurationService(ConfigurationService* service);
+    static void registerConfigurationService(std::shared_ptr<ConfigurationService> service);
 
     /**
      * @brief Enregistre le service NavigationConfigService
-     * @param service Pointeur vers le service à enregistrer
+     * @param service Pointeur partagé vers le service à enregistrer
      */
-    static void registerNavigationConfigService(NavigationConfigService* service);
+    static void registerNavigationConfigService(std::shared_ptr<NavigationConfigService> service);
 
     /**
      * @brief Enregistre le service ProfileManager
-     * @param service Pointeur vers le service à enregistrer
+     * @param service Pointeur partagé vers le service à enregistrer
      */
-    static void registerProfileManager(ProfileManager* service);
+    static void registerProfileManager(std::shared_ptr<ProfileManager> service);
 
     /**
      * @brief Enregistre le service MidiSystem
-     * @param service Pointeur vers le service à enregistrer
+     * @param service Pointeur partagé vers le service à enregistrer
      */
-    static void registerMidiSystem(MidiSystem* service);
+    static void registerMidiSystem(std::shared_ptr<MidiSystem> service);
 
     /**
      * @brief Enregistre le service InputSystem
-     * @param service Pointeur vers le service à enregistrer
+     * @param service Pointeur partagé vers le service à enregistrer
      */
-    static void registerInputSystem(InputSystem* service);
+    static void registerInputSystem(std::shared_ptr<InputSystem> service);
 
     /**
      * @brief Enregistre le service UiEventService
-     * @param service Pointeur vers le service à enregistrer
+     * @param service Pointeur partagé vers le service à enregistrer
      */
-    static void registerUiEventService(UiEventService* service);
+    static void registerUiEventService(std::shared_ptr<UiEventService> service);
 
     /**
      * @brief Enregistre le service ControllerService
-     * @param service Pointeur vers le service à enregistrer
+     * @param service Pointeur partagé vers le service à enregistrer
      */
-    static void registerControllerService(ControllerService* service);
+    static void registerControllerService(std::shared_ptr<ControllerService> service);
 
     /**
      * @brief Enregistre le contrôleur d'entrées
-     * @param controller Pointeur vers le contrôleur à enregistrer
+     * @param controller Pointeur partagé vers le contrôleur à enregistrer
      */
-    static void registerInputController(InputController* controller);
+    static void registerInputController(std::shared_ptr<InputController> controller);
 
     /**
      * @brief Enregistre le contrôleur d'interface utilisateur
-     * @param controller Pointeur vers le contrôleur à enregistrer
+     * @param controller Pointeur partagé vers le contrôleur à enregistrer
      */
-    static void registerUIController(UIController* controller);
+    static void registerUIController(std::shared_ptr<UIController> controller);
 
     /**
      * @brief Enregistre l'écouteur d'événements du UIController
-     * @param listener Pointeur vers l'écouteur à enregistrer
+     * @param listener Pointeur partagé vers l'écouteur à enregistrer
      */
-    static void registerUIControllerEventListener(UIEventListener* listener);
+    static void registerUIControllerEventListener(std::shared_ptr<UIEventListener> listener);
 
     /**
      * @brief Enregistre le gestionnaire de vues
-     * @param viewManager Pointeur vers le gestionnaire à enregistrer
+     * @param viewManager Pointeur partagé vers le gestionnaire à enregistrer
      */
-    static void registerViewManager(ViewManager* viewManager);
+    static void registerViewManager(std::shared_ptr<ViewManager> viewManager);
 
     /**
      * @brief Enregistre le contrôleur de menu
-     * @param menuController Pointeur vers le contrôleur à enregistrer
+     * @param menuController Pointeur partagé vers le contrôleur à enregistrer
      */
-    static void registerMenuController(MenuController* menuController);
+    static void registerMenuController(std::shared_ptr<MenuController> menuController);
 
     /**
      * @brief Obtient le bus d'événements centralisé
@@ -204,21 +204,21 @@ private:
     static ServiceLocator& getInstance();
 
     // Services
-    ConfigurationService* configurationService_;
-    NavigationConfigService* navigationConfigService_;
-    ProfileManager* profileManager_;
-    MidiSystem* midiSystem_;
-    InputSystem* inputSystem_;
-    UiEventService* uiEventService_;
-    ControllerService* controllerService_;
-    InputController* inputController_;
-    UIController* uiController_;
-    UIEventListener* uiControllerEventListener_;
-    ViewManager* viewManager_;
-    MenuController* menuController_;
+    std::shared_ptr<ConfigurationService> configurationService_;
+    std::shared_ptr<NavigationConfigService> navigationConfigService_;
+    std::shared_ptr<ProfileManager> profileManager_;
+    std::shared_ptr<MidiSystem> midiSystem_;
+    std::shared_ptr<InputSystem> inputSystem_;
+    std::shared_ptr<UiEventService> uiEventService_;
+    std::shared_ptr<ControllerService> controllerService_;
+    std::shared_ptr<InputController> inputController_;
+    std::shared_ptr<UIController> uiController_;
+    std::shared_ptr<UIEventListener> uiControllerEventListener_;
+    std::shared_ptr<ViewManager> viewManager_;
+    std::shared_ptr<MenuController> menuController_;
 
     // Configuration
-    std::unique_ptr<ApplicationConfiguration> configuration_;
+    std::shared_ptr<ApplicationConfiguration> configuration_;
 
     ServiceLocator();
     ~ServiceLocator();
