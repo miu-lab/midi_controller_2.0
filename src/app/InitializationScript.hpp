@@ -56,7 +56,7 @@ public:
         container->registerDependency<MidiOutputPort>(midiOut);
 
         // Utilisation de notre mock pour l'affichage
-        auto display = std::make_shared<MockDisplay>();
+        auto display = std::make_shared<DisplayMock>();
         container->registerDependency<DisplayPort>(display);
 
         auto profileManager = std::make_shared<ProfileManager>();

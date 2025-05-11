@@ -1,7 +1,7 @@
 #include "UISubsystem.hpp"
 
-#include "MockDisplay.hpp"
 #include "adapters/primary/ui/ViewManager.hpp"
+#include "app/mocks/DisplayMock.hpp"
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {}
@@ -23,13 +23,13 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
     display_ = container_->resolve<DisplayPort>();
     if (!display_) {
         // Si aucun display n'est disponible, en créer un pour les tests
-        display_ = std::make_shared<MockDisplay>();
+        display_ = std::make_shared<DisplayMock>();
         if (!display_) {
             return Result<bool, std::string>::error("Failed to create MockDisplay");
         }
         // Enregistrer ce display dans le conteneur
-        container_->registerImplementation<DisplayPort, MockDisplay>(
-            std::static_pointer_cast<MockDisplay>(display_));
+        container_->registerImplementation<DisplayPort, DisplayMock>(
+            std::static_pointer_cast<DisplayMock>(display_));
     }
 
     // Le ViewManager est une classe abstraite et ne peut pas être instancié directement
