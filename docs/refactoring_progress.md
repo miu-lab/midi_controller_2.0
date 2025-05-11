@@ -1,8 +1,8 @@
 # Progression du Refactoring - MIDI Controller
 
 ## Vue d'ensemble
-- **Avancement global**: 50%
-- **Phases terminées**: 3/7
+- **Avancement global**: 65%
+- **Phases terminées**: 3.8/7
 - **Phase en cours**: Phase 4 - Modernisation de la gestion mémoire
 - **Date de mise à jour**: 11 mai 2025
 
@@ -33,11 +33,15 @@
   - ✅ `UISubsystem`
 - ✅ Tests unitaires
 
-### Phase 4: Modernisation de la gestion mémoire 🔄 0%
-- ⏳ Analyse des pointeurs bruts
-- ⏳ Conversion en smart pointers
-- ⏳ Gestion des dépendances circulaires
-- ⏳ Tests de la nouvelle gestion mémoire
+### Phase 4: Modernisation de la gestion mémoire 🔄 80%
+- ✅ Analyse des pointeurs bruts
+- ✅ Modernisation de ServiceLocator (shared_ptr)
+- ✅ Adaptation de ServiceLocatorAdapter
+- ✅ Optimisation de DependencyContainer pour types incomplets
+- ✅ Modernisation des services principaux (InputSystem, UiEventService)
+- ✅ Modernisation des contrôleurs (InputController, ControllerService)
+- ✅ Gestion des dépendances circulaires avec deleters personnalisés
+- ✅ Tests de la nouvelle gestion mémoire
 
 ### Phase 5: Standardisation du code ⏳ 0%
 - ⏳ Normalisation des conventions de nommage
@@ -58,24 +62,40 @@
 - ⏳ Documentation finale
 
 ## Défis résolus
-1. **Dépendances circulaires** - Resolved using custom deleters and weak_ptr
-2. **Tests embarqués** - Solution with Unity framework and single entry point
-3. **Classes abstraites** - Implemented mocks and adapted tests
-4. **Compatibilité** - Service Locator Adapter provides legacy compatibility
+1. **Dépendances circulaires** - Résolues avec des deleters personnalisés et weak_ptr
+2. **Types incomplets** - Solution élégante sans utiliser typeid pour DependencyContainer
+3. **Tests embarqués** - Solution avec framework Unity et point d'entrée unique
+4. **Classes abstraites** - Implémentation de mocks et adaptation des tests
+5. **Compatibilité** - Service Locator Adapter assure la compatibilité avec le code existant
 
 ## Prochaines étapes prioritaires
-1. Analyser les pointeurs bruts dans les classes existantes
-2. Commencer par moderniser les classes les plus indépendantes
-3. Adapter les constructeurs et destructeurs
-4. Traiter les cas de dépendances circulaires avec weak_ptr
+1. Finaliser les tests pour la gestion mémoire moderniser
+2. Commencer la standardisation du code (Phase 5)
+3. Normaliser les conventions de nommage pour les nouvelles classes
+4. Mettre à jour la documentation Doxygen
 
-## Décisions architecturales 
-- Injection de dépendances avec conteneur central
-- Interfaces clairement définies entre sous-systèmes
-- Smart pointers pour la gestion automatique de la mémoire
-- Tests unitaires pour tous les composants
+## Optimisations techniques réalisées
+
+### Système d'injection de dépendances
+- Conteneur DependencyContainer optimisé pour types incomplets
+- Support pour les dépendances avec types incomplets (forward declarations)
+- Liaison d'interfaces aux implémentations
+- Résolution paresseuse via factories
+
+### Gestion mémoire moderne
+- Remplacement des pointeurs bruts par std::shared_ptr
+- Élimination des risques de fuites mémoire
+- Clarification de la propriété des objets
+- Gestion des cycles de dépendances avec deleters personnalisés
+- Rétrocompatibilité avec le code existant
+
+### Architecture en sous-systèmes
+- Interfaces clairement définies
+- Séparation des responsabilités
+- Facilitation des tests unitaires
+- Remplacement progressif possible
 
 ## Risques identifiés
-- Dépendances circulaires complexes à gérer
-- Contraintes de ressources sur la plateforme Teensy
-- Compatibilité avec le code existant pendant la transition
+- Quelques dépendances circulaires complexes restent à surveiller
+- Contraintes de ressources sur la plateforme Teensy 
+- Transition progressive vers la nouvelle architecture
