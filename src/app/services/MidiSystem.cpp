@@ -1,6 +1,5 @@
 #include "app/services/MidiSystem.hpp"
 
-#include "app/di/ServiceLocatorAdapter.hpp"
 #include "app/services/MidiSystemListener.hpp"
 #include "config/debug/DebugMacros.hpp"
 #include "core/domain/events/EventSystem.hpp"

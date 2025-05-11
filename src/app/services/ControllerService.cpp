@@ -1,8 +1,6 @@
 #include "app/services/ControllerService.hpp"
 
 #include "app/di/DependencyContainer.hpp"
-// ServiceLocator est maintenant déprécié, utiliser ServiceLocatorAdapter à la place
-#include "app/di/ServiceLocatorAdapter.hpp"
 #include "core/domain/events/EventSystem.hpp"
 #include "app/services/ControllerServiceListener.hpp"
 
@@ -22,13 +20,11 @@ ControllerService::ControllerService(ViewManager& viewManager, IMidiOut& midiOut
     // Appeler explicitement initializeDependencies() lors de init()
 }
 
-// Utiliser des méthodes statiques de l'adaptateur pour initialiser les références
 ControllerService::ControllerService(std::shared_ptr<DependencyContainer> container)
     : container_(container),
-      // Utiliser les méthodes d'interface spécifiques
-      viewManager_(ServiceLocatorAdapter::getViewManagerStatic()),
-      midiOut_(ServiceLocatorAdapter::getMidiOutStatic()),
-      profileManager_(ServiceLocatorAdapter::getProfileManagerInterfaceStatic()),
+      viewManager_(*container->resolve<ViewManager>()),
+      midiOut_(*container->resolve<IMidiOut>()),
+      profileManager_(*container->resolve<IProfileManager>()),
       usingContainer_(true),
       commandManager_(),
       menuController_(viewManager_, commandManager_),
@@ -60,27 +56,61 @@ void ControllerService::initializeDependencies() {
         auto uiController = container_->resolve<UIController>();
         auto inputController = container_->resolve<InputController>();
         
-        // Si les contrôleurs ne sont pas trouvés dans le container, fallback vers ServiceLocatorAdapter
         if (uiController) {
             uiController_ = uiController.get();
         } else {
-            uiController_ = &ServiceLocatorAdapter::getUIControllerStatic();
+            // UIController nécessite un MenuController, donc nous devons le créer
+            // ou le récupérer du container d'abord
+            auto menuController = container_->resolve<MenuController>();
+            if (!menuController) {
+                // Créer un MenuController si non disponible
+                menuController = std::make_shared<MenuController>(viewManager_, commandManager_);
+                container_->registerDependency<MenuController>(menuController);
+            }
+            
+            // Créer un UIController avec ViewManager et MenuController
+            auto newUIController = std::make_shared<UIController>(viewManager_, *menuController);
+            container_->registerDependency<UIController>(newUIController);
+            uiController_ = newUIController.get();
         }
         
         if (inputController) {
             inputController_ = inputController.get();
         } else {
-            inputController_ = &ServiceLocatorAdapter::getInputControllerStatic();
+            // Créer un InputController par défaut si aucun n'est trouvé
+            auto navConfig = container_->resolve<NavigationConfigService>();
+            if (navConfig) {
+                auto newInputController = std::make_shared<InputController>(navConfig);
+                container_->registerDependency<InputController>(newInputController);
+                inputController_ = newInputController.get();
+            } else {
+                // Création d'un service de navigation par défaut
+                auto newNavConfig = std::make_shared<NavigationConfigService>();
+                container_->registerDependency<NavigationConfigService>(newNavConfig);
+                
+                auto newInputController = std::make_shared<InputController>(newNavConfig);
+                container_->registerDependency<InputController>(newInputController);
+                inputController_ = newInputController.get();
+            }
         }
     } else {
-        // Toujours utiliser ServiceLocatorAdapter
-        uiController_ = &ServiceLocatorAdapter::getUIControllerStatic();
-        inputController_ = &ServiceLocatorAdapter::getInputControllerStatic();
+        // Cas non supporté - nous avons besoin d'un conteneur
+        #ifdef DEBUG
+        Serial.println(F("ERREUR: ControllerService nécessite un conteneur de dépendances"));
+        #endif
+        return;
     }
     
     // Configurer les interactions entre contrôleurs
-    std::shared_ptr<UIController> uiControllerSp(uiController_, [](UIController*){});
-    inputController_->setUIController(uiControllerSp);
+    if (inputController_ && uiController_) {
+        std::shared_ptr<UIController> uiControllerSp = container_->resolve<UIController>();
+        if (uiControllerSp) {
+            auto inputControllerSp = container_->resolve<InputController>();
+            if (inputControllerSp) {
+                inputControllerSp->setUIController(uiControllerSp);
+            }
+        }
+    }
 }
 
 void ControllerService::update() {
@@ -113,8 +143,15 @@ UIController& ControllerService::getUIController() {
                 return *uiController_;
             }
         }
-        // Utiliser ServiceLocatorAdapter
-        uiController_ = &ServiceLocatorAdapter::getUIControllerStatic();
+        
+        // Situation critique - nous avons besoin d'un UIController
+        #ifdef DEBUG
+        Serial.println(F("ERREUR CRITIQUE: UIController non disponible"));
+        #endif
+        
+        // Retourner un objet null en cas d'échec (pour éviter les crashs)
+        static UIController* nullController = nullptr;
+        return *nullController;
     }
     return *uiController_;
 }
@@ -129,8 +166,15 @@ InputController& ControllerService::getInputController() {
                 return *inputController_;
             }
         }
-        // Utiliser ServiceLocatorAdapter
-        inputController_ = &ServiceLocatorAdapter::getInputControllerStatic();
+        
+        // Situation critique - nous avons besoin d'un InputController
+        #ifdef DEBUG
+        Serial.println(F("ERREUR CRITIQUE: InputController non disponible"));
+        #endif
+        
+        // Retourner un objet null en cas d'échec (pour éviter les crashs)
+        static InputController* nullController = nullptr;
+        return *nullController;
     }
     return *inputController_;
 }

@@ -2,9 +2,9 @@
 
 // Inclure tous les fichiers de test
 #include "di_tests.h"
+#include "di_pure_tests.h"
 #include "integration/MidiControllerAppIntegrationTests.h"
 #include "mock_tests.h"
-#include "service_locator_adapter_tests.h"
 #include "unit/ConfigurationSubsystemTests.h"
 #include "unit/InputSubsystemTests.h"
 #include "unit/MidiControllerAppTests.h"
@@ -34,10 +34,11 @@ int main(void) {
     RUN_TEST(test_midi_messages);
     RUN_TEST(test_ui_messages);
 
-    // Tests pour le ServiceLocatorAdapter
-    RUN_TEST(test_service_locator_adapter_initialize);
-    RUN_TEST(test_service_locator_adapter_container);
-    RUN_TEST(test_service_locator_adapter_simple_service);
+    // Tests pour le DI pur (sans ServiceLocatorAdapter)
+    RUN_TEST(test_pure_di_initialization);
+    RUN_TEST(test_pure_di_subsystem_resolution);
+    RUN_TEST(test_pure_di_component_lifecycle);
+    RUN_TEST(test_pure_di_cyclic_dependencies);
 
     // Tests pour le ConfigurationSubsystem
     RUN_TEST(test_configuration_subsystem_initialization);

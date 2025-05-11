@@ -1,113 +1,46 @@
 #include <Arduino.h>
+#include <memory>
 
-#include "app/MidiControllerApp.hpp"
+// Configurations
 #include "config/ApplicationConfiguration.hpp"
-#include "config/debug/SerialBuffer.hpp"
-#include "core/TaskScheduler.hpp"
-#include "tools/Diagnostics.hpp"
-// Phase 7 - Migration en cours
-// Inclusion de l'adaptateur pour la transition
+
+// Container et initialisation
 #include "app/di/DependencyContainer.hpp"
-#include "app/di/ServiceLocatorAdapter.hpp"
+#include "app/InitializationScript.hpp"
+
+// Application
+#include "app/MidiControllerApp.hpp"
 
 // Variables globales
 ApplicationConfiguration appConfig;
-MidiControllerApp app(appConfig);
-int appUpdateTaskId = -1;
-
-// Callback pour la mise à jour de l'application
-void appUpdateCallback() {
-    app.update();
-}
-
-// Gestion des commandes du moniteur série
-void handleSerialCommands() {
-    if (Serial.available() <= 0) {
-        return;
-    }
-
-    String command = Serial.readStringUntil('\n');
-    command.trim();
-
-    // Priorité aux commandes de diagnostics
-    if (DiagnosticsManager::handleCommand(command)) {
-        return;
-    }
-
-    // Commandes standard
-    if (command == "clear") {
-        SerialBuffer::clear();
-        Serial.write(27);     // ESC
-        Serial.print("[2J");  // Efface l'écran
-        Serial.write(27);     // ESC
-        Serial.print("[H");   // Curseur en haut à gauche
-        Serial.println("Moniteur effacé");
-    } else if (command == "dump") {
-        Serial.println("\n===== CONTENU DU TAMPON =====\n");
-        SerialBuffer::flush();
-        Serial.println("\n============================\n");
-    } else if (command == "help") {
-        Serial.println("\nCommandes disponibles:");
-        Serial.println("  clear - Efface le moniteur et le tampon");
-        Serial.println("  dump  - Affiche tout le contenu du tampon");
-        Serial.println("  help  - Affiche cette aide");
-
-        // Commandes de diagnostics
-        Serial.println("\nCommandes de diagnostics:");
-        Serial.println("  stats            - Affiche les statistiques du système");
-        Serial.println("  stats detailed   - Affiche les statistiques détaillées");
-        Serial.println("  stats on/off     - Active/désactive l'affichage régulier");
-        Serial.println("  event on/off     - Active/désactive le diagnostic sur événements");
-        Serial.println("  stats interval N - Définit l'intervalle à N secondes");
-        Serial.println("  memory           - Affiche les statistiques de mémoire");
-    } else if (command.length() > 0) {
-        Serial.println("Commande non reconnue. Tapez 'help' pour voir les commandes disponibles.");
-    }
-}
+std::shared_ptr<MidiControllerApp> app;
+std::shared_ptr<DependencyContainer> container;
 
 void setup() {
-    // Initialisation du port série
-    Serial.begin(9600);
-    constexpr unsigned long SERIAL_TIMEOUT_MS = 50;
-    unsigned long startTime = millis();
-    while (!Serial && (millis() - startTime < SERIAL_TIMEOUT_MS)) {
-        // Attente avec timeout
-    }
-
-    // Phase 7 - Initialisation du container de dépendances et de l'adaptateur
-    auto container = std::make_shared<DependencyContainer>();
-    auto adapter = std::make_shared<ServiceLocatorAdapter>(container);
-    ServiceLocatorAdapter::setDefaultInstance(adapter);
-    adapter->initialize(appConfig);
+    // Création du conteneur d'injection de dépendances
+    container = std::make_shared<DependencyContainer>();
     
-    // Initialisation du tampon série et de l'application
-    SerialBuffer::init(300);
-    DEBUG_PRINTLN_FLASH("[INIT] MidiController - Démarrage...");
-    auto result = app.init();
-    if (result.isError()) {
-        DEBUG_PRINTLN_FLASH("[INIT] Erreur d'initialisation: ");
-        DEBUG_PRINTLN_FLASH(result.error()->c_str());
-    } else {
-        DEBUG_PRINTLN_FLASH("[INIT] Initialisation réussie");
+    // Initialisation du conteneur avec tous les composants nécessaires
+    bool initSuccess = InitializationScript::initializeContainer(container, appConfig);
+    if (!initSuccess) {
+        return;
     }
-
-    // Configuration de l'ordonnanceur
-    appUpdateTaskId = scheduler.addTask(appUpdateCallback, 1000, 1, "AppUpdate");
-    DEBUG_PRINTLN_FLASH("[INIT] Configuration de l'ordonnanceur terminée");
-
-    // Initialisation du module de diagnostics (0.1 seconde d'intervalle)
-    INIT_DIAGNOSTICS(scheduler, .1);
+    
+    // Création de l'application avec le conteneur de dépendances
+    app = std::make_shared<MidiControllerApp>(container);
+    
+    // Initialisation de l'application
+    auto result = app->init();
+    if (result.isError()) {
+        return;
+    }
 }
 
 void loop() {
-    // Mise à jour de l'ordonnanceur (budget CPU de 4000µs)
-    scheduler.update(4000);
-    
-    // Gestion des commandes série
-    handleSerialCommands();
-    
-    // Mise à jour des diagnostics (mode événementiel)
-    UPDATE_DIAGNOSTICS();
+    // Mise à jour de l'application
+    if (app) {
+        app->update();
+    }
     
     // Permet aux autres tâches système de s'exécuter
     yield();

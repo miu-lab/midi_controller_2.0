@@ -1,7 +1,6 @@
 #include "app/services/InputSystem.hpp"
 
 #include "app/di/DependencyContainer.hpp"
-#include "app/di/ServiceLocatorAdapter.hpp"
 #include "app/services/NavigationConfigService.hpp"
 
 InputSystem::InputSystem()
@@ -13,7 +12,15 @@ InputSystem::InputSystem()
       container_(nullptr),
       usingContainer_(false) {
       
-    initializeDependencies();
+    // Créer un service de navigation par défaut
+    auto navConfigService = std::make_shared<NavigationConfigService>();
+    
+    // Créer InputController
+    inputController_ = std::make_shared<InputController>(navConfigService);
+
+    // Configurer les processeurs
+    processEncoders_.setInputController(inputController_.get());
+    processButtons_.setInputController(inputController_.get());
 }
 
 InputSystem::InputSystem(std::shared_ptr<DependencyContainer> container)
@@ -39,33 +46,20 @@ void InputSystem::initializeDependencies() {
         
         // Si le service n'est pas dans le container, créer une nouvelle instance
         if (!navConfigService) {
-            auto& legacyService = ServiceLocatorAdapter::getNavigationConfigServiceStatic();
-            // Création d'un shared_ptr avec un deleter personnalisé
-            navConfigService = std::shared_ptr<NavigationConfigService>(&legacyService, [](NavigationConfigService*){});
+            navConfigService = std::make_shared<NavigationConfigService>();
+            container_->registerDependency<NavigationConfigService>(navConfigService);
         }
     } else {
-        // Ancien comportement - utiliser ServiceLocatorAdapter
-        auto& legacyService = ServiceLocatorAdapter::getNavigationConfigServiceStatic();
-        navConfigService = std::shared_ptr<NavigationConfigService>(&legacyService, [](NavigationConfigService*){});
+        // Créer un service de navigation par défaut
+        navConfigService = std::make_shared<NavigationConfigService>();
     }
     
     // Créer InputController
-    inputController_ = std::make_shared<InputController>(*navConfigService);
+    inputController_ = std::make_shared<InputController>(navConfigService);
 
     if (usingContainer_ && container_) {
-        // Créer une instance de ServiceLocatorAdapter avec le container
-        auto adapter = std::make_shared<ServiceLocatorAdapter>(container_);
-        ServiceLocatorAdapter::setDefaultInstance(adapter);
-        adapter->registerInputController(inputController_);
-        
-        // Enregistrer également dans le container
+        // Enregistrer dans le container
         container_->registerDependency<InputController>(inputController_);
-    } else {
-        // Si nous n'avons pas de container, essayer d'utiliser l'instance par défaut
-        auto defaultAdapter = ServiceLocatorAdapter::getDefaultInstance();
-        if (defaultAdapter) {
-            defaultAdapter->registerInputController(inputController_);
-        }
     }
 
     // Configurer les processeurs
@@ -79,9 +73,6 @@ void InputSystem::init() {
     encoderManager_.updateAll();
     buttonManager_.updateAll();
     processButtons_.initStates();  // Initialiser les états sans déclencher d'événements
-
-    // Aucun adaptateur de compatibilité nécessaire avec le nouveau système
-    // LegacyEventAdapter::initialize();
 
 #ifndef DISABLE_CONTROLLERS
     // Configurer le contrôleur d'entrée avec les callbacks par défaut
@@ -146,22 +137,10 @@ InputController& InputSystem::getInputController() {
 #ifndef DISABLE_CONTROLLERS
     return *inputController_;
 #else
-    // Ceci ne devrait jamais être appelé en mode DISABLE_CONTROLLERS
-    if (usingContainer_ && container_) {
-        auto navConfigService = container_->resolve<NavigationConfigService>();
-        if (navConfigService) {
-            static InputController nullController(*navConfigService);
-            return nullController;
-        }
-    }
-    
-    // Fallback vers ServiceLocatorAdapter
-    // Désactiver l'avertissement de dépréciation - c'est un fallback temporaire
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    static InputController nullController(ServiceLocatorAdapter::getNavigationConfigServiceStatic());
-    #pragma GCC diagnostic pop
-    return nullController; // Contrôleur par défaut en cas de besoin
+    // En mode DISABLE_CONTROLLERS, créer un contrôleur temporaire
+    static auto navConfigService = std::make_shared<NavigationConfigService>();
+    static InputController nullController(navConfigService);
+    return nullController;
 #endif
 }
 

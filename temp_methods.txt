@@ -1,9 +1,0 @@
-IMidiOut& ServiceLocatorAdapter::getMidiOutStatic() {
-    // Conversion explicite de MidiSystem à IMidiOut
-    return reinterpret_cast<IMidiOut&>(getMidiSystemStatic());
-}
-
-IProfileManager& ServiceLocatorAdapter::getProfileManagerInterfaceStatic() {
-    // Conversion explicite de ProfileManager à IProfileManager
-    return reinterpret_cast<IProfileManager&>(getProfileManagerStatic());
-}

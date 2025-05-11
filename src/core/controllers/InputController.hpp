@@ -19,21 +19,14 @@ class UIController;
 class InputController {
 public:
     /**
-     * @brief Constructeur
-     * @param navigationConfig Service de configuration des contrôles de navigation
+     * @brief Constructeur avec injection de dépendances
+     * @param navigationConfig Service de configuration de navigation
      */
-    InputController(NavigationConfigService& navigationConfig);
+    explicit InputController(std::shared_ptr<NavigationConfigService> navigationConfig);
 
     /**
-     * @brief Configure le contrôleur d'interface utilisateur à utiliser
-     * @param uiController Contrôleur d'interface utilisateur (pointeur brut - déprécié)
-     * @deprecated Utilisez la version avec std::shared_ptr à la place
-     */
-    void setUIController(UIController* uiController);
-    
-    /**
-     * @brief Configure le contrôleur d'interface utilisateur à utiliser
-     * @param uiController Contrôleur d'interface utilisateur (pointeur partagé)
+     * @brief Configure le contrôleur d'interface utilisateur
+     * @param uiController Contrôleur d'interface utilisateur
      */
     void setUIController(std::shared_ptr<UIController> uiController);
 
@@ -96,16 +89,16 @@ public:
     void setMidiButtonCallback(std::function<void(ButtonId, bool)> callback);
 
 private:
-    NavigationConfigService& navigationConfig_;
-    std::shared_ptr<UIController> uiController_;
+    std::shared_ptr<NavigationConfigService> m_navigationConfig;
+    std::shared_ptr<UIController> m_uiController;
 
     // Stockage des callbacks
-    std::function<void(EncoderId, int32_t, int8_t)> navigationEncoderCallback_;
-    std::function<void(EncoderId, int32_t, int8_t)> midiEncoderCallback_;
-    std::function<void(EncoderId, bool)> navigationEncoderButtonCallback_;
-    std::function<void(EncoderId, bool)> midiEncoderButtonCallback_;
-    std::function<void(ButtonId, bool)> navigationButtonCallback_;
-    std::function<void(ButtonId, bool)> midiButtonCallback_;
+    std::function<void(EncoderId, int32_t, int8_t)> m_navigationEncoderCallback;
+    std::function<void(EncoderId, int32_t, int8_t)> m_midiEncoderCallback;
+    std::function<void(EncoderId, bool)> m_navigationEncoderButtonCallback;
+    std::function<void(EncoderId, bool)> m_midiEncoderButtonCallback;
+    std::function<void(ButtonId, bool)> m_navigationButtonCallback;
+    std::function<void(ButtonId, bool)> m_midiButtonCallback;
 
     // Méthodes pour traiter les entrées via l'UIController
     void handleNavigationEncoderTurn(EncoderId id, int32_t absolutePosition, int8_t relativeChange);
