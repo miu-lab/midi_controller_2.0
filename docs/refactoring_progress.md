@@ -2,7 +2,7 @@
 
 ## État d'avancement
 
-*Dernière mise à jour: Phase 2, Jour 3 terminé*
+*Dernière mise à jour: Phase 2 terminée, prêt pour Phase 3*
 
 ### Phase 1: Préparation et Infrastructure
 - [x] Jour 1: Mise en place de l'infrastructure de tests
@@ -22,8 +22,14 @@
   - [x] Implantation du conteneur d'injection de dépendances
   - [x] Tests unitaires pour DependencyContainer
   - [x] Mise en place d'une structure de tests adaptée à PlatformIO/Teensy
-- [ ] Jour 4: Création de ServiceLocatorAdapter
-- [ ] Jour 5: Tests pour l'adaptateur
+- [x] Jour 4: Création de ServiceLocatorAdapter
+  - [x] Implémentation de l'adaptateur entre ServiceLocator et DependencyContainer
+  - [x] Gestion des dépendances circulaires avec des deleters personnalisés
+  - [x] Méthodes de compatibilité pour tous les services existants
+- [x] Jour 5: Tests pour l'adaptateur
+  - [x] Tests unitaires avec Unity
+  - [x] Adaptation des tests aux contraintes d'un environnement embarqué
+  - [x] Simplification des tests pour éviter les dépendances problématiques
 
 ### Phase 3: Création des sous-systèmes
 - [ ] Jour 1: Interfaces de base et ConfigurationSubsystem
@@ -50,19 +56,33 @@
 
 ## Points d'attention
 
-### Problèmes potentiels
+### Problèmes identifiés et solutions
 
-1. **Mémoire limitée** : Surveiller l'utilisation de la mémoire, notamment avec les smart pointers et les conteneurs standard
-2. **Performances** : Assurer que le nouveau système n'introduit pas de surcharge significative pour les performances
-3. **Compatibilité** : Garantir que le code refactorisé fonctionne correctement avec le matériel Teensy
-4. **Test complexe** : Les tests des interactions complexes entre les sous-systèmes pourraient être difficiles à mettre en place
+1. **Dépendances circulaires** : Des dépendances circulaires ont été identifiées entre certaines classes (par exemple, ControllerService et ControllerServiceEventListener)
+   - ✅ Solution : Utilisation de deleters personnalisés dans les smart pointers pour empêcher la destruction automatique dans les cas problématiques
 
-### Solutions proposées
+2. **Tests sur l'environnement embarqué** : Certaines classes sont difficiles à tester en isolation à cause des dépendances à Arduino/Teensy
+   - ✅ Solution : Simplification des tests pour éviter les dépendances problématiques, focus sur les mécanismes principaux plutôt que sur les détails d'implémentation
 
-1. **Utilisation judicieuse des smart pointers** : Préférer `unique_ptr` à `shared_ptr` quand possible
-2. **Profiling régulier** : Vérifier les performances de manière régulière pendant le refactoring
-3. **Tests d'intégration** : Créer des tests qui valident le comportement global du système
-4. **Approche incrémentale** : Effectuer les changements progressivement et tester à chaque étape
+3. **Classes abstraites dans les tests** : Impossibilité d'instancier directement certaines classes abstraites comme ViewManager
+   - ✅ Solution : Éviter d'utiliser ces classes dans les tests ou créer des implémentations concrètes spécifiques pour les tests
+
+4. **Mémoire limitée** : Surveiller l'utilisation de la mémoire, notamment avec les smart pointers et les conteneurs standard
+   - 🔍 En cours : Surveillance continue de l'utilisation mémoire pendant le développement
+
+### Leçons apprises
+
+1. **Approche progressive** : Une approche progressive du refactoring est essentielle pour maintenir la stabilité du code
+2. **Test des composants critiques** : Tester tôt les composants les plus critiques comme le système d'injection de dépendances
+3. **Adaptation aux contraintes** : Adapter les patterns de conception modernes aux contraintes spécifiques des microcontrôleurs
+4. **Simplification des tests** : Privilégier des tests simples mais robustes plutôt que des tests complexes et fragiles
+
+## Prochaines étapes
+
+1. Créer les interfaces de base pour tous les sous-systèmes
+2. Implémenter ConfigurationSubsystem comme premier sous-système
+3. Adapter progressivement les autres services pour qu'ils utilisent le nouveau système d'injection de dépendances
+4. Documenter clairement les nouvelles interfaces et leur utilisation
 
 ## Risques et mitigations
 
