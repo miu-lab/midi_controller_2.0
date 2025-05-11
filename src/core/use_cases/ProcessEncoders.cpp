@@ -2,9 +2,9 @@
 
 #include <Arduino.h>
 
+#include "config/debug/DebugMacros.hpp"
 #include "core/domain/events/EventSystem.hpp"
 #include "tools/Diagnostics.hpp"
-#include "config/debug/DebugMacros.hpp"
 
 ProcessEncoders::ProcessEncoders(const std::vector<EncoderPort *> &encoders)
     : encoders_(encoders),
@@ -29,13 +29,6 @@ void ProcessEncoders::setInputController(InputController *inputController) {
 }
 
 void ProcessEncoders::update() {
-    // Débogage périodique (une fois toutes les 30 secondes)
-    static unsigned long lastDebugTime = 0;
-    unsigned long currentTime = millis();
-    if (currentTime - lastDebugTime > 30000) {
-        lastDebugTime = currentTime;
-    }
-
     for (size_t i = 0; i < encoders_.size(); ++i) {
         EncoderPort *encoder = encoders_[i];
 
