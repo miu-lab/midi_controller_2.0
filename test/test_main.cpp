@@ -8,6 +8,8 @@
 #include "unit/InputSubsystemTests.h"
 #include "unit/MidiSubsystemTests.h"
 #include "unit/UISubsystemTests.h"
+#include "unit/MidiControllerApp2Tests.h"
+#include "integration/MidiControllerApp2IntegrationTests.h"
 
 // Fonctions de configuration communes
 void setUp(void) {
@@ -56,6 +58,15 @@ int main(void) {
     RUN_TEST(test_ui_subsystem_initialization);
     RUN_TEST(test_ui_subsystem_display_methods);
     RUN_TEST(test_ui_subsystem_full_ui);
+    
+    // Tests pour MidiControllerApp2
+    RUN_TEST(test_midi_controller_app2_initialization);
+    RUN_TEST(test_midi_controller_app2_update);
+    RUN_TEST(test_midi_controller_app2_navigation_api);
+    
+    // Tests d'intégration pour MidiControllerApp2
+    RUN_TEST(test_midi_controller_app2_full_integration);
+    RUN_TEST(test_midi_controller_app2_subsystem_interactions);
     
     return UNITY_END();
 }
