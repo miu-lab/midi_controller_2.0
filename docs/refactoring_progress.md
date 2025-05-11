@@ -16,7 +16,7 @@
   - [x] Identifier les zones de redondance
 
 ### Phase 2: Implémentation du nouveau système de dépendances
-- [ ] Jour 3: Création de DependencyContainer
+- [x] Jour 3: Création de DependencyContainer
 - [ ] Jour 4: Création de ServiceLocatorAdapter
 - [ ] Jour 5: Tests pour l'adaptateur
 
