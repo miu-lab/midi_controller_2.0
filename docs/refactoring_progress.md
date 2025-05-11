@@ -2,6 +2,8 @@
 
 ## État d'avancement
 
+*Dernière mise à jour: Phase 2, Jour 3 terminé*
+
 ### Phase 1: Préparation et Infrastructure
 - [x] Jour 1: Mise en place de l'infrastructure de tests
   - [x] Créer la structure de base des tests
@@ -17,6 +19,9 @@
 
 ### Phase 2: Implémentation du nouveau système de dépendances
 - [x] Jour 3: Création de DependencyContainer
+  - [x] Implantation du conteneur d'injection de dépendances
+  - [x] Tests unitaires pour DependencyContainer
+  - [x] Mise en place d'une structure de tests adaptée à PlatformIO/Teensy
 - [ ] Jour 4: Création de ServiceLocatorAdapter
 - [ ] Jour 5: Tests pour l'adaptateur
 
