@@ -1,20 +1,13 @@
+#ifndef MOCK_TESTS_H
+#define MOCK_TESTS_H
+
 #include <unity.h>
 #include "mocks/MockInput.h"
 #include "mocks/MockMidi.h"
 #include "mocks/MockUI.h"
 
-// Fonction appelée avant chaque test
-void setUp(void) {
-    // Initialisation si nécessaire
-}
-
-// Fonction appelée après chaque test
-void tearDown(void) {
-    // Nettoyage si nécessaire
-}
-
-// Test de l'initialisation des mocks
-void test_mock_initialization(void) {
+// Tests pour les mocks
+void test_mock_initialization() {
     MockInput input;
     MockMidi midi;
     MockUI ui;
@@ -31,8 +24,7 @@ void test_mock_initialization(void) {
     TEST_ASSERT_TRUE(ui.fullUIEnabled);
 }
 
-// Test des mises à jour
-void test_mock_updates(void) {
+void test_mock_updates() {
     MockInput input;
     MockMidi midi;
     MockUI ui;
@@ -48,8 +40,7 @@ void test_mock_updates(void) {
     TEST_ASSERT_EQUAL_INT(1, ui.updateCount);
 }
 
-// Test des fonctionnalités MIDI
-void test_midi_messages(void) {
+void test_midi_messages() {
     MockMidi midi;
     
     // Envoyer quelques messages MIDI
@@ -75,8 +66,7 @@ void test_midi_messages(void) {
     TEST_ASSERT_EQUAL_INT(127, midi.ccMessages[0].value);
 }
 
-// Test des fonctionnalités UI
-void test_ui_messages(void) {
+void test_ui_messages() {
     MockUI ui;
     
     // Envoyer des messages à l'UI
@@ -91,14 +81,4 @@ void test_ui_messages(void) {
     TEST_ASSERT_TRUE(ui.displayCleared);
 }
 
-// Fonction principale pour les tests
-int main(void) {
-    UNITY_BEGIN();
-    
-    RUN_TEST(test_mock_initialization);
-    RUN_TEST(test_mock_updates);
-    RUN_TEST(test_midi_messages);
-    RUN_TEST(test_ui_messages);
-    
-    return UNITY_END();
-}
+#endif // MOCK_TESTS_H
