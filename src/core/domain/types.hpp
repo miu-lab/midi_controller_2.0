@@ -9,12 +9,22 @@ using MidiCC = uint8_t;
 using MidiNote = uint8_t;
 
 /**
+ * @brief Type de contrôle (encodeur, bouton d'encodeur, ou bouton séparé)
+ */
+enum class ControlType {
+    ENCODER_ROTATION,
+    ENCODER_BUTTON,
+    BUTTON
+};
+
+/**
  * @brief Configuration d'un controle MIDI
  */
 struct MidiControl {
     MidiChannel channel{1};
     MidiCC control{0};
     bool relative{true};
+    ControlType controlType{ControlType::ENCODER_ROTATION};
 };
 
 /**

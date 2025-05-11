@@ -5,6 +5,7 @@
 #include "app/di/DependencyContainer.hpp"
 #include "app/services/NavigationConfigService.hpp"
 #include "config/ApplicationConfiguration.hpp"
+#include "config/HardwareConfiguration.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/utils/Result.hpp"
 
@@ -101,22 +102,24 @@ public:
     static constexpr bool DEFAULT_DEBUG_MODE = false;
     static constexpr bool DEFAULT_HARDWARE_INIT = true;
 
+private:
     // Membres privés
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<ApplicationConfiguration> config_;
     std::shared_ptr<NavigationConfigService> navService_;
+    std::shared_ptr<HardwareConfiguration> hardwareConfig_;  // Ajout de la configuration matérielle
     std::vector<EncoderConfig> encoderConfigs_;
     std::vector<ButtonConfig> buttonConfigs_;
 
     /**
-     * @brief Charge les configurations des encodeurs depuis ApplicationConfiguration
+     * @brief Charge les configurations des encodeurs depuis HardwareConfiguration
      *
      * @return Result<bool, std::string> Succès ou message d'erreur
      */
     Result<bool, std::string> loadEncoderConfigs();
 
     /**
-     * @brief Charge les configurations des boutons depuis ApplicationConfiguration
+     * @brief Charge les configurations des boutons depuis HardwareConfiguration
      *
      * @return Result<bool, std::string> Succès ou message d'erreur
      */

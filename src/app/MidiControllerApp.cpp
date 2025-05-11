@@ -5,10 +5,8 @@
 #include "core/domain/interfaces/IInputSystem.hpp"
 #include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
-
-#ifdef DEBUG
-#include <Arduino.h>
-#endif
+#include "app/subsystems/MidiSubsystem.hpp"
+#include "core/controllers/InputController.hpp"
 
 MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> container)
     : m_container(container) {
@@ -45,11 +43,6 @@ Result<bool, std::string> MidiControllerApp::init() {
     }
     
     // Initialiser les sous-systèmes dans l'ordre de dépendance
-    
-    // 1. Configuration (indépendant)
-    #ifdef DEBUG
-    Serial.println(F("MidiControllerApp: Initialisation du sous-système de configuration"));
-    #endif
     auto configResult = m_configSystem->init();
     if (configResult.isError()) {
         return Result<bool, std::string>::error(
@@ -57,10 +50,6 @@ Result<bool, std::string> MidiControllerApp::init() {
             *(configResult.error()));
     }
     
-    // 2. Input (dépend de Configuration)
-    #ifdef DEBUG
-    Serial.println(F("MidiControllerApp: Initialisation du sous-système d'entrée"));
-    #endif
     auto inputResult = m_inputSystem->init();
     if (inputResult.isError()) {
         return Result<bool, std::string>::error(
@@ -68,10 +57,6 @@ Result<bool, std::string> MidiControllerApp::init() {
             *(inputResult.error()));
     }
     
-    // 3. MIDI (peut dépendre de Configuration)
-    #ifdef DEBUG
-    Serial.println(F("MidiControllerApp: Initialisation du sous-système MIDI"));
-    #endif
     auto midiResult = m_midiSystem->init();
     if (midiResult.isError()) {
         return Result<bool, std::string>::error(
@@ -79,15 +64,35 @@ Result<bool, std::string> MidiControllerApp::init() {
             *(midiResult.error()));
     }
     
-    // 4. UI (peut dépendre de tous les autres)
-    #ifdef DEBUG
-    Serial.println(F("MidiControllerApp: Initialisation du sous-système d'interface utilisateur"));
-    #endif
     auto uiResult = m_uiSystem->init(true);  // true = enable full UI
     if (uiResult.isError()) {
         return Result<bool, std::string>::error(
             std::string("Failed to initialize UI subsystem: ") + 
             *(uiResult.error()));
+    }
+    
+    // Configuration des callbacks MIDI après l'initialisation de tous les sous-systèmes
+    auto inputController = m_container->resolve<InputController>();
+    auto midiSubsystem = std::dynamic_pointer_cast<MidiSubsystem>(m_midiSystem);
+    
+    if (inputController && midiSubsystem) {
+        auto& midiMapper = midiSubsystem->getMidiMapper();
+        
+        // Configurer les callbacks
+        inputController->setMidiEncoderCallback(
+            [&midiMapper](EncoderId id, int32_t position, int8_t delta) {
+                midiMapper.processEncoderChange(id, position);
+            });
+        
+        inputController->setMidiEncoderButtonCallback(
+            [&midiMapper](EncoderId id, bool pressed) {
+                midiMapper.processEncoderButton(id, pressed);
+            });
+        
+        inputController->setMidiButtonCallback(
+            [&midiMapper](ButtonId id, bool pressed) {
+                midiMapper.processButtonPress(id, pressed);
+            });
     }
     
     return Result<bool, std::string>::success(true);

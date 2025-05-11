@@ -7,10 +7,13 @@
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
 #include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
+#include "core/use_cases/ProcessEncoders.hpp"
+#include "core/use_cases/ProcessButtons.hpp"
 #include "core/utils/Result.hpp"
 
 class EncoderManager;
 class DigitalButtonManager;
+class InputController;
 
 /**
  * @brief Sous-système de gestion des entrées
@@ -62,6 +65,11 @@ private:
     std::shared_ptr<IConfiguration> configuration_;
     std::shared_ptr<EncoderManager> encoderManager_;
     std::shared_ptr<DigitalButtonManager> buttonManager_;
+    std::shared_ptr<InputController> inputController_;
+    
+    // Processeurs d'événements
+    std::unique_ptr<ProcessEncoders> processEncoders_;
+    std::unique_ptr<ProcessButtons> processButtons_;
     
     bool initialized_ = false;
 };

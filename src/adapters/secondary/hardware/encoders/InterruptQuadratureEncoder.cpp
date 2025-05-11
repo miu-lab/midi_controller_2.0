@@ -41,56 +41,26 @@ int8_t InterruptQuadratureEncoder::readDelta() {
 
     // Mettre à jour la dernière position immédiatement
     lastPosition_ = newPosition;
-    
+
     // Mettre à jour la position physique totale
     physicalPosition_ += delta;
-    
+
     // Calculer le delta normalisé avec facteur d'échelle pour éviter la perte de précision
     int32_t normalizedDelta = (delta * normalizationFactor_) >> 8;
-    
+
     // S'assurer qu'un mouvement physique réel produise toujours au moins 1 delta
     if (delta != 0 && normalizedDelta == 0) {
         normalizedDelta = (delta > 0) ? 1 : -1;
     }
 
     // Limiter le delta à la plage d'un int8_t en une seule opération
-    int8_t result = (normalizedDelta > INT8_MAX) ? INT8_MAX : 
-                   (normalizedDelta < INT8_MIN) ? INT8_MIN : 
-                   static_cast<int8_t>(normalizedDelta);
-    
+    int8_t result = (normalizedDelta > INT8_MAX)   ? INT8_MAX
+                    : (normalizedDelta < INT8_MIN) ? INT8_MIN
+                                                   : static_cast<int8_t>(normalizedDelta);
+
     // Recalculer la position absolue directement à partir de la position physique totale
     // pour garantir une cohérence parfaite entre les encodeurs de différents PPR
     absolutePosition_ = (physicalPosition_ * normalizationFactor_) >> 8;
-
-    // Débogage de niveau 1 (léger - pour les mouvements significatifs)
-#if defined(DEBUG) && defined(DEBUG_RAW_CONTROLS) && (DEBUG_RAW_CONTROLS == 1) && (delta != 0)
-    Serial.print("ENC_RAW ");
-    Serial.print(id_);
-    Serial.print(" raw:");
-    Serial.print(delta);
-    Serial.print(" ppr:");
-    Serial.print(ppr_);
-    Serial.print(" norm:");
-    Serial.print(normalizedDelta);
-    Serial.print(" result:");
-    Serial.print(result);
-    Serial.print(" abs_pos:");
-    Serial.println(absolutePosition_);
-#endif
-
-    // Débogage de niveau 2 (complet - pour tous les appels)
-#if defined(DEBUG) && defined(DEBUG_RAW_CONTROLS) && (DEBUG_RAW_CONTROLS >= 2)
-    Serial.print("ENC_RAW ");
-    Serial.print(id_);
-    Serial.print(" raw:");
-    Serial.print(delta);
-    Serial.print(" norm:");
-    Serial.print(normalizedDelta);
-    Serial.print(" result:");
-    Serial.print(result);
-    Serial.print(" abs_pos:");
-    Serial.println(absolutePosition_);
-#endif
 
     return result;
 }
@@ -99,7 +69,9 @@ bool InterruptQuadratureEncoder::isPressed() const {
     if (!hasButton_) return false;
     // Lire l'état du bouton
     int raw = digitalRead(buttonPin_);
-    return activeLowButton_ ? (raw == LOW) : (raw == HIGH);
+    bool pressed = activeLowButton_ ? (raw == LOW) : (raw == HIGH);
+
+    return pressed;
 }
 
 EncoderId InterruptQuadratureEncoder::getId() const {

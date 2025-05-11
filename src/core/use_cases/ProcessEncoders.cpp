@@ -1,5 +1,7 @@
 #include "core/use_cases/ProcessEncoders.hpp"
 
+#include <Arduino.h>
+
 #include "core/domain/events/EventSystem.hpp"
 #include "tools/Diagnostics.hpp"
 
@@ -26,6 +28,13 @@ void ProcessEncoders::setInputController(InputController *inputController) {
 }
 
 void ProcessEncoders::update() {
+    // Débogage périodique (une fois toutes les 30 secondes)
+    static unsigned long lastDebugTime = 0;
+    unsigned long currentTime = millis();
+    if (currentTime - lastDebugTime > 30000) {
+        lastDebugTime = currentTime;
+    }
+
     for (size_t i = 0; i < encoders_.size(); ++i) {
         IEncoder *encoder = encoders_[i];
 
@@ -39,20 +48,14 @@ void ProcessEncoders::update() {
         if (absPos != lastAbsPos_[i]) {
             // Diagnostic pour le changement d'encodeur
             char diagEvent[60];
-            snprintf(diagEvent, sizeof(diagEvent), 
-                    "ProcessEncoders: ID=%d absPos=%ld->%ld delta=%d", 
-                    encoder->getId(), lastAbsPos_[i], absPos, delta);
+            snprintf(diagEvent,
+                     sizeof(diagEvent),
+                     "ProcessEncoders: ID=%d absPos=%ld->%ld delta=%d",
+                     encoder->getId(),
+                     lastAbsPos_[i],
+                     absPos,
+                     delta);
             DIAG_ON_EVENT(diagEvent);
-            
-            // Déboguer uniquement les changements de position absolue
-#if defined(DEBUG) && defined(DEBUG_RAW_CONTROLS) && (DEBUG_RAW_CONTROLS >= 1)
-            Serial.print("ENC_ABS_CHANGED ");
-            Serial.print(encoder->getId());
-            Serial.print(" old:");
-            Serial.print(lastAbsPos_[i]);
-            Serial.print(" new:");
-            Serial.println(absPos);
-#endif
             // Mettre à jour la dernière position absolue connue
             lastAbsPos_[i] = absPos;
 
@@ -63,6 +66,8 @@ void ProcessEncoders::update() {
                 onEncoderTurnedCallback_(encoder->getId(), absPos, delta);
             } else if (useInputController_) {
                 inputController_->processEncoderTurn(encoder->getId(), absPos, delta);
+            } else {
+                Serial.println(F("ProcessEncoders: NO HANDLER FOR ENCODER EVENTS!"));
             }
             // Les EventBus ne sont plus utilisés dans la nouvelle version
         }
@@ -71,11 +76,13 @@ void ProcessEncoders::update() {
         if (pressed != lastPressed_[i]) {
             // Diagnostic pour le changement d'état du bouton d'encodeur
             char diagEvent[60];
-            snprintf(diagEvent, sizeof(diagEvent), 
-                    "ProcessEncoders: Bouton ID=%d %s", 
-                    encoder->getId(), pressed ? "pressé" : "relâché");
+            snprintf(diagEvent,
+                     sizeof(diagEvent),
+                     "ProcessEncoders: Bouton ID=%d %s",
+                     encoder->getId(),
+                     pressed ? "pressé" : "relâché");
             DIAG_ON_EVENT(diagEvent);
-            
+
             lastPressed_[i] = pressed;
 
             // Ordre de priorité pour traiter l'événement:
@@ -85,6 +92,8 @@ void ProcessEncoders::update() {
                 onEncoderButtonCallback_(encoder->getId(), pressed);
             } else if (useInputController_) {
                 inputController_->processEncoderButton(encoder->getId(), pressed);
+            } else {
+                Serial.println(F("ProcessEncoders: NO HANDLER FOR ENCODER BUTTON EVENTS!"));
             }
             // Les EventBus ne sont plus utilisés dans la nouvelle version
         }

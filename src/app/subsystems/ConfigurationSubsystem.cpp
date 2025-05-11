@@ -1,8 +1,13 @@
 #include "ConfigurationSubsystem.hpp"
 
+#include <Arduino.h>
+
+#include "config/HardwareConfiguration.hpp"
+
 ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
     navService_ = std::make_shared<NavigationConfigService>();
+    hardwareConfig_ = std::make_shared<HardwareConfiguration>();
 }
 
 Result<bool, std::string> ConfigurationSubsystem::init() {
@@ -19,7 +24,7 @@ Result<bool, std::string> ConfigurationSubsystem::init() {
     if (encoderResult.isError()) {
         return encoderResult;
     }
-    
+
     auto buttonResult = loadButtonConfigs();
     if (buttonResult.isError()) {
         return buttonResult;
@@ -30,7 +35,7 @@ Result<bool, std::string> ConfigurationSubsystem::init() {
         std::shared_ptr<ConfigurationSubsystem>(this, [](ConfigurationSubsystem*) {
             // Ne rien faire lors de la destruction (le conteneur ne possède pas cet objet)
         }));
-    
+
     return Result<bool, std::string>::success(true);
 }
 
@@ -70,24 +75,61 @@ bool ConfigurationSubsystem::isHardwareInitEnabled() const {
 
 Result<bool, std::string> ConfigurationSubsystem::loadEncoderConfigs() {
     // Charger les configurations des encodeurs depuis la configuration matérielle
-    // Pour l'instant, utiliser des configurations par défaut
     encoderConfigs_.clear();
-    
-    // Dans un environnement sans exceptions, nous vérifions simplement les erreurs directement
-    encoderConfigs_.push_back(EncoderConfig{1, 2, 3, 1});  // Pins A, B, Bouton, ID
-    encoderConfigs_.push_back(EncoderConfig{4, 5, 6, 2});
-    
+
+    Serial.println(F("ConfigurationSubsystem: Loading physical encoder configurations"));
+
+    // Utiliser HardwareConfiguration pour charger les encodeurs
+    const std::vector<EncoderConfig>& configuredEncoders =
+        hardwareConfig_->getEncoderConfigurations();
+    // Copier tous les encodeurs configurés
+    for (const auto& encoder : configuredEncoders) {
+        encoderConfigs_.push_back(encoder);
+
+        Serial.print(F("ConfigurationSubsystem: Added encoder ID="));
+        Serial.print(encoder.id);
+        Serial.print(F(" pinA="));
+        Serial.print(encoder.pinA);
+        Serial.print(F(" pinB="));
+        Serial.print(encoder.pinB);
+        Serial.print(F(" pinButton="));
+        if (encoder.hasButton) {
+            Serial.println(encoder.pinButton);
+        } else {
+            Serial.println(F("No Button"));
+        }
+    }
+
+    Serial.print(encoderConfigs_.size());
+    Serial.println(F(" Encoders loaded"));
+
     return Result<bool, std::string>::success(true);
 }
 
 Result<bool, std::string> ConfigurationSubsystem::loadButtonConfigs() {
     // Charger les configurations des boutons depuis la configuration matérielle
-    // Pour l'instant, utiliser des configurations par défaut
     buttonConfigs_.clear();
-    
-    // Dans un environnement sans exceptions, nous vérifions simplement les erreurs directement
-    buttonConfigs_.push_back(ButtonConfig{10, 3});  // Pin, ID
-    buttonConfigs_.push_back(ButtonConfig{11, 4});
-    
+
+    Serial.println(F("ConfigurationSubsystem: Loading button configurations"));
+
+    // Utiliser HardwareConfiguration pour charger les boutons
+    const std::vector<ButtonConfig>& configuredButtons =
+        hardwareConfig_->getControlButtonConfigurations();
+
+    // Copier tous les boutons configurés
+    for (const auto& button : configuredButtons) {
+        buttonConfigs_.push_back(button);
+
+        Serial.print(F("ConfigurationSubsystem: Added button ID="));
+        Serial.print(button.id);
+        Serial.print(F(" pin="));
+        Serial.print(button.pin);
+        Serial.print(F(" mode="));
+        Serial.println(button.mode == ButtonMode::MOMENTARY ? F("MOMENTARY") : F("TOGGLE"));
+    }
+
+    Serial.print(buttonConfigs_.size());
+    Serial.println(F(" Buttons loaded"));
+
     return Result<bool, std::string>::success(true);
 }

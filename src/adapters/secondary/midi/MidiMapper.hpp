@@ -95,7 +95,7 @@ private:
 
     IMidiOut& midiOut_;
     CommandManager& commandManager_;
-    std::unordered_map<ControlId, MappingInfo> mappings_;
+    std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
     std::unordered_map<ControlId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
     
     MidiControl defaultControl_;  // Contrôle par défaut retourné si non trouvé

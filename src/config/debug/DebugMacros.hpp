@@ -19,11 +19,16 @@
 
 // Vérifie si Serial est disponible (avec un timeout de 0ms)
 inline bool isSerialReady() {
+#ifdef DEBUG
     return Serial;
+#else
+    return false;
+#endif
 }
 
 // Fonction pour ajouter un saut de ligne et limiter la longueur des messages
 inline void formatDebugMessage(const String& msg) {
+#ifdef DEBUG
     // Limite la longueur de la ligne à 80 caractères maximum
     String formattedMsg;
     if (msg.length() > 80) {
@@ -34,6 +39,7 @@ inline void formatDebugMessage(const String& msg) {
     
     // Utilise le tampon série si disponible, sinon affiche directement
     SerialBuffer::println(formattedMsg);
+#endif
 }
 
 // Macros de débogage optimisées pour la mémoire Flash
@@ -111,7 +117,7 @@ inline void formatDebugMessage(const String& msg) {
     do { if (isSerialReady()) { SerialBuffer::println(F(str)); } } while(0)
 
 #define DEBUG_PRINT_FLASH(str) \
-    do { if (isSerialReady()) { Serial.print(F(str)); } } while(0)
+    do {} while(0)  // Version sans utilisation directe de Serial
 
 #else // DEBUG n'est pas défini
 // Toutes les macros sont vides si DEBUG n'est pas défini

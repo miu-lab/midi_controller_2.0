@@ -1,12 +1,14 @@
 #include <Arduino.h>
+
 #include <memory>
 
 // Configurations
 #include "config/ApplicationConfiguration.hpp"
+#include "config/debug/DebugConfig.hpp"
 
 // Container et initialisation
-#include "app/di/DependencyContainer.hpp"
 #include "app/InitializationScript.hpp"
+#include "app/di/DependencyContainer.hpp"
 
 // Application
 #include "app/MidiControllerApp.hpp"
@@ -19,16 +21,16 @@ std::shared_ptr<DependencyContainer> container;
 void setup() {
     // Création du conteneur d'injection de dépendances
     container = std::make_shared<DependencyContainer>();
-    
+
     // Initialisation du conteneur avec tous les composants nécessaires
     bool initSuccess = InitializationScript::initializeContainer(container, appConfig);
     if (!initSuccess) {
         return;
     }
-    
+
     // Création de l'application avec le conteneur de dépendances
     app = std::make_shared<MidiControllerApp>(container);
-    
+
     // Initialisation de l'application
     auto result = app->init();
     if (result.isError()) {
@@ -41,7 +43,7 @@ void loop() {
     if (app) {
         app->update();
     }
-    
+
     // Permet aux autres tâches système de s'exécuter
     yield();
 }

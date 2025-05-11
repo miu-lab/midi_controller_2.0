@@ -18,6 +18,8 @@
 #include "core/domain/IMidiOut.hpp"
 #include "core/domain/IProfileManager.hpp"
 #include "core/domain/commands/CommandManager.hpp"
+#include "adapters/secondary/midi/MidiMapper.hpp"
+#include <Arduino.h>
 
 // Importer tous les mocks dans un seul fichier d'inclusion
 #include "app/mocks/AllMocks.hpp"
@@ -64,14 +66,14 @@ public:
         auto navConfig = std::make_shared<NavigationConfigService>();
         container->registerDependency<NavigationConfigService>(navConfig);
         
+        // CommandManager (créé avant les sous-systèmes)
+        auto commandManager = std::make_shared<CommandManager>();
+        container->registerDependency<CommandManager>(commandManager);
+        
         // Sous-systèmes
         auto configSystem = std::make_shared<ConfigurationSubsystem>(container);
         container->registerDependency<ConfigurationSubsystem>(configSystem);
         container->registerDependency<IConfiguration>(configSystem);
-        
-        auto inputSystem = std::make_shared<InputSubsystem>(container);
-        container->registerDependency<InputSubsystem>(inputSystem);
-        container->registerDependency<IInputSystem>(inputSystem);
         
         auto midiSystem = std::make_shared<MidiSubsystem>(container);
         container->registerDependency<MidiSubsystem>(midiSystem);
@@ -86,9 +88,6 @@ public:
         container->registerDependency<ViewManager>(viewManager);
         
         // Pour UIController, nous avons besoin d'un MenuController d'abord
-        auto commandManager = std::make_shared<CommandManager>();
-        container->registerDependency<CommandManager>(commandManager);
-        
         auto menuController = std::make_shared<MenuController>(*viewManager, *commandManager);
         container->registerDependency<MenuController>(menuController);
         
@@ -102,6 +101,45 @@ public:
         
         // Configurer les interactions entre contrôleurs
         inputController->setUIController(uiController);
+        
+        // Configuration des callbacks pour MIDI
+        if (midiSystem && inputController) {
+            
+            // CORRECTION: Utiliser capturer midiSystem par référence pour maintenir le pointeur valide
+            // Obtenir une référence au MidiMapper pour la capture optimale
+            auto& midiMapper = midiSystem->getMidiMapper();
+            
+            // Callback pour les rotations d'encodeurs
+            inputController->setMidiEncoderCallback(
+                [&midiMapper](EncoderId id, int32_t position, int8_t delta) {
+                    
+                    midiMapper.processEncoderChange(id, position);
+                }
+            );
+            
+            // Callback pour les boutons d'encodeurs
+            inputController->setMidiEncoderButtonCallback(
+                [&midiMapper](EncoderId id, bool pressed) {
+                    
+                    midiMapper.processEncoderButton(id, pressed);
+                }
+            );
+            
+            // Callback pour les boutons
+            inputController->setMidiButtonCallback(
+                [&midiMapper](ButtonId id, bool pressed) {
+                    
+                    midiMapper.processButtonPress(id, pressed);
+                }
+            );
+            
+        } else {
+        }
+        
+        // Créer InputSubsystem après avoir configuré l'InputController
+        auto inputSystem = std::make_shared<InputSubsystem>(container);
+        container->registerDependency<InputSubsystem>(inputSystem);
+        container->registerDependency<IInputSystem>(inputSystem);
         
         return true;
     }

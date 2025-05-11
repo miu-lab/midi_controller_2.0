@@ -16,7 +16,7 @@ void DiagnosticsManager::init(TaskScheduler& scheduler, uint16_t interval) {
     _eventDiagnosticsEnabled = true;  // Activé par défaut
     
 #ifdef DEBUG
-    Serial.printf("[DIAG] Module de diagnostics initialisé (mode événementiel)\n");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Module de diagnostics initialisé (mode événementiel)");
     
     // Affiche les statistiques initiales
     printStats(false);
@@ -47,10 +47,9 @@ void DiagnosticsManager::onEvent(const char* eventName, bool showDetails) {
     }
     
     // Affiche un en-tête avec le nom de l'événement
-    Serial.println();
-    Serial.println("===================================================");
-    Serial.printf("DIAGNOSTICS - ÉVÉNEMENT: %s\n", eventName);
-    Serial.println("===================================================");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "===================================================");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "DIAGNOSTICS - ÉVÉNEMENT: %s", eventName);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "===================================================");
     
     // Affiche les statistiques
     printSchedulerStats(showDetails);
@@ -60,15 +59,14 @@ void DiagnosticsManager::onEvent(const char* eventName, bool showDetails) {
         printMemoryStats();
     }
     
-    Serial.println("===================================================");
-    Serial.println();
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "===================================================");
 #endif
 }
 
 void DiagnosticsManager::printStats(bool showDetails) {
 #ifdef DEBUG
     if (!_scheduler) {
-        Serial.println("[DIAG] Erreur: Diagnostics non initialisé!");
+        DEBUG_ERROR("Diagnostics non initialisé!");
         return;
     }
     
@@ -78,45 +76,41 @@ void DiagnosticsManager::printStats(bool showDetails) {
 }
 
 void DiagnosticsManager::enableRegularStats(bool enable) {
-#ifdef DEBUG
     _regularStatsEnabled = enable;
     
-    Serial.printf("[DIAG] Statistiques régulières %s\n", 
-                 enable ? "activées" : "désactivées");
+#ifdef DEBUG
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Statistiques régulières %s", enable ? "activées" : "désactivées");
 #endif
 }
 
 void DiagnosticsManager::enableEventDiagnostics(bool enable) {
-#ifdef DEBUG
     _eventDiagnosticsEnabled = enable;
-    Serial.printf("[DIAG] Diagnostics événementiels %s\n", 
-                 enable ? "activés" : "désactivés");
+#ifdef DEBUG
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Diagnostics événementiels %s", enable ? "activés" : "désactivés");
 #endif
 }
 
 void DiagnosticsManager::setStatsInterval(uint16_t seconds) {
-#ifdef DEBUG
     if (seconds < 1) seconds = 1;  // Minimum 1 seconde
     
     _statsInterval = seconds;
-    Serial.printf("[DIAG] Intervalle d'affichage des statistiques: %us\n", seconds);
-#else
-    _statsInterval = seconds;
+#ifdef DEBUG
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Intervalle d'affichage des statistiques: %us", seconds);
 #endif
 }
 
 bool DiagnosticsManager::handleCommand(const String& command) {
 #ifdef DEBUG
     if (command == "stats") {
-        Serial.println("\n===== STATISTIQUES =====");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "===== STATISTIQUES =====");
         printStats(true);
-        Serial.println("=======================\n");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "=======================");
         return true;
     }
     else if (command == "stats detailed") {
-        Serial.println("\n===== STATISTIQUES DÉTAILLÉES =====");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "===== STATISTIQUES DÉTAILLÉES =====");
         printStats(true);
-        Serial.println("================================\n");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "================================");
         return true;
     }
     else if (command == "stats off") {
@@ -143,7 +137,7 @@ bool DiagnosticsManager::handleCommand(const String& command) {
         if (interval > 0) {
             setStatsInterval(interval);
         } else {
-            Serial.println("[DIAG] Erreur: intervalle invalide");
+            DEBUG_ERROR("Intervalle invalide");
         }
         return true;
     }
@@ -159,33 +153,33 @@ bool DiagnosticsManager::handleCommand(const String& command) {
 void DiagnosticsManager::printSchedulerStats(bool showDetails) {
 #ifdef DEBUG
     // Affichage des statistiques du scheduler
-    Serial.println("========== STATISTIQUES SCHEDULER ===========");
-    Serial.printf("CPU: %.2f%% | Cycles: %u | Overruns: %u\n", 
-                _scheduler->getCpuUsage(), _scheduler->getCycleCount(), _scheduler->getOverruns());
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "========== STATISTIQUES SCHEDULER ===========");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "CPU: %.2f%% | Cycles: %u | Overruns: %u", 
+              _scheduler->getCpuUsage(), _scheduler->getCycleCount(), _scheduler->getOverruns());
     
     // Détails des tâches si demandé
     if (showDetails) {
         // Utilise l'API publique pour récupérer les infos sur les tâches
         size_t taskCount = _scheduler->getTaskCount();
         
-        Serial.println("Nombre total de tâches: " + String(taskCount));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "Nombre total de tâches: %d", taskCount);
         
         // Nous avons besoin d'accéder aux détails des tâches
         // Mais comme nous ne voulons pas modifier TaskScheduler, nous ne pouvons
         // afficher que les informations globales
         
-        Serial.println("Note: Pour les détails des tâches, utilisez la commande 'stats detailed'");
-        Serial.println("(Nécessite une modification de TaskScheduler pour être implémenté)");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "Note: Pour les détails des tâches, utilisez la commande 'stats detailed'");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "(Nécessite une modification de TaskScheduler pour être implémenté)");
     }
     
-    Serial.println("============================================");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "============================================");
 #endif
 }
 
 void DiagnosticsManager::printMemoryStats() {
 #if defined(DEBUG) && (defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY40) || defined(ARDUINO_TEENSY41))
     // Statistiques de mémoire spécifiques à Teensy
-    Serial.println("========== STATISTIQUES MEMOIRE ============");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "========== STATISTIQUES MEMOIRE ============");
     
     // Obtenir les informations de mémoire disponible
     extern unsigned long _heap_start;
@@ -196,15 +190,15 @@ void DiagnosticsManager::printMemoryStats() {
     int heapUsed = __brkval ? (char *)__brkval - (char *)&_heap_start : 0;
     int heapFree = heapSize - heapUsed;
     
-    Serial.printf("RAM Totale: %d octets\n", heapSize);
-    Serial.printf("RAM Utilisée: %d octets (%.1f%%)\n", 
-                 heapUsed, (heapUsed * 100.0) / heapSize);
-    Serial.printf("RAM Libre: %d octets (%.1f%%)\n", 
-                 heapFree, (heapFree * 100.0) / heapSize);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "RAM Totale: %d octets", heapSize);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "RAM Utilisée: %d octets (%.1f%%)", 
+              heapUsed, (heapUsed * 100.0) / heapSize);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "RAM Libre: %d octets (%.1f%%)", 
+              heapFree, (heapFree * 100.0) / heapSize);
     
-    Serial.println("============================================");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "============================================");
 #elif defined(DEBUG)
     // Pour les autres plateformes, utiliser freeMemory() si disponible
-    Serial.println("Information mémoire non disponible sur cette plateforme");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Information mémoire non disponible sur cette plateforme");
 #endif
 }

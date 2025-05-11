@@ -12,6 +12,7 @@ void SerialBuffer::init(size_t maxLines) {
 
 // Affichage d'une ligne
 void SerialBuffer::println(const String& line) {
+#ifdef DEBUG
     if (_instance) {
         _instance->addLine(line);
     } else {
@@ -24,13 +25,16 @@ void SerialBuffer::println(const String& line) {
             Serial.println(line);
         }
     }
+#endif
 }
 
 // Affichage de tout le contenu
 void SerialBuffer::flush() {
+#ifdef DEBUG
     if (_instance) {
         _instance->dumpBuffer();
     }
+#endif
 }
 
 // Effacement du tampon
@@ -63,6 +67,7 @@ void SerialBuffer::addLine(const String& line) {
 
 // Affichage de tout le contenu du tampon
 void SerialBuffer::dumpBuffer() {
+#ifdef DEBUG
     size_t startIndex = _isFull ? _currentIndex : 0;
     size_t count = _isFull ? _maxLines : _currentIndex;
     
@@ -70,6 +75,7 @@ void SerialBuffer::dumpBuffer() {
         size_t index = (startIndex + i) % _maxLines;
         Serial.println(_buffer[index]);
     }
+#endif
 }
 
 // Effacement du tampon

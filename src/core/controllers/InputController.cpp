@@ -1,7 +1,4 @@
 #include "core/controllers/InputController.hpp"
-
-#include <Arduino.h>
-
 #include "core/controllers/UIController.hpp"
 
 InputController::InputController(std::shared_ptr<NavigationConfigService> navigationConfig)
@@ -99,7 +96,9 @@ void InputController::setMidiButtonCallback(std::function<void(ButtonId, bool)> 
 void InputController::handleNavigationEncoderTurn(EncoderId id, int32_t absolutePosition,
                                                   int8_t relativeChange) {
     // Vérifier que l'UIController est disponible
-    if (!m_uiController) return;
+    if (!m_uiController) {
+        return;
+    }
 
     // Simplification: supposons que l'encodeur avec ID 79 est celui de navigation
     // Dans une implémentation réelle, cette correspondance pourrait être configurable
@@ -111,10 +110,14 @@ void InputController::handleNavigationEncoderTurn(EncoderId id, int32_t absolute
 
 void InputController::handleNavigationEncoderButton(EncoderId id, bool pressed) {
     // Vérifier que l'UIController est disponible
-    if (!m_uiController) return;
+    if (!m_uiController) {
+        return;
+    }
 
     // Ne traiter que les appuis (pas les relâchements)
-    if (!pressed) return;
+    if (!pressed) {
+        return;
+    }
 
     // Simplification: supposons que l'encodeur avec ID 79 est celui de navigation
     if (id == 79) {
@@ -125,10 +128,14 @@ void InputController::handleNavigationEncoderButton(EncoderId id, bool pressed) 
 
 void InputController::handleNavigationButton(ButtonId id, bool pressed) {
     // Vérifier que l'UIController est disponible
-    if (!m_uiController) return;
+    if (!m_uiController) {
+        return;
+    }
 
     // Ne traiter que les appuis (pas les relâchements)
-    if (!pressed) return;
+    if (!pressed) {
+        return;
+    }
 
     // Simplification: supposons que les boutons avec ID 51 et 52 sont pour la navigation
     // Dans une implémentation réelle, cette correspondance pourrait être configurable

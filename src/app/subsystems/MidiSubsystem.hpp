@@ -8,6 +8,9 @@
 #include "core/domain/IMidiOut.hpp"
 #include "adapters/secondary/midi/DummyUsbMidi.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidi.hpp"
+#include "adapters/secondary/midi/MidiMapper.hpp"
+#include "adapters/secondary/midi/MidiInHandler.hpp"
+#include "core/controllers/InputController.hpp"
 #include "core/utils/Result.hpp"
 
 /**
@@ -70,10 +73,30 @@ public:
      */
     Result<bool, std::string> sendControlChange(uint8_t channel, uint8_t controller, uint8_t value) override;
     
+    /**
+     * @brief Obtient l'interface MidiMapper
+     * @return Référence au MidiMapper
+     */
+    MidiMapper& getMidiMapper() const;
+    
+    /**
+     * @brief Configure les callbacks MIDI sur l'InputController fourni
+     * 
+     * Cette méthode établit les connexions entre InputController et MidiMapper
+     * pour permettre le traitement des événements MIDI
+     * 
+     * @param inputController Pointeur vers l'InputController à configurer
+     * @return true si la configuration a réussi, false sinon
+     */
+    bool configureCallbacks(std::shared_ptr<InputController> inputController);
+    
 private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<IConfiguration> configuration_;
     std::shared_ptr<IMidiOut> midiOut_;
+    std::unique_ptr<MidiMapper> midiMapper_;
+    std::unique_ptr<MidiInHandler> midiInHandler_;
+    std::shared_ptr<CommandManager> commandManager_;
     
     bool initialized_ = false;
 };
