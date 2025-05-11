@@ -3,6 +3,7 @@
 // Inclure tous les fichiers de test
 #include "di_tests.h"
 #include "mock_tests.h"
+#include "service_locator_adapter_tests.h"
 
 // Fonctions de configuration communes
 void setUp(void) {
@@ -26,6 +27,11 @@ int main(void) {
     RUN_TEST(test_mock_updates);
     RUN_TEST(test_midi_messages);
     RUN_TEST(test_ui_messages);
+    
+    // Tests pour le ServiceLocatorAdapter
+    RUN_TEST(test_service_locator_adapter_initialize);
+    RUN_TEST(test_service_locator_adapter_container);
+    RUN_TEST(test_service_locator_adapter_simple_service);
     
     return UNITY_END();
 }
