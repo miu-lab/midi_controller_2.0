@@ -6,7 +6,7 @@
 
 #include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
 #include "config/debug/DebugConfig.hpp"  // Configuration des modes de debug
-#include "core/domain/IEncoder.hpp"
+#include "core/ports/input/EncoderPort.hpp"
 
 /**
  * @brief Encodeur quadrature utilisant la bibliothèque Encoder + bouton optionnel + PPR.
@@ -14,7 +14,7 @@
  * Utilise la bibliothèque Encoder pour une lecture fiable des rotations
  * avec gestion automatique des interruptions et du debounce.
  */
-class InterruptQuadratureEncoder : public IEncoder {
+class InterruptQuadratureEncoder : public EncoderPort {
 public:
     explicit InterruptQuadratureEncoder(const EncoderConfig& cfg);
     ~InterruptQuadratureEncoder() override;

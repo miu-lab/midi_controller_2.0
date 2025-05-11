@@ -4,7 +4,7 @@
 
 #include "config/common/CommonIncludes.hpp"
 #include "core/controllers/InputController.hpp"
-#include "core/domain/IButton.hpp"
+#include "core/ports/input/ButtonPort.hpp"
 
 class ProcessButtons {
 public:
@@ -12,7 +12,7 @@ public:
      * @brief Constructeur
      * @param buttons Liste des boutons à traiter
      */
-    explicit ProcessButtons(const std::vector<IButton*>& buttons);
+    explicit ProcessButtons(const std::vector<ButtonPort*>& buttons);
 
     /**
      * @brief Type de callback pour les événements de bouton
@@ -42,7 +42,7 @@ public:
     void initStates();
 
 private:
-    std::vector<IButton*> buttons_;
+    std::vector<ButtonPort*> buttons_;
     std::vector<bool> lastPressed_;
     bool initialized_;
     ButtonStateChangedCallback onButtonStateChangedCallback_;

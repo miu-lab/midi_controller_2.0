@@ -2,12 +2,12 @@
 #include <unordered_map>
 #include <vector>
 
-#include "core/domain/IProfileManager.hpp"
+#include "core/ports/output/ProfileStoragePort.hpp"
 
 /**
  * Implémentation simple en RAM du gestionnaire de profils.
  */
-class ProfileManager : public IProfileManager {
+class ProfileManager : public ProfileStoragePort {
 public:
     std::optional<MidiControl> getBinding(ControlId id) const override;
     void setBinding(ControlId id, MidiControl binding) override;

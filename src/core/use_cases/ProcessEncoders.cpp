@@ -4,8 +4,9 @@
 
 #include "core/domain/events/EventSystem.hpp"
 #include "tools/Diagnostics.hpp"
+#include "config/debug/DebugMacros.hpp"
 
-ProcessEncoders::ProcessEncoders(const std::vector<IEncoder *> &encoders)
+ProcessEncoders::ProcessEncoders(const std::vector<EncoderPort *> &encoders)
     : encoders_(encoders),
       lastPressed_(encoders.size(), false),
       lastAbsPos_(encoders.size(), 0),
@@ -36,7 +37,7 @@ void ProcessEncoders::update() {
     }
 
     for (size_t i = 0; i < encoders_.size(); ++i) {
-        IEncoder *encoder = encoders_[i];
+        EncoderPort *encoder = encoders_[i];
 
         // Lire le delta pour mettre à jour la position interne
         int8_t delta = encoder->readDelta();
@@ -67,7 +68,7 @@ void ProcessEncoders::update() {
             } else if (useInputController_) {
                 inputController_->processEncoderTurn(encoder->getId(), absPos, delta);
             } else {
-                Serial.println(F("ProcessEncoders: NO HANDLER FOR ENCODER EVENTS!"));
+                DEBUG_ERROR("ProcessEncoders: NO HANDLER FOR ENCODER EVENTS!");
             }
             // Les EventBus ne sont plus utilisés dans la nouvelle version
         }
@@ -93,7 +94,7 @@ void ProcessEncoders::update() {
             } else if (useInputController_) {
                 inputController_->processEncoderButton(encoder->getId(), pressed);
             } else {
-                Serial.println(F("ProcessEncoders: NO HANDLER FOR ENCODER BUTTON EVENTS!"));
+                DEBUG_ERROR("ProcessEncoders: NO HANDLER FOR ENCODER BUTTON EVENTS!");
             }
             // Les EventBus ne sont plus utilisés dans la nouvelle version
         }

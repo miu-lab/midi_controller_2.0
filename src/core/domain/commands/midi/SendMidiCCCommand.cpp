@@ -2,7 +2,8 @@
 
 #include <cstdio>  // Pour snprintf
 
-SendMidiCCCommand::SendMidiCCCommand(IMidiOut& midiOut, uint8_t channel, uint8_t cc, uint8_t value)
+SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc,
+                                     uint8_t value)
     : midiOut_(midiOut),
       channel_(channel),
       cc_(cc),
@@ -15,7 +16,7 @@ void SendMidiCCCommand::execute() {
     // Cela permet d'avoir un état pour l'annulation
     if (!hasExecuted_) {
         // Idéalement, on devrait pouvoir lire la valeur actuelle du CC
-        // Mais comme IMidiOut ne nous permet pas de le faire directement,
+        // Mais comme MidiOutputPort ne nous permet pas de le faire directement,
         // on pourrait avoir besoin d'un autre service pour cela
 
         // Pour l'instant, on suppose que previousValue_ = 0 si on ne peut pas le lire

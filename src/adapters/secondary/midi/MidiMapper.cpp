@@ -2,7 +2,7 @@
 #include "config/GlobalSettings.hpp"
 #include "tools/Diagnostics.hpp"
 
-MidiMapper::MidiMapper(IMidiOut& midiOut, CommandManager& commandManager)
+MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
       commandManager_(commandManager),
       defaultControl_({0, 0, false, ControlType::ENCODER_ROTATION})  // Canal 1, CC 0, mode absolu

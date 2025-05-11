@@ -1,6 +1,6 @@
 #include "core/controllers/ProfileController.hpp"
 
-ProfileController::ProfileController(IProfileManager& profileManager)
+ProfileController::ProfileController(ProfileStoragePort& profileManager)
     : profileManager_(profileManager) {}
 
 std::vector<MidiControlMapping> ProfileController::getAllMappings() const {

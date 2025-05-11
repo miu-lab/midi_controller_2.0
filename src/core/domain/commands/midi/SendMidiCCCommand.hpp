@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "core/domain/IMidiOut.hpp"
 #include "core/domain/commands/Command.hpp"
+#include "core/ports/output/MidiOutputPort.hpp"
 
 /**
  * @brief Commande pour envoyer un message MIDI CC (Control Change)
@@ -17,7 +17,7 @@ public:
      * @param cc Numéro de contrôleur (0-127)
      * @param value Valeur (0-127)
      */
-    SendMidiCCCommand(IMidiOut& midiOut, uint8_t channel, uint8_t cc, uint8_t value);
+    SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value);
 
     /**
      * @brief Exécute la commande : envoie le message MIDI CC
@@ -43,7 +43,7 @@ public:
     const char* getDescription() const override;
 
 private:
-    IMidiOut& midiOut_;
+    MidiOutputPort& midiOut_;
     uint8_t channel_;
     uint8_t cc_;
     uint8_t value_;

@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "core/domain/IMidiOut.hpp"
 #include "core/domain/commands/Command.hpp"
+#include "core/ports/output/MidiOutputPort.hpp"
 
 /**
  * @brief Commande pour envoyer un message MIDI Note On/Off
@@ -18,7 +18,7 @@ public:
      * @param velocity Vélocité (0-127), 0 pour Note Off
      * @param duration Durée de la note en ms, 0 pour une note qui reste active
      */
-    SendMidiNoteCommand(IMidiOut& midiOut, uint8_t channel, uint8_t note, uint8_t velocity,
+    SendMidiNoteCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t note, uint8_t velocity,
                         unsigned long duration = 0);
 
     /**
@@ -58,7 +58,7 @@ public:
     bool isNoteActive() const;
 
 private:
-    IMidiOut& midiOut_;
+    MidiOutputPort& midiOut_;
     uint8_t channel_;
     uint8_t note_;
     uint8_t velocity_;

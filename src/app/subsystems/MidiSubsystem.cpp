@@ -32,12 +32,12 @@ Result<bool, std::string> MidiSubsystem::init() {
         Serial.println(F("MidiSubsystem: Using existing CommandManager"));
     }
 
-    // Récupérer un IMidiOut existant ou en créer un nouveau si nécessaire
-    midiOut_ = container_->resolve<IMidiOut>();
+    // Récupérer un MidiOutputPort existant ou en créer un nouveau si nécessaire
+    midiOut_ = container_->resolve<MidiOutputPort>();
     if (!midiOut_) {
         // Créer l'interface MIDI appropriée si aucune n'est enregistrée
         if (configuration_->isHardwareInitEnabled()) {
-            // Utiliser TeensyUsbMidiOut qui implémente IMidiOut
+            // Utiliser TeensyUsbMidiOut qui implémente MidiOutputPort
             midiOut_ = std::make_shared<TeensyUsbMidiOut>();
             if (!midiOut_) {
                 return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
@@ -52,7 +52,7 @@ Result<bool, std::string> MidiSubsystem::init() {
         }
 
         // Enregistrer l'implémentation que nous venons de créer
-        container_->registerImplementation<IMidiOut, IMidiOut>(midiOut_);
+        container_->registerImplementation<MidiOutputPort, MidiOutputPort>(midiOut_);
     } else {
     }
 

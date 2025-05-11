@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-SendMidiNoteCommand::SendMidiNoteCommand(IMidiOut& midiOut, uint8_t channel, uint8_t note,
+SendMidiNoteCommand::SendMidiNoteCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t note,
                                          uint8_t velocity, unsigned long duration)
     : midiOut_(midiOut),
       channel_(channel),
@@ -58,7 +58,11 @@ bool SendMidiNoteCommand::isUndoable() const {
 const char* SendMidiNoteCommand::getDescription() const {
     static char buffer[64];
     if (velocity_ > 0) {
-        snprintf(buffer, sizeof(buffer), "Note On: ch=%d note=%d vel=%d", channel_ + 1, note_,
+        snprintf(buffer,
+                 sizeof(buffer),
+                 "Note On: ch=%d note=%d vel=%d",
+                 channel_ + 1,
+                 note_,
                  velocity_);
     } else {
         snprintf(buffer, sizeof(buffer), "Note Off: ch=%d note=%d", channel_ + 1, note_);

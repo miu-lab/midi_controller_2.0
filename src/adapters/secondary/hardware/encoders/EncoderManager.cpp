@@ -21,6 +21,6 @@ void EncoderManager::updateAll() {
     }
 }
 
-const std::vector<IEncoder*>& EncoderManager::getEncoders() const {
+const std::vector<EncoderPort*>& EncoderManager::getEncoders() const {
     return encoders_;
 }

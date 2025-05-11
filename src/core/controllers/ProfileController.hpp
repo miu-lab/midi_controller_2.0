@@ -3,10 +3,10 @@
 #include <memory>
 #include <vector>
 
-#include "core/domain/IProfileManager.hpp"
 #include "core/domain/strategies/MidiMappingFactory.hpp"
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
+#include "core/ports/output/ProfileStoragePort.hpp"
 
 /**
  * @brief Contrôleur dédié à la gestion des profils
@@ -20,7 +20,7 @@ public:
      * @brief Constructeur
      * @param profileManager Gestionnaire de profils
      */
-    ProfileController(IProfileManager& profileManager);
+    ProfileController(ProfileStoragePort& profileManager);
 
     /**
      * @brief Obtient tous les mappings MIDI
@@ -77,5 +77,5 @@ public:
         ControlId controlId, const MidiControl& midiControl) const;
 
 private:
-    IProfileManager& profileManager_;
+    ProfileStoragePort& profileManager_;
 };

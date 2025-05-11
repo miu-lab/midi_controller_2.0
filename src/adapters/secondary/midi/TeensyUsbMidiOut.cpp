@@ -35,6 +35,23 @@ void TeensyUsbMidiOut::sendNoteOff(MidiChannel ch, MidiNote note, uint8_t veloci
     usbMIDI.sendNoteOff(note, velocity, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
 }
 
+// Nouvelles méthodes implémentées
+void TeensyUsbMidiOut::sendProgramChange(MidiChannel ch, uint8_t program) {
+    usbMIDI.sendProgramChange(program, ch + 1);
+}
+
+void TeensyUsbMidiOut::sendPitchBend(MidiChannel ch, uint16_t value) {
+    usbMIDI.sendPitchBend(value, ch + 1);
+}
+
+void TeensyUsbMidiOut::sendChannelPressure(MidiChannel ch, uint8_t pressure) {
+    usbMIDI.sendAfterTouch(pressure, ch + 1);
+}
+
+void TeensyUsbMidiOut::sendSysEx(const uint8_t* data, uint16_t length) {
+    usbMIDI.sendSysEx(length, data);
+}
+
 void TeensyUsbMidiOut::flush() {
     // Traiter les messages USB
     usbMIDI.read();

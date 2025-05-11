@@ -6,7 +6,7 @@
 
 #include "adapters/secondary/hardware/buttons/DigitalButton.hpp"
 #include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
-#include "core/domain/IButton.hpp"
+#include "core/ports/input/ButtonPort.hpp"
 
 /**
  * @brief Manager pour plusieurs Button configurés dynamiquement.
@@ -25,7 +25,7 @@ public:
     DigitalButtonManager& operator=(DigitalButtonManager&&) = default;
 
     void updateAll();
-    const std::vector<IButton*>& getButtons() const;
+    const std::vector<ButtonPort*>& getButtons() const;
 
     // Nouvelles méthodes pour contrôler les boutons
     void resetAllToggleStates();               // Réinitialiser tous les boutons toggle
@@ -33,5 +33,5 @@ public:
 
 private:
     std::vector<std::unique_ptr<DigitalButton>> ownedButtons_;  // possession des boutons
-    std::vector<IButton*> buttons_;                             // pointeurs pour use-cases
+    std::vector<ButtonPort*> buttons_;                          // pointeurs pour use-cases
 };

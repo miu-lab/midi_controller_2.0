@@ -4,7 +4,7 @@
 
 #include "config/common/CommonIncludes.hpp"
 #include "core/controllers/InputController.hpp"
-#include "core/domain/IEncoder.hpp"
+#include "core/ports/input/EncoderPort.hpp"
 
 class ProcessEncoders {
 public:
@@ -12,7 +12,7 @@ public:
      * @brief Constructeur
      * @param encoders Liste des encodeurs à traiter
      */
-    explicit ProcessEncoders(const std::vector<IEncoder*>& encoders);
+    explicit ProcessEncoders(const std::vector<EncoderPort*>& encoders);
 
     /**
      * @brief Types de callbacks pour la rotation des encodeurs
@@ -48,7 +48,7 @@ public:
     void update();
 
 private:
-    std::vector<IEncoder*> encoders_;
+    std::vector<EncoderPort*> encoders_;
     std::vector<bool> lastPressed_;
     std::vector<int32_t> lastAbsPos_;
     EncoderTurnedCallback onEncoderTurnedCallback_;

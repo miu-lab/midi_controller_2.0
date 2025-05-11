@@ -2,12 +2,12 @@
 
 #include <string>
 
-#include "core/domain/IDisplay.hpp"
+#include "core/ports/output/DisplayPort.hpp"
 
 /**
- * @brief Implémentation de IDisplay pour les tests
+ * @brief Implémentation de DisplayPort pour les tests
  */
-class MockDisplay : public IDisplay {
+class MockDisplay : public DisplayPort {
 public:
     void clear() override {
         wasCleared_ = true;

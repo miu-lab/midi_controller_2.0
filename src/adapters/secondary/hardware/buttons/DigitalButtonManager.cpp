@@ -22,7 +22,7 @@ void DigitalButtonManager::updateAll() {
     }
 }
 
-const std::vector<IButton*>& DigitalButtonManager::getButtons() const {
+const std::vector<ButtonPort*>& DigitalButtonManager::getButtons() const {
     return buttons_;
 }
 

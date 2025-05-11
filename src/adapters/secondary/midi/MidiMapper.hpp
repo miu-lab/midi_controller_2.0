@@ -3,7 +3,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "core/domain/IMidiOut.hpp"
+#include "core/ports/output/MidiOutputPort.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/commands/midi/SendMidiCCCommand.hpp"
 #include "core/domain/commands/midi/SendMidiNoteCommand.hpp"
@@ -24,7 +24,7 @@ public:
      * @param midiOut Interface de sortie MIDI
      * @param commandManager Gestionnaire de commandes
      */
-    MidiMapper(IMidiOut& midiOut, CommandManager& commandManager);
+    MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager);
 
     /**
      * @brief Définit le mapping pour un contrôle
@@ -93,7 +93,7 @@ private:
         int32_t midiOffset = 0;   // Offset pour le référentiel flottant
     };
 
-    IMidiOut& midiOut_;
+    MidiOutputPort& midiOut_;
     CommandManager& commandManager_;
     std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
     std::unordered_map<ControlId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
