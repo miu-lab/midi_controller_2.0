@@ -103,31 +103,8 @@ public:
         // Configurer les interactions entre contrôleurs
         inputController->setUIController(uiController);
 
-        // Configuration des callbacks pour MIDI
-        if (midiSystem && inputController) {
-            // CORRECTION: Utiliser capturer midiSystem par référence pour maintenir le pointeur
-            // valide Obtenir une référence au MidiMapper pour la capture optimale
-            auto& midiMapper = midiSystem->getMidiMapper();
-
-            // Callback pour les rotations d'encodeurs
-            inputController->setMidiEncoderCallback(
-                [&midiMapper](EncoderId id, int32_t position, int8_t delta) {
-                    midiMapper.processEncoderChange(id, position);
-                });
-
-            // Callback pour les boutons d'encodeurs
-            inputController->setMidiEncoderButtonCallback(
-                [&midiMapper](EncoderId id, bool pressed) {
-                    midiMapper.processEncoderButton(id, pressed);
-                });
-
-            // Callback pour les boutons
-            inputController->setMidiButtonCallback([&midiMapper](ButtonId id, bool pressed) {
-                midiMapper.processButtonPress(id, pressed);
-            });
-
-        } else {
-        }
+        // Note: La configuration des callbacks MIDI est gérée par MidiControllerApp::init()
+        // pour éviter les redondances et assurer une initialisation cohérente du système.
 
         // Créer InputSubsystem après avoir configuré l'InputController
         auto inputSystem = std::make_shared<InputSubsystem>(container);
