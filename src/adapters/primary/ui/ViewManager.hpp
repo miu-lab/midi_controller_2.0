@@ -103,6 +103,38 @@ public:
     virtual void scrollDebugLogByDelta(int8_t delta) = 0;
 
     /**
+     * @brief Met à jour les informations de contrôle sur le moniteur
+     * @param controlId ID du contrôle source
+     * @param type Type de message ("CC", "Note On", etc.)
+     * @param channel Canal MIDI
+     * @param number Numéro (CC ou note)
+     * @param value Valeur
+     */
+    virtual void updateControlMonitorInfo(uint8_t controlId, const String& type, 
+                                         uint8_t channel, uint8_t number, uint8_t value) = 0;
+
+    /**
+     * @brief Met à jour la position d'un encodeur sur l'interface
+     * @param encoderId ID de l'encodeur
+     * @param position Position actuelle
+     */
+    virtual void updateEncoderPosition(uint8_t encoderId, int32_t position) = 0;
+
+    /**
+     * @brief Met à jour l'état du bouton d'un encodeur sur l'interface
+     * @param encoderId ID de l'encodeur
+     * @param pressed État du bouton (pressé ou non)
+     */
+    virtual void updateEncoderButtonState(uint8_t encoderId, bool pressed) = 0;
+
+    /**
+     * @brief Met à jour l'état d'un bouton standard sur l'interface
+     * @param buttonId ID du bouton
+     * @param pressed État du bouton (pressé ou non)
+     */
+    virtual void updateButtonState(uint8_t buttonId, bool pressed) = 0;
+
+    /**
      * @brief Destructeur virtuel
      */
     virtual ~ViewManager() = default;

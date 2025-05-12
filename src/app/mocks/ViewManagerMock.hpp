@@ -47,6 +47,24 @@ public:
 
     void scrollDebugLogByDelta(int8_t delta) override {}
 
+    // Implémentation des nouvelles méthodes pour la mise à jour de l'interface
+    void updateControlMonitorInfo(uint8_t controlId, const String& type, 
+                                uint8_t channel, uint8_t number, uint8_t value) override {
+        // Mock: ne fait rien
+    }
+
+    void updateEncoderPosition(uint8_t encoderId, int32_t position) override {
+        // Mock: ne fait rien
+    }
+
+    void updateEncoderButtonState(uint8_t encoderId, bool pressed) override {
+        // Mock: ne fait rien
+    }
+
+    void updateButtonState(uint8_t buttonId, bool pressed) override {
+        // Mock: ne fait rien
+    }
+
 private:
     DisplayPort& display_;
 };
