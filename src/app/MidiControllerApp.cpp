@@ -1,5 +1,7 @@
 #include "MidiControllerApp.hpp"
 
+#include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
+#include "adapters/primary/ui/UIEventListener.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "app/subsystems/MidiSubsystem.hpp"
 #include "core/controllers/InputController.hpp"
@@ -7,12 +9,22 @@
 #include "core/domain/interfaces/IInputSystem.hpp"
 #include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
+#include "core/domain/events/core/EventBus.hpp"
+#include "core/ports/output/MidiOutputPort.hpp"
+#include "adapters/primary/ui/ViewManager.hpp"
 
 MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> container)
     : m_container(container) {}
 
 MidiControllerApp::~MidiControllerApp() {
+    // Arrêter d'abord l'écouteur d'événements
+    if (m_uiEventListener) {
+        m_uiEventListener->unsubscribe();
+        m_uiEventListener.reset();
+    }
+    
     // Nettoyer les ressources dans l'ordre inverse de leur création
+    m_eventEnabledMidiOut.reset();
     m_uiSystem.reset();
     m_midiSystem.reset();
     m_inputSystem.reset();
@@ -67,6 +79,30 @@ Result<bool, std::string> MidiControllerApp::init() {
                                                 *(uiResult.error()));
     }
 
+    // ===========================================================================
+    // Configuration des adaptateurs pour le système d'événements
+    // ===========================================================================
+    
+    // 1. Obtenir les ports nécessaires
+    auto midiPort = m_container->resolve<MidiOutputPort>();
+    auto viewManager = m_container->resolve<ViewManager>();
+    
+    if (!midiPort || !viewManager) {
+        return Result<bool, std::string>::error("Failed to resolve required ports for event system");
+    }
+    
+    // 2. Créer le décorateur MidiOutputPort qui émet des événements
+    m_eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*midiPort);
+    
+    // 3. Remplacer le port MIDI standard par notre version avec événements
+    m_container->registerDependency<MidiOutputPort>(m_eventEnabledMidiOut);
+    
+    // 4. Créer l'écouteur d'événements UI
+    m_uiEventListener = std::make_unique<UIEventListener>(*viewManager);
+    
+    // 5. S'abonner aux événements
+    m_uiEventListener->subscribe();
+    
     // ===========================================================================
     // Configuration des callbacks MIDI après l'initialisation de tous les sous-systèmes
     // Note: Cette configuration est centralisée ici pour éviter les redondances

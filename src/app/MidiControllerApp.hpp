@@ -9,6 +9,8 @@ class IConfiguration;
 class IInputSystem;
 class IMidiSystem;
 class IUISystem;
+class UIEventListener;
+class EventEnabledMidiOut;
 
 /**
  * @brief Application principale du contrôleur MIDI
@@ -49,4 +51,10 @@ private:
     std::shared_ptr<IInputSystem> m_inputSystem;
     std::shared_ptr<IMidiSystem> m_midiSystem;
     std::shared_ptr<IUISystem> m_uiSystem;
+    
+    // Écouteur d'événements UI
+    std::unique_ptr<UIEventListener> m_uiEventListener;
+    
+    // Port MIDI avec émission d'événements
+    std::shared_ptr<EventEnabledMidiOut> m_eventEnabledMidiOut;
 };
