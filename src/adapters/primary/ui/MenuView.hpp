@@ -8,6 +8,9 @@
 #include "View.hpp"
 #include "core/ports/output/DisplayPort.hpp"
 
+// Déclaration anticipée pour éviter l'inclusion circulaire
+class ViewManager;
+
 /**
  * @brief Vue pour l'affichage et la gestion des menus
  */
@@ -120,4 +123,11 @@ private:
      * @brief Met à jour le décalage de défilement si nécessaire
      */
     void updateScrollOffsetIfNeeded();
+    
+    // Pour interagir avec le ViewManager
+    ViewManager* viewManager_ = nullptr;
+    
+public:
+    // Setter pour viewManager
+    void setViewManager(ViewManager* viewManager) { viewManager_ = viewManager; }
 };

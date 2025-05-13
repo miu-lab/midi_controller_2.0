@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "core/ports/output/DisplayPort.hpp"
+#include "core/utils/DisplayProfiler.hpp"
 
 /**
  * @brief Implémentation de DisplayPort pour l'écran OLED SSD1306
@@ -96,6 +97,29 @@ public:
      */
     void setTextColor(uint16_t color);
 
+    /**
+     * @brief Obtient le temps moyen de mise à jour de l'écran en microsecondes
+     * @return Temps moyen en microsecondes
+     */
+    unsigned long getAverageUpdateTime() const;
+    
+    /**
+     * @brief Obtient le temps maximum de mise à jour de l'écran en microsecondes
+     * @return Temps maximum en microsecondes
+     */
+    unsigned long getMaxUpdateTime() const;
+    
+    /**
+     * @brief Obtient le temps minimum de mise à jour de l'écran en microsecondes
+     * @return Temps minimum en microsecondes
+     */
+    unsigned long getMinUpdateTime() const;
+    
+    /**
+     * @brief Réinitialise les compteurs de performance
+     */
+    void resetPerformanceCounters();
+
 private:
     Adafruit_SSD1306 display_;
     uint16_t width_;
@@ -103,4 +127,6 @@ private:
     uint8_t i2cAddress_;
     TwoWire& wireInstance_;
     bool initialized_;
+    DisplayProfiler profiler_;
+    bool isDirty_ = false;  // Flag indiquant si l'affichage a été modifié
 };

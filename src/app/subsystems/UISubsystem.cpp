@@ -1,9 +1,12 @@
 #include "UISubsystem.hpp"
 
+#include "core/TaskScheduler.hpp"
 #include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "adapters/primary/ui/UIEventListener.hpp"
+#include "adapters/primary/ui/DisplayEventListener.hpp"
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "app/mocks/DisplayMock.hpp"
+#include "core/tasks/DisplayUpdateTask.hpp"
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {}
@@ -59,6 +62,24 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
             return Result<bool, std::string>::error("Failed to initialize ViewManager");
         }
         
+        // Créer la tâche d'affichage et l'écouteur d'événements
+        Serial.println(F("UISubsystem: Creating display task..."));
+        displayTask_ = std::make_shared<DisplayUpdateTask>(display_, 50); // 50ms = 20fps max
+        int taskIndex = scheduler.addTask(displayTask_->getTaskFunction(), 
+                                     displayTask_->getIntervalMicros(), 
+                                     displayTask_->getPriority(), 
+                                     displayTask_->getName());
+        Serial.print(F("UISubsystem: Display task added with index "));
+        Serial.println(taskIndex);
+        
+        // Forcer une mise à jour immédiate pour vérifier que l'écran fonctionne
+        displayTask_->requestUpdate();
+        displayTask_->execute(); // Exécution directe pour tester
+
+        // Créer et enregistrer l'écouteur d'événements d'affichage
+        displayEventListener_ = std::make_unique<DisplayEventListener>(displayTask_);
+        displayEventListener_->subscribe();
+        
         // Créer l'écouteur d'événements UI et l'abonner aux événements
         eventListener_ = std::make_unique<UIEventListener>(*viewManager_);
         eventListener_->subscribe();
@@ -92,6 +113,13 @@ void UISubsystem::update() {
         // Mettre à jour la logique des vues
         // Le gestionnaire de vues gère maintenant lui-même les rendus uniquement si nécessaire
         viewManager_->update();
+        
+        // Forcer périodiquement une mise à jour du display pour vérifier que le système fonctionne
+        static uint32_t updateCounter = 0;
+        if (++updateCounter % 500 == 0 && displayTask_) {
+            // Tous les 500 cycles (environ 10 secondes), forcer une mise à jour
+            displayTask_->requestUpdate();
+        }
     }
 }
 

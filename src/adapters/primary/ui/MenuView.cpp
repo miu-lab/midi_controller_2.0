@@ -1,4 +1,6 @@
+// Ajouter l'inclusion du gestionnaire de vue par défaut
 #include "MenuView.hpp"
+#include "ViewManager.hpp"
 
 MenuView::MenuView(std::shared_ptr<DisplayPort> display)
     : View(display), selectedIndex_(0), scrollOffset_(0), maxVisibleItems_(4) {}
@@ -11,11 +13,12 @@ bool MenuView::init() {
     addItem("Main Screen", 0);
     addItem("Control Monitor", 1);
     addItem("Debug Log", 2);
-    addItem("MIDI Settings", 3);
-    addItem("Display Settings", 4);
-    addItem("Save Config", 5);
-    addItem("Load Config", 6);
-    addItem("Factory Reset", 7);
+    addItem("Performance", 3);
+    addItem("MIDI Settings", 4);
+    addItem("Display Settings", 5);
+    addItem("Save Config", 6);
+    addItem("Load Config", 7);
+    addItem("Factory Reset", 8);
     
     title_ = "MENU";
     return true;
@@ -115,6 +118,30 @@ void MenuView::selectItem(int index) {
     if (index >= 0 && index < static_cast<int>(items_.size())) {
         selectedIndex_ = index;
         updateScrollOffsetIfNeeded();
+        
+        // Notifier le ViewManager si présent
+        if (viewManager_) {
+            // Convertir l'ID d'item de menu en action correspondante
+            switch (items_[selectedIndex_].id) {
+                case 0: // Main Screen
+                    viewManager_->showMainScreen();
+                    break;
+                case 1: // Control Monitor
+                    viewManager_->showControlMonitor();
+                    break;
+                case 2: // Debug Log
+                    viewManager_->showDebugScreen();
+                    break;
+                case 3: // Performance
+                    // Utiliser la méthode dédiée de DefaultViewManager pour la vue de performances
+                    viewManager_->setActiveView(ViewType::Performance);
+                    break;
+                // Cas pour d'autres options de menu
+                default:
+                    // Ne rien faire pour les autres options de menu pour l'instant
+                    break;
+            }
+        }
     }
 }
 

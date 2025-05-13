@@ -13,6 +13,7 @@
 #include "ModalView.hpp"
 #include "SplashScreenView.hpp"
 #include "LastControlView.hpp"
+#include "PerformanceView.hpp"
 #include "core/ports/output/DisplayPort.hpp"
 
 /**
@@ -109,6 +110,17 @@ public:
     void showLastControlView();
 
     /**
+     * @brief Affiche la vue des performances d'affichage
+     */
+    void showPerformanceView();
+    
+    /**
+     * @brief Définit la vue active par type
+     * @param type Type de vue à activer
+     */
+    void setActiveView(ViewType type);
+
+    /**
      * @brief Affiche une boîte de dialogue modale
      * @param message Message à afficher
      */
@@ -189,6 +201,7 @@ private:
     std::shared_ptr<ModalView> modalView_;
     std::shared_ptr<SplashScreenView> splashScreenView_;
     std::shared_ptr<LastControlView> lastControlView_;
+    std::shared_ptr<PerformanceView> performanceView_;
     
     std::vector<std::shared_ptr<View>> views_;
     std::shared_ptr<View> activeView_;

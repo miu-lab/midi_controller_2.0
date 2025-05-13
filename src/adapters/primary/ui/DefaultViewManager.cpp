@@ -1,4 +1,6 @@
 #include "DefaultViewManager.hpp"
+#include "core/domain/events/UIEvent.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 
 DefaultViewManager::DefaultViewManager(std::shared_ptr<DisplayPort> display)
     : display_(display) {}
@@ -16,14 +18,20 @@ bool DefaultViewManager::init() {
     modalView_ = std::make_shared<ModalView>(display_);
     splashScreenView_ = std::make_shared<SplashScreenView>(display_);
     lastControlView_ = std::make_shared<LastControlView>(display_);
+    
+    // Créer PerformanceView et lui passer l'affichage
+    performanceView_ = std::make_shared<PerformanceView>(display_);
 
     // Initialiser chaque vue
     if (!menuView_->init() || !debugView_->init() || !controlMonitorView_->init() ||
         !contextualView_->init() || !modalView_->init() || !splashScreenView_->init() ||
-        !lastControlView_->init()) {
+        !lastControlView_->init() || !performanceView_->init()) {
         Serial.println(F("Failed to initialize one or more views"));
         return false;
     }
+    
+    // Définir le ViewManager pour les vues qui en ont besoin
+    menuView_->setViewManager(this);
 
     // Désactiver explicitement toutes les vues d'abord
     menuView_->setActive(false);
@@ -33,6 +41,7 @@ bool DefaultViewManager::init() {
     modalView_->setActive(false);
     splashScreenView_->setActive(false);
     lastControlView_->setActive(false);
+    performanceView_->setActive(false);
 
     // Ajouter les vues au vecteur de vues
     views_.push_back(menuView_);
@@ -42,6 +51,7 @@ bool DefaultViewManager::init() {
     views_.push_back(modalView_);
     views_.push_back(splashScreenView_);
     views_.push_back(lastControlView_);
+    views_.push_back(performanceView_);
     
     Serial.println(F("Views initialized and all set to inactive"));
     
@@ -106,6 +116,7 @@ void DefaultViewManager::activateViewExclusively(std::shared_ptr<View> viewToAct
     else if (viewToActivate == contextualView_) Serial.println(F("Contextual"));
     else if (viewToActivate == splashScreenView_) Serial.println(F("Splash Screen"));
     else if (viewToActivate == lastControlView_) Serial.println(F("Last Control"));
+    else if (viewToActivate == performanceView_) Serial.println(F("Performance"));
     else Serial.println(F("Unknown"));
 }
 
@@ -242,8 +253,19 @@ void DefaultViewManager::render() {
         modalView_->render();
     }
 
-    // Mettre à jour l'affichage
-    display_->update();
+    // Au lieu de mettre à jour l'affichage directement, émettre un événement
+    // pour demander une mise à jour asynchrone
+    auto event = std::make_shared<DisplayUpdateRequestedEvent>();
+    EventBus::getInstance().publish(*event);
+    
+    // Forcer une demande immédiate de mise à jour pour éviter les problèmes de timing
+    // Cette ligne est critique pour assurer le bon fonctionnement - si nécessaire en production
+    static int forceUpdateCounter = 0;
+    if (++forceUpdateCounter % 5 == 0) { // 1 fois sur 5 rend plus fiable
+        // Mettre à jour l'affichage directement comme solution de secours 
+        // pour s'assurer que l'écran se met bien à jour
+        display_->update();
+    }
     
     // Compter le nombre de rendus pour débuguer
     static unsigned long lastRenderCountTime = 0;
@@ -322,6 +344,67 @@ void DefaultViewManager::showLastControlView() {
     }
     
     activateViewExclusively(lastControlView_);
+    
+    // Forcer un rendu immédiat
+    render();
+}
+
+void DefaultViewManager::showPerformanceView() {
+    if (!initialized_) return;
+    
+    Serial.println(F("DefaultViewManager::showPerformanceView() - Activating PerformanceView"));
+    
+    // Vérifier si performanceView_ est valide
+    if (!performanceView_) {
+        Serial.println(F("ERROR: performanceView_ is null!"));
+        return;
+    }
+    
+    activateViewExclusively(performanceView_);
+    
+    // Forcer un rendu immédiat
+    render();
+}
+
+void DefaultViewManager::setActiveView(ViewType type) {
+    if (!initialized_) return;
+    
+    Serial.print(F("DefaultViewManager::setActiveView() - Activating view type: "));
+    Serial.println(static_cast<int>(type));
+    
+    switch (type) {
+        case ViewType::Menu:
+            activateViewExclusively(menuView_);
+            break;
+        case ViewType::ControlMonitor:
+            activateViewExclusively(controlMonitorView_);
+            break;
+        case ViewType::Debug:
+            activateViewExclusively(debugView_);
+            break;
+        case ViewType::ContextualView:
+            activateViewExclusively(contextualView_);
+            break;
+        case ViewType::SplashScreen:
+            activateViewExclusively(splashScreenView_);
+            break;
+        case ViewType::LastControl:
+            activateViewExclusively(lastControlView_);
+            break;
+        case ViewType::Performance:
+            activateViewExclusively(performanceView_);
+            break;
+        case ViewType::Modal:
+            // On ne peut pas activer uniquement la vue modale
+            // mais on peut la rendre visible au-dessus de la vue actuelle
+            if (modalView_) {
+                modalView_->setActive(true);
+            }
+            break;
+        default:
+            Serial.println(F("WARNING: Unknown view type"));
+            break;
+    }
     
     // Forcer un rendu immédiat
     render();

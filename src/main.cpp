@@ -79,11 +79,24 @@ void setup() {
             Serial.println(F("UI system reinitialized successfully"));
         }
         
-        // Message de bienvenue uniquement dans la console
-        Serial.println(F("MIDI Controller Ready - No Modal Dialog"));
+        // Message de bienvenue directement sur l'écran
+        Serial.println(F("Testing display with direct drawing..."));
+        uiSystem->showMessage("MIDI Controller v2\nReady!");
+        delay(1000); // Donner du temps à l'écran pour s'afficher
         
-        // Nettoyer l'écran pour s'assurer qu'aucune modale n'est affichée
-        uiSystem->clearDisplay();
+        // Pour le débogage, dessiner un motif de test
+        auto display = container->resolve<DisplayPort>();
+        if (display) {
+            Serial.println(F("Drawing test pattern..."));
+            display->clear();
+            display->drawText(0, 0, "Test Pattern");
+            display->drawRect(5, 15, 118, 44, false);
+            display->drawText(10, 25, "MIDI Controller v2");
+            display->drawText(10, 35, "Direct Drawing");
+            display->drawText(10, 45, "If you see this, OK!");
+            display->update();
+            delay(2000);
+        }
     }
 }
 

@@ -2,6 +2,20 @@
 #include <Arduino.h>
 
 /**
+ * @brief Types de vues disponibles
+ */
+enum class ViewType {
+    Menu,
+    ControlMonitor,
+    Debug,
+    ContextualView,
+    Modal,
+    SplashScreen,
+    LastControl,
+    Performance
+};
+
+/**
  * @brief Gestionnaire de vues pour l'interface utilisateur
  *
  * Cette classe est responsable de la gestion des différentes vues
@@ -19,6 +33,12 @@ public:
      * @brief Met à jour toutes les vues actives
      */
     virtual void update() = 0;
+    
+    /**
+     * @brief Définit la vue active
+     * @param type Type de vue à activer
+     */
+    virtual void setActiveView(ViewType type) = 0;
     
     /**
      * @brief Rend les vues actives sur l'écran
