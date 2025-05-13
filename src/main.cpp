@@ -22,82 +22,29 @@ std::shared_ptr<MidiControllerApp> app;
 std::shared_ptr<DependencyContainer> container;
 
 void setup() {
-    // Initialisation de la communication série pour le débogage
-    Serial.begin(115200);
-    delay(1000);  // Attendre la stabilisation
-    Serial.println("MIDI Controller starting...");
-    
-    // Configuration de Wire2 pour la communication I2C avec l'écran
-    Wire2.begin();
-    Wire2.setClock(400000);  // 400 kHz
-    
-    // Si vous avez un pin de reset connecté à l'écran, uncomment ces lignes
-    // const int OLED_RESET_PIN = 22; // Changer selon votre branchement
-    // pinMode(OLED_RESET_PIN, OUTPUT);
-    // digitalWrite(OLED_RESET_PIN, LOW);   // Reset l'écran
-    // delay(10);
-    // digitalWrite(OLED_RESET_PIN, HIGH);  // Sortir du reset
-    // delay(100);                          // Attendre que l'écran s'initialise
-    
+    // // Initialisation de la communication série pour le débogage
+    // Serial.begin(115200);
+    // delay(1000);  // Attendre la stabilisation
+    // Serial.println("MIDI Controller starting...");
+
+    // // Configuration de Wire2 pour la communication I2C avec l'écran
+    // Wire2.begin();
+    // Wire2.setClock(400000);  // 400 kHzse
+
     // Création du conteneur d'injection de dépendances
     container = std::make_shared<DependencyContainer>();
-    
-    // Initialisation du conteneur avec tous les composants nécessaires
-    Serial.println("Initializing dependency container...");
-    bool initSuccess = InitializationScript::initializeContainer(container, appConfig);
-    if (!initSuccess) {
-        Serial.println("Container initialization failed!");
-        return;
-    }
-    Serial.println("Container initialization successful.");
-    
+
+    InitializationScript::initializeContainer(container, appConfig);
+
     // Création de l'application avec le conteneur de dépendances
     app = std::make_shared<MidiControllerApp>(container);
-    
-    // Initialisation de l'application
-    Serial.println("Initializing application...");
+
     auto result = app->init();
-    if (result.isError()) {
-        Serial.print("Application initialization failed: ");
-        if (auto err = result.error()) {
-            Serial.println(err->c_str());
-        } else {
-            Serial.println("Unknown error");
-        }
-        return;
-    }
-    Serial.println("Application started successfully.");
-    
+
     // Afficher un message de bienvenue
     auto uiSystem = container->resolve<IUISystem>();
-    if (uiSystem) {
-        // Forcer la réinitialisation du sous-système UI pour s'assurer que l'écran est propre
-        auto result = uiSystem->init(true); // true = UI complète
-        if (result.isError()) {
-            Serial.println(F("Failed to reinitialize UI system"));
-        } else {
-            Serial.println(F("UI system reinitialized successfully"));
-        }
-        
-        // Message de bienvenue directement sur l'écran
-        Serial.println(F("Testing display with direct drawing..."));
-        uiSystem->showMessage("MIDI Controller v2\nReady!");
-        delay(1000); // Donner du temps à l'écran pour s'afficher
-        
-        // Pour le débogage, dessiner un motif de test
-        auto display = container->resolve<DisplayPort>();
-        if (display) {
-            Serial.println(F("Drawing test pattern..."));
-            display->clear();
-            display->drawText(0, 0, "Test Pattern");
-            display->drawRect(5, 15, 118, 44, false);
-            display->drawText(10, 25, "MIDI Controller v2");
-            display->drawText(10, 35, "Direct Drawing");
-            display->drawText(10, 45, "If you see this, OK!");
-            display->update();
-            delay(2000);
-        }
-    }
+    // Pour le débogage, dessiner un motif de test
+    auto display = container->resolve<DisplayPort>();
 }
 
 void loop() {
@@ -105,7 +52,7 @@ void loop() {
     if (app) {
         app->update();
     }
-    
+
     // Permet aux autres tâches système de s'exécuter
     yield();
 }
