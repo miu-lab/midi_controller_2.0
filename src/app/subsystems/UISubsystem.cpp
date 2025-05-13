@@ -1,6 +1,7 @@
 #include "UISubsystem.hpp"
 
 #include "adapters/primary/ui/DefaultViewManager.hpp"
+#include "adapters/primary/ui/UIEventListener.hpp"
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "app/mocks/DisplayMock.hpp"
 
@@ -58,6 +59,11 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
             return Result<bool, std::string>::error("Failed to initialize ViewManager");
         }
         
+        // Créer l'écouteur d'événements UI et l'abonner aux événements
+        eventListener_ = std::make_unique<UIEventListener>(*viewManager_);
+        eventListener_->subscribe();
+        Serial.println(F("UISubsystem: Created and subscribed UIEventListener"));
+        
         // Enregistrer le ViewManager dans le conteneur
         container_->registerImplementation<ViewManager, DefaultViewManager>(
             std::static_pointer_cast<DefaultViewManager>(viewManager_));
@@ -83,8 +89,9 @@ void UISubsystem::update() {
 
     // Mettre à jour le gestionnaire de vues si l'UI complète est activée
     if (fullUIEnabled_ && viewManager_) {
+        // Mettre à jour la logique des vues
+        // Le gestionnaire de vues gère maintenant lui-même les rendus uniquement si nécessaire
         viewManager_->update();
-        viewManager_->render();
     }
 }
 
@@ -100,27 +107,10 @@ Result<bool, std::string> UISubsystem::showMessage(const std::string& message) {
     std::cout << "UISubsystem: Showing message: '" << message << "'" << std::endl;
 
     // Afficher directement le message en utilisant les méthodes de DisplayPort
-    if (!fullUIEnabled_) {
-        display_->clear();
-        display_->drawText(0, 0, message.c_str());
-        display_->update();
-        return Result<bool, std::string>::success(true);
-    }
-
-    // Sinon, utiliser le gestionnaire de vues pour afficher le message
-    if (viewManager_) {
-        // Utiliser le dialogue modal pour afficher un message
-        viewManager_->showModalDialog(String(message.c_str()));
-        viewManager_->render();
-    } else {
-        // Si pas de gestionnaire de vues même en mode UI complète,
-        // afficher directement le message
-        std::cout << "UISubsystem: No view manager, displaying directly in full UI mode"
-                  << std::endl;
-        display_->clear();
-        display_->drawText(0, 0, message.c_str());
-        display_->update();
-    }
+    // Ne plus afficher de boîte de dialogue modale
+    display_->clear();
+    display_->drawText(0, 0, message.c_str());
+    display_->update();
 
     return Result<bool, std::string>::success(true);
 }

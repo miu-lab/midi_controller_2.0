@@ -18,7 +18,9 @@ public:
      * @param basePort Port MIDI de base à décorer
      */
     explicit EventEnabledMidiOut(MidiOutputPort& basePort) 
-        : m_basePort(basePort) {}
+        : m_basePort(basePort) {
+        Serial.println(F("EventEnabledMidiOut decorator created"));
+    }
 
     /**
      * @brief Envoie un message MIDI Control Change et émet un événement
@@ -28,6 +30,18 @@ public:
      * @param source Identifiant de la source du message (encodeur, bouton, etc.)
      */
     void sendCc(MidiChannel ch, MidiCC cc, uint8_t value, uint8_t source = 0) {
+        // Log de débogage
+        Serial.print(F("\n####### EventEnabledMidiOut: Sending CC #######\n"));
+        Serial.print(F("Source ID: "));
+        Serial.println(source);
+        Serial.print(F("Channel: "));
+        Serial.println(ch);
+        Serial.print(F("CC: "));
+        Serial.println(cc);
+        Serial.print(F("Value: "));
+        Serial.println(value);
+        Serial.println(F("############################################\n"));
+        
         // Envoyer le message MIDI via le port de base
         m_basePort.sendCc(ch, cc, value);
         
@@ -54,6 +68,18 @@ public:
      * @param source Identifiant de la source du message
      */
     void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
+        // Log de débogage
+        Serial.print(F("\n####### EventEnabledMidiOut: Sending Note On #######\n"));
+        Serial.print(F("Source ID: "));
+        Serial.println(source);
+        Serial.print(F("Channel: "));
+        Serial.println(ch);
+        Serial.print(F("Note: "));
+        Serial.println(note);
+        Serial.print(F("Velocity: "));
+        Serial.println(velocity);
+        Serial.println(F("################################################\n"));
+        
         // Envoyer le message MIDI via le port de base
         m_basePort.sendNoteOn(ch, note, velocity);
         
@@ -80,6 +106,18 @@ public:
      * @param source Identifiant de la source du message
      */
     void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
+        // Log de débogage
+        Serial.print(F("\n####### EventEnabledMidiOut: Sending Note Off #######\n"));
+        Serial.print(F("Source ID: "));
+        Serial.println(source);
+        Serial.print(F("Channel: "));
+        Serial.println(ch);
+        Serial.print(F("Note: "));
+        Serial.println(note);
+        Serial.print(F("Velocity: "));
+        Serial.println(velocity);
+        Serial.println(F("################################################\n"));
+        
         // Envoyer le message MIDI via le port de base
         m_basePort.sendNoteOff(ch, note, velocity);
         

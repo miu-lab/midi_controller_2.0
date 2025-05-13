@@ -21,18 +21,33 @@ void ModalView::update() {
 void ModalView::render() {
     if (!active_) return;
     
-    // Dessiner le fond semi-transparent (simulé par un cadre)
-    display_->drawRect(10, 8, 108, 48, false);
+    // Dessiner un fond semi-opaque pour masquer partiellement le contenu en arrière-plan
+    // Fond transparent : remplir un rectangle avec une alternance de pixels
+    for (int y = 6; y < 58; y += 2) {
+        for (int x = 8; x < 120; x += 2) {
+            display_->drawRect(x, y, 1, 1, true);
+        }
+    }
     
-    // Dessiner le titre
-    display_->drawText(14, 11, title_.c_str());
-    display_->drawLine(10, 19, 118, 19);
+    // Dessiner la boîte de dialogue - fond noir avec bordure blanche
+    display_->drawRect(10, 8, 108, 48, false); // Bordure blanche
+    
+    // Créer une barre de titre (rectangle blanc en haut)
+    display_->drawRect(11, 9, 106, 10, true);
+    
+    // Dessiner le titre en noir sur la barre blanche
+    display_->setTextColor(0); // Texte noir 
+    display_->drawText(14, 10, title_.c_str());
+    display_->setTextColor(1); // Revenir au texte blanc pour le reste
     
     // Découper le message en lignes
     std::vector<String> lines = wrapText(message_);
     
+    // Dessiner une ligne horizontale sous la barre de titre
+    display_->drawLine(11, 21, 116, 21);
+    
     // Afficher le message
-    int y = 22;
+    int y = 24;
     for (const auto& line : lines) {
         display_->drawText(14, y, line.c_str());
         y += 9; // Espacement des lignes

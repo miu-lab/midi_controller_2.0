@@ -33,6 +33,8 @@ public:
     void subscribe() {
         if (m_subscriptionId == 0) {
             m_subscriptionId = EventBus::getInstance().subscribe(this);
+            Serial.print(F("UIEventListener: Subscribed with ID "));
+            Serial.println(m_subscriptionId);
         }
     }
     
@@ -44,6 +46,14 @@ public:
             EventBus::getInstance().unsubscribe(m_subscriptionId);
             m_subscriptionId = 0;
         }
+    }
+    
+    /**
+     * @brief Obtient l'identifiant d'abonnement
+     * @return Identifiant d'abonnement, 0 si non abonné
+     */
+    SubscriptionId getSubscriptionId() const {
+        return m_subscriptionId;
     }
     
     /**
@@ -81,6 +91,15 @@ private:
             case EventTypes::MidiControlChange: {
                 // Traiter les événements CC MIDI
                 auto& ccEvent = static_cast<const MidiCCEvent&>(event);
+                
+                Serial.print(F("\nMIDI CC Event received: source="));
+                Serial.print(ccEvent.source);
+                Serial.print(F(" channel="));
+                Serial.print(ccEvent.channel);
+                Serial.print(F(" controller="));
+                Serial.print(ccEvent.controller);
+                Serial.print(F(" value="));
+                Serial.println(ccEvent.value);
                 
                 // Mettre à jour l'écran de surveillance des contrôles avec les informations CC
                 m_viewManager.updateControlMonitorInfo(

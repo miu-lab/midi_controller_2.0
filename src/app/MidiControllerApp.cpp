@@ -103,6 +103,13 @@ Result<bool, std::string> MidiControllerApp::init() {
     // 5. S'abonner aux événements
     m_uiEventListener->subscribe();
     
+    // 6. Vérifier que l'abonnement a fonctionné
+    Serial.print(F("\nUI Event Listener subscription status: "));
+    Serial.println(EventBus::getInstance().exists(m_uiEventListener->getSubscriptionId()) ? 
+                   F("SUCCESS") : F("FAILED"));
+    Serial.print(F("Total event bus subscribers: "));
+    Serial.println(EventBus::getInstance().getCount());
+    
     // ===========================================================================
     // Configuration des callbacks MIDI après l'initialisation de tous les sous-systèmes
     // Note: Cette configuration est centralisée ici pour éviter les redondances

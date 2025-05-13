@@ -1,15 +1,21 @@
 #include "core/domain/commands/midi/SendMidiCCCommand.hpp"
 
 #include <cstdio>  // Pour snprintf
+#include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 
 SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc,
-                                     uint8_t value)
+                                     uint8_t value, uint8_t source)
     : midiOut_(midiOut),
       channel_(channel),
       cc_(cc),
       value_(value),
+      source_(source),
       previousValue_(0)  // Sera mis à jour lors de l'exécution
-{}
+{
+    // Log pour voir si le source ID est correctement transmis
+    Serial.print(F("SendMidiCCCommand created with source ID: "));
+    Serial.println(source_);
+}
 
 void SendMidiCCCommand::execute() {
     // Si c'est la première exécution, essayer de lire la valeur actuelle
@@ -23,8 +29,14 @@ void SendMidiCCCommand::execute() {
         hasExecuted_ = true;
     }
 
-    // Envoyer le CC MIDI
-    midiOut_.sendCc(channel_, cc_, value_);
+    // Tenter d'utiliser l'interface étendue si disponible
+    auto* eventMidiOut = dynamic_cast<EventEnabledMidiOut*>(&midiOut_);
+    if (eventMidiOut) {
+        eventMidiOut->sendCc(channel_, cc_, value_, source_);
+    } else {
+        // Utiliser l'interface standard sans l'ID de source
+        midiOut_.sendCc(channel_, cc_, value_);
+    }
 }
 
 bool SendMidiCCCommand::undo() {
@@ -44,7 +56,8 @@ bool SendMidiCCCommand::isUndoable() const {
 }
 
 const char* SendMidiCCCommand::getDescription() const {
-    static char buffer[64];
-    snprintf(buffer, sizeof(buffer), "Send MIDI CC: ch=%d cc=%d val=%d", channel_ + 1, cc_, value_);
+    static char buffer[80];
+    snprintf(buffer, sizeof(buffer), "Send MIDI CC: source=%d ch=%d cc=%d val=%d", 
+             source_, channel_ + 1, cc_, value_);
     return buffer;
 }

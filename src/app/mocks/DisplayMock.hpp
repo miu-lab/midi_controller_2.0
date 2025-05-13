@@ -23,4 +23,6 @@ public:
     void drawCircle(int x, int y, int radius, bool fill = false) override {}
 
     void update() override {}
+
+    void setTextColor(uint16_t color) override {}
 };

@@ -23,12 +23,21 @@ bool Ssd1306Display::init(int8_t resetPin) {
         return false;
     }
 
-    // Configuration initiale
+    // Effacer complètement l'écran et le buffer
     display_.clearDisplay();
+    display_.display();  // Mettre à jour l'écran physique
+
+    // Attendre un court instant pour stabiliser l'écran
+    delay(50);
+
+    // Effacer à nouveau pour s'assurer que tout est propre
+    display_.clearDisplay();
+    display_.display();
+
+    // Configuration initiale
     display_.setTextColor(SSD1306_WHITE);
     display_.setTextSize(1);
     display_.setCursor(0, 0);
-    display_.display();
 
     initialized_ = true;
     return true;
@@ -36,7 +45,34 @@ bool Ssd1306Display::init(int8_t resetPin) {
 
 void Ssd1306Display::clear() {
     if (!initialized_) return;
+
+    // Effacer tout le buffer en RAM
     display_.clearDisplay();
+
+    // S'assurer que le curseur est remis à la position initiale
+    display_.setCursor(0, 0);
+
+    // En cas de problème persistant, on peut essayer de réinitialiser complètement l'affichage
+    // Attention: c'est une solution radicale et lente!
+    static bool deepCleanDone = false;
+    if (!deepCleanDone) {
+        deepCleanDone = true;
+        Serial.println(F("Performing deep clean of SSD1306 display..."));
+
+        // Dessiner un motif de test
+        for (int i = 0; i < 64; i += 2) {
+            for (int j = 0; j < 128; j += 2) {
+                display_.drawPixel(j, i, SSD1306_WHITE);
+            }
+        }
+        display_.display();
+        delay(100);
+
+        // Effacer complètement
+        display_.clearDisplay();
+        display_.display();
+        delay(100);
+    }
 }
 
 void Ssd1306Display::drawText(int x, int y, const char* text) {
@@ -70,6 +106,8 @@ void Ssd1306Display::drawCircle(int x, int y, int radius, bool fill) {
 
 void Ssd1306Display::update() {
     if (!initialized_) return;
+
+    // Envoyer les données du buffer à l'écran physique
     display_.display();
 }
 

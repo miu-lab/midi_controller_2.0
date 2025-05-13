@@ -109,15 +109,25 @@ const MidiControl& MidiMapper::getMidiControl(ControlId controlId) const {
 }
 
 void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
+    // Limiteur de taux pour les messages d'encodeur
+    static const unsigned long RATE_LIMIT_MS = 5; // 5ms entre les messages (200Hz)
+    static unsigned long lastSendTimePerEncoder[256] = {0}; // Temps du dernier envoi par encodeur
+    
     // On utilise une variable statique pour suivre les derniers encodeurs traités
     // afin d'éviter les duplications
     static EncoderId lastEncoderId = 255;  // Valeur impossible
     static int32_t lastPosition = -9999;   // Valeur impossible
     static unsigned long lastProcessTime = 0;
 
+    // Vérifier la limitation de taux pour cet encodeur
+    unsigned long currentTime = millis();
+    if (currentTime - lastSendTimePerEncoder[encoderId] < RATE_LIMIT_MS) {
+        // Trop tôt pour envoyer un autre message
+        return;
+    }
+    
     // Si le même encodeur avec la même position a été traité récemment (dans les 20ms),
     // on ignore ce traitement pour éviter les duplications
-    unsigned long currentTime = millis();
     if (encoderId == lastEncoderId && position == lastPosition &&
         currentTime - lastProcessTime < 20) {
         return;  // Ignorer ce traitement car c'est un doublon
@@ -127,6 +137,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     lastEncoderId = encoderId;
     lastPosition = position;
     lastProcessTime = currentTime;
+    lastSendTimePerEncoder[encoderId] = currentTime;
 
     // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
     if (isNavigationControl(encoderId)) {
@@ -232,10 +243,15 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Mettre à jour et envoyer la nouvelle valeur
     info.lastMidiValue = static_cast<uint8_t>(newValue);
 
+    // Débogage pour voir l'ID de l'encodeur
+    Serial.print(F("MidiMapper: Sending MIDI for encoderId="));
+    Serial.println(encoderId);
+
     auto command = std::make_unique<SendMidiCCCommand>(midiOut_,
                                                        control.channel,
                                                        control.control,
-                                                       static_cast<uint8_t>(newValue));
+                                                       static_cast<uint8_t>(newValue),
+                                                       encoderId);
     commandManager_.execute(std::move(command));
 }
 

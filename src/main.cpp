@@ -31,6 +31,14 @@ void setup() {
     Wire2.begin();
     Wire2.setClock(400000);  // 400 kHz
     
+    // Si vous avez un pin de reset connecté à l'écran, uncomment ces lignes
+    // const int OLED_RESET_PIN = 22; // Changer selon votre branchement
+    // pinMode(OLED_RESET_PIN, OUTPUT);
+    // digitalWrite(OLED_RESET_PIN, LOW);   // Reset l'écran
+    // delay(10);
+    // digitalWrite(OLED_RESET_PIN, HIGH);  // Sortir du reset
+    // delay(100);                          // Attendre que l'écran s'initialise
+    
     // Création du conteneur d'injection de dépendances
     container = std::make_shared<DependencyContainer>();
     
@@ -63,7 +71,19 @@ void setup() {
     // Afficher un message de bienvenue
     auto uiSystem = container->resolve<IUISystem>();
     if (uiSystem) {
-        uiSystem->showMessage("MIDI Controller Ready");
+        // Forcer la réinitialisation du sous-système UI pour s'assurer que l'écran est propre
+        auto result = uiSystem->init(true); // true = UI complète
+        if (result.isError()) {
+            Serial.println(F("Failed to reinitialize UI system"));
+        } else {
+            Serial.println(F("UI system reinitialized successfully"));
+        }
+        
+        // Message de bienvenue uniquement dans la console
+        Serial.println(F("MIDI Controller Ready - No Modal Dialog"));
+        
+        // Nettoyer l'écran pour s'assurer qu'aucune modale n'est affichée
+        uiSystem->clearDisplay();
     }
 }
 

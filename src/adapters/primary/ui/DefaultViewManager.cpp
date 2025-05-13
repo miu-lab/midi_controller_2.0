@@ -14,13 +14,25 @@ bool DefaultViewManager::init() {
     controlMonitorView_ = std::make_shared<ControlMonitorView>(display_);
     contextualView_ = std::make_shared<ContextualView>(display_);
     modalView_ = std::make_shared<ModalView>(display_);
+    splashScreenView_ = std::make_shared<SplashScreenView>(display_);
+    lastControlView_ = std::make_shared<LastControlView>(display_);
 
     // Initialiser chaque vue
     if (!menuView_->init() || !debugView_->init() || !controlMonitorView_->init() ||
-        !contextualView_->init() || !modalView_->init()) {
+        !contextualView_->init() || !modalView_->init() || !splashScreenView_->init() ||
+        !lastControlView_->init()) {
         Serial.println(F("Failed to initialize one or more views"));
         return false;
     }
+
+    // Désactiver explicitement toutes les vues d'abord
+    menuView_->setActive(false);
+    debugView_->setActive(false);
+    controlMonitorView_->setActive(false);
+    contextualView_->setActive(false);
+    modalView_->setActive(false);
+    splashScreenView_->setActive(false);
+    lastControlView_->setActive(false);
 
     // Ajouter les vues au vecteur de vues
     views_.push_back(menuView_);
@@ -28,17 +40,145 @@ bool DefaultViewManager::init() {
     views_.push_back(controlMonitorView_);
     views_.push_back(contextualView_);
     views_.push_back(modalView_);
+    views_.push_back(splashScreenView_);
+    views_.push_back(lastControlView_);
+    
+    Serial.println(F("Views initialized and all set to inactive"));
+    
+    // Par défaut, activer le splash screen en premier
+    Serial.println(F("Activating SplashScreen"));
+    splashScreenView_->setActive(true);  // Activation directe
+    activeView_ = splashScreenView_;
 
-    // Par défaut, activer la vue contextuelle (écran principal)
-    activeView_ = contextualView_;
-    activeView_->setActive(true);
+    // Vérifier si la vue modale est active et la masquer explicitement
+    if (modalView_ && modalView_->isActive()) {
+        Serial.println(F("Explicitly hiding modal dialog at startup"));
+        modalView_->setActive(false);
+    }
 
     initialized_ = true;
+    
+    // Forcer un premier rendu pour montrer le splash screen
+    Serial.println(F("Forcing initial render of splash screen"));
+    render();
+    
     return true;
+}
+
+void DefaultViewManager::activateViewExclusively(std::shared_ptr<View> viewToActivate, bool keepModalState) {
+    // Si la vue à activer est null, rien à faire
+    if (!viewToActivate) {
+        Serial.println(F("ERROR: Trying to activate a null view!"));
+        return;
+    }
+    
+    // Sauvegarder l'état du modal si nécessaire
+    bool modalWasActive = false;
+    if (keepModalState && modalView_) {
+        modalWasActive = modalView_->isActive();
+    }
+    
+    // Désactiver toutes les vues d'abord
+    for (auto& view : views_) {
+        view->setActive(false);
+    }
+    
+    // Activer la vue souhaitée
+    viewToActivate->setActive(true);
+    activeView_ = viewToActivate;
+    
+    // Restaurer l'état du modal si nécessaire
+    if (keepModalState && modalView_) {
+        modalView_->setActive(modalWasActive);
+    }
+    
+    // Marquer la vue active et le modal (si actif) comme sales pour forcer le rendu
+    viewToActivate->setDirty(true);
+    if (modalWasActive) {
+        modalView_->setDirty(true);
+    }
+    
+    // Journalisation minimale
+    Serial.print(F("View activated: "));
+    if (viewToActivate == menuView_) Serial.println(F("Menu"));
+    else if (viewToActivate == debugView_) Serial.println(F("Debug"));
+    else if (viewToActivate == controlMonitorView_) Serial.println(F("Control Monitor"));
+    else if (viewToActivate == contextualView_) Serial.println(F("Contextual"));
+    else if (viewToActivate == splashScreenView_) Serial.println(F("Splash Screen"));
+    else if (viewToActivate == lastControlView_) Serial.println(F("Last Control"));
+    else Serial.println(F("Unknown"));
+}
+
+void DefaultViewManager::checkViewConsistency() {
+    if (!initialized_) return;
+    
+    // Vérifier qu'une seule vue principale est active (hors modal)
+    int activeMainViewCount = 0;
+    std::shared_ptr<View> lastActiveMainView = nullptr;
+    
+    for (auto& view : views_) {
+        if (view != modalView_ && view->isActive()) {
+            activeMainViewCount++;
+            lastActiveMainView = view;
+        }
+    }
+    
+    // Problème: aucune vue principale active
+    if (activeMainViewCount == 0) {
+        Serial.println(F("ERROR: No main view active! Activating default view."));
+        
+        // Activer la vue lastControl par défaut
+        bool modalWasActive = modalView_->isActive();
+        lastControlView_->setActive(true);
+        activeView_ = lastControlView_;
+        modalView_->setActive(modalWasActive); // Préserver l'état du modal
+    }
+    // Problème: plusieurs vues principales actives
+    else if (activeMainViewCount > 1) {
+        Serial.println(F("ERROR: Multiple main views active! Fixing..."));
+        
+        // Désactiver toutes les vues principales sauf la dernière qui a été activée
+        bool modalWasActive = modalView_->isActive();
+        
+        for (auto& view : views_) {
+            if (view != modalView_ && view != lastActiveMainView) {
+                view->setActive(false);
+            }
+        }
+        
+        // Assurer que la dernière vue active est bien active
+        lastActiveMainView->setActive(true);
+        activeView_ = lastActiveMainView;
+        modalView_->setActive(modalWasActive); // Préserver l'état du modal
+        
+        Serial.println(F("View consistency fixed."));
+    }
+    
+    // Vérifier si activeView_ est cohérent avec les vues actives
+    if (activeView_ && !activeView_->isActive()) {
+        Serial.println(F("ERROR: activeView_ is not active! Fixing..."));
+        activeView_->setActive(true);
+    }
 }
 
 void DefaultViewManager::update() {
     if (!initialized_) return;
+
+    // Débogage: imprimer l'état des vues périodiquement
+    static unsigned long lastDebugTime = 0;
+    unsigned long currentTime = millis();
+    
+    if (currentTime - lastDebugTime >= 5000) {
+        lastDebugTime = currentTime;
+        // Auto-vérification de l'état des vues
+        checkViewConsistency();
+    }
+
+    // Gérer la transition du splash screen à la vue par défaut
+    if (splashScreenView_->isActive() && splashScreenView_->isSplashScreenCompleted()) {
+        // Serial.println(F("Splash screen completed, switching to LastControlView"));
+        activateViewExclusively(lastControlView_, false);
+    }
 
     // Mettre à jour toutes les vues actives
     for (auto& view : views_) {
@@ -46,45 +186,88 @@ void DefaultViewManager::update() {
             view->update();
         }
     }
+    
+    // Vérifier si une vue active a changé et nécessite un rendu
+    bool needsRedraw = false;
+    
+    if (activeView_ && activeView_->isDirty()) {
+        needsRedraw = true;
+    }
+    
+    // Vérifier l'état de saleté des overlays
+    if (modalView_->isActive() && modalView_->isDirty()) {
+        needsRedraw = true;
+    }
+    
+    if (lastControlView_->isActive() && lastControlView_->isDirty()) {
+        needsRedraw = true;
+    }
+    
+    // Redessiner uniquement si nécessaire
+    if (needsRedraw) {
+        render();
+        
+        // Après le rendu, marquer les vues comme propres
+        if (activeView_) activeView_->setDirty(false);
+        if (modalView_->isActive()) modalView_->setDirty(false);
+        if (lastControlView_->isActive()) lastControlView_->setDirty(false);
+    }
 }
 
 void DefaultViewManager::render() {
     if (!initialized_) return;
 
-    // Effacer l'écran avant de rendre
+    // Effacer complètement l'écran avant de rendre
     display_->clear();
-
-    // Rendre toutes les vues actives
-    // L'ordre est important - les vues de premier plan (comme les modales)
-    // doivent être rendues en dernier
-    for (auto& view : views_) {
-        if (view->isActive()) {
-            view->render();
+    
+    // Vérifier et rendre la vue principale active
+    if (activeView_ && activeView_->isActive()) {
+        activeView_->render();
+    } else {
+        // Si aucune vue n'est active, c'est un état problématique - activer la vue par défaut
+        static bool warningShown = false;
+        if (!warningShown) {
+            Serial.println(F("WARNING: No active view to render! Activating default view."));
+            warningShown = true;
+            
+            // Activer la vue LastControl par défaut
+            lastControlView_->setActive(true);
+            activeView_ = lastControlView_;
+            activeView_->render();
         }
+    }
+    
+    // Rendre la vue modale par-dessus si elle est active
+    if (modalView_ && modalView_->isActive()) {
+        modalView_->render();
     }
 
     // Mettre à jour l'affichage
     display_->update();
+    
+    // Compter le nombre de rendus pour débuguer
+    static unsigned long lastRenderCountTime = 0;
+    static int renderCount = 0;
+    
+    renderCount++;
+    
+    unsigned long currentTime = millis();
+    if (currentTime - lastRenderCountTime >= 10000) { // Afficher tous les 10 secondes
+        Serial.print(F("Render count in last 10s: "));
+        Serial.println(renderCount);
+        renderCount = 0;
+        lastRenderCountTime = currentTime;
+    }
 }
 
 void DefaultViewManager::enterMenu() {
     if (!initialized_) return;
-
-    // Désactiver toutes les vues sauf le menu
-    for (auto& view : views_) {
-        view->setActive(false);
-    }
-
-    menuView_->setActive(true);
-    activeView_ = menuView_;
+    activateViewExclusively(menuView_);
 }
 
 void DefaultViewManager::exitMenu() {
     if (!initialized_) return;
-
-    menuView_->setActive(false);
-    contextualView_->setActive(true);
-    activeView_ = contextualView_;
+    activateViewExclusively(lastControlView_);
 }
 
 void DefaultViewManager::selectNextMenuItem() {
@@ -114,38 +297,34 @@ bool DefaultViewManager::isInMenu() const {
 
 void DefaultViewManager::showMainScreen() {
     if (!initialized_) return;
-
-    // Désactiver toutes les vues
-    for (auto& view : views_) {
-        view->setActive(false);
-    }
-
-    contextualView_->setActive(true);
-    activeView_ = contextualView_;
+    activateViewExclusively(contextualView_);
 }
 
 void DefaultViewManager::showControlMonitor() {
     if (!initialized_) return;
-
-    // Désactiver toutes les vues
-    for (auto& view : views_) {
-        view->setActive(false);
-    }
-
-    controlMonitorView_->setActive(true);
-    activeView_ = controlMonitorView_;
+    activateViewExclusively(controlMonitorView_);
 }
 
 void DefaultViewManager::showDebugScreen() {
     if (!initialized_) return;
+    activateViewExclusively(debugView_);
+}
 
-    // Désactiver toutes les vues
-    for (auto& view : views_) {
-        view->setActive(false);
+void DefaultViewManager::showLastControlView() {
+    if (!initialized_) return;
+    
+    Serial.println(F("DefaultViewManager::showLastControlView() - Activating LastControlView"));
+    
+    // Vérifier si lastControlView_ est valide
+    if (!lastControlView_) {
+        Serial.println(F("ERROR: lastControlView_ is null!"));
+        return;
     }
-
-    debugView_->setActive(true);
-    activeView_ = debugView_;
+    
+    activateViewExclusively(lastControlView_);
+    
+    // Forcer un rendu immédiat
+    render();
 }
 
 void DefaultViewManager::showModalDialog(const String& message) {
@@ -153,16 +332,19 @@ void DefaultViewManager::showModalDialog(const String& message) {
 
     modalView_->setMessage(message.c_str());
     modalView_->setActive(true);
+    modalView_->setDirty(true);
 }
 
 void DefaultViewManager::hideModalDialog() {
     if (!initialized_) return;
     modalView_->setActive(false);
+    modalView_->setDirty(true);
 }
 
 void DefaultViewManager::toggleModalDialogButton() {
     if (!initialized_ || !modalView_->isActive()) return;
     modalView_->toggleButton();
+    modalView_->setDirty(true);
 }
 
 bool DefaultViewManager::isModalDialogOkSelected() const {
@@ -188,7 +370,50 @@ void DefaultViewManager::scrollDebugLogByDelta(int8_t delta) {
 void DefaultViewManager::updateControlMonitorInfo(uint8_t controlId, const String& type,
                                                 uint8_t channel, uint8_t number, uint8_t value) {
     if (!initialized_) return;
+    
+    // Log de débogage
+    Serial.print(F("\nDefaultViewManager: Updating control info for controlId="));
+    Serial.print(controlId);
+    Serial.print(F(" type="));
+    Serial.print(type);
+    Serial.print(F(" channel="));
+    Serial.print(channel);
+    Serial.print(F(" number="));
+    Serial.print(number);
+    Serial.print(F(" value="));
+    Serial.println(value);
+    
+    // Mettre à jour les informations sur le moniteur de contrôle
     controlMonitorView_->updateControlInfo(controlId, type, channel, number, value);
+    
+    // Mettre à jour les informations sur la vue du dernier contrôle
+    if (lastControlView_) {
+        lastControlView_->updateLastControl(controlId, type, channel, number, value);
+        Serial.println(F("LastControlView updated"));
+        
+        // Activer LastControlView si nous ne sommes pas dans d'autres vues spécifiques
+        if (!menuView_->isActive() && !debugView_->isActive() && 
+            !controlMonitorView_->isActive()) {
+            
+            Serial.println(F("Automatically switching to LastControlView after control update"));
+            
+            // Désactiver toutes les vues principales
+            menuView_->setActive(false);
+            debugView_->setActive(false);
+            controlMonitorView_->setActive(false);
+            contextualView_->setActive(false);
+            splashScreenView_->setActive(false);
+            
+            // Activer LastControlView et le définir comme vue active
+            lastControlView_->setActive(true);
+            activeView_ = lastControlView_;
+            
+            // Forcer un rendu immédiat pour afficher les changements
+            render();
+        }
+    } else {
+        Serial.println(F("ERROR: lastControlView_ is null!"));
+    }
 }
 
 void DefaultViewManager::updateEncoderPosition(uint8_t encoderId, int32_t position) {

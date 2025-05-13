@@ -9,6 +9,7 @@
 #include "core/domain/interfaces/IUISystem.hpp"
 #include "core/ports/output/DisplayPort.hpp"
 #include "core/utils/Result.hpp"
+#include "adapters/primary/ui/UIEventListener.hpp" // Ajout de l'inclusion manquante
 
 class ViewManager;
 
@@ -64,6 +65,7 @@ private:
     std::shared_ptr<IConfiguration> configuration_;
     std::shared_ptr<DisplayPort> display_;
     std::shared_ptr<ViewManager> viewManager_;
+    std::unique_ptr<UIEventListener> eventListener_;
 
     bool fullUIEnabled_ = false;
     bool initialized_ = false;

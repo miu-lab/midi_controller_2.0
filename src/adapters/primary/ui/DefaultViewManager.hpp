@@ -11,6 +11,8 @@
 #include "ControlMonitorView.hpp"
 #include "ContextualView.hpp"
 #include "ModalView.hpp"
+#include "SplashScreenView.hpp"
+#include "LastControlView.hpp"
 #include "core/ports/output/DisplayPort.hpp"
 
 /**
@@ -100,6 +102,11 @@ public:
      * @brief Affiche l'écran de débogage
      */
     void showDebugScreen() override;
+    
+    /**
+     * @brief Affiche la vue du dernier contrôle MIDI
+     */
+    void showLastControlView();
 
     /**
      * @brief Affiche une boîte de dialogue modale
@@ -180,9 +187,17 @@ private:
     std::shared_ptr<ControlMonitorView> controlMonitorView_;
     std::shared_ptr<ContextualView> contextualView_;
     std::shared_ptr<ModalView> modalView_;
+    std::shared_ptr<SplashScreenView> splashScreenView_;
+    std::shared_ptr<LastControlView> lastControlView_;
     
     std::vector<std::shared_ptr<View>> views_;
     std::shared_ptr<View> activeView_;
     
     bool initialized_ = false;
+    
+    // Méthode auxiliaire pour activer une vue et désactiver toutes les autres
+    void activateViewExclusively(std::shared_ptr<View> viewToActivate, bool keepModalState = true);
+    
+    // Auto-vérification pour détecter et corriger les incohérences dans l'état des vues
+    void checkViewConsistency();
 };

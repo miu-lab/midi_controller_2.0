@@ -58,7 +58,20 @@ public:
      */
     virtual void setActive(bool active) = 0;
 
+    /**
+     * @brief Vérifie si la vue a été modifiée et nécessite un rendu
+     * @return true si la vue est sale (modifiée), false sinon
+     */
+    virtual bool isDirty() const { return isDirty_; }
+    
+    /**
+     * @brief Marque la vue comme sale ou propre
+     * @param dirty État de saleté à définir
+     */
+    virtual void setDirty(bool dirty = true) { isDirty_ = dirty; }
+
 protected:
     std::shared_ptr<DisplayPort> display_; ///< Référence à l'affichage
     bool active_ = false; ///< Indique si la vue est actuellement active
+    bool isDirty_ = true; ///< Indique si la vue a été modifiée et nécessite un rendu
 };

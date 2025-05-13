@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
+#include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "config/MappingConfiguration.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/strategies/AbsoluteMappingStrategy.hpp"
@@ -32,29 +33,36 @@ Result<bool, std::string> MidiSubsystem::init() {
         Serial.println(F("MidiSubsystem: Using existing CommandManager"));
     }
 
-    // Récupérer un MidiOutputPort existant ou en créer un nouveau si nécessaire
-    midiOut_ = container_->resolve<MidiOutputPort>();
-    if (!midiOut_) {
-        // Créer l'interface MIDI appropriée si aucune n'est enregistrée
-        if (configuration_->isHardwareInitEnabled()) {
-            // Utiliser TeensyUsbMidiOut qui implémente MidiOutputPort
-            midiOut_ = std::make_shared<TeensyUsbMidiOut>();
-            if (!midiOut_) {
-                return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
-            }
-        } else {
-            Serial.println(F("MidiSubsystem: Creating TeensyUsbMidiOut (test mode)"));
-            // Pour l'instant, utiliser TeensyUsbMidiOut même en mode test
-            midiOut_ = std::make_shared<TeensyUsbMidiOut>();
-            if (!midiOut_) {
-                return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
-            }
+    // Créer l'interface MIDI de base (TeensyUsbMidiOut)
+    std::shared_ptr<TeensyUsbMidiOut> baseMidiOut;
+    if (configuration_->isHardwareInitEnabled()) {
+        baseMidiOut = std::make_shared<TeensyUsbMidiOut>();
+        if (!baseMidiOut) {
+            return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
         }
-
-        // Enregistrer l'implémentation que nous venons de créer
-        container_->registerImplementation<MidiOutputPort, MidiOutputPort>(midiOut_);
     } else {
+        Serial.println(F("MidiSubsystem: Creating TeensyUsbMidiOut (test mode)"));
+        baseMidiOut = std::make_shared<TeensyUsbMidiOut>();
+        if (!baseMidiOut) {
+            return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
+        }
     }
+
+    // Créer l'EventEnabledMidiOut qui va décorer TeensyUsbMidiOut
+    auto eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*baseMidiOut);
+    if (!eventEnabledMidiOut) {
+        return Result<bool, std::string>::error("Failed to create EventEnabledMidiOut");
+    }
+    Serial.println(F("MidiSubsystem: Created EventEnabledMidiOut wrapper"));
+
+    // Utiliser EventEnabledMidiOut comme interface MidiOutputPort
+    midiOut_ = eventEnabledMidiOut;
+
+    // Enregistrer l'implémentation que nous venons de créer
+    container_->registerImplementation<MidiOutputPort, MidiOutputPort>(midiOut_);
+    
+    // Enregistrer également le baseMidiOut pour éviter qu'il soit détruit
+    container_->registerDependency<TeensyUsbMidiOut>(baseMidiOut);
 
     // Créer le MidiMapper et MidiInHandler
     midiMapper_ = std::make_unique<MidiMapper>(*midiOut_, *commandManager_);

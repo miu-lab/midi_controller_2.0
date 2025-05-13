@@ -54,10 +54,16 @@ public:
     virtual void drawCircle(int x, int y, int radius, bool fill = false) = 0;
 
     /**
-     * @brief Met à jour l'affichage
-     *
-     * Certains affichages nécessitent un appel explicite pour mettre à jour
-     * le contenu après des modifications.
-     */
-    virtual void update() = 0;
+    * @brief Met à jour l'affichage
+    *
+    * Certains affichages nécessitent un appel explicite pour mettre à jour
+    * le contenu après des modifications.
+    */
+virtual void update() = 0;
+
+/**
+ * @brief Définit la couleur du texte (pour les affichages monochromes, 1 = blanc, 0 = noir)
+ * @param color Couleur (1 = blanc, 0 = noir)
+ */
+virtual void setTextColor(uint16_t color) = 0;
 };

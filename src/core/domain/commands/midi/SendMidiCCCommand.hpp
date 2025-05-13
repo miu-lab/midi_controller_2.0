@@ -11,13 +11,14 @@
 class SendMidiCCCommand : public ICommand {
 public:
     /**
-     * @brief Constructeur
-     * @param midiOut Interface de sortie MIDI
-     * @param channel Canal MIDI (0-15)
-     * @param cc Numéro de contrôleur (0-127)
-     * @param value Valeur (0-127)
-     */
-    SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value);
+    * @brief Constructeur
+    * @param midiOut Interface de sortie MIDI
+    * @param channel Canal MIDI (0-15)
+    * @param cc Numéro de contrôleur (0-127)
+    * @param value Valeur (0-127)
+    * @param source ID de la source (encodeur, bouton, etc.)
+ */
+SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value, uint8_t source = 0);
 
     /**
      * @brief Exécute la commande : envoie le message MIDI CC
@@ -47,6 +48,7 @@ private:
     uint8_t channel_;
     uint8_t cc_;
     uint8_t value_;
+    uint8_t source_; // ID de la source (encodeur, bouton, etc.)
     uint8_t previousValue_;  // Pour l'annulation
     bool hasExecuted_ = false;
 };
