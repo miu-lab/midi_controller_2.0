@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "config/debug/DebugMacros.hpp"
-#include "core/domain/events/EventSystem.hpp"
+#include "core/domain/events/core/Events.hpp"
 #include "tools/Diagnostics.hpp"
 
 ProcessEncoders::ProcessEncoders(const std::vector<EncoderPort *> &encoders)

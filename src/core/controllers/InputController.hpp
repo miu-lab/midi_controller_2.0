@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "app/services/NavigationConfigService.hpp"
-#include "core/domain/events/EventTypes.hpp"
+#include "core/domain/events/core/EventTypes.hpp"
 #include "core/domain/types.hpp"
 
 // Forward declaration
