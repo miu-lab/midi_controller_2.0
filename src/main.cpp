@@ -22,15 +22,6 @@ std::shared_ptr<MidiControllerApp> app;
 std::shared_ptr<DependencyContainer> container;
 
 void setup() {
-    // // Initialisation de la communication série pour le débogage
-    // Serial.begin(115200);
-    // delay(1000);  // Attendre la stabilisation
-    // Serial.println("MIDI Controller starting...");
-
-    // // Configuration de Wire2 pour la communication I2C avec l'écran
-    // Wire2.begin();
-    // Wire2.setClock(400000);  // 400 kHzse
-
     // Création du conteneur d'injection de dépendances
     container = std::make_shared<DependencyContainer>();
 
