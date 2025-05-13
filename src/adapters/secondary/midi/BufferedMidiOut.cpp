@@ -34,7 +34,7 @@ BufferedMidiOut::~BufferedMidiOut() {
     // buffer_ est également mis à nullptr automatiquement
 }
 
-void BufferedMidiOut::sendCc(MidiChannel ch, MidiCC cc, uint8_t value) {
+void BufferedMidiOut::sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) {
     uint16_t index = findOrCreateMessage(MessageType::CC, ch, cc);
 
     // Seulement mettre à jour si la valeur a changé
@@ -100,7 +100,9 @@ void BufferedMidiOut::flush() {
 
         switch (buffer_[idx].type) {
         case MessageType::CC:
-            output_.sendCc(buffer_[idx].channel, buffer_[idx].control, buffer_[idx].value);
+            output_.sendControlChange(buffer_[idx].channel,
+                                      buffer_[idx].control,
+                                      buffer_[idx].value);
             break;
         case MessageType::NOTE_ON:
             output_.sendNoteOn(buffer_[idx].channel, buffer_[idx].control, buffer_[idx].value);
@@ -315,7 +317,9 @@ uint16_t BufferedMidiOut::update(uint16_t maxMessages) {
 
         switch (buffer_[idx].type) {
         case MessageType::CC:
-            output_.sendCc(buffer_[idx].channel, buffer_[idx].control, buffer_[idx].value);
+            output_.sendControlChange(buffer_[idx].channel,
+                                      buffer_[idx].control,
+                                      buffer_[idx].value);
             break;
         case MessageType::NOTE_ON:
             output_.sendNoteOn(buffer_[idx].channel, buffer_[idx].control, buffer_[idx].value);

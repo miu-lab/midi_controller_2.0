@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/ports/output/MidiOutputPort.hpp"
-#include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/core/Event.hpp"
+#include "core/domain/events/core/EventBus.hpp"
+#include "core/ports/output/MidiOutputPort.hpp"
 
 /**
  * @brief Adaptateur MIDI qui émet des événements en plus de transmettre les messages MIDI
@@ -17,8 +17,7 @@ public:
      * @brief Constructeur
      * @param basePort Port MIDI de base à décorer
      */
-    explicit EventEnabledMidiOut(MidiOutputPort& basePort) 
-        : m_basePort(basePort) {
+    explicit EventEnabledMidiOut(MidiOutputPort& basePort) : m_basePort(basePort) {
         Serial.println(F("EventEnabledMidiOut decorator created"));
     }
 
@@ -41,10 +40,10 @@ public:
         Serial.print(F("Value: "));
         Serial.println(value);
         Serial.println(F("############################################\n"));
-        
+
         // Envoyer le message MIDI via le port de base
-        m_basePort.sendCc(ch, cc, value);
-        
+        m_basePort.sendControlChange(ch, cc, value);
+
         // Émettre un événement MidiCC
         MidiCCEvent event(ch, cc, value, source);
         EventBus::getInstance().publish(event);
@@ -56,7 +55,7 @@ public:
      * @param cc Numéro de contrôleur (0-127)
      * @param value Valeur (0-127)
      */
-    void sendCc(MidiChannel ch, MidiCC cc, uint8_t value) override {
+    void sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) override {
         sendCc(ch, cc, value, 0);
     }
 
@@ -79,10 +78,10 @@ public:
         Serial.print(F("Velocity: "));
         Serial.println(velocity);
         Serial.println(F("################################################\n"));
-        
+
         // Envoyer le message MIDI via le port de base
         m_basePort.sendNoteOn(ch, note, velocity);
-        
+
         // Émettre un événement MidiNoteOn
         MidiNoteOnEvent event(ch, note, velocity, source);
         EventBus::getInstance().publish(event);
@@ -117,10 +116,10 @@ public:
         Serial.print(F("Velocity: "));
         Serial.println(velocity);
         Serial.println(F("################################################\n"));
-        
+
         // Envoyer le message MIDI via le port de base
         m_basePort.sendNoteOff(ch, note, velocity);
-        
+
         // Émettre un événement MidiNoteOff
         MidiNoteOffEvent event(ch, note, velocity, source);
         EventBus::getInstance().publish(event);

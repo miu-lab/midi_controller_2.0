@@ -21,11 +21,11 @@ void NavigateMenuCommand::execute() {
 
     // Exécuter l'action en fonction du type
     switch (action_) {
-    case Action::ENTER_MENU:
+    case Action::ENTER:
         viewManager_.enterMenu();
         break;
 
-    case Action::EXIT_MENU:
+    case Action::EXIT:
         viewManager_.exitMenu();
         break;
 
@@ -37,7 +37,7 @@ void NavigateMenuCommand::execute() {
         viewManager_.selectPreviousMenuItem();
         break;
 
-    case Action::GO_TO_ITEM:
+    case Action::HOME:
         if (itemIndex_ >= 0) {
             viewManager_.selectMenuItem(itemIndex_);
         }
@@ -75,10 +75,10 @@ const char* NavigateMenuCommand::getDescription() const {
     static char buffer[64];
 
     switch (action_) {
-    case Action::ENTER_MENU:
+    case Action::ENTER:
         return "Enter Menu";
 
-    case Action::EXIT_MENU:
+    case Action::EXIT:
         return "Exit Menu";
 
     case Action::NEXT_ITEM:
@@ -87,7 +87,7 @@ const char* NavigateMenuCommand::getDescription() const {
     case Action::PREVIOUS_ITEM:
         return "Previous Menu Item";
 
-    case Action::GO_TO_ITEM:
+    case Action::HOME:
         snprintf(buffer, sizeof(buffer), "Go to Menu Item %d", itemIndex_);
         return buffer;
 

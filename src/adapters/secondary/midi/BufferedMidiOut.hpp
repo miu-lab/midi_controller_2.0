@@ -38,7 +38,7 @@ public:
     ~BufferedMidiOut();
 
     // Implémentation de MidiOutputPort
-    void sendCc(MidiChannel ch, MidiCC cc, uint8_t value) override;
+    void sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) override;
     void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity) override;
     void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity) override;
 

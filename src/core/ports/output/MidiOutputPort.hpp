@@ -20,7 +20,7 @@ public:
      * @param cc Numéro de contrôleur (0-127)
      * @param value Valeur (0-127)
      */
-    virtual void sendCc(MidiChannel ch, MidiCC cc, uint8_t value) = 0;
+    virtual void sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) = 0;
 
     /**
      * @brief Envoie un message MIDI Note On

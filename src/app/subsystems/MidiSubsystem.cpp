@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 
-#include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
+#include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "config/MappingConfiguration.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/strategies/AbsoluteMappingStrategy.hpp"
@@ -60,7 +60,7 @@ Result<bool, std::string> MidiSubsystem::init() {
 
     // Enregistrer l'implémentation que nous venons de créer
     container_->registerImplementation<MidiOutputPort, MidiOutputPort>(midiOut_);
-    
+
     // Enregistrer également le baseMidiOut pour éviter qu'il soit détruit
     container_->registerDependency<TeensyUsbMidiOut>(baseMidiOut);
 
@@ -195,7 +195,7 @@ Result<bool, std::string> MidiSubsystem::sendControlChange(uint8_t channel, uint
     }
 
     // La méthode s'appelle sendCc et non sendControlChange
-    midiOut_->sendCc(MidiChannel(channel), MidiCC(controller), value);
+    midiOut_->sendControlChange(MidiChannel(channel), MidiCC(controller), value);
     return Result<bool, std::string>::success(true);
 }
 

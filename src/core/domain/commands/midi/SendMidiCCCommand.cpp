@@ -1,6 +1,7 @@
 #include "core/domain/commands/midi/SendMidiCCCommand.hpp"
 
 #include <cstdio>  // Pour snprintf
+
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 
 SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc,
@@ -35,7 +36,7 @@ void SendMidiCCCommand::execute() {
         eventMidiOut->sendCc(channel_, cc_, value_, source_);
     } else {
         // Utiliser l'interface standard sans l'ID de source
-        midiOut_.sendCc(channel_, cc_, value_);
+        midiOut_.sendControlChange(channel_, cc_, value_);
     }
 }
 
@@ -45,7 +46,7 @@ bool SendMidiCCCommand::undo() {
     }
 
     // Restaurer la valeur précédente
-    midiOut_.sendCc(channel_, cc_, previousValue_);
+    midiOut_.sendControlChange(channel_, cc_, previousValue_);
     return true;
 }
 
@@ -57,7 +58,12 @@ bool SendMidiCCCommand::isUndoable() const {
 
 const char* SendMidiCCCommand::getDescription() const {
     static char buffer[80];
-    snprintf(buffer, sizeof(buffer), "Send MIDI CC: source=%d ch=%d cc=%d val=%d", 
-             source_, channel_ + 1, cc_, value_);
+    snprintf(buffer,
+             sizeof(buffer),
+             "Send MIDI CC: source=%d ch=%d cc=%d val=%d",
+             source_,
+             channel_ + 1,
+             cc_,
+             value_);
     return buffer;
 }

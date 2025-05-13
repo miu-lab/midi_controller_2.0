@@ -16,11 +16,11 @@ public:
      * @brief Types d'action de navigation
      */
     enum class Action {
-        ENTER_MENU,     ///< Entrer dans un menu ou sélectionner une option
-        EXIT_MENU,      ///< Sortir d'un menu
+        ENTER,          ///< Entrer dans un menu ou sélectionner une option
+        EXIT,           ///< Sortir d'un menu
         NEXT_ITEM,      ///< Sélectionner l'élément suivant
         PREVIOUS_ITEM,  ///< Sélectionner l'élément précédent
-        GO_TO_ITEM      ///< Aller directement à un élément spécifique
+        HOME            ///< Aller directement à un élément spécifique
     };
 
     /**

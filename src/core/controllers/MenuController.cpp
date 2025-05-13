@@ -4,14 +4,14 @@ MenuController::MenuController(ViewManager& viewManager, CommandManager& command
     : viewManager_(viewManager), commandManager_(commandManager) {}
 
 void MenuController::enterMenu() {
-    auto command = std::make_unique<NavigateMenuCommand>(viewManager_,
-                                                         NavigateMenuCommand::Action::ENTER_MENU);
+    auto command =
+        std::make_unique<NavigateMenuCommand>(viewManager_, NavigateMenuCommand::Action::ENTER);
     commandManager_.execute(std::move(command));
 }
 
 void MenuController::exitMenu() {
     auto command =
-        std::make_unique<NavigateMenuCommand>(viewManager_, NavigateMenuCommand::Action::EXIT_MENU);
+        std::make_unique<NavigateMenuCommand>(viewManager_, NavigateMenuCommand::Action::EXIT);
     commandManager_.execute(std::move(command));
 }
 
@@ -22,14 +22,16 @@ void MenuController::selectNextItem() {
 }
 
 void MenuController::selectPreviousItem() {
-    auto command = std::make_unique<NavigateMenuCommand>(
-        viewManager_, NavigateMenuCommand::Action::PREVIOUS_ITEM);
+    auto command =
+        std::make_unique<NavigateMenuCommand>(viewManager_,
+                                              NavigateMenuCommand::Action::PREVIOUS_ITEM);
     commandManager_.execute(std::move(command));
 }
 
 void MenuController::selectItem(int index) {
-    auto command = std::make_unique<NavigateMenuCommand>(
-        viewManager_, NavigateMenuCommand::Action::GO_TO_ITEM, index);
+    auto command = std::make_unique<NavigateMenuCommand>(viewManager_,
+                                                         NavigateMenuCommand::Action::HOME,
+                                                         index);
     commandManager_.execute(std::move(command));
 }
 

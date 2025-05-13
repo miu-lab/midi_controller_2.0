@@ -13,10 +13,10 @@ class TeensyUsbMidiOut : public MidiOutputPort {
 public:
     TeensyUsbMidiOut();
 
-    void sendCc(MidiChannel ch, MidiCC cc, uint8_t value) override;
+    void sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) override;
     void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity) override;
     void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity) override;
-    
+
     // Nouvelles méthodes à implémenter pour satisfaire l'interface
     void sendProgramChange(MidiChannel ch, uint8_t program) override;
     void sendPitchBend(MidiChannel ch, uint16_t value) override;

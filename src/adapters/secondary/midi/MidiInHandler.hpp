@@ -16,9 +16,9 @@ public:
     MidiInHandler();
 
     // Méthodes pour enregistrer des callbacks
-    void onCcReceived(CcCallback callback);
-    void onNoteOnReceived(NoteCallback callback);
-    void onNoteOffReceived(NoteCallback callback);
+    void onControlChange(CcCallback callback);
+    void onNoteOn(NoteCallback callback);
+    void onNoteOff(NoteCallback callback);
 
     // Méthode à appeler régulièrement pour traiter les messages MIDI entrants
     void update();
@@ -30,7 +30,7 @@ private:
     std::vector<NoteCallback> noteOffCallbacks_;
 
     // Méthodes de traitement des messages
-    void handleCcMessage(MidiChannel channel, MidiCC cc, uint8_t value);
-    void handleNoteOnMessage(MidiChannel channel, MidiNote note, uint8_t velocity);
-    void handleNoteOffMessage(MidiChannel channel, MidiNote note, uint8_t velocity);
+    void handleControlChange(MidiChannel channel, MidiCC cc, uint8_t value);
+    void handleNoteOn(MidiChannel channel, MidiNote note, uint8_t velocity);
+    void handleNoteOff(MidiChannel channel, MidiNote note, uint8_t velocity);
 };

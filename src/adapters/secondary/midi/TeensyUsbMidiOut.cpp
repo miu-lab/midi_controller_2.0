@@ -14,7 +14,7 @@ TeensyUsbMidiOut::TeensyUsbMidiOut() {
     // Rien à faire, Teensy gère cela automatiquement
 }
 
-void TeensyUsbMidiOut::sendCc(MidiChannel ch, MidiCC cc, uint8_t value) {
+void TeensyUsbMidiOut::sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) {
     // Envoyer via usbMIDI
     usbMIDI.sendControlChange(cc, value, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
 }

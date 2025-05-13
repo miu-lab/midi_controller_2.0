@@ -8,15 +8,15 @@ MidiInHandler::MidiInHandler() {
     // Rien à initialiser
 }
 
-void MidiInHandler::onCcReceived(CcCallback callback) {
+void MidiInHandler::onControlChange(CcCallback callback) {
     ccCallbacks_.push_back(callback);
 }
 
-void MidiInHandler::onNoteOnReceived(NoteCallback callback) {
+void MidiInHandler::onNoteOn(NoteCallback callback) {
     noteOnCallbacks_.push_back(callback);
 }
 
-void MidiInHandler::onNoteOffReceived(NoteCallback callback) {
+void MidiInHandler::onNoteOff(NoteCallback callback) {
     noteOffCallbacks_.push_back(callback);
 }
 
@@ -31,20 +31,20 @@ void MidiInHandler::update() {
 
         switch (type) {
         case usbMIDI.ControlChange:
-            handleCcMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
+            handleControlChange(channel, usbMIDI.getData1(), usbMIDI.getData2());
             break;
 
         case usbMIDI.NoteOn:
             if (usbMIDI.getData2() == 0) {
                 // NoteOn avec vélocité 0 est traité comme NoteOff
-                handleNoteOffMessage(channel, usbMIDI.getData1(), 0);
+                handleNoteOff(channel, usbMIDI.getData1(), 0);
             } else {
-                handleNoteOnMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
+                handleNoteOn(channel, usbMIDI.getData1(), usbMIDI.getData2());
             }
             break;
 
         case usbMIDI.NoteOff:
-            handleNoteOffMessage(channel, usbMIDI.getData1(), usbMIDI.getData2());
+            handleNoteOff(channel, usbMIDI.getData1(), usbMIDI.getData2());
             break;
 
         default:
@@ -54,19 +54,19 @@ void MidiInHandler::update() {
     }
 }
 
-void MidiInHandler::handleCcMessage(MidiChannel channel, MidiCC cc, uint8_t value) {
+void MidiInHandler::handleControlChange(MidiChannel channel, MidiCC cc, uint8_t value) {
     for (auto& callback : ccCallbacks_) {
         callback(channel, cc, value);
     }
 }
 
-void MidiInHandler::handleNoteOnMessage(MidiChannel channel, MidiNote note, uint8_t velocity) {
+void MidiInHandler::handleNoteOn(MidiChannel channel, MidiNote note, uint8_t velocity) {
     for (auto& callback : noteOnCallbacks_) {
         callback(channel, note, velocity);
     }
 }
 
-void MidiInHandler::handleNoteOffMessage(MidiChannel channel, MidiNote note, uint8_t velocity) {
+void MidiInHandler::handleNoteOff(MidiChannel channel, MidiNote note, uint8_t velocity) {
     for (auto& callback : noteOffCallbacks_) {
         callback(channel, note, velocity);
     }

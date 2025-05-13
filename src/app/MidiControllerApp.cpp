@@ -1,17 +1,17 @@
 #include "MidiControllerApp.hpp"
 
-#include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "adapters/primary/ui/UIEventListener.hpp"
+#include "adapters/primary/ui/ViewManager.hpp"
+#include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "app/subsystems/MidiSubsystem.hpp"
 #include "core/controllers/InputController.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"
 #include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
-#include "core/domain/events/core/EventBus.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
-#include "adapters/primary/ui/ViewManager.hpp"
 
 MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> container)
     : m_container(container) {}
@@ -22,7 +22,7 @@ MidiControllerApp::~MidiControllerApp() {
         m_uiEventListener->unsubscribe();
         m_uiEventListener.reset();
     }
-    
+
     // Nettoyer les ressources dans l'ordre inverse de leur création
     m_eventEnabledMidiOut.reset();
     m_uiSystem.reset();
@@ -82,34 +82,36 @@ Result<bool, std::string> MidiControllerApp::init() {
     // ===========================================================================
     // Configuration des adaptateurs pour le système d'événements
     // ===========================================================================
-    
+
     // 1. Obtenir les ports nécessaires
     auto midiPort = m_container->resolve<MidiOutputPort>();
     auto viewManager = m_container->resolve<ViewManager>();
-    
+
     if (!midiPort || !viewManager) {
-        return Result<bool, std::string>::error("Failed to resolve required ports for event system");
+        return Result<bool, std::string>::error(
+            "Failed to resolve required ports for event system");
     }
-    
+
     // 2. Créer le décorateur MidiOutputPort qui émet des événements
     m_eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*midiPort);
-    
+
     // 3. Remplacer le port MIDI standard par notre version avec événements
     m_container->registerDependency<MidiOutputPort>(m_eventEnabledMidiOut);
-    
+
     // 4. Créer l'écouteur d'événements UI
     m_uiEventListener = std::make_unique<UIEventListener>(*viewManager);
-    
+
     // 5. S'abonner aux événements
     m_uiEventListener->subscribe();
-    
+
     // 6. Vérifier que l'abonnement a fonctionné
     Serial.print(F("\nUI Event Listener subscription status: "));
-    Serial.println(EventBus::getInstance().exists(m_uiEventListener->getSubscriptionId()) ? 
-                   F("SUCCESS") : F("FAILED"));
+    Serial.println(EventBus::getInstance().exists(m_uiEventListener->getSubscriptionId())
+                       ? F("SUCCESS")
+                       : F("FAILED"));
     Serial.print(F("Total event bus subscribers: "));
     Serial.println(EventBus::getInstance().getCount());
-    
+
     // ===========================================================================
     // Configuration des callbacks MIDI après l'initialisation de tous les sous-systèmes
     // Note: Cette configuration est centralisée ici pour éviter les redondances
@@ -129,19 +131,18 @@ Result<bool, std::string> MidiControllerApp::init() {
             });
 
         // 2. Configuration du callback pour les boutons d'encodeurs
-        inputController->setMidiEncoderButtonCallback(
-            [&midiMapper](EncoderId id, bool pressed) {
-                midiMapper.processEncoderButton(id, pressed);
-            });
+        inputController->setMidiEncoderButtonCallback([&midiMapper](EncoderId id, bool pressed) {
+            midiMapper.processEncoderButton(id, pressed);
+        });
 
         // 3. Configuration du callback pour les boutons standard
-        inputController->setMidiButtonCallback(
-            [&midiMapper](ButtonId id, bool pressed) {
-                midiMapper.processButtonPress(id, pressed);
-            });
+        inputController->setMidiButtonCallback([&midiMapper](ButtonId id, bool pressed) {
+            midiMapper.processButtonPress(id, pressed);
+        });
     } else {
         // Journalisation d'erreur si les composants nécessaires ne sont pas disponibles
-        return Result<bool, std::string>::error("Failed to resolve components for MIDI callbacks setup");
+        return Result<bool, std::string>::error(
+            "Failed to resolve components for MIDI callbacks setup");
     }
 
     return Result<bool, std::string>::success(true);
