@@ -1,4 +1,4 @@
-#include "core/controllers/UIController.hpp"
+#include "UIController.hpp"
 
 #include <Arduino.h>
 

@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include <functional>
+#include <vector>
 
 #include "config/common/CommonIncludes.hpp"
 #include "core/controllers/InputController.hpp"
@@ -18,13 +18,13 @@ public:
      * @brief Type de callback pour les événements de bouton
      */
     using ButtonStateChangedCallback = std::function<void(uint8_t, bool)>;
-    
+
     /**
      * @brief Définit le callback pour les changements d'état des boutons
      * @param callback Fonction à appeler
      */
     void setOnButtonStateChangedCallback(ButtonStateChangedCallback callback);
-    
+
     /**
      * @brief Définit le contrôleur d'entrée à utiliser
      * @param inputController Contrôleur d'entrée

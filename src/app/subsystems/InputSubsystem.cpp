@@ -2,16 +2,15 @@
 
 #include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
-#include "core/domain/interfaces/IConfiguration.hpp"
-#include "core/domain/interfaces/IMidiSystem.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
 #include "core/controllers/InputController.hpp"
-#include "core/use_cases/ProcessEncoders.hpp"
+#include "core/domain/interfaces/IConfiguration.hpp"
+#include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/use_cases/ProcessButtons.hpp"
+#include "core/use_cases/ProcessEncoders.hpp"
 
 InputSubsystem::InputSubsystem(std::shared_ptr<DependencyContainer> container)
-    : container_(container), initialized_(false) {
-}
+    : container_(container), initialized_(false) {}
 
 Result<bool, std::string> InputSubsystem::init() {
     if (initialized_) {
@@ -33,7 +32,7 @@ Result<bool, std::string> InputSubsystem::init() {
     if (!encoderManager_) {
         return Result<bool, std::string>::error("Failed to create EncoderManager");
     }
-    
+
     buttonManager_ = std::make_shared<DigitalButtonManager>(buttonConfigs);
     if (!buttonManager_) {
         return Result<bool, std::string>::error("Failed to create DigitalButtonManager");
@@ -44,12 +43,12 @@ Result<bool, std::string> InputSubsystem::init() {
     if (!processEncoders_) {
         return Result<bool, std::string>::error("Failed to create ProcessEncoders");
     }
-    
+
     processButtons_ = std::make_unique<ProcessButtons>(buttonManager_->getButtons());
     if (!processButtons_) {
         return Result<bool, std::string>::error("Failed to create ProcessButtons");
     }
-    
+
     // Récupérer InputController depuis le conteneur
     inputController_ = container_->resolve<InputController>();
     if (!inputController_) {
@@ -84,33 +83,35 @@ void InputSubsystem::update() {
     if (buttonManager_) {
         buttonManager_->updateAll();
     }
-    
+
     // Traiter les événements d'encodeurs
     if (processEncoders_) {
         processEncoders_->update();
     }
-    
+
     // Traiter les événements de boutons
     if (processButtons_) {
         processButtons_->update();
     }
 }
 
-Result<bool, std::string> InputSubsystem::configureEncoders(const std::vector<EncoderConfig>& encoderConfigs) {
+Result<bool, std::string> InputSubsystem::configureEncoders(
+    const std::vector<EncoderConfig>& encoderConfigs) {
     if (!encoderManager_) {
         return Result<bool, std::string>::error("EncoderManager is not initialized");
     }
-    
+
     // Note: cette méthode n'est plus utilisée car les encodeurs sont configurés dans le
     // constructeur Mais nous la conservons pour l'API publique
     return Result<bool, std::string>::success(true);
 }
 
-Result<bool, std::string> InputSubsystem::configureButtons(const std::vector<ButtonConfig>& buttonConfigs) {
+Result<bool, std::string> InputSubsystem::configureButtons(
+    const std::vector<ButtonConfig>& buttonConfigs) {
     if (!buttonManager_) {
         return Result<bool, std::string>::error("ButtonManager is not initialized");
     }
-    
+
     // Note: cette méthode n'est plus utilisée car les boutons sont configurés dans le constructeur
     // Mais nous la conservons pour l'API publique
     return Result<bool, std::string>::success(true);

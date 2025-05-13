@@ -1,5 +1,5 @@
-#include "core/controllers/InputController.hpp"
-#include "core/controllers/UIController.hpp"
+#include "InputController.hpp"
+#include "UIController.hpp"
 
 InputController::InputController(std::shared_ptr<NavigationConfigService> navigationConfig)
     : m_navigationConfig(navigationConfig), m_uiController(nullptr) {

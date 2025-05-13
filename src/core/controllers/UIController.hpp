@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "adapters/primary/ui/ViewManager.hpp"
-#include "core/controllers/MenuController.hpp"
+#include "MenuController.hpp"
 #include "core/domain/types.hpp"
 
 /**

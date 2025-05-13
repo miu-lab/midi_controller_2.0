@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include <functional>
+#include <vector>
 
 #include "config/common/CommonIncludes.hpp"
 #include "core/controllers/InputController.hpp"
@@ -18,24 +18,24 @@ public:
      * @brief Types de callbacks pour la rotation des encodeurs
      */
     using EncoderTurnedCallback = std::function<void(uint8_t, int32_t, int8_t)>;
-    
+
     /**
      * @brief Types de callbacks pour les boutons d'encodeurs
      */
     using EncoderButtonCallback = std::function<void(uint8_t, bool)>;
-    
+
     /**
      * @brief Définit le callback pour la rotation des encodeurs
      * @param callback Fonction à appeler
      */
     void setOnEncoderTurnedCallback(EncoderTurnedCallback callback);
-    
+
     /**
      * @brief Définit le callback pour les boutons d'encodeurs
      * @param callback Fonction à appeler
      */
     void setOnEncoderButtonCallback(EncoderButtonCallback callback);
-    
+
     /**
      * @brief Définit le contrôleur d'entrée à utiliser
      * @param inputController Contrôleur d'entrée

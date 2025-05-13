@@ -1,4 +1,4 @@
-#include "core/controllers/ProfileController.hpp"
+#include "ProfileController.hpp"
 
 ProfileController::ProfileController(ProfileStoragePort& profileManager)
     : profileManager_(profileManager) {}

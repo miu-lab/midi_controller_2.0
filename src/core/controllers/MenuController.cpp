@@ -1,4 +1,4 @@
-#include "core/controllers/MenuController.hpp"
+#include "MenuController.hpp"
 
 MenuController::MenuController(ViewManager& viewManager, CommandManager& commandManager)
     : viewManager_(viewManager), commandManager_(commandManager) {}
