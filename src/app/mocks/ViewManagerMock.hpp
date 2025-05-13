@@ -6,6 +6,19 @@ class ViewManagerMock : public ViewManager {
 public:
     explicit ViewManagerMock(DisplayPort& display) : display_(display) {}
 
+    // Nouvelles méthodes ajoutées
+    bool init() override {
+        return true; // Mock: toujours réussi
+    }
+    
+    void update() override {
+        // Mock: ne fait rien
+    }
+    
+    void render() override {
+        // Mock: ne fait rien
+    }
+
     // Implémentation des méthodes virtuelles pures
     void enterMenu() override {}
 
@@ -47,7 +60,7 @@ public:
 
     void scrollDebugLogByDelta(int8_t delta) override {}
 
-    // Implémentation des nouvelles méthodes pour la mise à jour de l'interface
+    // Implémentation des méthodes pour la mise à jour de l'interface
     void updateControlMonitorInfo(uint8_t controlId, const String& type, 
                                 uint8_t channel, uint8_t number, uint8_t value) override {
         // Mock: ne fait rien

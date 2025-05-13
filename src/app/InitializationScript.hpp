@@ -6,7 +6,9 @@
 
 #include "adapters/secondary/midi/MidiMapper.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
+#include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
+#include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "app/services/NavigationConfigService.hpp"
 #include "app/subsystems/ConfigurationSubsystem.hpp"
@@ -55,9 +57,19 @@ public:
         auto midiOut = std::make_shared<TeensyUsbMidiOut>();
         container->registerDependency<MidiOutputPort>(midiOut);
 
-        // Utilisation de notre mock pour l'affichage
-        auto display = std::make_shared<DisplayMock>();
-        container->registerDependency<DisplayPort>(display);
+        // Création de l'adaptateur d'affichage SSD1306
+        auto ssd1306Display = std::make_shared<Ssd1306Display>();
+        bool displayInitSuccess = ssd1306Display->init();
+        
+        // Si l'initialisation de l'écran échoue, utiliser un MockDisplay
+        if (!displayInitSuccess) {
+            Serial.println(F("SSD1306 initialization failed. Using MockDisplay instead."));
+            auto displayMock = std::make_shared<DisplayMock>();
+            container->registerDependency<DisplayPort>(displayMock);
+        } else {
+            Serial.println(F("SSD1306 initialized successfully."));
+            container->registerDependency<DisplayPort>(ssd1306Display);
+        }
 
         auto profileManager = std::make_shared<ProfileManager>();
         container->registerDependency<ProfileStoragePort>(profileManager);
@@ -80,13 +92,37 @@ public:
         container->registerDependency<MidiSubsystem>(midiSystem);
         container->registerDependency<IMidiSystem>(midiSystem);
 
+        // Initialisation du sous-système UI avec l'option d'UI complète
         auto uiSystem = std::make_shared<UISubsystem>(container);
+        auto uiResult = uiSystem->init(true); // true = activer l'UI complète
+        
+        if (uiResult.isError()) {
+            Serial.print(F("UISubsystem initialization failed: "));
+            if (auto err = uiResult.error()) {
+                Serial.println(err->c_str());
+            } else {
+                Serial.println(F("Unknown error"));
+            }
+        } else {
+            Serial.println(F("UISubsystem initialized successfully."));
+        }
+        
         container->registerDependency<UISubsystem>(uiSystem);
         container->registerDependency<IUISystem>(uiSystem);
 
-        // Création des composants d'interface utilisateur avec le mock ViewManager
-        auto viewManager = std::make_shared<ViewManagerMock>(*display);
-        container->registerDependency<ViewManager>(viewManager);
+        // Récupérer le ViewManager configuré dans UISubsystem
+        auto viewManager = container->resolve<ViewManager>();
+        
+        if (!viewManager) {
+            Serial.println(F("Warning: ViewManager not found, creating DefaultViewManager."));
+            auto display = container->resolve<DisplayPort>();
+            auto defaultViewManager = std::make_shared<DefaultViewManager>(display);
+            if (!defaultViewManager->init()) {
+                Serial.println(F("DefaultViewManager initialization failed."));
+            }
+            viewManager = defaultViewManager;
+            container->registerDependency<ViewManager>(viewManager);
+        }
 
         // Pour UIController, nous avons besoin d'un MenuController d'abord
         auto menuController = std::make_shared<MenuController>(*viewManager, *commandManager);
@@ -102,9 +138,6 @@ public:
 
         // Configurer les interactions entre contrôleurs
         inputController->setUIController(uiController);
-
-        // Note: La configuration des callbacks MIDI est gérée par MidiControllerApp::init()
-        // pour éviter les redondances et assurer une initialisation cohérente du système.
 
         // Créer InputSubsystem après avoir configuré l'InputController
         auto inputSystem = std::make_shared<InputSubsystem>(container);
