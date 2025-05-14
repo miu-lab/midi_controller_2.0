@@ -20,6 +20,12 @@ public:
     explicit EventEnabledMidiOut(MidiOutputPort& basePort) : m_basePort(basePort) {
         Serial.println(F("EventEnabledMidiOut decorator created"));
     }
+    
+    /**
+     * @brief Vérifie si le port MIDI supporte les événements
+     * @return Toujours true pour cette classe
+     */
+    bool supportsEvents() const override { return true; }
 
     /**
      * @brief Envoie un message MIDI Control Change et émet un événement

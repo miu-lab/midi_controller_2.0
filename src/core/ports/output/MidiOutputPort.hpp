@@ -13,6 +13,25 @@ public:
      * @brief Destructeur virtuel
      */
     virtual ~MidiOutputPort() = default;
+    
+    /**
+     * @brief Vérifie si le port MIDI supporte les événements
+     * @return true si le port supporte les événements, false sinon
+     */
+    virtual bool supportsEvents() const { return false; }
+    
+    /**
+     * @brief Envoie un message CC avec ID de source et publie un événement
+     * Méthode par défaut qui ne fait rien - à surcharger par les classes qui supportent les événements
+     * @param ch Canal MIDI (0-15)
+     * @param cc Numéro de contrôleur (0-127)
+     * @param value Valeur (0-127)
+     * @param source ID de la source (encodeur, bouton, etc.)
+     */
+    virtual void sendCc(MidiChannel ch, MidiCC cc, uint8_t value, uint8_t source) {
+        // Par défaut, appeler simplement sendControlChange
+        sendControlChange(ch, cc, value);
+    }
 
     /**
      * @brief Envoie un message MIDI Control Change

@@ -11,6 +11,30 @@ public:
      * @brief Destructeur virtuel
      */
     virtual ~DisplayPort() = default;
+    
+    /**
+     * @brief Vérifie si l'affichage est de type SSD1306
+     * @return true si c'est un SSD1306, false sinon
+     */
+    virtual bool isSsd1306Display() const { return false; }
+    
+    /**
+     * @brief Obtient le type d'affichage
+     * @return Chaîne de caractères représentant le type
+     */
+    virtual const char* getDisplayType() const { return "BaseDisplay"; }
+    
+    /**
+     * @brief Obtient les statistiques de performance de l'affichage
+     * @param avgTime Temps moyen en microsecondes (sortie)
+     * @param maxTime Temps maximum en microsecondes (sortie)
+     * @param minTime Temps minimum en microsecondes (sortie)
+     */
+    virtual void getPerformanceStats(unsigned long& avgTime, unsigned long& maxTime, unsigned long& minTime) const {
+        avgTime = 0;
+        maxTime = 0;
+        minTime = 0;
+    }
 
     /**
      * @brief Efface l'écran

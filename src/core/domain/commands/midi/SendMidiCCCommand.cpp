@@ -30,10 +30,10 @@ void SendMidiCCCommand::execute() {
         hasExecuted_ = true;
     }
 
-    // Tenter d'utiliser l'interface étendue si disponible
-    auto* eventMidiOut = dynamic_cast<EventEnabledMidiOut*>(&midiOut_);
-    if (eventMidiOut) {
-        eventMidiOut->sendCc(channel_, cc_, value_, source_);
+    // Vérifier si le port supporte les événements via la méthode virtuelle
+    if (midiOut_.supportsEvents()) {
+        // Utiliser l'interface étendue avec l'ID de source
+        midiOut_.sendCc(channel_, cc_, value_, source_);
     } else {
         // Utiliser l'interface standard sans l'ID de source
         midiOut_.sendControlChange(channel_, cc_, value_);

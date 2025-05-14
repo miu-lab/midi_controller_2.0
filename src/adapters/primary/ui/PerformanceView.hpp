@@ -2,6 +2,8 @@
 
 #include "View.hpp"
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
+#include "core/utils/AppStrings.hpp"
+#include "core/utils/FlashStrings.hpp"
 #include <memory>
 
 class PerformanceView : public View {
@@ -19,34 +21,44 @@ public:
     void render() override {
         if (!active_ || !display_) return;
         
-        // Tenter de convertir en Ssd1306Display
-        auto* ssd1306Display = dynamic_cast<Ssd1306Display*>(display_.get());
-        if (!ssd1306Display) return;
+        // Utiliser les méthodes virtuelles au lieu de dynamic_cast
+        if (!display_->isSsd1306Display()) return;
         
         display_->clear();
         
-        display_->drawText(0, 0, "Display Performance:");
+        // Utiliser des chaînes en mémoire Flash
+        char buffer[32]; // Buffer temporaire pour les chaînes
         
-        char buffer[32];
+        // Afficher le titre
+        FlashStrings::copy(buffer, sizeof(buffer), PERF_TITLE);
+        display_->drawText(0, 0, buffer);
         
-        snprintf(buffer, sizeof(buffer), "Avg: %lu us", ssd1306Display->getAverageUpdateTime());
+        // Récupérer les statistiques via la méthode virtuelle
+        unsigned long avgTime = 0, maxTime = 0, minTime = 0;
+        display_->getPerformanceStats(avgTime, maxTime, minTime);
+        
+        // Afficher les statistiques
+        char temp[32];
+        FlashStrings::copy(temp, sizeof(temp), PERF_AVG);
+        snprintf(buffer, sizeof(buffer), temp, avgTime);
         display_->drawText(0, 16, buffer);
         
-        snprintf(buffer, sizeof(buffer), "Max: %lu us", ssd1306Display->getMaxUpdateTime());
+        FlashStrings::copy(temp, sizeof(temp), PERF_MAX);
+        snprintf(buffer, sizeof(buffer), temp, maxTime);
         display_->drawText(0, 24, buffer);
         
-        snprintf(buffer, sizeof(buffer), "Min: %lu us", ssd1306Display->getMinUpdateTime());
+        FlashStrings::copy(temp, sizeof(temp), PERF_MIN);
+        snprintf(buffer, sizeof(buffer), temp, minTime);
         display_->drawText(0, 32, buffer);
-        
-        const unsigned long avgTime = ssd1306Display->getAverageUpdateTime();
         if (avgTime > 0) {
             float fps = 1000000.0f / avgTime;
-            snprintf(buffer, sizeof(buffer), "FPS: %.1f", fps);
+            FlashStrings::copy(temp, sizeof(temp), PERF_FPS);
+            snprintf(buffer, sizeof(buffer), temp, fps);
             display_->drawText(0, 48, buffer);
         }
         
         // Dessiner un graphique simple
-        drawPerformanceBar(64, 42, 60, 10, ssd1306Display->getAverageUpdateTime(), 20000);
+        drawPerformanceBar(64, 42, 60, 10, avgTime, 20000);
         
         // Ne pas appeler display_->update() directement 
         // mais laisser le gestionnaire d'affichage s'en charger

@@ -1,6 +1,8 @@
 #include "Ssd1306Display.hpp"
 
 #include <Arduino.h>
+#include "core/utils/AppStrings.hpp"
+#include "core/utils/FlashStrings.hpp"
 
 Ssd1306Display::Ssd1306Display(uint16_t width, uint16_t height, uint8_t i2cAddress,
                                TwoWire& wireInstance)
@@ -17,15 +19,19 @@ bool Ssd1306Display::init(int8_t resetPin) {
         return true;
     }
 
-    Serial.println(F("SSD1306: Initializing display..."));
+    char buffer[64]; // Buffer temporaire pour les chaînes Flash
+    FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306);
+    Serial.println(buffer);
 
     // Initialisation de l'écran SSD1306
     if (!display_.begin(SSD1306_SWITCHCAPVCC, i2cAddress_, resetPin)) {
-        Serial.println(F("SSD1306 allocation failed"));
+        FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306_FAILED);
+        Serial.println(buffer);
         return false;
     }
 
-    Serial.println(F("SSD1306: Display initialized successfully"));
+    FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306_SUCCESS);
+    Serial.println(buffer);
 
     // Effacer complètement l'écran et le buffer
     display_.clearDisplay();
@@ -50,7 +56,8 @@ bool Ssd1306Display::init(int8_t resetPin) {
     display_.clearDisplay();
     display_.display();
 
-    Serial.println(F("SSD1306: Display ready"));
+    FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306_READY);
+    Serial.println(buffer);
     return true;
 }
 
@@ -102,7 +109,9 @@ void Ssd1306Display::drawCircle(int x, int y, int radius, bool fill) {
 
 void Ssd1306Display::update() {
     if (!initialized_) {
-        Serial.println(F("SSD1306: Update called but display not initialized"));
+        char buffer[64];
+        FlashStrings::copy(buffer, sizeof(buffer), SSD1306_NOT_INITIALIZED);
+        Serial.println(buffer);
         return;
     }
 

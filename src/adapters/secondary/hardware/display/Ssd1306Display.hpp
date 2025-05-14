@@ -18,6 +18,29 @@
 class Ssd1306Display : public DisplayPort {
 public:
     /**
+     * @brief Vérifie si l'affichage est de type SSD1306
+     * @return Toujours true pour cette classe
+     */
+    bool isSsd1306Display() const override { return true; }
+    
+    /**
+     * @brief Obtient le type d'affichage
+     * @return "SSD1306"
+     */
+    const char* getDisplayType() const override { return "SSD1306"; }
+    
+    /**
+     * @brief Obtient les statistiques de performance de l'affichage
+     * @param avgTime Temps moyen en microsecondes (sortie)
+     * @param maxTime Temps maximum en microsecondes (sortie)
+     * @param minTime Temps minimum en microsecondes (sortie)
+     */
+    void getPerformanceStats(unsigned long& avgTime, unsigned long& maxTime, unsigned long& minTime) const override {
+        avgTime = getAverageUpdateTime();
+        maxTime = getMaxUpdateTime();
+        minTime = getMinUpdateTime();
+    }
+    /**
      * @brief Constructeur
      * @param width Largeur en pixels de l'écran (typiquement 128)
      * @param height Hauteur en pixels de l'écran (typiquement 64 ou 32)

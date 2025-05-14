@@ -118,7 +118,12 @@ Result<bool, std::string> MidiControllerApp::init() {
     // avec InitializationScript.hpp et garantir une initialisation cohérente
     // ===========================================================================
     auto inputController = m_container->resolve<InputController>();
-    auto midiSubsystem = std::dynamic_pointer_cast<MidiSubsystem>(m_midiSystem);
+    
+    // Utiliser static_cast au lieu de dynamic_pointer_cast car nous savons que m_midiSystem est un MidiSubsystem
+    // Ceci est sûr car InitializationScript.hpp crée toujours un MidiSubsystem
+    auto midiSubsystem = static_cast<MidiSubsystem*>(m_midiSystem.get()) ? 
+                        std::shared_ptr<MidiSubsystem>(m_midiSystem, static_cast<MidiSubsystem*>(m_midiSystem.get())) : 
+                        nullptr;
 
     if (inputController && midiSubsystem) {
         // Récupérer une référence au MidiMapper
