@@ -33,12 +33,16 @@ FLASH_STRING(MSG_EXIT, "Exit");
 // ============================================================================
 // Messages d'erreur
 // ============================================================================
+// Format commun pour les erreurs d'initialisation
+FLASH_STRING(FMT_INIT_FAILED, "%s initialization failed");
+// Composants pour utiliser avec le format d'erreur d'initialisation
+FLASH_STRING(COMP_DISPLAY, "Display");
+FLASH_STRING(COMP_MIDI, "MIDI");
+FLASH_STRING(COMP_CONFIG, "Configuration");
+FLASH_STRING(COMP_INPUT, "Input");
+FLASH_STRING(COMP_UI, "UI");
+// Autres erreurs génériques
 FLASH_STRING(ERR_INIT_FAILED, "Initialization failed");
-FLASH_STRING(ERR_DISPLAY_INIT_FAILED, "Display initialization failed");
-FLASH_STRING(ERR_MIDI_INIT_FAILED, "MIDI initialization failed");
-FLASH_STRING(ERR_CONFIG_INIT_FAILED, "Configuration initialization failed");
-FLASH_STRING(ERR_INPUT_INIT_FAILED, "Input initialization failed");
-FLASH_STRING(ERR_UI_INIT_FAILED, "UI initialization failed");
 FLASH_STRING(ERR_INVALID_PARAMETER, "Invalid parameter");
 FLASH_STRING(ERR_OUT_OF_MEMORY, "Out of memory");
 
@@ -81,26 +85,30 @@ FLASH_STRING(MIDI_CHANNEL, "Channel");
 // ============================================================================
 // Messages de débogage
 // ============================================================================
-FLASH_STRING(DBG_EVENT_ENABLED_MIDI_OUT, "EventEnabledMidiOut decorator created");
-FLASH_STRING(DBG_SENDING_CC, "####### EventEnabledMidiOut: Sending CC #######");
-// Format commun pour les labels de débogage
-FLASH_STRING(FMT_LABEL, "%s: ");
-// Libellés courts pour utiliser avec FMT_LABEL
-FLASH_STRING(LBL_SOURCE_ID, "Source ID");
-FLASH_STRING(LBL_CHANNEL, "Channel");
-FLASH_STRING(LBL_CC, "CC");
-FLASH_STRING(LBL_VALUE, "Value");
-FLASH_STRING(DBG_SEPARATOR, "############################################");
+FLASH_STRING(DBG_EVENT_ENABLED_MIDI_OUT, "EventEnabledMidiOut created");
+// Simplification des longs séparateurs
+FLASH_STRING(DBG_SENDING_CC, "--- EventEnabledMidiOut: Sending CC ---");
+FLASH_STRING(DBG_SEPARATOR, "-----------------------------------");
+// Format compacte pour les étiquettes de débogage
+FLASH_STRING(DBG_FMT, "%s:%d");
+FLASH_STRING(DBG_SRC, "Src");
+FLASH_STRING(DBG_CH, "Ch");
+FLASH_STRING(DBG_CC, "CC");
+FLASH_STRING(DBG_VAL, "Val");
 
 // ============================================================================
 // Messages d'initialisation
 // ============================================================================
-FLASH_STRING(INIT_SSD1306, "SSD1306: Initializing display...");
-FLASH_STRING(INIT_SSD1306_FAILED, "SSD1306 allocation failed");
-FLASH_STRING(INIT_SSD1306_SUCCESS, "SSD1306: Display initialized successfully");
-FLASH_STRING(INIT_SSD1306_READY, "SSD1306: Display ready");
-FLASH_STRING(INIT_CREATING_DISPLAY_TASK, "UISubsystem: Creating display task...");
-FLASH_STRING(INIT_DISPLAY_TASK_ADDED, "UISubsystem: Display task added with index ");
-FLASH_STRING(INIT_EVENT_LISTENER, "UISubsystem: Created and subscribed DisplayEventListener");
-FLASH_STRING(INIT_VIEW_MANAGER_LISTENER, "UISubsystem: Created and subscribed ViewManagerEventListener");
-FLASH_STRING(SSD1306_NOT_INITIALIZED, "SSD1306: Update called but display not initialized");
+// Préfixes communs pour les modules
+FLASH_STRING(PFX_SSD1306, "SSD1306:");
+FLASH_STRING(PFX_UI, "UISubsystem:");
+// Messages spécifiques avec formats compacts
+FLASH_STRING(MSG_INIT_DISPLAY, " Initializing display...");
+FLASH_STRING(MSG_ALLOC_FAILED, " allocation failed");
+FLASH_STRING(MSG_INIT_SUCCESS, " Display initialized successfully");
+FLASH_STRING(MSG_DISPLAY_READY, " Display ready");
+FLASH_STRING(MSG_CREATING_TASK, " Creating display task...");
+FLASH_STRING(MSG_TASK_ADDED, " Display task added with index ");
+FLASH_STRING(MSG_EVENT_LISTENER, " Created and subscribed DisplayEventListener");
+FLASH_STRING(MSG_VIEW_MANAGER, " Created and subscribed ViewManagerEventListener");
+FLASH_STRING(MSG_NOT_INITIALIZED, " Update called but display not initialized");

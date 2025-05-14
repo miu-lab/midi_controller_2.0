@@ -19,18 +19,31 @@ bool Ssd1306Display::init(int8_t resetPin) {
         return true;
     }
 
-    char buffer[64]; // Buffer temporaire pour les chaînes Flash
-    FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306);
+    char buffer[80]; // Buffer temporaire pour les chaînes composées
+    char temp[32];  // Buffer pour les fragments
+    
+    // Construire "SSD1306: Initializing display..."
+    FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
+    strcpy(buffer, temp);
+    FlashStrings::copy(temp, sizeof(temp), MSG_INIT_DISPLAY);
+    strcat(buffer, temp);
     Serial.println(buffer);
 
     // Initialisation de l'écran SSD1306
     if (!display_.begin(SSD1306_SWITCHCAPVCC, i2cAddress_, resetPin)) {
-        FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306_FAILED);
+        // Construire "SSD1306 allocation failed"
+        strcpy(buffer, "SSD1306");
+        FlashStrings::copy(temp, sizeof(temp), MSG_ALLOC_FAILED);
+        strcat(buffer, temp);
         Serial.println(buffer);
         return false;
     }
 
-    FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306_SUCCESS);
+    // Construire "SSD1306: Display initialized successfully"
+    FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
+    strcpy(buffer, temp);
+    FlashStrings::copy(temp, sizeof(temp), MSG_INIT_SUCCESS);
+    strcat(buffer, temp);
     Serial.println(buffer);
 
     // Effacer complètement l'écran et le buffer
@@ -56,7 +69,11 @@ bool Ssd1306Display::init(int8_t resetPin) {
     display_.clearDisplay();
     display_.display();
 
-    FlashStrings::copy(buffer, sizeof(buffer), INIT_SSD1306_READY);
+    // Construire "SSD1306: Display ready"
+    FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
+    strcpy(buffer, temp);
+    FlashStrings::copy(temp, sizeof(temp), MSG_DISPLAY_READY);
+    strcat(buffer, temp);
     Serial.println(buffer);
     return true;
 }
@@ -109,8 +126,14 @@ void Ssd1306Display::drawCircle(int x, int y, int radius, bool fill) {
 
 void Ssd1306Display::update() {
     if (!initialized_) {
-        char buffer[64];
-        FlashStrings::copy(buffer, sizeof(buffer), SSD1306_NOT_INITIALIZED);
+        char buffer[80];
+        char temp[32];
+        
+        // Construire "SSD1306: Update called but display not initialized"
+        FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
+        strcpy(buffer, temp);
+        FlashStrings::copy(temp, sizeof(temp), MSG_NOT_INITIALIZED);
+        strcat(buffer, temp);
         Serial.println(buffer);
         return;
     }

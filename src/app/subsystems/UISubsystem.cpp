@@ -6,6 +6,8 @@
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "core/TaskScheduler.hpp"
 #include "core/tasks/DisplayUpdateTask.hpp"
+#include "core/utils/AppStrings.hpp"
+#include "core/utils/FlashStrings.hpp"
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {}
@@ -58,13 +60,26 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         }
 
         // Créer la tâche d'affichage et l'écouteur d'événements
-        Serial.println(F("UISubsystem: Creating display task..."));
+        char buffer[80];
+        char temp[32];
+        
+        // Construire "UISubsystem: Creating display task..."
+        FlashStrings::copy(temp, sizeof(temp), PFX_UI);
+        strcpy(buffer, temp);
+        FlashStrings::copy(temp, sizeof(temp), MSG_CREATING_TASK);
+        strcat(buffer, temp);
+        Serial.println(buffer);
         displayTask_ = std::make_shared<DisplayUpdateTask>(display_, 50);  // 50ms = 20fps max
         int taskIndex = scheduler.addTask(displayTask_->getTaskFunction(),
                                           displayTask_->getIntervalMicros(),
                                           displayTask_->getPriority(),
                                           displayTask_->getName());
-        Serial.print(F("UISubsystem: Display task added with index "));
+        // Afficher "UISubsystem: Display task added with index X"
+        FlashStrings::copy(temp, sizeof(temp), PFX_UI);
+        strcpy(buffer, temp);
+        FlashStrings::copy(temp, sizeof(temp), MSG_TASK_ADDED);
+        strcat(buffer, temp);
+        Serial.print(buffer);
         Serial.println(taskIndex);
 
         // Forcer une mise à jour immédiate pour vérifier que l'écran fonctionne
@@ -78,7 +93,12 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         // Créer l'écouteur d'événements UI et l'abonner aux événements
         eventListener_ = std::make_unique<ViewManagerEventListener>(*viewManager_);
         eventListener_->subscribe();
-        Serial.println(F("UISubsystem: Created and subscribed ViewManagerEventListener"));
+        // Afficher "UISubsystem: Created and subscribed ViewManagerEventListener"
+        FlashStrings::copy(temp, sizeof(temp), PFX_UI);
+        strcpy(buffer, temp);
+        FlashStrings::copy(temp, sizeof(temp), MSG_VIEW_MANAGER);
+        strcat(buffer, temp);
+        Serial.println(buffer);
 
         // Enregistrer le ViewManager dans le conteneur
         container_->registerImplementation<ViewManager, DefaultViewManager>(
