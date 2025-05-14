@@ -4,11 +4,11 @@
 
 #include <memory>
 
+#include "adapters/primary/ui/DefaultViewManager.hpp"
+#include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
-#include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
-#include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "app/services/NavigationConfigService.hpp"
 #include "app/subsystems/ConfigurationSubsystem.hpp"
@@ -23,9 +23,6 @@
 #include "core/ports/output/DisplayPort.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
 #include "core/ports/output/ProfileStoragePort.hpp"
-
-// Importer tous les mocks dans un seul fichier d'inclusion
-#include "app/mocks/AllMocks.hpp"
 
 /**
  * @brief Script d'initialisation pour configurer le conteneur de dépendances
@@ -60,12 +57,10 @@ public:
         // Création de l'adaptateur d'affichage SSD1306
         auto ssd1306Display = std::make_shared<Ssd1306Display>();
         bool displayInitSuccess = ssd1306Display->init();
-        
+
         // Si l'initialisation de l'écran échoue, utiliser un MockDisplay
         if (!displayInitSuccess) {
             Serial.println(F("SSD1306 initialization failed. Using MockDisplay instead."));
-            auto displayMock = std::make_shared<DisplayMock>();
-            container->registerDependency<DisplayPort>(displayMock);
         } else {
             Serial.println(F("SSD1306 initialized successfully."));
             container->registerDependency<DisplayPort>(ssd1306Display);
@@ -94,8 +89,8 @@ public:
 
         // Initialisation du sous-système UI avec l'option d'UI complète
         auto uiSystem = std::make_shared<UISubsystem>(container);
-        auto uiResult = uiSystem->init(true); // true = activer l'UI complète
-        
+        auto uiResult = uiSystem->init(true);  // true = activer l'UI complète
+
         if (uiResult.isError()) {
             Serial.print(F("UISubsystem initialization failed: "));
             if (auto err = uiResult.error()) {
@@ -106,13 +101,13 @@ public:
         } else {
             Serial.println(F("UISubsystem initialized successfully."));
         }
-        
+
         container->registerDependency<UISubsystem>(uiSystem);
         container->registerDependency<IUISystem>(uiSystem);
 
         // Récupérer le ViewManager configuré dans UISubsystem
         auto viewManager = container->resolve<ViewManager>();
-        
+
         if (!viewManager) {
             Serial.println(F("Warning: ViewManager not found, creating DefaultViewManager."));
             auto display = container->resolve<DisplayPort>();
