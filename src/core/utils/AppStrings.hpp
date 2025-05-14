@@ -26,7 +26,8 @@ FLASH_STRING(MSG_BACK, "Back");
 FLASH_STRING(MSG_NEXT, "Next");
 FLASH_STRING(MSG_SAVE, "Save");
 FLASH_STRING(MSG_LOAD, "Load");
-FLASH_STRING(MSG_MENU, "Menu");
+// Utiliser MENU pour les deux contextes (MSG et VIEW)
+FLASH_STRING(MENU, "Menu");
 FLASH_STRING(MSG_EXIT, "Exit");
 
 // ============================================================================
@@ -44,7 +45,7 @@ FLASH_STRING(ERR_OUT_OF_MEMORY, "Out of memory");
 // ============================================================================
 // Noms des vues
 // ============================================================================
-FLASH_STRING(VIEW_MENU, "Menu");
+// VIEW_MENU utilise la définition commune MENU
 FLASH_STRING(VIEW_DEBUG, "Debug");
 FLASH_STRING(VIEW_CONTROL_MONITOR, "Control Monitor");
 FLASH_STRING(VIEW_CONTEXTUAL, "Main");
@@ -57,9 +58,11 @@ FLASH_STRING(VIEW_PERFORMANCE, "Performance");
 // Messages liés aux performances
 // ============================================================================
 FLASH_STRING(PERF_TITLE, "Display Performance:");
-FLASH_STRING(PERF_AVG, "Avg: %lu us");
-FLASH_STRING(PERF_MAX, "Max: %lu us");
-FLASH_STRING(PERF_MIN, "Min: %lu us");
+// Format commun pour les unités de mesure en microsecondes
+FLASH_STRING(FMT_MICROSECONDS, "%lu us");
+FLASH_STRING(FMT_AVG, "Avg: ");
+FLASH_STRING(FMT_MAX, "Max: ");
+FLASH_STRING(FMT_MIN, "Min: ");
 FLASH_STRING(PERF_FPS, "FPS: %.1f");
 
 // ============================================================================
@@ -80,10 +83,13 @@ FLASH_STRING(MIDI_CHANNEL, "Channel");
 // ============================================================================
 FLASH_STRING(DBG_EVENT_ENABLED_MIDI_OUT, "EventEnabledMidiOut decorator created");
 FLASH_STRING(DBG_SENDING_CC, "####### EventEnabledMidiOut: Sending CC #######");
-FLASH_STRING(DBG_SOURCE_ID, "Source ID: ");
-FLASH_STRING(DBG_CHANNEL, "Channel: ");
-FLASH_STRING(DBG_CC, "CC: ");
-FLASH_STRING(DBG_VALUE, "Value: ");
+// Format commun pour les labels de débogage
+FLASH_STRING(FMT_LABEL, "%s: ");
+// Libellés courts pour utiliser avec FMT_LABEL
+FLASH_STRING(LBL_SOURCE_ID, "Source ID");
+FLASH_STRING(LBL_CHANNEL, "Channel");
+FLASH_STRING(LBL_CC, "CC");
+FLASH_STRING(LBL_VALUE, "Value");
 FLASH_STRING(DBG_SEPARATOR, "############################################");
 
 // ============================================================================

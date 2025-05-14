@@ -4,6 +4,8 @@
 #include "core/domain/events/core/Event.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
+#include "core/utils/AppStrings.hpp"
+#include "core/utils/FlashStrings.hpp"
 
 /**
  * @brief Adaptateur MIDI qui émet des événements en plus de transmettre les messages MIDI
@@ -37,13 +39,29 @@ public:
     void sendCc(MidiChannel ch, MidiCC cc, uint8_t value, uint8_t source = 0) {
         // Log de débogage
         Serial.print(F("\n####### EventEnabledMidiOut: Sending CC #######\n"));
-        Serial.print(F("Source ID: "));
+        // Utiliser les formats communs pour les messages de débogage
+        char buffer[32];
+        FlashStrings::copy(buffer, sizeof(buffer), FMT_LABEL);
+        
+        // Source ID
+        char labelBuffer[16];
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_SOURCE_ID);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(source);
-        Serial.print(F("Channel: "));
+        
+        // Channel
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_CHANNEL);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(ch);
-        Serial.print(F("CC: "));
+        
+        // CC
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_CC);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(cc);
-        Serial.print(F("Value: "));
+        
+        // Value
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_VALUE);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(value);
         Serial.println(F("############################################\n"));
 
@@ -75,12 +93,26 @@ public:
     void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
         // Log de débogage
         Serial.print(F("\n####### EventEnabledMidiOut: Sending Note On #######\n"));
-        Serial.print(F("Source ID: "));
+        // Utiliser les formats communs pour les messages de débogage
+        char buffer[32];
+        FlashStrings::copy(buffer, sizeof(buffer), FMT_LABEL);
+        
+        // Source ID
+        char labelBuffer[16];
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_SOURCE_ID);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(source);
-        Serial.print(F("Channel: "));
+        
+        // Channel
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_CHANNEL);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(ch);
+        
+        // Note
         Serial.print(F("Note: "));
         Serial.println(note);
+        
+        // Velocity
         Serial.print(F("Velocity: "));
         Serial.println(velocity);
         Serial.println(F("################################################\n"));
@@ -113,12 +145,26 @@ public:
     void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
         // Log de débogage
         Serial.print(F("\n####### EventEnabledMidiOut: Sending Note Off #######\n"));
-        Serial.print(F("Source ID: "));
+        // Utiliser les formats communs pour les messages de débogage
+        char buffer[32];
+        FlashStrings::copy(buffer, sizeof(buffer), FMT_LABEL);
+        
+        // Source ID
+        char labelBuffer[16];
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_SOURCE_ID);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(source);
-        Serial.print(F("Channel: "));
+        
+        // Channel
+        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), LBL_CHANNEL);
+        Serial.printf(buffer, labelBuffer);
         Serial.println(ch);
+        
+        // Note
         Serial.print(F("Note: "));
         Serial.println(note);
+        
+        // Velocity
         Serial.print(F("Velocity: "));
         Serial.println(velocity);
         Serial.println(F("################################################\n"));

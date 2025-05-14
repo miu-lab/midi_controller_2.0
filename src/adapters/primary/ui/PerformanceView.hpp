@@ -37,24 +37,32 @@ public:
         unsigned long avgTime = 0, maxTime = 0, minTime = 0;
         display_->getPerformanceStats(avgTime, maxTime, minTime);
         
-        // Afficher les statistiques
-        char temp[32];
-        FlashStrings::copy(temp, sizeof(temp), PERF_AVG);
-        snprintf(buffer, sizeof(buffer), temp, avgTime);
+        // Afficher les statistiques avec les nouveaux formats
+        char format[32];
+        
+        // Afficher Avg
+        FlashStrings::copy(buffer, sizeof(buffer), FMT_AVG);
         display_->drawText(0, 16, buffer);
+        FlashStrings::copy(format, sizeof(format), FMT_MICROSECONDS);
+        snprintf(buffer, sizeof(buffer), format, avgTime);
+        display_->drawText(32, 16, buffer);
         
-        FlashStrings::copy(temp, sizeof(temp), PERF_MAX);
-        snprintf(buffer, sizeof(buffer), temp, maxTime);
+        // Afficher Max
+        FlashStrings::copy(buffer, sizeof(buffer), FMT_MAX);
         display_->drawText(0, 24, buffer);
+        snprintf(buffer, sizeof(buffer), format, maxTime);
+        display_->drawText(32, 24, buffer);
         
-        FlashStrings::copy(temp, sizeof(temp), PERF_MIN);
-        snprintf(buffer, sizeof(buffer), temp, minTime);
+        // Afficher Min
+        FlashStrings::copy(buffer, sizeof(buffer), FMT_MIN);
         display_->drawText(0, 32, buffer);
+        snprintf(buffer, sizeof(buffer), format, minTime);
+        display_->drawText(32, 32, buffer);
         if (avgTime > 0) {
             float fps = 1000000.0f / avgTime;
-            FlashStrings::copy(temp, sizeof(temp), PERF_FPS);
-            snprintf(buffer, sizeof(buffer), temp, fps);
-            display_->drawText(0, 48, buffer);
+            FlashStrings::copy(buffer, sizeof(buffer), PERF_FPS);
+            snprintf(format, sizeof(format), buffer, fps);
+            display_->drawText(0, 48, format);
         }
         
         // Dessiner un graphique simple

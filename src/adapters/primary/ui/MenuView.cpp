@@ -1,6 +1,8 @@
 // Ajouter l'inclusion du gestionnaire de vue par défaut
 #include "MenuView.hpp"
 #include "ViewManager.hpp"
+#include "core/utils/AppStrings.hpp"
+#include "core/utils/FlashStrings.hpp"
 
 MenuView::MenuView(std::shared_ptr<DisplayPort> display)
     : View(display), selectedIndex_(0), scrollOffset_(0), maxVisibleItems_(4) {}
@@ -20,7 +22,10 @@ bool MenuView::init() {
     addItem("Load Config", 7);
     addItem("Factory Reset", 8);
     
-    title_ = "MENU";
+    // Utiliser la chaîne partagée MENU
+    char buffer[16];
+    FlashStrings::copy(buffer, sizeof(buffer), MENU);
+    title_ = buffer;
     return true;
 }
 
