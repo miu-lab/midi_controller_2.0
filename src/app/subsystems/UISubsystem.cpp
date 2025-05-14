@@ -2,7 +2,7 @@
 
 #include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "adapters/primary/ui/DisplayEventListener.hpp"
-#include "adapters/primary/ui/UIEventListener.hpp"
+#include "adapters/primary/ui/ViewManagerEventListener.hpp"
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "core/TaskScheduler.hpp"
 #include "core/tasks/DisplayUpdateTask.hpp"
@@ -76,9 +76,9 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         displayEventListener_->subscribe();
 
         // Créer l'écouteur d'événements UI et l'abonner aux événements
-        eventListener_ = std::make_unique<UIEventListener>(*viewManager_);
+        eventListener_ = std::make_unique<ViewManagerEventListener>(*viewManager_);
         eventListener_->subscribe();
-        Serial.println(F("UISubsystem: Created and subscribed UIEventListener"));
+        Serial.println(F("UISubsystem: Created and subscribed ViewManagerEventListener"));
 
         // Enregistrer le ViewManager dans le conteneur
         container_->registerImplementation<ViewManager, DefaultViewManager>(

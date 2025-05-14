@@ -7,22 +7,22 @@
 #include "core/domain/events/core/Event.hpp"
 
 /**
- * @brief Écouteur d'événements pour mettre à jour l'interface utilisateur
+ * @brief Écouteur d'événements pour mettre à jour l'interface utilisateur via le ViewManager
  * 
  * Cette classe écoute les événements MIDI et de contrôle et met à jour l'UI en conséquence.
  */
-class UIEventListener : public EventListener {
+class ViewManagerEventListener : public EventListener {
 public:
     /**
      * @brief Constructeur
      * @param viewManager Gestionnaire de vues à mettre à jour
      */
-    explicit UIEventListener(ViewManager& viewManager);
+    explicit ViewManagerEventListener(ViewManager& viewManager);
     
     /**
      * @brief Destructeur
      */
-    ~UIEventListener() override;
+    ~ViewManagerEventListener() override;
     
     /**
      * @brief S'abonne aux événements

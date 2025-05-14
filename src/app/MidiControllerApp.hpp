@@ -9,7 +9,7 @@ class IConfiguration;
 class IInputSystem;
 class IMidiSystem;
 class IUISystem;
-class UIEventListener;
+class ViewManagerEventListener;
 class EventEnabledMidiOut;
 
 /**
@@ -53,7 +53,7 @@ private:
     std::shared_ptr<IUISystem> m_uiSystem;
     
     // Écouteur d'événements UI
-    std::unique_ptr<UIEventListener> m_uiEventListener;
+    std::unique_ptr<ViewManagerEventListener> m_uiEventListener;
     
     // Port MIDI avec émission d'événements
     std::shared_ptr<EventEnabledMidiOut> m_eventEnabledMidiOut;

@@ -1,7 +1,7 @@
 #include "MidiControllerApp.hpp"
 
-#include "adapters/primary/ui/UIEventListener.hpp"
 #include "adapters/primary/ui/ViewManager.hpp"
+#include "adapters/primary/ui/ViewManagerEventListener.hpp"
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "app/subsystems/MidiSubsystem.hpp"
@@ -99,7 +99,7 @@ Result<bool, std::string> MidiControllerApp::init() {
     m_container->registerDependency<MidiOutputPort>(m_eventEnabledMidiOut);
 
     // 4. Créer l'écouteur d'événements UI
-    m_uiEventListener = std::make_unique<UIEventListener>(*viewManager);
+    m_uiEventListener = std::make_unique<ViewManagerEventListener>(*viewManager);
 
     // 5. S'abonner aux événements
     m_uiEventListener->subscribe();

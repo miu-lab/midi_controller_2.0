@@ -1,33 +1,33 @@
-#include "UIEventListener.hpp"
+#include "ViewManagerEventListener.hpp"
 
-UIEventListener::UIEventListener(ViewManager& viewManager)
+ViewManagerEventListener::ViewManagerEventListener(ViewManager& viewManager)
     : m_viewManager(viewManager), m_subscriptionId(0) {
 }
 
-UIEventListener::~UIEventListener() {
+ViewManagerEventListener::~ViewManagerEventListener() {
     unsubscribe();
 }
 
-void UIEventListener::subscribe() {
+void ViewManagerEventListener::subscribe() {
     if (m_subscriptionId == 0) {
         m_subscriptionId = EventBus::getInstance().subscribe(this);
-        Serial.print(F("UIEventListener: Subscribed with ID "));
+        Serial.print(F("ViewManagerEventListener: Subscribed with ID "));
         Serial.println(m_subscriptionId);
     }
 }
 
-void UIEventListener::unsubscribe() {
+void ViewManagerEventListener::unsubscribe() {
     if (m_subscriptionId != 0) {
         EventBus::getInstance().unsubscribe(m_subscriptionId);
         m_subscriptionId = 0;
     }
 }
 
-SubscriptionId UIEventListener::getSubscriptionId() const {
+SubscriptionId ViewManagerEventListener::getSubscriptionId() const {
     return m_subscriptionId;
 }
 
-bool UIEventListener::onEvent(const Event& event) {
+bool ViewManagerEventListener::onEvent(const Event& event) {
     // Gestion des événements MIDI
     if (event.getCategory() == EventCategory::MIDI) {
         return handleMidiEvent(event);
@@ -46,7 +46,7 @@ bool UIEventListener::onEvent(const Event& event) {
     return false;
 }
 
-bool UIEventListener::handleMidiEvent(const Event& event) {
+bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
     switch (event.getType()) {
         case EventTypes::MidiControlChange: {
             // Traiter les événements CC MIDI
@@ -143,7 +143,7 @@ bool UIEventListener::handleMidiEvent(const Event& event) {
     }
 }
 
-bool UIEventListener::handleInputEvent(const Event& event) {
+bool ViewManagerEventListener::handleInputEvent(const Event& event) {
     switch (event.getType()) {
         case EventTypes::EncoderTurned: {
             // Traiter les événements d'encodeur tourné
@@ -185,7 +185,7 @@ bool UIEventListener::handleInputEvent(const Event& event) {
     }
 }
 
-bool UIEventListener::handleUIEvent(const Event& event) {
+bool ViewManagerEventListener::handleUIEvent(const Event& event) {
     // Pour le moment, aucun événement UI à traiter
     // À implémenter si nécessaire
     return false;
