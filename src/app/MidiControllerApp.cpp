@@ -1,7 +1,6 @@
 #include "MidiControllerApp.hpp"
 
 #include "adapters/primary/ui/ViewManager.hpp"
-#include "adapters/primary/ui/ViewManagerEventListener.hpp"
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "app/subsystems/MidiSubsystem.hpp"
@@ -19,12 +18,6 @@ MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> contai
     : m_container(container) {}
 
 MidiControllerApp::~MidiControllerApp() {
-    // Arrêter d'abord l'écouteur d'événements
-    if (m_uiEventListener) {
-        m_uiEventListener->unsubscribe();
-        m_uiEventListener.reset();
-    }
-
     // Nettoyer les ressources dans l'ordre inverse de leur création
     m_eventEnabledMidiOut.reset();
     m_uiSystem.reset();
@@ -100,17 +93,7 @@ Result<bool, std::string> MidiControllerApp::init() {
     // 3. Remplacer le port MIDI standard par notre version avec événements
     m_container->registerDependency<MidiOutputPort>(m_eventEnabledMidiOut);
 
-    // 4. Créer l'écouteur d'événements UI
-    m_uiEventListener = std::make_unique<ViewManagerEventListener>(*viewManager);
-
-    // 5. S'abonner aux événements
-    m_uiEventListener->subscribe();
-
-    // 6. Vérifier que l'abonnement a fonctionné
-    Serial.print(F("\nUI Event Listener subscription status: "));
-    Serial.println(EventBus::getInstance().exists(m_uiEventListener->getSubscriptionId())
-                       ? F("SUCCESS")
-                       : F("FAILED"));
+    // Remarque: L'écouteur d'événements UI est maintenant géré exclusivement par UISubsystem
     Serial.print(F("Total event bus subscribers: "));
     Serial.println(EventBus::getInstance().getCount());
 

@@ -13,18 +13,18 @@
 #define INITIAL_TASK_COUNT 8
 
 // Priorités prédéfinies pour le TaskScheduler
-#define TASK_PRIORITY_CRITICAL    0   // Plus haute priorité
-#define TASK_PRIORITY_HIGH        1
-#define TASK_PRIORITY_NORMAL      5
-#define TASK_PRIORITY_LOW        10
-#define TASK_PRIORITY_BACKGROUND 20   // Plus basse priorité
+#define TASK_PRIORITY_CRITICAL 0  // Plus haute priorité
+#define TASK_PRIORITY_HIGH 1
+#define TASK_PRIORITY_NORMAL 5
+#define TASK_PRIORITY_LOW 10
+#define TASK_PRIORITY_BACKGROUND 20  // Plus basse priorité
 
 // Budget temporel pour les différents sous-systèmes (en microsecondes)
 namespace TaskTiming {
-    static constexpr unsigned long MAX_INPUT_TIME_US = 1000;  // 1ms pour l'input (critique)
-    static constexpr unsigned long MAX_MIDI_TIME_US = 2000;   // 2ms pour MIDI (critique)
-    static constexpr unsigned long MAX_UI_TIME_US = 10000;    // 10ms pour l'UI (moins critique)
-    
-    // Période minimale d'exécution pour certaines tâches
-    static constexpr unsigned long UI_MIN_PERIOD_MS = 20;     // 50Hz max pour l'UI
-}
+static constexpr unsigned long MAX_INPUT_TIME_US = 1000;  // 1ms pour l'input (critique)
+static constexpr unsigned long MAX_MIDI_TIME_US = 2000;   // 2ms pour MIDI (critique)
+static constexpr unsigned long MAX_UI_TIME_US = 6;        // 6µs pour l'UI (moins critique)
+
+// Période minimale d'exécution pour certaines tâches
+static constexpr unsigned long UI_MIN_PERIOD_MS = 16;  // 60Hz max pour l'UI
+}  // namespace TaskTiming

@@ -62,7 +62,7 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         // Créer la tâche d'affichage et l'écouteur d'événements
         char buffer[80];
         char temp[64];
-        
+
         // Construire "UISubsystem: Creating display task..."
         FlashStrings::copy(temp, sizeof(temp), PFX_UI);
         strcpy(buffer, temp);
@@ -91,8 +91,18 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         displayEventListener_->subscribe();
 
         // Créer l'écouteur d'événements UI et l'abonner aux événements
+        // Note: UISubsystem est le seul endroit où ViewManagerEventListener doit être instancié
+        // pour éviter les abonnements multiples aux événements UI et MIDI
         eventListener_ = std::make_unique<ViewManagerEventListener>(*viewManager_);
         eventListener_->subscribe();
+
+        // Log d'information sur l'abonnement
+        Serial.print(F("\nUI Event Listener subscription status: "));
+        Serial.println(EventBus::getInstance().exists(eventListener_->getSubscriptionId())
+                           ? F("SUCCESS")
+                           : F("FAILED"));
+        Serial.print(F("Total event bus subscribers: "));
+        Serial.println(EventBus::getInstance().getCount());
         // Afficher "UISubsystem: Created and subscribed ViewManagerEventListener"
         FlashStrings::copy(temp, sizeof(temp), PFX_UI);
         strcpy(buffer, temp);
