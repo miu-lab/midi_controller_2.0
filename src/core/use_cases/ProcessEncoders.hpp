@@ -6,6 +6,13 @@
 #include "core/controllers/InputController.hpp"
 #include "core/ports/input/EncoderPort.hpp"
 
+/**
+ * @brief Cas d'utilisation qui traite la lecture des encodeurs physiques
+ *
+ * Cette classe est responsable uniquement de lire l'état des encodeurs physiques
+ * et de transmettre les événements bruts (delta/boutons) sans filtrage ni stockage d'état.
+ * La limitation de taux et le suivi de position sont gérés par les classes en aval (MidiMapper).
+ */
 class ProcessEncoders {
 public:
     /**
@@ -43,14 +50,17 @@ public:
     void setInputController(InputController* inputController);
 
     /**
-     * @brief Mise à jour des encodeurs
-     */
+ * @brief Mise à jour des encodeurs
+ * 
+ * Cette méthode lit l'état des encodeurs physiques et transmet les événements bruts
+ * sans filtrage ni stockage d'état. Seuls les changements de delta non nuls et
+ * les changements d'état des boutons sont transmis.
+ */
     void update();
 
 private:
     std::vector<EncoderPort*> encoders_;
-    std::vector<bool> lastPressed_;
-    std::vector<int32_t> lastAbsPos_;
+    std::vector<bool> lastPressed_;  // Uniquement pour détecter les changements d'état des boutons
     EncoderTurnedCallback onEncoderTurnedCallback_;
     EncoderButtonCallback onEncoderButtonCallback_;
     InputController* inputController_;

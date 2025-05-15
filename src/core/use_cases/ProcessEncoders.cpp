@@ -9,7 +9,6 @@
 ProcessEncoders::ProcessEncoders(const std::vector<EncoderPort *> &encoders)
     : encoders_(encoders),
       lastPressed_(encoders.size(), false),
-      lastAbsPos_(encoders.size(), 0),
       onEncoderTurnedCallback_(nullptr),
       onEncoderButtonCallback_(nullptr),
       inputController_(nullptr),
@@ -32,36 +31,13 @@ void ProcessEncoders::update() {
     for (size_t i = 0; i < encoders_.size(); ++i) {
         EncoderPort *encoder = encoders_[i];
 
-        // Lire le delta pour mettre à jour la position interne
-        int8_t delta = encoder->readDelta();
-
-        // Obtenir la position absolue actuelle
+        // Lire les valeurs actuelles
         int32_t absPos = encoder->getAbsolutePosition();
-
-        // N'envoyer un événement que si la position absolue a changé
-        if (absPos != lastAbsPos_[i]) {
-#ifndef PERFORMANCE_MODE
-            // Diagnostic pour le changement d'encodeur
-            char diagEvent[60];
-            snprintf(diagEvent,
-                     sizeof(diagEvent),
-                     "ProcessEncoders: ID=%d absPos=%ld->%ld delta=%d",
-                     encoder->getId(),
-                     lastAbsPos_[i],
-                     absPos,
-                     delta);
-            DIAG_ON_EVENT(diagEvent);
-#endif
-
-            // Mettre à jour la dernière position absolue connue
-            lastAbsPos_[i] = absPos;
-
-            // Ordre de priorité pour traiter l'événement:
-            // 1. Nouveau callback (onEncoderTurnedCallback_)
-            // 2. Ancien contrôleur d'entrée (inputController_)
-            //
-            // Note: Le contrôleur d'entrée dispose maintenant de callbacks directs
-            // qui contournent le bus d'événements pour les chemins critiques MIDI
+        int8_t delta = encoder->readDelta();
+        
+        // Transmettre les rotations uniquement si delta est non nul
+        // Note: Le filtrage supplémentaire et la limitation de taux sont gérés par MidiMapper
+        if (delta != 0) {
             if (onEncoderTurnedCallback_) {
                 onEncoderTurnedCallback_(encoder->getId(), absPos, delta);
             } else if (useInputController_) {
@@ -69,12 +45,14 @@ void ProcessEncoders::update() {
             } else {
                 DEBUG_ERROR("ProcessEncoders: NO HANDLER FOR ENCODER EVENTS!");
             }
-            // Les EventBus ne sont plus utilisés dans la nouvelle version
         }
-
+        
+        // Gérer les boutons d'encodeur (détecter uniquement les changements d'état)
         bool pressed = encoder->isPressed();
         if (pressed != lastPressed_[i]) {
-#ifndef PERFORMANCE_MODE
+            lastPressed_[i] = pressed;
+            
+            #ifndef PERFORMANCE_MODE
             // Diagnostic pour le changement d'état du bouton d'encodeur
             char diagEvent[60];
             snprintf(diagEvent,
@@ -83,13 +61,8 @@ void ProcessEncoders::update() {
                      encoder->getId(),
                      pressed ? "pressé" : "relâché");
             DIAG_ON_EVENT(diagEvent);
-#endif
-
-            lastPressed_[i] = pressed;
-
-            // Ordre de priorité pour traiter l'événement:
-            // 1. Nouveau callback (onEncoderButtonCallback_)
-            // 2. Ancien contrôleur d'entrée (inputController_)
+            #endif
+            
             if (onEncoderButtonCallback_) {
                 onEncoderButtonCallback_(encoder->getId(), pressed);
             } else if (useInputController_) {
@@ -97,7 +70,6 @@ void ProcessEncoders::update() {
             } else {
                 DEBUG_ERROR("ProcessEncoders: NO HANDLER FOR ENCODER BUTTON EVENTS!");
             }
-            // Les EventBus ne sont plus utilisés dans la nouvelle version
         }
     }
 }
