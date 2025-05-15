@@ -2,8 +2,6 @@
 
 #include <Arduino.h>
 
-#include "adapters/secondary/midi/TeensyUsbMidi.hpp"
-
 MidiInHandler::MidiInHandler() {
     // Rien à initialiser
 }

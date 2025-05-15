@@ -6,7 +6,6 @@
 #include "adapters/secondary/midi/DummyUsbMidi.hpp"
 #include "adapters/secondary/midi/MidiInHandler.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
-#include "adapters/secondary/midi/TeensyUsbMidi.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"

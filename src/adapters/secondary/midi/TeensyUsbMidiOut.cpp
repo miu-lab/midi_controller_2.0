@@ -2,8 +2,6 @@
 
 #include <Arduino.h>
 
-#include "adapters/secondary/midi/TeensyUsbMidi.hpp"
-
 TeensyUsbMidiOut::TeensyUsbMidiOut() {
     // Initialiser le tableau de notes actives
     for (size_t i = 0; i < MAX_ACTIVE_NOTES; i++) {
