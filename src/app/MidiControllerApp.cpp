@@ -12,6 +12,8 @@
 #include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
+#include "config/debug/TaskSchedulerConfig.hpp"
+#include "config/debug/DebugMacros.hpp" // Pour avoir accès à PERFORMANCE_MODE
 
 MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> container)
     : m_container(container) {}
@@ -154,8 +156,43 @@ Result<bool, std::string> MidiControllerApp::init() {
 }
 
 void MidiControllerApp::update() {
-    // Mettre à jour les sous-systèmes dans l'ordre logique
-    if (m_inputSystem) m_inputSystem->update();
-    if (m_midiSystem) m_midiSystem->update();
-    if (m_uiSystem) m_uiSystem->update();
+    static unsigned long lastUiUpdateTime = 0;
+    unsigned long startTime = micros();
+    
+    // Priorité 1: Système d'entrée (critique)
+    if (m_inputSystem) {
+        m_inputSystem->update();
+    }
+    
+    unsigned long afterInputTime = micros();
+    unsigned long inputDuration = afterInputTime - startTime;
+    
+    // Priorité 2: Système MIDI (critique)
+    if (m_midiSystem && inputDuration <= TaskTiming::MAX_INPUT_TIME_US) {
+        m_midiSystem->update();
+    }
+    
+    unsigned long afterMidiTime = micros();
+    unsigned long midiDuration = afterMidiTime - afterInputTime;
+    
+    // Priorité 3: Système UI (moins critique, peut être exécuté à une fréquence plus basse)
+    unsigned long currentTime = millis();
+    if (m_uiSystem && 
+        inputDuration <= TaskTiming::MAX_INPUT_TIME_US && 
+        midiDuration <= TaskTiming::MAX_MIDI_TIME_US &&
+        currentTime - lastUiUpdateTime >= TaskTiming::UI_MIN_PERIOD_MS) {
+        
+        m_uiSystem->update();
+        lastUiUpdateTime = currentTime;
+    }
+    
+    // Débordement temporel global à des fins de diagnostic
+    #ifndef PERFORMANCE_MODE
+    unsigned long totalDuration = micros() - startTime;
+    static const unsigned long MAX_TOTAL_TIME_US = 5000;  // 5ms
+    if (totalDuration > MAX_TOTAL_TIME_US) {
+        Serial.printf("WARNING: Update cycle took %lu us (limit: %lu)\n", 
+                     totalDuration, MAX_TOTAL_TIME_US);
+    }
+    #endif
 }
