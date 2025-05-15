@@ -88,6 +88,11 @@ public:
      */
     void setMidiButtonCallback(std::function<void(ButtonId, bool)> callback);
 
+    // Callbacks directs pour les chemins critiques (contournement du bus d'événements)
+    std::function<void(EncoderId, int32_t)> onEncoderChangedDirect = nullptr;
+    std::function<void(EncoderId, bool)> onEncoderButtonDirect = nullptr;
+    std::function<void(ButtonId, bool)> onButtonDirect = nullptr;
+
 private:
     std::shared_ptr<NavigationConfigService> m_navigationConfig;
     std::shared_ptr<UIController> m_uiController;

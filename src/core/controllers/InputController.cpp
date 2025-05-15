@@ -1,4 +1,5 @@
 #include "InputController.hpp"
+
 #include "UIController.hpp"
 
 InputController::InputController(std::shared_ptr<NavigationConfigService> navigationConfig)
@@ -38,29 +39,44 @@ void InputController::setUIController(std::shared_ptr<UIController> uiController
 
 void InputController::processEncoderTurn(EncoderId id, int32_t absolutePosition,
                                          int8_t relativeChange) {
+    // Appel direct pour le chemin critique MIDI en premier si disponible
+    if (onEncoderChangedDirect) {
+        onEncoderChangedDirect(id, absolutePosition);
+    }
+
     // Déterminer si cet encodeur est dédié à la navigation
     if (m_navigationConfig->isNavigationControl(id)) {
         m_navigationEncoderCallback(id, absolutePosition, relativeChange);
     } else {
-        m_midiEncoderCallback(id, absolutePosition, relativeChange);
+        // m_midiEncoderCallback(id, absolutePosition, relativeChange);
     }
 }
 
 void InputController::processEncoderButton(EncoderId id, bool pressed) {
+    // Appel direct pour le chemin critique MIDI en premier si disponible
+    if (onEncoderButtonDirect) {
+        onEncoderButtonDirect(id, pressed);
+    }
+
     // Déterminer si ce bouton d'encodeur est dédié à la navigation
     if (m_navigationConfig->isNavigationControl(id)) {
         m_navigationEncoderButtonCallback(id, pressed);
     } else {
-        m_midiEncoderButtonCallback(id, pressed);
+        // m_midiEncoderButtonCallback(id, pressed);
     }
 }
 
 void InputController::processButtonPress(ButtonId id, bool pressed) {
+    // Appel direct pour le chemin critique MIDI en premier si disponible
+    if (onButtonDirect) {
+        onButtonDirect(id, pressed);
+    }
+
     // Déterminer si ce bouton est dédié à la navigation
     if (m_navigationConfig->isNavigationControl(id)) {
         m_navigationButtonCallback(id, pressed);
     } else {
-        m_midiButtonCallback(id, pressed);
+        // m_midiButtonCallback(id, pressed);
     }
 }
 

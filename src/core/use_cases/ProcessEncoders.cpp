@@ -40,7 +40,7 @@ void ProcessEncoders::update() {
 
         // N'envoyer un événement que si la position absolue a changé
         if (absPos != lastAbsPos_[i]) {
-            #ifndef PERFORMANCE_MODE
+#ifndef PERFORMANCE_MODE
             // Diagnostic pour le changement d'encodeur
             char diagEvent[60];
             snprintf(diagEvent,
@@ -51,14 +51,17 @@ void ProcessEncoders::update() {
                      absPos,
                      delta);
             DIAG_ON_EVENT(diagEvent);
-            #endif
-            
+#endif
+
             // Mettre à jour la dernière position absolue connue
             lastAbsPos_[i] = absPos;
 
             // Ordre de priorité pour traiter l'événement:
             // 1. Nouveau callback (onEncoderTurnedCallback_)
             // 2. Ancien contrôleur d'entrée (inputController_)
+            //
+            // Note: Le contrôleur d'entrée dispose maintenant de callbacks directs
+            // qui contournent le bus d'événements pour les chemins critiques MIDI
             if (onEncoderTurnedCallback_) {
                 onEncoderTurnedCallback_(encoder->getId(), absPos, delta);
             } else if (useInputController_) {
@@ -71,7 +74,7 @@ void ProcessEncoders::update() {
 
         bool pressed = encoder->isPressed();
         if (pressed != lastPressed_[i]) {
-            #ifndef PERFORMANCE_MODE
+#ifndef PERFORMANCE_MODE
             // Diagnostic pour le changement d'état du bouton d'encodeur
             char diagEvent[60];
             snprintf(diagEvent,
@@ -80,7 +83,7 @@ void ProcessEncoders::update() {
                      encoder->getId(),
                      pressed ? "pressé" : "relâché");
             DIAG_ON_EVENT(diagEvent);
-            #endif
+#endif
 
             lastPressed_[i] = pressed;
 

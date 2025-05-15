@@ -5,6 +5,8 @@
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "app/subsystems/MidiSubsystem.hpp"
+#include "config/debug/DebugMacros.hpp"  // Pour avoir accès à PERFORMANCE_MODE
+#include "config/debug/TaskSchedulerConfig.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
@@ -12,8 +14,6 @@
 #include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
-#include "config/debug/TaskSchedulerConfig.hpp"
-#include "config/debug/DebugMacros.hpp" // Pour avoir accès à PERFORMANCE_MODE
 
 MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> container)
     : m_container(container) {}
@@ -120,32 +120,32 @@ Result<bool, std::string> MidiControllerApp::init() {
     // avec InitializationScript.hpp et garantir une initialisation cohérente
     // ===========================================================================
     auto inputController = m_container->resolve<InputController>();
-    
-    // Utiliser static_cast au lieu de dynamic_pointer_cast car nous savons que m_midiSystem est un MidiSubsystem
-    // Ceci est sûr car InitializationScript.hpp crée toujours un MidiSubsystem
-    auto midiSubsystem = static_cast<MidiSubsystem*>(m_midiSystem.get()) ? 
-                        std::shared_ptr<MidiSubsystem>(m_midiSystem, static_cast<MidiSubsystem*>(m_midiSystem.get())) : 
-                        nullptr;
+
+    // Utiliser static_cast au lieu de dynamic_pointer_cast car nous savons que m_midiSystem est un
+    // MidiSubsystem Ceci est sûr car InitializationScript.hpp crée toujours un MidiSubsystem
+    auto midiSubsystem =
+        static_cast<MidiSubsystem*>(m_midiSystem.get())
+            ? std::shared_ptr<MidiSubsystem>(m_midiSystem,
+                                             static_cast<MidiSubsystem*>(m_midiSystem.get()))
+            : nullptr;
 
     if (inputController && midiSubsystem) {
         // Récupérer une référence au MidiMapper
         auto& midiMapper = midiSubsystem->getMidiMapper();
 
-        // 1. Configuration du callback pour les rotations d'encodeurs
-        inputController->setMidiEncoderCallback(
-            [&midiMapper](EncoderId id, int32_t position, int8_t delta) {
-                midiMapper.processEncoderChange(id, position);
-            });
+        // 1. Configuration des callbacks directs (chemin critique, contournement du bus
+        // d'événements)
+        inputController->onEncoderChangedDirect = [&midiMapper](EncoderId id, int32_t position) {
+            midiMapper.processEncoderChange(id, position);
+        };
 
-        // 2. Configuration du callback pour les boutons d'encodeurs
-        inputController->setMidiEncoderButtonCallback([&midiMapper](EncoderId id, bool pressed) {
+        inputController->onEncoderButtonDirect = [&midiMapper](EncoderId id, bool pressed) {
             midiMapper.processEncoderButton(id, pressed);
-        });
+        };
 
-        // 3. Configuration du callback pour les boutons standard
-        inputController->setMidiButtonCallback([&midiMapper](ButtonId id, bool pressed) {
+        inputController->onButtonDirect = [&midiMapper](ButtonId id, bool pressed) {
             midiMapper.processButtonPress(id, pressed);
-        });
+        };
     } else {
         // Journalisation d'erreur si les composants nécessaires ne sont pas disponibles
         return Result<bool, std::string>::error(
@@ -158,41 +158,40 @@ Result<bool, std::string> MidiControllerApp::init() {
 void MidiControllerApp::update() {
     static unsigned long lastUiUpdateTime = 0;
     unsigned long startTime = micros();
-    
+
     // Priorité 1: Système d'entrée (critique)
     if (m_inputSystem) {
         m_inputSystem->update();
     }
-    
+
     unsigned long afterInputTime = micros();
     unsigned long inputDuration = afterInputTime - startTime;
-    
+
     // Priorité 2: Système MIDI (critique)
     if (m_midiSystem && inputDuration <= TaskTiming::MAX_INPUT_TIME_US) {
         m_midiSystem->update();
     }
-    
+
     unsigned long afterMidiTime = micros();
     unsigned long midiDuration = afterMidiTime - afterInputTime;
-    
+
     // Priorité 3: Système UI (moins critique, peut être exécuté à une fréquence plus basse)
     unsigned long currentTime = millis();
-    if (m_uiSystem && 
-        inputDuration <= TaskTiming::MAX_INPUT_TIME_US && 
+    if (m_uiSystem && inputDuration <= TaskTiming::MAX_INPUT_TIME_US &&
         midiDuration <= TaskTiming::MAX_MIDI_TIME_US &&
         currentTime - lastUiUpdateTime >= TaskTiming::UI_MIN_PERIOD_MS) {
-        
         m_uiSystem->update();
         lastUiUpdateTime = currentTime;
     }
-    
-    // Débordement temporel global à des fins de diagnostic
-    #ifndef PERFORMANCE_MODE
+
+// Débordement temporel global à des fins de diagnostic
+#ifndef PERFORMANCE_MODE
     unsigned long totalDuration = micros() - startTime;
     static const unsigned long MAX_TOTAL_TIME_US = 5000;  // 5ms
     if (totalDuration > MAX_TOTAL_TIME_US) {
-        Serial.printf("WARNING: Update cycle took %lu us (limit: %lu)\n", 
-                     totalDuration, MAX_TOTAL_TIME_US);
+        Serial.printf("WARNING: Update cycle took %lu us (limit: %lu)\n",
+                      totalDuration,
+                      MAX_TOTAL_TIME_US);
     }
-    #endif
+#endif
 }
