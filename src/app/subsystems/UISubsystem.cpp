@@ -61,7 +61,7 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
 
         // Créer la tâche d'affichage et l'écouteur d'événements
         char buffer[80];
-        char temp[32];
+        char temp[64];
         
         // Construire "UISubsystem: Creating display task..."
         FlashStrings::copy(temp, sizeof(temp), PFX_UI);

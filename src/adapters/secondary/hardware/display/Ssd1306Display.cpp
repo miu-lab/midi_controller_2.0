@@ -20,7 +20,7 @@ bool Ssd1306Display::init(int8_t resetPin) {
     }
 
     char buffer[80]; // Buffer temporaire pour les chaînes composées
-    char temp[32];  // Buffer pour les fragments
+    char temp[64];  // Buffer pour les fragments
     
     // Construire "SSD1306: Initializing display..."
     FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
@@ -127,7 +127,7 @@ void Ssd1306Display::drawCircle(int x, int y, int radius, bool fill) {
 void Ssd1306Display::update() {
     if (!initialized_) {
         char buffer[80];
-        char temp[32];
+        char temp[64];
         
         // Construire "SSD1306: Update called but display not initialized"
         FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);

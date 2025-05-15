@@ -20,7 +20,7 @@ public:
      * @param basePort Port MIDI de base à décorer
      */
     explicit EventEnabledMidiOut(MidiOutputPort& basePort) : m_basePort(basePort) {
-        char buffer[32];
+        char buffer[64];
         FlashStrings::copy(buffer, sizeof(buffer), DBG_EVENT_ENABLED_MIDI_OUT);
         Serial.println(buffer);
     }
@@ -40,7 +40,7 @@ public:
      */
     void sendCc(MidiChannel ch, MidiCC cc, uint8_t value, uint8_t source = 0) {
         // Log de débogage compact
-        char buffer[32];
+        char buffer[64];
         FlashStrings::copy(buffer, sizeof(buffer), DBG_SENDING_CC);
         Serial.print(F("\n"));
         Serial.println(buffer);
@@ -101,7 +101,7 @@ public:
      */
     void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
         // Log de débogage compact
-        char buffer[32];
+        char buffer[64];
         FlashStrings::copy(buffer, sizeof(buffer), DBG_SENDING_CC); // Réutiliser la même chaîne
         Serial.print(F("\n"));
         Serial.println(buffer);
@@ -161,7 +161,7 @@ public:
      */
     void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
         // Log de débogage compact
-        char buffer[32];
+        char buffer[64];
         FlashStrings::copy(buffer, sizeof(buffer), DBG_SENDING_CC); // Réutiliser la même chaîne
         Serial.print(F("\n"));
         Serial.println(buffer);

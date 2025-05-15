@@ -21,10 +21,34 @@ public:
      * @return Pointeur vers le buffer
      */
     static char* copy(char* buffer, size_t bufferSize, const char* flashStr) {
-        if (!buffer || bufferSize == 0 || !flashStr) return buffer;
+        if (!buffer || bufferSize <= 1 || !flashStr) return buffer;
         
-        strncpy_P(buffer, flashStr, bufferSize - 1);
-        buffer[bufferSize - 1] = '\0'; // Assurer la terminaison
+        // Obtenir la longueur de la chaîne source
+        size_t srcLen = strlen_P(flashStr);
+        
+        // Vérifier si la chaîne va être tronquée
+        if (srcLen >= bufferSize) {
+            #ifdef DEBUG
+            // En mode debug, afficher un avertissement la première fois
+            static bool warningDisplayed = false;
+            if (!warningDisplayed) {
+                Serial.println(F("AVERTISSEMENT: Troncation de chaîne détectée dans FlashStrings::copy"));
+                warningDisplayed = true; // N'afficher qu'une fois
+            }
+            #endif
+        }
+        
+        // Méthode de copie plus sûre pour éviter les avertissements de troncation
+        if (srcLen >= bufferSize) {
+            // Cas où la source est plus grande que la destination - copier avec troncation
+            memcpy_P(buffer, flashStr, bufferSize - 1);
+            buffer[bufferSize - 1] = '\0';
+        } else {
+            // Cas où la source tient dans la destination - copier le tout
+            memcpy_P(buffer, flashStr, srcLen);
+            buffer[srcLen] = '\0';
+        }
+        
         return buffer;
     }
     
