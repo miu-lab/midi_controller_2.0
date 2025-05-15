@@ -1,8 +1,10 @@
 #pragma once
 
 #include <Arduino.h>
+
+#include "config/debug/DebugMacros.hpp"  // Pour avoir accès à PERFORMANCE_MODE
 #include "core/TaskScheduler.hpp"
-#include "config/debug/DebugMacros.hpp" // Pour avoir accès à PERFORMANCE_MODE
+#include "core/utils/Result.hpp"  // Pour avoir accès à Result
 
 /**
  * @brief Module de diagnostics pour le débogage et le monitoring
@@ -62,6 +64,13 @@ public:
      */
     static void enableEventDiagnostics(bool enable);
 
+    /**
+     * @brief Affiche un message d'erreur provenant d'un objet Result
+     * @param result L'objet Result contenant l'erreur potentielle
+     * @param prefix Préfixe à afficher avant le message d'erreur
+     */
+    static void printError(const Result<bool, std::string>& result, const char* prefix);
+
 private:
     static TaskScheduler* _scheduler;
     static unsigned long _lastStatsTime;
@@ -83,17 +92,36 @@ private:
 #define UPDATE_DIAGNOSTICS() DiagnosticsManager::update()
 #define PRINT_DIAGNOSTICS(showDetails) DiagnosticsManager::printStats(showDetails)
 #define DIAG_ON_EVENT(eventName) DiagnosticsManager::onEvent(eventName)
+#define PRINT_ERROR(result, prefix) DiagnosticsManager::printError(result, prefix)
 #else
 // Mode production ou mode performance - pas de diagnostics
-#define INIT_DIAGNOSTICS(scheduler, interval) do {} while(0)
-#define UPDATE_DIAGNOSTICS() do {} while(0)
-#define PRINT_DIAGNOSTICS(showDetails) do {} while(0)
-#define DIAG_ON_EVENT(eventName) do {} while(0)
+#define INIT_DIAGNOSTICS(scheduler, interval) \
+    do {                                      \
+    } while (0)
+#define UPDATE_DIAGNOSTICS() \
+    do {                     \
+    } while (0)
+#define PRINT_DIAGNOSTICS(showDetails) \
+    do {                               \
+    } while (0)
+#define DIAG_ON_EVENT(eventName) \
+    do {                         \
+    } while (0)
+#define PRINT_ERROR(result, prefix) \
+    do {                            \
+    } while (0)
 #endif
 
 // Fonction globale pour accéder aux diagnostics depuis n'importe où
 inline void printDiagnostics(bool showDetails = false) {
-    #ifndef PERFORMANCE_MODE
+#ifndef PERFORMANCE_MODE
     DiagnosticsManager::printStats(showDetails);
-    #endif
+#endif
+}
+
+// Fonction globale pour afficher les erreurs
+inline void printError(const Result<bool, std::string>& result, const char* prefix) {
+#ifndef PERFORMANCE_MODE
+    DiagnosticsManager::printError(result, prefix);
+#endif
 }

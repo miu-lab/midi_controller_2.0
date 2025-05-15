@@ -3,10 +3,8 @@
 #include "adapters/primary/ui/ViewManager.hpp"
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "app/di/DependencyContainer.hpp"
-#include "app/subsystems/MidiSubsystem.hpp"
-#include "config/debug/DebugMacros.hpp"  // Pour avoir accès à PERFORMANCE_MODE
+#include "config/debug/DebugMacros.hpp"
 #include "config/debug/TaskSchedulerConfig.hpp"
-#include "core/controllers/InputController.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"
@@ -18,7 +16,7 @@ MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> contai
     : m_container(container) {}
 
 MidiControllerApp::~MidiControllerApp() {
-    // Nettoyer les ressources dans l'ordre inverse de leur création
+    // Libération des ressources dans l'ordre inverse
     m_eventEnabledMidiOut.reset();
     m_uiSystem.reset();
     m_midiSystem.reset();
@@ -27,130 +25,41 @@ MidiControllerApp::~MidiControllerApp() {
 }
 
 Result<bool, std::string> MidiControllerApp::init() {
-    // Résoudre les interfaces des sous-systèmes
+    // 1. Obtention des références aux sous-systèmes
     m_configSystem = m_container->resolve<IConfiguration>();
-    if (!m_configSystem) {
-        return Result<bool, std::string>::error("Failed to resolve IConfiguration");
-    }
-
     m_inputSystem = m_container->resolve<IInputSystem>();
-    if (!m_inputSystem) {
-        return Result<bool, std::string>::error("Failed to resolve IInputSystem");
-    }
-
     m_midiSystem = m_container->resolve<IMidiSystem>();
-    if (!m_midiSystem) {
-        return Result<bool, std::string>::error("Failed to resolve IMidiSystem");
-    }
-
     m_uiSystem = m_container->resolve<IUISystem>();
-    if (!m_uiSystem) {
-        return Result<bool, std::string>::error("Failed to resolve IUISystem");
+
+    if (!m_configSystem || !m_inputSystem || !m_midiSystem || !m_uiSystem) {
+        return Result<bool, std::string>::error("Sous-systèmes manquants");
     }
 
-    // Initialiser les sous-systèmes dans l'ordre de dépendance
-    auto configResult = m_configSystem->init();
-    if (configResult.isError()) {
-        return Result<bool, std::string>::error(
-            std::string("Failed to initialize configuration subsystem: ") +
-            *(configResult.error()));
-    }
-
-    auto inputResult = m_inputSystem->init();
-    if (inputResult.isError()) {
-        return Result<bool, std::string>::error(
-            std::string("Failed to initialize input subsystem: ") + *(inputResult.error()));
-    }
-
-    auto midiResult = m_midiSystem->init();
-    if (midiResult.isError()) {
-        return Result<bool, std::string>::error(
-            std::string("Failed to initialize MIDI subsystem: ") + *(midiResult.error()));
-    }
-
-    auto uiResult = m_uiSystem->init(true);  // true = enable full UI
-    if (uiResult.isError()) {
-        return Result<bool, std::string>::error(std::string("Failed to initialize UI subsystem: ") +
-                                                *(uiResult.error()));
-    }
-
-    // ===========================================================================
-    // Configuration des adaptateurs pour le système d'événements
-    // ===========================================================================
-
-    // 1. Obtenir les ports nécessaires
+    // 2. Configuration du décorateur MIDI pour les événements
     auto midiPort = m_container->resolve<MidiOutputPort>();
-    auto viewManager = m_container->resolve<ViewManager>();
-
-    if (!midiPort || !viewManager) {
-        return Result<bool, std::string>::error(
-            "Failed to resolve required ports for event system");
+    if (!midiPort) {
+        return Result<bool, std::string>::error("MidiOutputPort manquant");
     }
 
-    // 2. Créer le décorateur MidiOutputPort qui émet des événements
     m_eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*midiPort);
-
-    // 3. Remplacer le port MIDI standard par notre version avec événements
     m_container->registerDependency<MidiOutputPort>(m_eventEnabledMidiOut);
-
-    // Remarque: L'écouteur d'événements UI est maintenant géré exclusivement par UISubsystem
-    Serial.print(F("Total event bus subscribers: "));
-    Serial.println(EventBus::getInstance().getCount());
-
-    // ===========================================================================
-    // Configuration des callbacks MIDI après l'initialisation de tous les sous-systèmes
-    // Note: Cette configuration est centralisée ici pour éviter les redondances
-    // avec InitializationScript.hpp et garantir une initialisation cohérente
-    // ===========================================================================
-    auto inputController = m_container->resolve<InputController>();
-
-    // Utiliser static_cast au lieu de dynamic_pointer_cast car nous savons que m_midiSystem est un
-    // MidiSubsystem Ceci est sûr car InitializationScript.hpp crée toujours un MidiSubsystem
-    auto midiSubsystem =
-        static_cast<MidiSubsystem*>(m_midiSystem.get())
-            ? std::shared_ptr<MidiSubsystem>(m_midiSystem,
-                                             static_cast<MidiSubsystem*>(m_midiSystem.get()))
-            : nullptr;
-
-    if (inputController && midiSubsystem) {
-        // Récupérer une référence au MidiMapper
-        auto& midiMapper = midiSubsystem->getMidiMapper();
-
-        // 1. Configuration des callbacks directs (chemin critique, contournement du bus
-        // d'événements)
-        inputController->onEncoderChangedDirect = [&midiMapper](EncoderId id, int32_t position) {
-            midiMapper.processEncoderChange(id, position);
-        };
-
-        inputController->onEncoderButtonDirect = [&midiMapper](EncoderId id, bool pressed) {
-            midiMapper.processEncoderButton(id, pressed);
-        };
-
-        inputController->onButtonDirect = [&midiMapper](ButtonId id, bool pressed) {
-            midiMapper.processButtonPress(id, pressed);
-        };
-    } else {
-        // Journalisation d'erreur si les composants nécessaires ne sont pas disponibles
-        return Result<bool, std::string>::error(
-            "Failed to resolve components for MIDI callbacks setup");
-    }
 
     return Result<bool, std::string>::success(true);
 }
 
 void MidiControllerApp::update() {
-    // Seul l'appel essentiel est conservé - tout fonctionne grâce aux callbacks et au TaskScheduler
+    // Seule la mise à jour d'entrée est nécessaire car les événements, callbacks
+    // et le TaskScheduler gèrent le reste automatiquement
     if (m_inputSystem) {
+        unsigned long startTime = micros();
+
         m_inputSystem->update();
-    }
 
 #ifndef PERFORMANCE_MODE
-    unsigned long totalDuration = micros() - startTime;
-    static const unsigned long MAX_TOTAL_TIME_US = 5000;  // 5ms
-    if (totalDuration > MAX_TOTAL_TIME_US) {
-        Serial.printf("WARNING: Update cycle took %lu us (limit: %lu)\n",
-                      totalDuration,
-                      MAX_TOTAL_TIME_US);
-    }
+        unsigned long duration = micros() - startTime;
+        if (duration > 30000) {  // 30ms
+            Serial.printf(F("WARNING: Update cycle took %lu us\n"), duration);
+        }
 #endif
+    }
 }
