@@ -41,17 +41,17 @@
 
 ## Gestion des erreurs
 - Utiliser `Result<T, E>` pour les opérations pouvant échouer
-- Éviter les pointeurs bruts, préférer les smart pointers
 - Documenter les cas d'erreur possibles
 - Éviter les exceptions (coûteuses en ressources et imprévisibles en embarqué)
 - Toujours valider les entrées et vérifier les limites des opérations
 
 ## Gestion de la mémoire
-- Préférer l'allocation statique à l'allocation dynamique
+- Préférer l'allocation statique à l'allocation dynamique autant que possible
 - Utiliser des structures de données à taille fixe (tableaux statiques plutôt que `std::vector`)
 - Éviter la fragmentation de la mémoire
 - Passer les objets volumineux par référence constante (`const Type&`) plutôt que par valeur
 - Utiliser des buffers circulaires pour les opérations de streaming (comme les messages MIDI)
+- Éviter les pointeurs bruts; quand l'allocation dynamique est nécessaire, utiliser des smart pointers pour la gestion des ressources
 
 ## Optimisation du code
 - Éviter la récursion qui peut conduire à des débordements de pile
@@ -67,6 +67,9 @@
 - Utiliser les interfaces pour découpler l'implémentation
 - Appliquer l'injection de dépendances pour faciliter les tests
 - Garder les fonctions courtes, particulièrement dans le code critique ou les interruptions
+- Équilibrer conception orientée objet et performances :
+  - Dans les sections critiques pour les performances, privilégier des approches plus directes
+  - Accepter des compromis sur l'architecture quand les contraintes de ressources l'exigent
 
 ## Timing et temps réel
 - Éviter les délais bloquants (`delay()`)
@@ -92,3 +95,12 @@
 - Branches fonctionnelles
 - Pull requests pour revue de code
 - Intégration continue quand c'est possible
+
+## Priorités et arbitrages
+- La stabilité et la fiabilité du système sont prioritaires
+- Les performances et le timing sont essentiels pour les fonctionnalités MIDI
+- Équilibrer la lisibilité du code et l'optimisation des ressources
+- Dans les cas où les principes entrent en conflit, privilégier :
+  1. Stabilité et fiabilité
+  2. Performances des fonctionnalités critiques (MIDI)
+  3. Maintenabilité et lisibilité du code
