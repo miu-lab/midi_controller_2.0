@@ -22,6 +22,22 @@ public:
                         unsigned long duration = 0);
 
     /**
+     * @brief Constructeur par défaut pour le pool d'objets
+     */
+    SendMidiNoteCommand() = default;
+
+    /**
+     * @brief Réinitialise la commande avec de nouveaux paramètres
+     * @param midiOut Interface de sortie MIDI
+     * @param channel Canal MIDI (0-15)
+     * @param note Numéro de note (0-127)
+     * @param velocity Vélocité (0-127), 0 pour Note Off
+     * @param duration Durée de la note en ms, 0 pour une note qui reste active
+     */
+    void reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t note, uint8_t velocity,
+               unsigned long duration = 0);
+
+    /**
      * @brief Exécute la commande : envoie le message MIDI Note On
      * (et Note Off après duration si spécifié)
      */
@@ -58,12 +74,12 @@ public:
     bool isNoteActive() const;
 
 private:
-    MidiOutputPort& midiOut_;
-    uint8_t channel_;
-    uint8_t note_;
-    uint8_t velocity_;
-    unsigned long duration_;
-    unsigned long startTime_;
+    MidiOutputPort* midiOut_ = nullptr;
+    uint8_t channel_ = 0;
+    uint8_t note_ = 0;
+    uint8_t velocity_ = 0;
+    unsigned long duration_ = 0;
+    unsigned long startTime_ = 0;
     bool noteActive_ = false;
     bool hasExecuted_ = false;
 

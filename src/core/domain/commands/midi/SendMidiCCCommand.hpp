@@ -17,8 +17,23 @@ public:
     * @param cc Numéro de contrôleur (0-127)
     * @param value Valeur (0-127)
     * @param source ID de la source (encodeur, bouton, etc.)
- */
-SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value, uint8_t source = 0);
+    */
+    SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value, uint8_t source = 0);
+
+    /**
+     * @brief Constructeur par défaut pour le pool d'objets
+     */
+    SendMidiCCCommand() = default;
+
+    /**
+     * @brief Réinitialise la commande avec de nouveaux paramètres
+     * @param midiOut Interface de sortie MIDI
+     * @param channel Canal MIDI (0-15)
+     * @param cc Numéro de contrôleur (0-127)
+     * @param value Valeur (0-127)
+     * @param source ID de la source (encodeur, bouton, etc.)
+     */
+    void reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value, uint8_t source = 0);
 
     /**
      * @brief Exécute la commande : envoie le message MIDI CC
@@ -44,11 +59,11 @@ SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t 
     const char* getDescription() const override;
 
 private:
-    MidiOutputPort& midiOut_;
-    uint8_t channel_;
-    uint8_t cc_;
-    uint8_t value_;
-    uint8_t source_; // ID de la source (encodeur, bouton, etc.)
-    uint8_t previousValue_;  // Pour l'annulation
+    MidiOutputPort* midiOut_ = nullptr;
+    uint8_t channel_ = 0;
+    uint8_t cc_ = 0;
+    uint8_t value_ = 0;
+    uint8_t source_ = 0; // ID de la source (encodeur, bouton, etc.)
+    uint8_t previousValue_ = 0;  // Pour l'annulation
     bool hasExecuted_ = false;
 };

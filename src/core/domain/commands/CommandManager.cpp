@@ -13,6 +13,15 @@ void CommandManager::execute(std::unique_ptr<ICommand> command) {
     }
 }
 
+void CommandManager::executeShared(ICommand& command) {
+    // Exécuter la commande sans l'ajouter à l'historique
+    // Utilisé pour les commandes provenant d'un pool d'objets
+    command.execute();
+    
+    // Nous ne gardons pas de trace de cette commande pour l'annulation
+    // car c'est un objet partagé qui pourrait être réutilisé
+}
+
 bool CommandManager::undo() {
     if (undoStack.empty()) {
         return false;

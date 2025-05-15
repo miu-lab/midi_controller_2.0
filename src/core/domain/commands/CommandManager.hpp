@@ -20,6 +20,16 @@ public:
     void execute(std::unique_ptr<ICommand> command);
 
     /**
+     * @brief Exécute une commande partagée (à partir d'un pool) sans la déplacer dans l'historique
+     * 
+     * Utilisé principalement pour les objets réutilisables dans un pool d'objets.
+     * La commande est exécutée mais n'est pas ajoutée à l'historique d'annulation.
+     * 
+     * @param command Référence à la commande à exécuter
+     */
+    void executeShared(ICommand& command);
+
+    /**
      * @brief Annule la dernière commande exécutée
      * @return true si une commande a été annulée, false sinon
      */

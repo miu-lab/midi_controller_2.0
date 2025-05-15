@@ -4,17 +4,33 @@
 
 SendMidiNoteCommand::SendMidiNoteCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t note,
                                          uint8_t velocity, unsigned long duration)
-    : midiOut_(midiOut),
+    : midiOut_(&midiOut),
       channel_(channel),
       note_(note),
       velocity_(velocity),
       duration_(duration),
-      startTime_(0) {}
+      startTime_(0),
+      noteActive_(false),
+      hasExecuted_(false) {}
+
+void SendMidiNoteCommand::reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t note,
+                               uint8_t velocity, unsigned long duration) {
+    midiOut_ = &midiOut;
+    channel_ = channel;
+    note_ = note;
+    velocity_ = velocity;
+    duration_ = duration;
+    startTime_ = 0;
+    noteActive_ = false;
+    hasExecuted_ = false;
+}
 
 void SendMidiNoteCommand::execute() {
+    if (!midiOut_) return; // Vérification de sécurité
+    
     if (velocity_ > 0) {
         // Note On
-        midiOut_.sendNoteOn(channel_, note_, velocity_);
+        midiOut_->sendNoteOn(channel_, note_, velocity_);
         noteActive_ = true;
 
         // Si une durée est spécifiée, enregistrer le temps de début
@@ -23,7 +39,7 @@ void SendMidiNoteCommand::execute() {
         }
     } else {
         // Note Off
-        midiOut_.sendNoteOff(channel_, note_, 0);
+        midiOut_->sendNoteOff(channel_, note_, 0);
         noteActive_ = false;
     }
 
@@ -31,7 +47,7 @@ void SendMidiNoteCommand::execute() {
 }
 
 bool SendMidiNoteCommand::undo() {
-    if (!hasExecuted_) {
+    if (!hasExecuted_ || !midiOut_) {
         return false;
     }
 
@@ -52,7 +68,7 @@ bool SendMidiNoteCommand::undo() {
 
 bool SendMidiNoteCommand::isUndoable() const {
     // Une commande Note est annulable seulement si la note est encore active
-    return noteActive_;
+    return noteActive_ && midiOut_ != nullptr;
 }
 
 const char* SendMidiNoteCommand::getDescription() const {
@@ -71,6 +87,8 @@ const char* SendMidiNoteCommand::getDescription() const {
 }
 
 void SendMidiNoteCommand::update() {
+    if (!midiOut_) return; // Vérification de sécurité
+    
     // Si la note est active et une durée est spécifiée
     if (noteActive_ && duration_ > 0) {
         unsigned long currentTime = millis();
@@ -87,6 +105,8 @@ bool SendMidiNoteCommand::isNoteActive() const {
 }
 
 void SendMidiNoteCommand::sendNoteOff() {
-    midiOut_.sendNoteOff(channel_, note_, 0);
+    if (!midiOut_) return; // Vérification de sécurité
+    
+    midiOut_->sendNoteOff(channel_, note_, 0);
     noteActive_ = false;
 }

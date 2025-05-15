@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <array>
 
 #include "core/ports/output/MidiOutputPort.hpp"
 #include "core/domain/commands/CommandManager.hpp"
@@ -10,6 +11,7 @@
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
 #include "config/MappingConfiguration.hpp"
+#include "config/GlobalSettings.hpp"
 
 /**
  * @brief Mapper qui gère la transformation des événements en commandes MIDI
@@ -92,6 +94,31 @@ private:
         int32_t lastEncoderPosition;
         int32_t midiOffset = 0;   // Offset pour le référentiel flottant
     };
+
+    // Taille du pool d'objets pour les commandes MIDI
+    static constexpr size_t COMMAND_POOL_SIZE = 16;
+    
+    // Pool d'objets pour les commandes MIDI CC
+    std::array<SendMidiCCCommand, COMMAND_POOL_SIZE> midiCCCommandPool_;
+    uint8_t nextCCCommandIndex_ = 0;
+    
+    // Pool d'objets pour les commandes MIDI Note
+    std::array<SendMidiNoteCommand, COMMAND_POOL_SIZE> midiNoteCommandPool_;
+    uint8_t nextNoteCommandIndex_ = 0;
+    
+    // Obtient la prochaine commande CC disponible du pool
+    SendMidiCCCommand& getNextCCCommand() {
+        SendMidiCCCommand& cmd = midiCCCommandPool_[nextCCCommandIndex_];
+        nextCCCommandIndex_ = (nextCCCommandIndex_ + 1) % COMMAND_POOL_SIZE;
+        return cmd;
+    }
+    
+    // Obtient la prochaine commande Note disponible du pool
+    SendMidiNoteCommand& getNextNoteCommand() {
+        SendMidiNoteCommand& cmd = midiNoteCommandPool_[nextNoteCommandIndex_];
+        nextNoteCommandIndex_ = (nextNoteCommandIndex_ + 1) % COMMAND_POOL_SIZE;
+        return cmd;
+    }
 
     MidiOutputPort& midiOut_;
     CommandManager& commandManager_;

@@ -2,12 +2,22 @@
 
 #include "config/GlobalSettings.hpp"
 #include "tools/Diagnostics.hpp"
+#include "config/debug/DebugMacros.hpp" // Pour avoir accès à PERFORMANCE_MODE
 
 MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
       commandManager_(commandManager),
       defaultControl_({0, 0, false, ControlType::ENCODER_ROTATION})  // Canal 1, CC 0, mode absolu
-{}
+{
+    // Initialisation préalable des pool d'objets
+    for (auto& cmd : midiCCCommandPool_) {
+        cmd.reset(midiOut_, 0, 0, 0, 0);
+    }
+    
+    for (auto& cmd : midiNoteCommandPool_) {
+        cmd.reset(midiOut_, 0, 0, 0, 0);
+    }
+}
 
 void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
                             std::unique_ptr<IMidiMappingStrategy> strategy) {
@@ -32,6 +42,7 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
     // Ajouter le nouveau mapping
     mappings_[compositeKey] = std::move(info);
 
+    #ifndef PERFORMANCE_MODE
     // Diagnostic d'ajout de mapping
     char eventName[60];
     snprintf(eventName,
@@ -42,6 +53,7 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
              midiControl.control,
              static_cast<int>(midiControl.controlType));
     DIAG_ON_EVENT(eventName);
+    #endif
 }
 
 bool MidiMapper::removeMapping(ControlId controlId) {
@@ -67,10 +79,12 @@ bool MidiMapper::removeMapping(ControlId controlId) {
     }
 
     if (removed) {
+        #ifndef PERFORMANCE_MODE
         // Diagnostic de suppression de mapping
         char eventName[40];
         snprintf(eventName, sizeof(eventName), "Mapping supprimé: ID=%d", controlId);
         DIAG_ON_EVENT(eventName);
+        #endif
     }
 
     return removed;
@@ -155,6 +169,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 
     auto it = mappings_.find(encoderKey);
     if (it == mappings_.end()) {
+        #ifndef PERFORMANCE_MODE
         // Diagnostic de mapping non trouvé
         char noMappingEvent[50];
         snprintf(noMappingEvent,
@@ -162,6 +177,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
                  "No mapping found for encoder %d",
                  encoderId);
         DIAG_ON_EVENT(noMappingEvent);
+        #endif
         return;  // Pas de mapping pour cet encodeur
     }
 
@@ -174,6 +190,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;  // Pas de changement
     }
 
+    #ifndef PERFORMANCE_MODE
     // Diagnostic avant application de la sensibilité
     char preSensitivityEvent[50];
     snprintf(preSensitivityEvent,
@@ -182,6 +199,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
              encoderId,
              delta);
     DIAG_ON_EVENT(preSensitivityEvent);
+    #endif
 
     // Appliquer le facteur de sensibilité global
     float sensitivity = GlobalSettings::getInstance().getEncoderSensitivity();
@@ -197,6 +215,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         // Reconstruire delta avec son signe
         int32_t new_delta = delta_sign * scaled_delta_abs;
 
+        #ifndef PERFORMANCE_MODE
         // Diagnostic après application de la sensibilité
         char sensitivityEvent[60];
         snprintf(sensitivityEvent,
@@ -207,6 +226,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
                  new_delta,
                  sensitivity);
         DIAG_ON_EVENT(sensitivityEvent);
+        #endif
 
         delta = new_delta;
     }
@@ -246,6 +266,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;
     }
 
+    #ifndef PERFORMANCE_MODE
     // Diagnostic de la valeur MIDI envoyée
     char midiEvent[60];
     snprintf(midiEvent,
@@ -258,19 +279,22 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
              control.relative ? "relatif" : "absolu");
     DIAG_ON_EVENT(midiEvent);
 
-    // Mettre à jour et envoyer la nouvelle valeur
-    info.lastMidiValue = static_cast<uint8_t>(newValue);
-
     // Débogage pour voir l'ID de l'encodeur
     Serial.print(F("MidiMapper: Sending MIDI for encoderId="));
     Serial.println(encoderId);
+    #endif
 
-    auto command = std::make_unique<SendMidiCCCommand>(midiOut_,
-                                                       control.channel,
-                                                       control.control,
-                                                       static_cast<uint8_t>(newValue),
-                                                       encoderId);
-    commandManager_.execute(std::move(command));
+    // Mettre à jour et envoyer la nouvelle valeur
+    info.lastMidiValue = static_cast<uint8_t>(newValue);
+
+    // Utiliser le pool de commandes au lieu de créer un nouvel objet
+    SendMidiCCCommand& command = getNextCCCommand();
+    command.reset(midiOut_, 
+                  control.channel, 
+                  control.control, 
+                  static_cast<uint8_t>(newValue), 
+                  encoderId);
+    commandManager_.executeShared(command);
 }
 
 void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
@@ -285,6 +309,7 @@ void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
 
     auto it = mappings_.find(buttonKey);
     if (it == mappings_.end()) {
+        #ifndef PERFORMANCE_MODE
         // Diagnostic de mapping non trouvé
         char noMappingEvent[50];
         snprintf(noMappingEvent,
@@ -292,6 +317,7 @@ void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
                  "No mapping found for encoder button %d",
                  encoderId);
         DIAG_ON_EVENT(noMappingEvent);
+        #endif
         return;  // Pas de mapping pour ce bouton d'encodeur
     }
 
@@ -301,6 +327,7 @@ void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
 
+    #ifndef PERFORMANCE_MODE
     // Diagnostic du bouton d'encodeur
     char buttonEvent[60];
     snprintf(buttonEvent,
@@ -311,14 +338,19 @@ void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
              control.control,
              velocity);
     DIAG_ON_EVENT(buttonEvent);
+    #endif
 
-    // Créer et exécuter la commande
-    auto command =
-        std::make_unique<SendMidiNoteCommand>(midiOut_, control.channel, control.control, velocity);
+    // Utiliser le pool d'objets pour créer la commande
+    SendMidiNoteCommand& command = getNextNoteCommand();
+    command.reset(midiOut_, control.channel, control.control, velocity);
 
     // Si c'est une note on, la stocker pour pouvoir la couper plus tard
     if (pressed) {
-        activeNotes_[encoderId] = std::move(command);
+        // Pour les notes actives, nous gardons toujours des objets gérés par smart pointers
+        // car elles doivent persister longtemps
+        auto noteCmd = std::make_unique<SendMidiNoteCommand>(
+            midiOut_, control.channel, control.control, velocity);
+        activeNotes_[encoderId] = std::move(noteCmd);
         activeNotes_[encoderId]->execute();
     } else {
         // Si c'est une note off, utiliser la commande et la supprimer
@@ -327,8 +359,8 @@ void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
             noteIt->second->undo();  // Undo = Note Off
             activeNotes_.erase(noteIt);
         } else {
-            // Si pas de note active, simplement envoyer la commande
-            commandManager_.execute(std::move(command));
+            // Si pas de note active, simplement exécuter la commande du pool
+            commandManager_.executeShared(command);
         }
     }
 }
@@ -345,6 +377,7 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
 
     auto it = mappings_.find(buttonKey);
     if (it == mappings_.end()) {
+        #ifndef PERFORMANCE_MODE
         // Diagnostic de mapping non trouvé
         char noMappingEvent[50];
         snprintf(noMappingEvent,
@@ -352,6 +385,7 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
                  "No mapping found for button %d",
                  buttonId);
         DIAG_ON_EVENT(noMappingEvent);
+        #endif
         return;  // Pas de mapping pour ce bouton
     }
 
@@ -361,6 +395,7 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
 
+    #ifndef PERFORMANCE_MODE
     // Diagnostic du bouton
     char buttonEvent[50];
     snprintf(buttonEvent,
@@ -371,14 +406,19 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
              control.control,
              velocity);
     DIAG_ON_EVENT(buttonEvent);
+    #endif
 
-    // Créer et exécuter la commande
-    auto command =
-        std::make_unique<SendMidiNoteCommand>(midiOut_, control.channel, control.control, velocity);
+    // Utiliser le pool d'objets pour créer la commande
+    SendMidiNoteCommand& command = getNextNoteCommand();
+    command.reset(midiOut_, control.channel, control.control, velocity);
 
     // Si c'est une note on, la stocker pour pouvoir la couper plus tard
     if (pressed) {
-        activeNotes_[buttonId] = std::move(command);
+        // Pour les notes actives, nous gardons toujours des objets gérés par smart pointers
+        // car elles doivent persister longtemps
+        auto noteCmd = std::make_unique<SendMidiNoteCommand>(
+            midiOut_, control.channel, control.control, velocity);
+        activeNotes_[buttonId] = std::move(noteCmd);
         activeNotes_[buttonId]->execute();
     } else {
         // Si c'est une note off, utiliser la commande et la supprimer
@@ -387,8 +427,8 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
             noteIt->second->undo();  // Undo = Note Off
             activeNotes_.erase(noteIt);
         } else {
-            // Si pas de note active, simplement envoyer la commande
-            commandManager_.execute(std::move(command));
+            // Si pas de note active, simplement exécuter la commande du pool
+            commandManager_.executeShared(command);
         }
     }
 }
@@ -402,10 +442,12 @@ void MidiMapper::update() {
     // Supprimer les notes qui ne sont plus actives
     for (auto it = activeNotes_.begin(); it != activeNotes_.end();) {
         if (!it->second->isNoteActive()) {
+            #ifndef PERFORMANCE_MODE
             // Diagnostic de suppression de note
             char noteEvent[50];
             snprintf(noteEvent, sizeof(noteEvent), "Note supprimée: ID=%d", it->first);
             DIAG_ON_EVENT(noteEvent);
+            #endif
 
             it = activeNotes_.erase(it);
         } else {
