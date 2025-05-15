@@ -1,4 +1,5 @@
 #include "LastControlView.hpp"
+
 #include "core/utils/AppStrings.hpp"
 
 LastControlView::LastControlView(std::shared_ptr<DisplayPort> display)
@@ -27,20 +28,9 @@ void LastControlView::render() {
         return;
     }
 
-    // Effacer l'écran (important pour éviter les superpositions)
-    // Note: Pas besoin de clear ici, car DefaultViewManager::render() le fait déjà
-    // display_->clear();
-
-    // Dessiner le cadre
-    display_->drawRect(0, 0, 128, 64, false);
-
-    // Dessiner le titre
-    display_->drawText(4, 2, title_.c_str());
-    display_->drawLine(0, 10, 128, 10);
-
     // Informations sur le contrôle
-    char formatBuffer[32]; // Buffer pour la chaîne de format
-    char outputBuffer[32]; // Buffer pour le résultat formaté
+    char formatBuffer[32];  // Buffer pour la chaîne de format
+    char outputBuffer[32];  // Buffer pour le résultat formaté
 
     // Afficher l'ID du contrôle (encodeur ou bouton)
     if (lastControlType_ == "Note On" || lastControlType_ == "Note Off") {
@@ -77,18 +67,6 @@ void LastControlView::render() {
 
     // Dessiner la barre de progression
     display_->drawRect(4, 50, progressWidth, 10, true);
-
-    // Déboguer uniquement occasionnellement pour éviter de surcharger le port série
-    static unsigned long lastDebugTime = 0;
-    unsigned long currentTime = millis();
-
-    if (currentTime - lastDebugTime >= 5000) {  // Débogage toutes les 5 secondes maximum
-        lastDebugTime = currentTime;
-        Serial.print(F("LastControlView rendering - ID="));
-        Serial.print(lastControlId_);
-        Serial.print(F(" Val="));
-        Serial.println(lastValue_);
-    }
 }
 
 bool LastControlView::handleEvent(uint8_t eventType, int32_t data) {
