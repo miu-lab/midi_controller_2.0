@@ -83,6 +83,21 @@ FLASH_STRING(MIDI_VALUE, "Value");
 FLASH_STRING(MIDI_CHANNEL, "Channel");
 
 // ============================================================================
+// Formats pour les vues
+// ============================================================================
+FLASH_STRING(FMT_ENCODER_ID, "Encoder: %d");
+FLASH_STRING(FMT_BUTTON_ID, "Button: %d");
+FLASH_STRING(FMT_TYPE_CH, "Type: %s  Ch: %d");
+FLASH_STRING(FMT_NUMBER, "Number: %d");
+FLASH_STRING(FMT_VALUE, "Value: %d");
+FLASH_STRING(FMT_LAST_CONTROL_RENDER, "LastControlView rendering - ID=%d Val=%d");
+FLASH_STRING(FMT_LAST_CONTROL_ACTIVE, "LastControlView: Setting active state to %s");
+FLASH_STRING(STR_TRUE, "true");
+FLASH_STRING(STR_FALSE, "false");
+FLASH_STRING(MSG_CONTROL_UPDATED, "LastControlView: Control information updated");
+FLASH_STRING(MSG_ACTIVATING_VIEW, "LastControlView: Activating view after control update");
+
+// ============================================================================
 // Messages de débogage
 // ============================================================================
 FLASH_STRING(DBG_EVENT_ENABLED_MIDI_OUT, "EventEnabledMidiOut created");

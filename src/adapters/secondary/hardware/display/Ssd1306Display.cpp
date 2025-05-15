@@ -19,32 +19,20 @@ bool Ssd1306Display::init(int8_t resetPin) {
         return true;
     }
 
-    char buffer[80]; // Buffer temporaire pour les chaînes composées
-    char temp[64];  // Buffer pour les fragments
-    
-    // Construire "SSD1306: Initializing display..."
-    FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
-    strcpy(buffer, temp);
-    FlashStrings::copy(temp, sizeof(temp), MSG_INIT_DISPLAY);
-    strcat(buffer, temp);
-    Serial.println(buffer);
+    // Afficher message d'initialisation
+    Serial.print(F("SSD1306:"));
+    Serial.println(F(" Initializing display..."));
 
     // Initialisation de l'écran SSD1306
     if (!display_.begin(SSD1306_SWITCHCAPVCC, i2cAddress_, resetPin)) {
-        // Construire "SSD1306 allocation failed"
-        strcpy(buffer, "SSD1306");
-        FlashStrings::copy(temp, sizeof(temp), MSG_ALLOC_FAILED);
-        strcat(buffer, temp);
-        Serial.println(buffer);
+        // Afficher message d'échec
+        Serial.println(F("SSD1306 allocation failed"));
         return false;
     }
 
-    // Construire "SSD1306: Display initialized successfully"
-    FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
-    strcpy(buffer, temp);
-    FlashStrings::copy(temp, sizeof(temp), MSG_INIT_SUCCESS);
-    strcat(buffer, temp);
-    Serial.println(buffer);
+    // Afficher message de succès
+    Serial.print(F("SSD1306:"));
+    Serial.println(F(" Display initialized successfully"));
 
     // Effacer complètement l'écran et le buffer
     display_.clearDisplay();
@@ -69,12 +57,9 @@ bool Ssd1306Display::init(int8_t resetPin) {
     display_.clearDisplay();
     display_.display();
 
-    // Construire "SSD1306: Display ready"
-    FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
-    strcpy(buffer, temp);
-    FlashStrings::copy(temp, sizeof(temp), MSG_DISPLAY_READY);
-    strcat(buffer, temp);
-    Serial.println(buffer);
+    // Afficher message de fin d'initialisation
+    Serial.print(F("SSD1306:"));
+    Serial.println(F(" Display ready"));
     return true;
 }
 
@@ -126,16 +111,9 @@ void Ssd1306Display::drawCircle(int x, int y, int radius, bool fill) {
 
 void Ssd1306Display::update() {
     if (!initialized_) {
-        char buffer[80];
-        char temp[64];
-        
-        // Construire "SSD1306: Update called but display not initialized"
-        FlashStrings::copy(temp, sizeof(temp), PFX_SSD1306);
-        strcpy(buffer, temp);
-        FlashStrings::copy(temp, sizeof(temp), MSG_NOT_INITIALIZED);
-        strcat(buffer, temp);
-        Serial.println(buffer);
-        return;
+        // Afficher message d'erreur
+        Serial.print(F("SSD1306:"));
+        Serial.println(F(" Update called but display not initialized"));
     }
 
     // Envoyer les données du buffer à l'écran physique

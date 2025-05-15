@@ -1,4 +1,5 @@
 #include "LastControlView.hpp"
+#include "core/utils/AppStrings.hpp"
 
 LastControlView::LastControlView(std::shared_ptr<DisplayPort> display)
     : View(display),
@@ -38,27 +39,35 @@ void LastControlView::render() {
     display_->drawLine(0, 10, 128, 10);
 
     // Informations sur le contrôle
-    char buffer[32];
+    char formatBuffer[32]; // Buffer pour la chaîne de format
+    char outputBuffer[32]; // Buffer pour le résultat formaté
 
     // Afficher l'ID du contrôle (encodeur ou bouton)
     if (lastControlType_ == "Note On" || lastControlType_ == "Note Off") {
-        sprintf(buffer, "Button: %d", lastControlId_);
+        // Utiliser la chaîne en mémoire Flash pour "Button: %d"
+        FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_BUTTON_ID);
+        sprintf(outputBuffer, formatBuffer, lastControlId_);
     } else {
-        sprintf(buffer, "Encoder: %d", lastControlId_);
+        // Utiliser la chaîne en mémoire Flash pour "Encoder: %d"
+        FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_ENCODER_ID);
+        sprintf(outputBuffer, formatBuffer, lastControlId_);
     }
-    display_->drawText(4, 15, buffer);
+    display_->drawText(4, 15, outputBuffer);
 
     // Afficher le type et le canal
-    sprintf(buffer, "Type: %s  Ch: %d", lastControlType_.c_str(), lastChannel_);
-    display_->drawText(4, 25, buffer);
+    FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_TYPE_CH);
+    sprintf(outputBuffer, formatBuffer, lastControlType_.c_str(), lastChannel_);
+    display_->drawText(4, 25, outputBuffer);
 
     // Afficher le numéro (CC ou note)
-    sprintf(buffer, "Number: %d", lastNumber_);
-    display_->drawText(4, 35, buffer);
+    FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_NUMBER);
+    sprintf(outputBuffer, formatBuffer, lastNumber_);
+    display_->drawText(4, 35, outputBuffer);
 
     // Afficher la valeur
-    sprintf(buffer, "Value: %d", lastValue_);
-    display_->drawText(4, 45, buffer);
+    FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_VALUE);
+    sprintf(outputBuffer, formatBuffer, lastValue_);
+    display_->drawText(4, 45, outputBuffer);
 
     // Représentation graphique de la valeur sous forme de barre de progression
     int progressWidth = map(lastValue_, 0, 127, 0, 120);
