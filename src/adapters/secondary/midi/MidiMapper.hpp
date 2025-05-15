@@ -86,6 +86,21 @@ public:
     void update();
 
 private:
+    //=============================================================================
+    // Constantes
+    //=============================================================================
+    
+    // Taille du pool d'objets pour les commandes MIDI
+    static constexpr size_t COMMAND_POOL_SIZE = 16;
+    
+    // Constantes de timing
+    static constexpr unsigned long ENCODER_RATE_LIMIT_MS = 16;  // 60Hz
+    static constexpr unsigned long DUPLICATE_CHECK_MS = 10;     // 10ms
+
+    //=============================================================================
+    // Types et structures
+    //=============================================================================
+    
     // Structure pour stocker les informations de mapping
     struct MappingInfo {
         MidiControl control;
@@ -95,8 +110,40 @@ private:
         int32_t midiOffset = 0;   // Offset pour le référentiel flottant
     };
 
-    // Taille du pool d'objets pour les commandes MIDI
-    static constexpr size_t COMMAND_POOL_SIZE = 16;
+    //=============================================================================
+    // Méthodes utilitaires
+    //=============================================================================
+    
+    // Crée une clé composite à partir d'un ID de contrôle et d'un type
+    static uint32_t makeCompositeKey(ControlId controlId, ControlType type);
+    
+    // Obtient la prochaine commande CC disponible du pool
+    SendMidiCCCommand& getNextCCCommand();
+    
+    // Obtient la prochaine commande Note disponible du pool
+    SendMidiNoteCommand& getNextNoteCommand();
+    
+    // Fonction de log diagnostique conditionnelle
+    void logDiagnostic(const char* format, ...) const;
+    
+    // Vérifie si un contrôle est dédié à la navigation
+    bool isNavigationControl(ControlId controlId) const;
+    
+    // Vérifie si l'encodeur doit être traité en fonction de la limitation de taux
+    bool shouldProcessEncoder(EncoderId encoderId, int32_t position);
+    
+    // Applique la sensibilité à un delta d'encodeur
+    int32_t applyEncoderSensitivity(int32_t delta, EncoderId encoderId);
+    
+    // Calcule la nouvelle valeur MIDI en fonction du mode (relatif/absolu)
+    int16_t calculateMidiValue(MappingInfo& info, int32_t delta, int32_t position);
+    
+    // Traite les événements de type bouton (encodeur ou bouton standard)
+    void processButtonEvent(ControlId buttonId, bool pressed, ControlType type);
+
+    //=============================================================================
+    // Membres
+    //=============================================================================
     
     // Pool d'objets pour les commandes MIDI CC
     std::array<SendMidiCCCommand, COMMAND_POOL_SIZE> midiCCCommandPool_;
@@ -105,20 +152,6 @@ private:
     // Pool d'objets pour les commandes MIDI Note
     std::array<SendMidiNoteCommand, COMMAND_POOL_SIZE> midiNoteCommandPool_;
     uint8_t nextNoteCommandIndex_ = 0;
-    
-    // Obtient la prochaine commande CC disponible du pool
-    SendMidiCCCommand& getNextCCCommand() {
-        SendMidiCCCommand& cmd = midiCCCommandPool_[nextCCCommandIndex_];
-        nextCCCommandIndex_ = (nextCCCommandIndex_ + 1) % COMMAND_POOL_SIZE;
-        return cmd;
-    }
-    
-    // Obtient la prochaine commande Note disponible du pool
-    SendMidiNoteCommand& getNextNoteCommand() {
-        SendMidiNoteCommand& cmd = midiNoteCommandPool_[nextNoteCommandIndex_];
-        nextNoteCommandIndex_ = (nextNoteCommandIndex_ + 1) % COMMAND_POOL_SIZE;
-        return cmd;
-    }
 
     MidiOutputPort& midiOut_;
     CommandManager& commandManager_;
@@ -126,7 +159,4 @@ private:
     std::unordered_map<ControlId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
     
     MidiControl defaultControl_;  // Contrôle par défaut retourné si non trouvé
-    
-    // Vérifie si un contrôle est dédié à la navigation en le consultant auprès de MappingConfiguration
-    bool isNavigationControl(ControlId controlId) const;
 };

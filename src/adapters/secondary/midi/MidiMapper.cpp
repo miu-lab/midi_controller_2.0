@@ -1,8 +1,13 @@
 #include "adapters/secondary/midi/MidiMapper.hpp"
 
+#include <stdarg.h>
 #include "config/GlobalSettings.hpp"
 #include "tools/Diagnostics.hpp"
 #include "config/debug/DebugMacros.hpp" // Pour avoir accès à PERFORMANCE_MODE
+
+//=============================================================================
+// Construction et initialisation
+//=============================================================================
 
 MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
@@ -19,6 +24,47 @@ MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     }
 }
 
+//=============================================================================
+// Implémentation des méthodes utilitaires
+//=============================================================================
+
+uint32_t MidiMapper::makeCompositeKey(ControlId controlId, ControlType type) {
+    return static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(type);
+}
+
+SendMidiCCCommand& MidiMapper::getNextCCCommand() {
+    SendMidiCCCommand& cmd = midiCCCommandPool_[nextCCCommandIndex_];
+    nextCCCommandIndex_ = (nextCCCommandIndex_ + 1) % COMMAND_POOL_SIZE;
+    return cmd;
+}
+
+SendMidiNoteCommand& MidiMapper::getNextNoteCommand() {
+    SendMidiNoteCommand& cmd = midiNoteCommandPool_[nextNoteCommandIndex_];
+    nextNoteCommandIndex_ = (nextNoteCommandIndex_ + 1) % COMMAND_POOL_SIZE;
+    return cmd;
+}
+
+void MidiMapper::logDiagnostic(const char* format, ...) const {
+#ifndef PERFORMANCE_MODE
+    char buffer[100];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    DIAG_ON_EVENT(buffer);
+#endif
+}
+
+bool MidiMapper::isNavigationControl(ControlId controlId) const {
+    // Utiliser MappingConfiguration pour savoir si c'est un contrôle de navigation
+    static MappingConfiguration mappingConfig;
+    return mappingConfig.isNavigationControl(controlId);
+}
+
+//=============================================================================
+// Gestion des mappings
+//=============================================================================
+
 void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
                             std::unique_ptr<IMidiMappingStrategy> strategy) {
     // Créer une nouvelle info de mapping
@@ -30,8 +76,7 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
     info.midiOffset = 0;
 
     // Créer une clé composite qui inclut le type de contrôle
-    uint32_t compositeKey =
-        static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(midiControl.controlType);
+    uint32_t compositeKey = makeCompositeKey(controlId, midiControl.controlType);
 
     // Supprimer l'ancien mapping s'il existe
     auto it = mappings_.find(compositeKey);
@@ -42,18 +87,11 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
     // Ajouter le nouveau mapping
     mappings_[compositeKey] = std::move(info);
 
-    #ifndef PERFORMANCE_MODE
-    // Diagnostic d'ajout de mapping
-    char eventName[60];
-    snprintf(eventName,
-             sizeof(eventName),
-             "Mapping ajouté: ID=%d CH=%d CC=%d Type=%d",
-             controlId,
-             midiControl.channel,
-             midiControl.control,
-             static_cast<int>(midiControl.controlType));
-    DIAG_ON_EVENT(eventName);
-    #endif
+    logDiagnostic("Mapping ajouté: ID=%d CH=%d CC=%d Type=%d",
+                 controlId,
+                 midiControl.channel,
+                 midiControl.control,
+                 static_cast<int>(midiControl.controlType));
 }
 
 bool MidiMapper::removeMapping(ControlId controlId) {
@@ -61,8 +99,7 @@ bool MidiMapper::removeMapping(ControlId controlId) {
     bool removed = false;
 
     // Essayer de supprimer le mapping pour l'encodeur
-    uint32_t encoderKey =
-        static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_ROTATION);
+    uint32_t encoderKey = makeCompositeKey(controlId, ControlType::ENCODER_ROTATION);
     auto encoderIt = mappings_.find(encoderKey);
     if (encoderIt != mappings_.end()) {
         mappings_.erase(encoderIt);
@@ -70,8 +107,7 @@ bool MidiMapper::removeMapping(ControlId controlId) {
     }
 
     // Essayer de supprimer le mapping pour le bouton d'encodeur
-    uint32_t buttonKey =
-        static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_BUTTON);
+    uint32_t buttonKey = makeCompositeKey(controlId, ControlType::ENCODER_BUTTON);
     auto buttonIt = mappings_.find(buttonKey);
     if (buttonIt != mappings_.end()) {
         mappings_.erase(buttonIt);
@@ -79,12 +115,7 @@ bool MidiMapper::removeMapping(ControlId controlId) {
     }
 
     if (removed) {
-        #ifndef PERFORMANCE_MODE
-        // Diagnostic de suppression de mapping
-        char eventName[40];
-        snprintf(eventName, sizeof(eventName), "Mapping supprimé: ID=%d", controlId);
-        DIAG_ON_EVENT(eventName);
-        #endif
+        logDiagnostic("Mapping supprimé: ID=%d", controlId);
     }
 
     return removed;
@@ -92,14 +123,12 @@ bool MidiMapper::removeMapping(ControlId controlId) {
 
 bool MidiMapper::hasMapping(ControlId controlId) const {
     // Vérifier tous les types de contrôle possibles
-    uint32_t encoderKey =
-        static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_ROTATION);
+    uint32_t encoderKey = makeCompositeKey(controlId, ControlType::ENCODER_ROTATION);
     if (mappings_.find(encoderKey) != mappings_.end()) {
         return true;
     }
 
-    uint32_t buttonKey =
-        static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_BUTTON);
+    uint32_t buttonKey = makeCompositeKey(controlId, ControlType::ENCODER_BUTTON);
     if (mappings_.find(buttonKey) != mappings_.end()) {
         return true;
     }
@@ -109,16 +138,14 @@ bool MidiMapper::hasMapping(ControlId controlId) const {
 
 const MidiControl& MidiMapper::getMidiControl(ControlId controlId) const {
     // Vérifier pour encoder en premier
-    uint32_t encoderKey =
-        static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_ROTATION);
+    uint32_t encoderKey = makeCompositeKey(controlId, ControlType::ENCODER_ROTATION);
     auto encoderIt = mappings_.find(encoderKey);
     if (encoderIt != mappings_.end()) {
         return encoderIt->second.control;
     }
 
     // Puis vérifier pour bouton d'encodeur
-    uint32_t buttonKey =
-        static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_BUTTON);
+    uint32_t buttonKey = makeCompositeKey(controlId, ControlType::ENCODER_BUTTON);
     auto buttonIt = mappings_.find(buttonKey);
     if (buttonIt != mappings_.end()) {
         return buttonIt->second.control;
@@ -127,29 +154,27 @@ const MidiControl& MidiMapper::getMidiControl(ControlId controlId) const {
     return defaultControl_;
 }
 
-void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
-    // Limiteur de taux pour les messages d'encodeur
-    static const unsigned long RATE_LIMIT_MS = 16;            // 16ms entre les messages (60Hz)
-    static unsigned long lastSendTimePerEncoder[256] = {0};  // Temps du dernier envoi par encodeur
+//=============================================================================
+// Méthodes de traitement des encodeurs
+//=============================================================================
 
-    // On utilise une variable statique pour suivre les derniers encodeurs traités
-    // afin d'éviter les duplications
+bool MidiMapper::shouldProcessEncoder(EncoderId encoderId, int32_t position) {
+    // Limiteur de taux pour les messages d'encodeur
+    static unsigned long lastSendTimePerEncoder[256] = {0};  // Temps du dernier envoi par encodeur
     static EncoderId lastEncoderId = 255;  // Valeur impossible
     static int32_t lastPosition = -9999;   // Valeur impossible
     static unsigned long lastProcessTime = 0;
 
     // Vérifier la limitation de taux pour cet encodeur
     unsigned long currentTime = millis();
-    if (currentTime - lastSendTimePerEncoder[encoderId] < RATE_LIMIT_MS) {
-        // Trop tôt pour envoyer un autre message
-        return;
+    if (currentTime - lastSendTimePerEncoder[encoderId] < ENCODER_RATE_LIMIT_MS) {
+        return false;  // Trop tôt pour traiter
     }
 
-    // Si le même encodeur avec la même position a été traité récemment (dans les 10ms),
-    // on ignore ce traitement pour éviter les duplications
+    // Détection de doublons
     if (encoderId == lastEncoderId && position == lastPosition &&
-        currentTime - lastProcessTime < 10) {
-        return;  // Ignorer ce traitement car c'est un doublon
+        currentTime - lastProcessTime < DUPLICATE_CHECK_MS) {
+        return false;  // Éviter les doublons
     }
 
     // Mettre à jour les variables de tracking
@@ -157,52 +182,16 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     lastPosition = position;
     lastProcessTime = currentTime;
     lastSendTimePerEncoder[encoderId] = currentTime;
+    
+    return true;
+}
 
-    // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
-    if (isNavigationControl(encoderId)) {
-        return;
-    }
-
-    // Rechercher le mapping avec l'ID de l'encodeur et le type ENCODER_ROTATION
-    uint32_t encoderKey =
-        static_cast<uint32_t>(encoderId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_ROTATION);
-
-    auto it = mappings_.find(encoderKey);
-    if (it == mappings_.end()) {
-        #ifndef PERFORMANCE_MODE
-        // Diagnostic de mapping non trouvé
-        char noMappingEvent[50];
-        snprintf(noMappingEvent,
-                 sizeof(noMappingEvent),
-                 "No mapping found for encoder %d",
-                 encoderId);
-        DIAG_ON_EVENT(noMappingEvent);
-        #endif
-        return;  // Pas de mapping pour cet encodeur
-    }
-
-    MappingInfo& info = it->second;
-    const MidiControl& control = info.control;
-
-    // Calculer le delta de mouvement
-    int32_t delta = position - info.lastEncoderPosition;
-    if (delta == 0) {
-        return;  // Pas de changement
-    }
-
-    #ifndef PERFORMANCE_MODE
-    // Diagnostic avant application de la sensibilité
-    char preSensitivityEvent[50];
-    snprintf(preSensitivityEvent,
-             sizeof(preSensitivityEvent),
-             "Pre-sensibilité: Enc=%d Delta=%ld",
-             encoderId,
-             delta);
-    DIAG_ON_EVENT(preSensitivityEvent);
-    #endif
-
+int32_t MidiMapper::applyEncoderSensitivity(int32_t delta, EncoderId encoderId) {
     // Appliquer le facteur de sensibilité global
     float sensitivity = GlobalSettings::getInstance().getEncoderSensitivity();
+    
+    logDiagnostic("Pre-sensibilité: Enc=%d Delta=%ld", encoderId, delta);
+    
     if (sensitivity != 1.0f) {
         // Appliquer la sensibilité tout en préservant le signe
         int32_t delta_sign = (delta > 0) ? 1 : -1;
@@ -214,27 +203,18 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 
         // Reconstruire delta avec son signe
         int32_t new_delta = delta_sign * scaled_delta_abs;
-
-        #ifndef PERFORMANCE_MODE
-        // Diagnostic après application de la sensibilité
-        char sensitivityEvent[60];
-        snprintf(sensitivityEvent,
-                 sizeof(sensitivityEvent),
-                 "Post-sensibilité: Enc=%d Delta=%ld->%ld Sens=%.2f",
-                 encoderId,
-                 delta,
-                 new_delta,
-                 sensitivity);
-        DIAG_ON_EVENT(sensitivityEvent);
-        #endif
-
-        delta = new_delta;
+        
+        logDiagnostic("Post-sensibilité: Enc=%d Delta=%ld->%ld Sens=%.2f", 
+                     encoderId, delta, new_delta, sensitivity);
+        
+        return new_delta;
     }
+    
+    return delta;
+}
 
-    // Mettre à jour la dernière position
-    info.lastEncoderPosition = position;
-
-    // Calcul de la nouvelle valeur MIDI
+int16_t MidiMapper::calculateMidiValue(MappingInfo& info, int32_t delta, int32_t position) {
+    const MidiControl& control = info.control;
     int16_t newValue;
 
     if (control.relative) {
@@ -259,35 +239,65 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     }
 
     // Garantir que la valeur est dans la plage MIDI valide (0-127)
-    newValue = constrain(newValue, 0, 127);
+    return constrain(newValue, 0, 127);
+}
 
+void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
+    // Vérifier si l'encodeur doit être traité (limitation de taux)
+    if (!shouldProcessEncoder(encoderId, position)) {
+        return;
+    }
+    
+    // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
+    if (isNavigationControl(encoderId)) {
+        return;
+    }
+    
+    // Rechercher le mapping avec l'ID de l'encodeur et le type ENCODER_ROTATION
+    uint32_t encoderKey = makeCompositeKey(encoderId, ControlType::ENCODER_ROTATION);
+    auto it = mappings_.find(encoderKey);
+    if (it == mappings_.end()) {
+        logDiagnostic("No mapping found for encoder %d", encoderId);
+        return;  // Pas de mapping pour cet encodeur
+    }
+    
+    MappingInfo& info = it->second;
+    const MidiControl& control = info.control;
+    
+    // Calculer le delta de mouvement
+    int32_t delta = position - info.lastEncoderPosition;
+    if (delta == 0) {
+        return;  // Pas de changement
+    }
+    
+    // Appliquer la sensibilité aux mouvements d'encodeur
+    delta = applyEncoderSensitivity(delta, encoderId);
+    
+    // Mettre à jour la dernière position
+    info.lastEncoderPosition = position;
+    
+    // Calculer la nouvelle valeur MIDI selon le mode
+    int16_t newValue = calculateMidiValue(info, delta, position);
+    
     // Ne rien faire si la valeur n'a pas changé
     if (newValue == info.lastMidiValue) {
         return;
     }
-
+    
+    logDiagnostic("Envoi MIDI: Enc=%d CH=%d CC=%d Val=%d (mode %s)",
+                 encoderId, control.channel, control.control, newValue,
+                 control.relative ? "relatif" : "absolu");
+    
     #ifndef PERFORMANCE_MODE
-    // Diagnostic de la valeur MIDI envoyée
-    char midiEvent[60];
-    snprintf(midiEvent,
-             sizeof(midiEvent),
-             "Envoi MIDI: Enc=%d CH=%d CC=%d Val=%d (mode %s)",
-             encoderId,
-             control.channel,
-             control.control,
-             newValue,
-             control.relative ? "relatif" : "absolu");
-    DIAG_ON_EVENT(midiEvent);
-
     // Débogage pour voir l'ID de l'encodeur
     Serial.print(F("MidiMapper: Sending MIDI for encoderId="));
     Serial.println(encoderId);
     #endif
-
+    
     // Mettre à jour et envoyer la nouvelle valeur
     info.lastMidiValue = static_cast<uint8_t>(newValue);
-
-    // Utiliser le pool de commandes au lieu de créer un nouvel objet
+    
+    // Utiliser le pool de commandes
     SendMidiCCCommand& command = getNextCCCommand();
     command.reset(midiOut_, 
                   control.channel, 
@@ -297,95 +307,23 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     commandManager_.executeShared(command);
 }
 
-void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
-    // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
-    if (isNavigationControl(encoderId)) {
-        return;
-    }
+//=============================================================================
+// Méthodes de traitement des boutons
+//=============================================================================
 
-    // Rechercher le mapping avec l'ID de l'encodeur et le type ENCODER_BUTTON
-    uint32_t buttonKey =
-        static_cast<uint32_t>(encoderId) << 8 | static_cast<uint8_t>(ControlType::ENCODER_BUTTON);
-
-    auto it = mappings_.find(buttonKey);
-    if (it == mappings_.end()) {
-        #ifndef PERFORMANCE_MODE
-        // Diagnostic de mapping non trouvé
-        char noMappingEvent[50];
-        snprintf(noMappingEvent,
-                 sizeof(noMappingEvent),
-                 "No mapping found for encoder button %d",
-                 encoderId);
-        DIAG_ON_EVENT(noMappingEvent);
-        #endif
-        return;  // Pas de mapping pour ce bouton d'encodeur
-    }
-
-    MappingInfo& info = it->second;
-    const MidiControl& control = info.control;
-
-    // Pour les boutons, on utilise des notes MIDI au lieu de CC
-    uint8_t velocity = pressed ? 127 : 0;
-
-    #ifndef PERFORMANCE_MODE
-    // Diagnostic du bouton d'encodeur
-    char buttonEvent[60];
-    snprintf(buttonEvent,
-             sizeof(buttonEvent),
-             "Bouton encodeur MIDI: ID=%d CH=%d Note=%d Vel=%d",
-             encoderId,
-             control.channel,
-             control.control,
-             velocity);
-    DIAG_ON_EVENT(buttonEvent);
-    #endif
-
-    // Utiliser le pool d'objets pour créer la commande
-    SendMidiNoteCommand& command = getNextNoteCommand();
-    command.reset(midiOut_, control.channel, control.control, velocity);
-
-    // Si c'est une note on, la stocker pour pouvoir la couper plus tard
-    if (pressed) {
-        // Pour les notes actives, nous gardons toujours des objets gérés par smart pointers
-        // car elles doivent persister longtemps
-        auto noteCmd = std::make_unique<SendMidiNoteCommand>(
-            midiOut_, control.channel, control.control, velocity);
-        activeNotes_[encoderId] = std::move(noteCmd);
-        activeNotes_[encoderId]->execute();
-    } else {
-        // Si c'est une note off, utiliser la commande et la supprimer
-        auto noteIt = activeNotes_.find(encoderId);
-        if (noteIt != activeNotes_.end()) {
-            noteIt->second->undo();  // Undo = Note Off
-            activeNotes_.erase(noteIt);
-        } else {
-            // Si pas de note active, simplement exécuter la commande du pool
-            commandManager_.executeShared(command);
-        }
-    }
-}
-
-void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
+void MidiMapper::processButtonEvent(ControlId buttonId, bool pressed, ControlType type) {
     // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
     if (isNavigationControl(buttonId)) {
         return;
     }
 
-    // Rechercher le mapping avec l'ID du bouton et le type BUTTON
-    uint32_t buttonKey =
-        static_cast<uint32_t>(buttonId) << 8 | static_cast<uint8_t>(ControlType::BUTTON);
+    // Créer une clé composite à partir de l'ID et du type
+    uint32_t buttonKey = makeCompositeKey(buttonId, type);
 
     auto it = mappings_.find(buttonKey);
     if (it == mappings_.end()) {
-        #ifndef PERFORMANCE_MODE
-        // Diagnostic de mapping non trouvé
-        char noMappingEvent[50];
-        snprintf(noMappingEvent,
-                 sizeof(noMappingEvent),
-                 "No mapping found for button %d",
-                 buttonId);
-        DIAG_ON_EVENT(noMappingEvent);
-        #endif
+        const char* typeStr = (type == ControlType::ENCODER_BUTTON) ? "encoder button" : "button";
+        logDiagnostic("No mapping found for %s %d", typeStr, buttonId);
         return;  // Pas de mapping pour ce bouton
     }
 
@@ -395,18 +333,9 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
 
-    #ifndef PERFORMANCE_MODE
-    // Diagnostic du bouton
-    char buttonEvent[50];
-    snprintf(buttonEvent,
-             sizeof(buttonEvent),
-             "Bouton MIDI: ID=%d CH=%d Note=%d Vel=%d",
-             buttonId,
-             control.channel,
-             control.control,
-             velocity);
-    DIAG_ON_EVENT(buttonEvent);
-    #endif
+    const char* typeStr = (type == ControlType::ENCODER_BUTTON) ? "Bouton encodeur" : "Bouton";
+    logDiagnostic("%s MIDI: ID=%d CH=%d Note=%d Vel=%d", 
+                 typeStr, buttonId, control.channel, control.control, velocity);
 
     // Utiliser le pool d'objets pour créer la commande
     SendMidiNoteCommand& command = getNextNoteCommand();
@@ -433,6 +362,18 @@ void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
     }
 }
 
+void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
+    processButtonEvent(encoderId, pressed, ControlType::ENCODER_BUTTON);
+}
+
+void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
+    processButtonEvent(buttonId, pressed, ControlType::BUTTON);
+}
+
+//=============================================================================
+// Méthodes de maintenance et mises à jour
+//=============================================================================
+
 void MidiMapper::update() {
     // Mettre à jour les commandes de notes actives
     for (auto& pair : activeNotes_) {
@@ -442,22 +383,10 @@ void MidiMapper::update() {
     // Supprimer les notes qui ne sont plus actives
     for (auto it = activeNotes_.begin(); it != activeNotes_.end();) {
         if (!it->second->isNoteActive()) {
-            #ifndef PERFORMANCE_MODE
-            // Diagnostic de suppression de note
-            char noteEvent[50];
-            snprintf(noteEvent, sizeof(noteEvent), "Note supprimée: ID=%d", it->first);
-            DIAG_ON_EVENT(noteEvent);
-            #endif
-
+            logDiagnostic("Note supprimée: ID=%d", it->first);
             it = activeNotes_.erase(it);
         } else {
             ++it;
         }
     }
-}
-
-bool MidiMapper::isNavigationControl(ControlId controlId) const {
-    // Utiliser MappingConfiguration pour savoir si c'est un contrôle de navigation
-    static MappingConfiguration mappingConfig;
-    return mappingConfig.isNavigationControl(controlId);
 }
