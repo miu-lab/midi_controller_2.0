@@ -4,7 +4,6 @@
 #include "adapters/primary/ui/DisplayEventListener.hpp"
 #include "adapters/primary/ui/ViewManagerEventListener.hpp"
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
-#include "core/TaskScheduler.hpp"
 #include "core/tasks/DisplayUpdateTask.hpp"
 #include "core/utils/AppStrings.hpp"
 #include "core/utils/FlashStrings.hpp"

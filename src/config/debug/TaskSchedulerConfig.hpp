@@ -23,8 +23,8 @@
 namespace TaskTiming {
 static constexpr unsigned long MAX_INPUT_TIME_US = 1000;  // 1ms pour l'input (critique)
 static constexpr unsigned long MAX_MIDI_TIME_US = 2000;   // 2ms pour MIDI (critique)
-static constexpr unsigned long MAX_UI_TIME_US = 6;        // 6µs pour l'UI (moins critique)
+static constexpr unsigned long MAX_UI_TIME_US = 2000;     // 2ms pour l'UI (moins critique)
 
 // Période minimale d'exécution pour certaines tâches
-static constexpr unsigned long UI_MIN_PERIOD_MS = 16;  // 60Hz max pour l'UI
+static constexpr unsigned long UI_MIN_PERIOD_MS = 50;  // 20Hz max pour l'UI
 }  // namespace TaskTiming

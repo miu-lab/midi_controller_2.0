@@ -139,35 +139,11 @@ Result<bool, std::string> MidiControllerApp::init() {
 }
 
 void MidiControllerApp::update() {
-    static unsigned long lastUiUpdateTime = 0;
-    unsigned long startTime = micros();
-
-    // Priorité 1: Système d'entrée (critique)
+    // Seul l'appel essentiel est conservé - tout fonctionne grâce aux callbacks et au TaskScheduler
     if (m_inputSystem) {
         m_inputSystem->update();
     }
 
-    unsigned long afterInputTime = micros();
-    unsigned long inputDuration = afterInputTime - startTime;
-
-    // Priorité 2: Système MIDI (critique)
-    if (m_midiSystem && inputDuration <= TaskTiming::MAX_INPUT_TIME_US) {
-        m_midiSystem->update();
-    }
-
-    unsigned long afterMidiTime = micros();
-    unsigned long midiDuration = afterMidiTime - afterInputTime;
-
-    // Priorité 3: Système UI (moins critique, peut être exécuté à une fréquence plus basse)
-    unsigned long currentTime = millis();
-    if (m_uiSystem && inputDuration <= TaskTiming::MAX_INPUT_TIME_US &&
-        midiDuration <= TaskTiming::MAX_MIDI_TIME_US &&
-        currentTime - lastUiUpdateTime >= TaskTiming::UI_MIN_PERIOD_MS) {
-        m_uiSystem->update();
-        lastUiUpdateTime = currentTime;
-    }
-
-// Débordement temporel global à des fins de diagnostic
 #ifndef PERFORMANCE_MODE
     unsigned long totalDuration = micros() - startTime;
     static const unsigned long MAX_TOTAL_TIME_US = 5000;  // 5ms
