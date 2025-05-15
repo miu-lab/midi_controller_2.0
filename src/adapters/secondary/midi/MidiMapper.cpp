@@ -129,7 +129,7 @@ const MidiControl& MidiMapper::getMidiControl(ControlId controlId) const {
 
 void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Limiteur de taux pour les messages d'encodeur
-    static const unsigned long RATE_LIMIT_MS = 5;            // 5ms entre les messages (200Hz)
+    static const unsigned long RATE_LIMIT_MS = 16;            // 16ms entre les messages (60Hz)
     static unsigned long lastSendTimePerEncoder[256] = {0};  // Temps du dernier envoi par encodeur
 
     // On utilise une variable statique pour suivre les derniers encodeurs traités
@@ -145,10 +145,10 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;
     }
 
-    // Si le même encodeur avec la même position a été traité récemment (dans les 20ms),
+    // Si le même encodeur avec la même position a été traité récemment (dans les 10ms),
     // on ignore ce traitement pour éviter les duplications
     if (encoderId == lastEncoderId && position == lastPosition &&
-        currentTime - lastProcessTime < 20) {
+        currentTime - lastProcessTime < 10) {
         return;  // Ignorer ce traitement car c'est un doublon
     }
 

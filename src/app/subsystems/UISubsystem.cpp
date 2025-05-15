@@ -4,6 +4,7 @@
 #include "adapters/primary/ui/DisplayEventListener.hpp"
 #include "adapters/primary/ui/ViewManagerEventListener.hpp"
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
+#include "config/debug/TaskSchedulerConfig.hpp"
 #include "core/tasks/DisplayUpdateTask.hpp"
 #include "core/utils/AppStrings.hpp"
 #include "core/utils/FlashStrings.hpp"
@@ -68,7 +69,7 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         FlashStrings::copy(temp, sizeof(temp), MSG_CREATING_TASK);
         strcat(buffer, temp);
         Serial.println(buffer);
-        displayTask_ = std::make_shared<DisplayUpdateTask>(display_, 50);  // 50ms = 20fps max
+        displayTask_ = std::make_shared<DisplayUpdateTask>(display_, TaskTiming::UI_MIN_PERIOD_MS);  // Utilise la constante globale pour le taux de rafraîchissement
         int taskIndex = scheduler.addTask(displayTask_->getTaskFunction(),
                                           displayTask_->getIntervalMicros(),
                                           displayTask_->getPriority(),

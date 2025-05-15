@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 
+#include "config/debug/TaskSchedulerConfig.hpp"
 #include "core/TaskScheduler.hpp"
 #include "core/ports/output/DisplayPort.hpp"
 
@@ -18,7 +19,7 @@ public:
      * @param display Référence à l'adaptateur d'affichage
      * @param intervalMs Intervalle minimum entre les mises à jour en ms (limite le framerate)
      */
-    DisplayUpdateTask(std::shared_ptr<DisplayPort> display, uint32_t intervalMs = 50)
+    DisplayUpdateTask(std::shared_ptr<DisplayPort> display, uint32_t intervalMs = TaskTiming::UI_MIN_PERIOD_MS)
         : display_(display), needsUpdate_(false), intervalMs_(intervalMs) {}
 
     /**

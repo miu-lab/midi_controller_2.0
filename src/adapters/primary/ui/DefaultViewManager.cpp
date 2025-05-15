@@ -259,13 +259,9 @@ void DefaultViewManager::render() {
     EventBus::getInstance().publish(*event);
     
     // Forcer une demande immédiate de mise à jour pour éviter les problèmes de timing
-    // Cette ligne est critique pour assurer le bon fonctionnement - si nécessaire en production
-    static int forceUpdateCounter = 0;
-    if (++forceUpdateCounter % 5 == 0) { // 1 fois sur 5 rend plus fiable
-        // Mettre à jour l'affichage directement comme solution de secours 
-        // pour s'assurer que l'écran se met bien à jour
-        display_->update();
-    }
+    // Cette ligne est critique pour assurer le bon fonctionnement
+    // Mise à jour directe CHAQUE FOIS pour assurer une UI plus réactive
+    display_->update();
     
     // Compter le nombre de rendus pour débuguer
     static unsigned long lastRenderCountTime = 0;

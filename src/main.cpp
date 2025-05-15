@@ -31,11 +31,6 @@ void setup() {
     app = std::make_shared<MidiControllerApp>(container);
 
     auto result = app->init();
-
-    // // Afficher un message de bienvenue
-    // auto uiSystem = container->resolve<IUISystem>();
-    // // Pour le débogage, dessiner un motif de test
-    // auto display = container->resolve<DisplayPort>();
 }
 
 void loop() {
