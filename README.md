@@ -32,20 +32,6 @@ Le projet est organisé selon une architecture hexagonale (aussi appelée archit
   - **Subsystems** : Sous-systèmes modulaires encapsulant des fonctionnalités complètes
   - **DI** : Système d'injection de dépendances moderne
 
-### Injection de Dépendances
-
-Le projet utilise un système moderne d'injection de dépendances basé sur:
-
-```cpp
-// Enregistrement d'une dépendance
-container->registerDependency<IInputSystem>(inputSystem);
-
-// Résolution d'une dépendance
-auto inputSystem = container->resolve<IInputSystem>();
-```
-
-Pour plus d'informations, voir [DependencyInjection.md](docs/DependencyInjection.md).
-
 ### Sous-systèmes
 
 L'application est divisée en sous-systèmes indépendants, chacun implémentant une interface abstraite:
@@ -62,43 +48,6 @@ L'application est divisée en sous-systèmes indépendants, chacun implémentant
 - **Profils multiples**: Sauvegardez et chargez différentes configurations
 - **Mode d'apprentissage**: Apprenez facilement de nouveaux mappings MIDI
 - **Modularité**: Ajoutez de nouvelles fonctionnalités sans modifier le code existant
-
-## Documentation
-
-La documentation complète se trouve dans le dossier `docs/`:
-
-- [MigrationGuide.md](docs/MigrationGuide.md): Guide de migration vers la nouvelle architecture
-- [DependencyInjection.md](docs/DependencyInjection.md): Utilisation du système d'injection de dépendances
-- [GestionErreurs.md](docs/GestionErreurs.md): Guide d'utilisation de Result<T, E>
-- [DeveloperGuide.md](docs/DeveloperGuide.md): Guide du développeur complet
-- [NewArchitecture.md](docs/NewArchitecture.md): Description détaillée de la nouvelle architecture
-- [refactoring_progress.md](docs/refactoring_progress.md): Historique du refactoring
-
-## Conventions de Code
-
-Le projet suit les conventions définies dans le fichier [CodingStandard.md](CodingStandard.md). En résumé :
-
-- Membres de classe : suffixe underscore (`_`) 
-- Variables locales : camelCase sans suffixe
-- Noms de classes : PascalCase
-- Interfaces : préfixe "I" + PascalCase
-- Méthodes : camelCase
-- Documentation Doxygen pour l'API publique
-
-## Gestion des Erreurs
-
-Le projet utilise `Result<T, E>` pour la gestion des erreurs, permettant un traitement explicite sans exceptions. Exemple:
-
-```cpp
-Result<bool, std::string> init() {
-    if (!loadConfiguration()) {
-        return Result<bool, std::string>("Échec du chargement de la configuration");
-    }
-    return Result<bool, std::string>(true);
-}
-```
-
-Voir [GestionErreurs.md](docs/GestionErreurs.md) pour plus d'informations.
 
 ## Compilation et Déploiement
 
