@@ -184,7 +184,9 @@ void InitializationScript::setupMidiCallbacks(std::shared_ptr<DependencyContaine
     }
 
     // Configuration des callbacks directs pour le chemin critique MIDI
-    // La capture de midiSystem par valeur assure la durée de vie des lambdas
+    // Depuis la refactorisation, ces callbacks sont essentiels car ils permettent à MidiMapper
+    // de recevoir directement les événements d'encodeur pour gérer le suivi d'état et la limitation de taux
+    // Note: La capture de midiSystem par valeur assure la durée de vie des lambdas
     inputController->onEncoderChangedDirect = [midiSys = midiSystem.get()](EncoderId id,
                                                                            int32_t position) {
         midiSys->getMidiMapper().processEncoderChange(id, position);

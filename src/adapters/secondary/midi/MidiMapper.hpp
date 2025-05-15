@@ -58,8 +58,15 @@ public:
      */
     const MidiControl& getMidiControl(ControlId controlId) const;
 
-    /**
+/**
      * @brief Traite un changement d'encodeur
+     * 
+     * Cette méthode est responsable de :
+     * - Limiter le taux d'envoi des messages MIDI (via shouldProcessEncoder)
+     * - Détecter et éliminer les doublons
+     * - Suivre les positions des encodeurs
+     * - Appliquer les stratégies de mapping MIDI appropriées
+     * 
      * @param encoderId ID de l'encodeur
      * @param position Position absolue de l'encodeur
      */

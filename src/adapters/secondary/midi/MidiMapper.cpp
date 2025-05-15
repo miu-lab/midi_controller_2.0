@@ -159,6 +159,9 @@ const MidiControl& MidiMapper::getMidiControl(ControlId controlId) const {
 //=============================================================================
 
 bool MidiMapper::shouldProcessEncoder(EncoderId encoderId, int32_t position) {
+    // Cette méthode centralise désormais toute la logique de limitation de taux
+    // et de détection de doublons pour les encodeurs dans le système.
+    
     // Limiteur de taux pour les messages d'encodeur
     static unsigned long lastSendTimePerEncoder[256] = {0};  // Temps du dernier envoi par encodeur
     static EncoderId lastEncoderId = 255;  // Valeur impossible
@@ -243,6 +246,9 @@ int16_t MidiMapper::calculateMidiValue(MappingInfo& info, int32_t delta, int32_t
 }
 
 void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
+    // Note: Depuis la refactorisation, MidiMapper est responsable de tout le traitement des encodeurs,
+    // y compris la limitation de taux, le suivi des positions et la détection des doublons.
+    
     // Vérifier si l'encodeur doit être traité (limitation de taux)
     if (!shouldProcessEncoder(encoderId, position)) {
         return;
