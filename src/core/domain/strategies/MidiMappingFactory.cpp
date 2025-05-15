@@ -6,16 +6,16 @@ std::unique_ptr<IMidiMappingStrategy> MidiMappingFactory::create(StrategyType ty
         return createAbsolute(0, 127);
 
     case StrategyType::RELATIVE_BINARY:
-        return createRelative(1.0f, RelativeMappingStrategy::EncodingType::BINARY_OFFSET);
+        return createRelative(5.0f, RelativeMappingStrategy::EncodingType::BINARY_OFFSET);
 
     case StrategyType::RELATIVE_SIGNED:
-        return createRelative(1.0f, RelativeMappingStrategy::EncodingType::SIGNED_BIT);
+        return createRelative(5.0f, RelativeMappingStrategy::EncodingType::SIGNED_BIT);
 
     case StrategyType::RELATIVE_SIGNED2:
-        return createRelative(1.0f, RelativeMappingStrategy::EncodingType::SIGNED_2);
+        return createRelative(5.0f, RelativeMappingStrategy::EncodingType::SIGNED_2);
 
     case StrategyType::RELATIVE_INCREMENT:
-        return createRelative(1.0f, RelativeMappingStrategy::EncodingType::INCREMENT_TYPE);
+        return createRelative(5.0f, RelativeMappingStrategy::EncodingType::INCREMENT_TYPE);
 
     case StrategyType::DYNAMIC_RANGE:
         return createDynamicRange();
