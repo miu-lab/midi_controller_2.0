@@ -14,8 +14,6 @@ Ce projet implémente un contrôleur MIDI complet avec:
 
 Le projet est organisé selon une architecture hexagonale (aussi appelée architecture en oignon) avec injection de dépendances:
 
-![Architecture du projet](docs/assets/architecture_diagram.png)
-
 ### Couches Principales
 
 - **Core** : Contient la logique métier principale, indépendante de l'implémentation

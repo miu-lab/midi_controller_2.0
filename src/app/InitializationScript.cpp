@@ -183,23 +183,10 @@ void InitializationScript::setupMidiCallbacks(std::shared_ptr<DependencyContaine
         return;
     }
 
-    // Configuration des callbacks directs pour le chemin critique MIDI
-    // Depuis la refactorisation, ces callbacks sont essentiels car ils permettent à MidiMapper
-    // de recevoir directement les événements d'encodeur pour gérer le suivi d'état et la limitation de taux
-    // Note: La capture de midiSystem par valeur assure la durée de vie des lambdas
-    inputController->onEncoderChangedDirect = [midiSys = midiSystem.get()](EncoderId id,
-                                                                           int32_t position) {
-        midiSys->getMidiMapper().processEncoderChange(id, position);
-    };
-
-    inputController->onEncoderButtonDirect = [midiSys = midiSystem.get()](EncoderId id,
-                                                                          bool pressed) {
-        midiSys->getMidiMapper().processEncoderButton(id, pressed);
-    };
-
-    inputController->onButtonDirect = [midiSys = midiSystem.get()](ButtonId id, bool pressed) {
-        midiSys->getMidiMapper().processButtonPress(id, pressed);
-    };
-
-    Serial.println(F("Callbacks MIDI configurés"));
+    // Déléguer la configuration des callbacks au sous-système MIDI
+    if (midiSystem->configureCallbacks(inputController)) {
+        Serial.println(F("Configuration des callbacks MIDI déléguée au MidiSubsystem"));
+    } else {
+        Serial.println(F("Échec de la configuration des callbacks MIDI"));
+    }
 }

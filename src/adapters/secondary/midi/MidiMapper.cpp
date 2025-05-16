@@ -297,14 +297,13 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;
     }
 
+#ifndef PERFORMANCE_MODE
     logDiagnostic("Envoi MIDI: Enc=%d CH=%d CC=%d Val=%d (mode %s)",
                   encoderId,
                   control.channel,
                   control.control,
                   newValue,
                   control.relative ? "relatif" : "absolu");
-
-#ifndef PERFORMANCE_MODE
     // Débogage pour voir l'ID de l'encodeur
     Serial.print(F("MidiMapper: Sending MIDI for encoderId="));
     Serial.println(encoderId);

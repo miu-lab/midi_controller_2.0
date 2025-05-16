@@ -115,23 +115,21 @@ bool MidiSubsystem::configureCallbacks(std::shared_ptr<InputController> inputCon
         return false;
     }
 
-    // Capturer une référence au MidiMapper
-    auto& mapper = *midiMapper_;
+    // Configuration des callbacks directs pour le chemin critique MIDI
+    // Capture de 'this' par référence pour éviter toute capture inutile d'instance
+    inputController->onEncoderChangedDirect = [this](EncoderId id, int32_t position) {
+        this->getMidiMapper().processEncoderChange(id, position);
+    };
 
-    // Configurer le callback pour les rotations d'encodeur
-    inputController->setMidiEncoderCallback(
-        [&mapper](EncoderId id, int32_t position, int8_t delta) {
-            mapper.processEncoderChange(id, position);
-        });
+    inputController->onEncoderButtonDirect = [this](EncoderId id, bool pressed) {
+        this->getMidiMapper().processEncoderButton(id, pressed);
+    };
 
-    // Configurer le callback pour les boutons d'encodeur
-    inputController->setMidiEncoderButtonCallback(
-        [&mapper](EncoderId id, bool pressed) { mapper.processEncoderButton(id, pressed); });
+    inputController->onButtonDirect = [this](ButtonId id, bool pressed) {
+        this->getMidiMapper().processButtonPress(id, pressed);
+    };
 
-    // Configurer le callback pour les boutons standard
-    inputController->setMidiButtonCallback(
-        [&mapper](ButtonId id, bool pressed) { mapper.processButtonPress(id, pressed); });
-
+    Serial.println(F("MidiSubsystem: Callbacks directs configurés"));
     return true;
 }
 

@@ -81,10 +81,11 @@ public:
     MidiMapper& getMidiMapper() const;
 
     /**
-     * @brief Configure les callbacks MIDI sur l'InputController fourni
+     * @brief Configure les callbacks MIDI directs sur l'InputController fourni
      *
-     * Cette méthode établit les connexions entre InputController et MidiMapper
-     * pour permettre le traitement des événements MIDI
+     * Cette méthode établit les connexions directes entre InputController et MidiMapper
+     * pour permettre le traitement des événements MIDI avec une latence minimale.
+     * Ces callbacks directs sont essentiels pour le chemin critique de traitement MIDI.
      *
      * @param inputController Pointeur vers l'InputController à configurer
      * @return true si la configuration a réussi, false sinon
