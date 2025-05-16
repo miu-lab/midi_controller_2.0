@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 
-#include "adapters/secondary/midi/BufferedMidiOut.hpp"
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "config/MappingConfiguration.hpp"
@@ -49,15 +48,8 @@ Result<bool, std::string> MidiSubsystem::init() {
         }
     }
     
-    // Créer BufferedMidiOut comme premier décorateur avec flush immédiat activé
-    auto bufferedMidiOut = std::make_shared<BufferedMidiOut>(*baseMidiOut, 128, true); // Buffer de taille 128
-    if (!bufferedMidiOut) {
-        return Result<bool, std::string>::error("Failed to create BufferedMidiOut");
-    }
-    Serial.println(F("MidiSubsystem: Created BufferedMidiOut wrapper (immediate flush mode)"));
-
-    // Créer l'EventEnabledMidiOut qui va décorer BufferedMidiOut
-    auto eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*bufferedMidiOut);
+    // Créer l'EventEnabledMidiOut qui va décorer directement TeensyUsbMidiOut
+    auto eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*baseMidiOut);
     if (!eventEnabledMidiOut) {
         return Result<bool, std::string>::error("Failed to create EventEnabledMidiOut");
     }
@@ -71,7 +63,6 @@ Result<bool, std::string> MidiSubsystem::init() {
 
     // Enregistrer également les objets intermédiaires pour éviter qu'ils soient détruits
     container_->registerDependency<TeensyUsbMidiOut>(baseMidiOut);
-    container_->registerDependency<BufferedMidiOut>(bufferedMidiOut);
     container_->registerDependency<EventEnabledMidiOut>(eventEnabledMidiOut);
 
     // Créer le MidiMapper et MidiInHandler
@@ -154,30 +145,16 @@ void MidiSubsystem::update() {
         midiMapper_->update();
     }
     
-    // Mettre à jour BufferedMidiOut pour envoyer les messages non-immédiats
-    auto bufferedMidiOut = container_->resolve<BufferedMidiOut>();
-    if (bufferedMidiOut) {
-        // Même avec le mode flush immédiat, certains messages pourraient être en attente
-        // (par exemple ceux qui étaient en buffer avant de passer en mode immédiat)
-        unsigned int sentCount = bufferedMidiOut->update(8); // Max 8 messages par cycle
-        
-        // Débogage périodique si des messages sont en attente
-        if (sentCount > 0 && configuration_->isDebugEnabled()) {
-            Serial.printf(F("MidiSubsystem: Sent %u buffered MIDI messages\n"), sentCount);
-        }
-    }
+    // Appeler usbMIDI.read() directement pour s'assurer que les messages MIDI sont traités
+    // C'est nécessaire pour que les messages MIDI soient physiquement transmis
+    usbMIDI.read();
 
     // Débogage périodique toutes les 60 secondes
     static unsigned long lastDebugTime = 0;
     unsigned long currentTime = millis();
     if (currentTime - lastDebugTime > 60000) {
         if (configuration_->isDebugEnabled()) {
-            auto bufferedMidiOut = container_->resolve<BufferedMidiOut>();
-            if (bufferedMidiOut) {
-                Serial.printf(F("MidiSubsystem: %u pending MIDI messages (%s mode)\n"), 
-                             bufferedMidiOut->getPendingCount(),
-                             bufferedMidiOut->isImmediateFlush() ? "immediate" : "buffered");
-            }
+            Serial.println(F("MidiSubsystem: MIDI processed"));
         }
         lastDebugTime = currentTime;
     }

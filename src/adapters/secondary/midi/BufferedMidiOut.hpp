@@ -35,7 +35,7 @@ public:
 
     // Constructeur
     explicit BufferedMidiOut(MidiOutputPort& output, uint16_t bufferSize = DEFAULT_BUFFER_SIZE, 
-                            bool immediateFlush = true);
+                            bool immediateFlush = false);
     ~BufferedMidiOut();
 
     // Implémentation de MidiOutputPort

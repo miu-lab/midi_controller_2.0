@@ -1,6 +1,7 @@
 #include "adapters/secondary/midi/BufferedMidiOut.hpp"
 
 #include "config/debug/DebugMacros.hpp"
+#include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 
 BufferedMidiOut::BufferedMidiOut(MidiOutputPort& output, uint16_t bufferSize, bool immediateFlush)
     : output_(output),
@@ -27,7 +28,12 @@ BufferedMidiOut::BufferedMidiOut(MidiOutputPort& output, uint16_t bufferSize, bo
         hashTable_[i] = INVALID_INDEX;
     }
 
+    // Initialisation complète du buffer
     clear();
+    
+    // Forcer le flush initial au cas où des messages seraient déjà en attente
+    // Appeler usbMIDI.read() directement pour s'assurer que le port MIDI est prêt
+    usbMIDI.read();
 }
 
 BufferedMidiOut::~BufferedMidiOut() {
@@ -51,6 +57,9 @@ void BufferedMidiOut::sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value
         // Mode flush immédiat : envoyer directement au port MIDI tout en gardant le buffer
         if (immediateFlush_) {
             output_.sendControlChange(ch, cc, value);
+            
+            // En mode flush immédiat, appeler usbMIDI.read() pour s'assurer que le message est traité
+            usbMIDI.read();
         }
     }
 }
@@ -71,6 +80,9 @@ void BufferedMidiOut::sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity
         // Mode flush immédiat : envoyer directement
         if (immediateFlush_) {
             output_.sendNoteOn(ch, note, velocity);
+            
+            // En mode flush immédiat, appeler usbMIDI.read() pour s'assurer que le message est traité
+            usbMIDI.read();
         }
     }
 }
@@ -91,6 +103,9 @@ void BufferedMidiOut::sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocit
         // Mode flush immédiat : envoyer directement
         if (immediateFlush_) {
             output_.sendNoteOff(ch, note, velocity);
+            
+            // En mode flush immédiat, appeler usbMIDI.read() pour s'assurer que le message est traité
+            usbMIDI.read();
         }
     }
 }
@@ -132,9 +147,14 @@ void BufferedMidiOut::flush() {
 
         // Temporisation minimale entre les messages (sauf en mode haute priorité)
         if (!highPriority_ && i < messageCount - 1) {
-            delayMicroseconds(100);
+            delayMicroseconds(50); // Temporisation réduite pour une meilleure réactivité
         }
     }
+
+    // S'assurer que les messages sont bien envoyés en appelant flush sur l'objet TeensyUsbMidiOut sous-jacent
+    // Cette ligne est cruciale pour s'assurer que les messages MIDI sont physiquement transmis
+    // Au lieu d'utiliser dynamic_cast, utiliser directement usbMIDI
+    usbMIDI.read(); // Traite les entrées/sorties MIDI
 
     // Tous les messages ont été envoyés
     dirtyCount_ = 0;
@@ -352,9 +372,13 @@ uint16_t BufferedMidiOut::update(uint16_t maxMessages) {
         // Temporisation minimale entre les messages pour éviter de saturer le port MIDI
         // (sauf si mode haute priorité)
         if (!highPriority_ && i < messageCount - 1) {
-            delayMicroseconds(200);
+            delayMicroseconds(100); // Temporisation réduite pour une meilleure réactivité
         }
     }
+
+    // S'assurer que les messages sont bien envoyés 
+    // Appeler usbMIDI.read() pour traiter les entrées/sorties MIDI
+    usbMIDI.read();
 
     // Optimisation: si nous avons envoyé tous les messages et qu'il y a beaucoup de messages
     // envoyés, compacter le buffer
@@ -368,21 +392,33 @@ uint16_t BufferedMidiOut::update(uint16_t maxMessages) {
 void BufferedMidiOut::sendProgramChange(MidiChannel ch, uint8_t program) {
     // Pour l'instant, on transmet directement sans buffer
     output_.sendProgramChange(ch, program);
+    
+    // S'assurer que les messages sont bien envoyés
+    usbMIDI.read();
 }
 
 void BufferedMidiOut::sendPitchBend(MidiChannel ch, uint16_t value) {
     // Pour l'instant, on transmet directement sans buffer
     output_.sendPitchBend(ch, value);
+    
+    // S'assurer que les messages sont bien envoyés
+    usbMIDI.read();
 }
 
 void BufferedMidiOut::sendChannelPressure(MidiChannel ch, uint8_t pressure) {
     // Pour l'instant, on transmet directement sans buffer
     output_.sendChannelPressure(ch, pressure);
+    
+    // S'assurer que les messages sont bien envoyés
+    usbMIDI.read();
 }
 
 void BufferedMidiOut::sendSysEx(const uint8_t* data, uint16_t length) {
     // Pour l'instant, on transmet directement sans buffer
     output_.sendSysEx(data, length);
+    
+    // S'assurer que les messages sont bien envoyés
+    usbMIDI.read();
 }
 
 void BufferedMidiOut::setImmediateFlush(bool enable) {
@@ -392,5 +428,7 @@ void BufferedMidiOut::setImmediateFlush(bool enable) {
     // flush tout de suite pour synchroniser l'état
     if (enable && dirtyCount_ > 0) {
         flush();
+        // S'assurer que les messages sont bien envoyés
+        usbMIDI.read();
     }
 }
