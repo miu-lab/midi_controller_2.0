@@ -2,13 +2,14 @@
 
 #include "config/debug/DebugMacros.hpp"
 
-BufferedMidiOut::BufferedMidiOut(MidiOutputPort& output, uint16_t bufferSize)
+BufferedMidiOut::BufferedMidiOut(MidiOutputPort& output, uint16_t bufferSize, bool immediateFlush)
     : output_(output),
       bufferSize_(bufferSize > 0 ? bufferSize : DEFAULT_BUFFER_SIZE),
       nextIndex_(0),
       dirtyCount_(0),
       highPriority_(false),
-      usingDynamicBuffer_(bufferSize > STATIC_BUFFER_SIZE) {
+      usingDynamicBuffer_(bufferSize > STATIC_BUFFER_SIZE),
+      immediateFlush_(immediateFlush) {
     // Utiliser le buffer statique si possible, sinon allouer dynamiquement
     if (usingDynamicBuffer_) {
         dynamicBuffer_ = std::make_unique<MidiMessage[]>(bufferSize_);
@@ -46,6 +47,11 @@ void BufferedMidiOut::sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value
             buffer_[index].sent = false;
             dirtyCount_++;
         }
+
+        // Mode flush immédiat : envoyer directement au port MIDI tout en gardant le buffer
+        if (immediateFlush_) {
+            output_.sendControlChange(ch, cc, value);
+        }
     }
 }
 
@@ -61,6 +67,11 @@ void BufferedMidiOut::sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity
             buffer_[index].sent = false;
             dirtyCount_++;
         }
+
+        // Mode flush immédiat : envoyer directement
+        if (immediateFlush_) {
+            output_.sendNoteOn(ch, note, velocity);
+        }
     }
 }
 
@@ -75,6 +86,11 @@ void BufferedMidiOut::sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocit
         if (buffer_[index].sent) {
             buffer_[index].sent = false;
             dirtyCount_++;
+        }
+
+        // Mode flush immédiat : envoyer directement
+        if (immediateFlush_) {
+            output_.sendNoteOff(ch, note, velocity);
         }
     }
 }
@@ -347,4 +363,34 @@ uint16_t BufferedMidiOut::update(uint16_t maxMessages) {
     }
 
     return sentCount;
+}
+
+void BufferedMidiOut::sendProgramChange(MidiChannel ch, uint8_t program) {
+    // Pour l'instant, on transmet directement sans buffer
+    output_.sendProgramChange(ch, program);
+}
+
+void BufferedMidiOut::sendPitchBend(MidiChannel ch, uint16_t value) {
+    // Pour l'instant, on transmet directement sans buffer
+    output_.sendPitchBend(ch, value);
+}
+
+void BufferedMidiOut::sendChannelPressure(MidiChannel ch, uint8_t pressure) {
+    // Pour l'instant, on transmet directement sans buffer
+    output_.sendChannelPressure(ch, pressure);
+}
+
+void BufferedMidiOut::sendSysEx(const uint8_t* data, uint16_t length) {
+    // Pour l'instant, on transmet directement sans buffer
+    output_.sendSysEx(data, length);
+}
+
+void BufferedMidiOut::setImmediateFlush(bool enable) {
+    immediateFlush_ = enable;
+
+    // Si on active le flush immédiat et qu'il y a des messages en attente,
+    // flush tout de suite pour synchroniser l'état
+    if (enable && dirtyCount_ > 0) {
+        flush();
+    }
 }

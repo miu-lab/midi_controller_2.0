@@ -33,7 +33,4 @@ private:
     std::shared_ptr<IInputSystem> m_inputSystem;
     std::shared_ptr<IMidiSystem> m_midiSystem;
     std::shared_ptr<IUISystem> m_uiSystem;
-
-    // Adaptateurs
-    std::shared_ptr<EventEnabledMidiOut> m_eventEnabledMidiOut;
 };

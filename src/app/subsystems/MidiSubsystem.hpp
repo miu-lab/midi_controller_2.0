@@ -35,12 +35,20 @@ public:
     /**
      * @brief Initialise le sous-système MIDI
      *
+     * Cette méthode configure la chaîne de traitement MIDI:
+     * TeensyUsbMidiOut -> BufferedMidiOut -> EventEnabledMidiOut
+     * 
      * @return Result<bool, std::string> Succès ou message d'erreur
      */
     Result<bool, std::string> init() override;
 
     /**
      * @brief Met à jour l'état du sous-système MIDI
+     * 
+     * Cette méthode effectue les opérations suivantes :
+     * 1. Traite les messages MIDI entrants via MidiInHandler
+     * 2. Met à jour le MidiMapper pour les commandes temporisées
+     * 3. Traite les messages MIDI en attente dans BufferedMidiOut
      */
     void update() override;
 

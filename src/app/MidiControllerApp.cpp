@@ -17,7 +17,6 @@ MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> contai
 
 MidiControllerApp::~MidiControllerApp() {
     // Libération des ressources dans l'ordre inverse
-    m_eventEnabledMidiOut.reset();
     m_uiSystem.reset();
     m_midiSystem.reset();
     m_inputSystem.reset();
@@ -35,15 +34,8 @@ Result<bool, std::string> MidiControllerApp::init() {
         return Result<bool, std::string>::error("Sous-systèmes manquants");
     }
 
-    // 2. Configuration du décorateur MIDI pour les événements
-    auto midiPort = m_container->resolve<MidiOutputPort>();
-    if (!midiPort) {
-        return Result<bool, std::string>::error("MidiOutputPort manquant");
-    }
-
-    m_eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*midiPort);
-    m_container->registerDependency<MidiOutputPort>(m_eventEnabledMidiOut);
-
+    // Le décorateur MIDI pour les événements est maintenant créé et géré par MidiSubsystem
+    
     return Result<bool, std::string>::success(true);
 }
 

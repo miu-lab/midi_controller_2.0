@@ -34,17 +34,38 @@ public:
     };
 
     // Constructeur
-    explicit BufferedMidiOut(MidiOutputPort& output, uint16_t bufferSize = DEFAULT_BUFFER_SIZE);
+    explicit BufferedMidiOut(MidiOutputPort& output, uint16_t bufferSize = DEFAULT_BUFFER_SIZE, 
+                            bool immediateFlush = true);
     ~BufferedMidiOut();
 
     // Implémentation de MidiOutputPort
     void sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) override;
     void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity) override;
     void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity) override;
+    void sendProgramChange(MidiChannel ch, uint8_t program) override;
+    void sendPitchBend(MidiChannel ch, uint16_t value) override;
+    void sendChannelPressure(MidiChannel ch, uint8_t pressure) override;
+    void sendSysEx(const uint8_t* data, uint16_t length) override;
 
     // Méthodes spécifiques au buffer
     void flush();
     void clear();
+    
+    /**
+     * @brief Active ou désactive le flush immédiat des messages
+     * 
+     * Lorsque activé, les messages sont envoyés immédiatement au port MIDI 
+     * tout en étant stockés dans le buffer pour déduplication
+     * 
+     * @param enable True pour activer le flush immédiat, false pour utiliser uniquement le buffer
+     */
+    void setImmediateFlush(bool enable);
+    
+    /**
+     * @brief Indique si le flush immédiat est activé
+     * @return True si le flush immédiat est activé
+     */
+    bool isImmediateFlush() const { return immediateFlush_; }
 
     /**
      * @brief Met à jour le buffer et envoie les messages en attente
@@ -90,6 +111,7 @@ private:
     uint16_t hashTable_[HASH_TABLE_SIZE];           // Table de hachage pour un accès rapide
     bool highPriority_;                             // Mode haute priorité (moins de temporisation)
     bool usingDynamicBuffer_;                       // Si nous utilisons un buffer dynamique
+    bool immediateFlush_;                           // Si les messages sont envoyés immédiatement
 
     // Fonction de hachage simple et efficace pour les messages MIDI
     inline uint16_t hashMessage(MessageType type, MidiChannel ch, uint8_t control) const {
