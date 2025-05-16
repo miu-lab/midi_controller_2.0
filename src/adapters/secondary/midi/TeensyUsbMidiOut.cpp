@@ -16,8 +16,8 @@ void TeensyUsbMidiOut::sendControlChange(MidiChannel ch, MidiCC cc, uint8_t valu
     // Envoyer via usbMIDI
     usbMIDI.sendControlChange(cc, value, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
     
-    // Appeler read pour traiter les messages MIDI
-    usbMIDI.read();
+    // Appeler send_now pour assurer la transmission immédiate
+    usbMIDI.send_now();
 }
 
 void TeensyUsbMidiOut::sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity) {
@@ -27,8 +27,8 @@ void TeensyUsbMidiOut::sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocit
     // Envoyer via usbMIDI
     usbMIDI.sendNoteOn(note, velocity, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
     
-    // Appeler read pour traiter les messages MIDI
-    usbMIDI.read();
+    // Appeler send_now pour assurer la transmission immédiate
+    usbMIDI.send_now();
 }
 
 void TeensyUsbMidiOut::sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity) {
@@ -38,33 +38,36 @@ void TeensyUsbMidiOut::sendNoteOff(MidiChannel ch, MidiNote note, uint8_t veloci
     // Envoyer via usbMIDI
     usbMIDI.sendNoteOff(note, velocity, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
     
-    // Appeler read pour traiter les messages MIDI
-    usbMIDI.read();
+    // Appeler send_now pour assurer la transmission immédiate
+    usbMIDI.send_now();
 }
 
 // Nouvelles méthodes implémentées
 void TeensyUsbMidiOut::sendProgramChange(MidiChannel ch, uint8_t program) {
     usbMIDI.sendProgramChange(program, ch + 1);
-    usbMIDI.read();
+    usbMIDI.send_now();
 }
 
 void TeensyUsbMidiOut::sendPitchBend(MidiChannel ch, uint16_t value) {
     usbMIDI.sendPitchBend(value, ch + 1);
-    usbMIDI.read();
+    usbMIDI.send_now();
 }
 
 void TeensyUsbMidiOut::sendChannelPressure(MidiChannel ch, uint8_t pressure) {
     usbMIDI.sendAfterTouch(pressure, ch + 1);
-    usbMIDI.read();
+    usbMIDI.send_now();
 }
 
 void TeensyUsbMidiOut::sendSysEx(const uint8_t* data, uint16_t length) {
     usbMIDI.sendSysEx(length, data);
-    usbMIDI.read();
+    usbMIDI.send_now();
 }
 
 void TeensyUsbMidiOut::flush() {
-    // Traiter les messages USB
+    // Forcer l'envoi des messages en attente
+    usbMIDI.send_now();
+
+    // Traiter les messages entrants
     usbMIDI.read();
 }
 

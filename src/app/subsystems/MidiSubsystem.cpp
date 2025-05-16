@@ -145,8 +145,8 @@ void MidiSubsystem::update() {
         midiMapper_->update();
     }
     
-    // Appeler usbMIDI.read() directement pour s'assurer que les messages MIDI sont traités
-    // C'est nécessaire pour que les messages MIDI soient physiquement transmis
+    // Appeler usbMIDI.read() pour traiter les messages MIDI entrants
+    // Ceci est nécessaire pour que les callbacks MIDI entrants soient appelés
     usbMIDI.read();
 
     // Débogage périodique toutes les 60 secondes
