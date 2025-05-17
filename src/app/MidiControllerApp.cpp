@@ -35,23 +35,13 @@ Result<bool, std::string> MidiControllerApp::init() {
     }
 
     // Le décorateur MIDI pour les événements est maintenant créé et géré par MidiSubsystem
-    
+
     return Result<bool, std::string>::success(true);
 }
 
 void MidiControllerApp::update() {
-    // Seule la mise à jour d'entrée est nécessaire car les événements, callbacks
-    // et le TaskScheduler gèrent le reste automatiquement
+    // Mettre à jour le sous-système d'entrée
     if (m_inputSystem) {
-        unsigned long startTime = micros();
-
         m_inputSystem->update();
-
-#ifndef PERFORMANCE_MODE
-        unsigned long duration = micros() - startTime;
-        if (duration > 30000) {  // 30ms
-            Serial.printf(F("WARNING: Update cycle took %lu us\n"), duration);
-        }
-#endif
     }
 }

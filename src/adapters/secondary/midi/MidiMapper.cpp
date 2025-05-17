@@ -167,28 +167,14 @@ bool MidiMapper::shouldProcessEncoder(EncoderId encoderId, int32_t position) {
 
     // Limiteur de taux pour les messages d'encodeur
     static unsigned long lastSendTimePerEncoder[256] = {0};  // Temps du dernier envoi par encodeur
-    static EncoderId lastEncoderId = 255;                    // Valeur impossible
-    static int32_t lastPosition = -9999;                     // Valeur impossible
-    static unsigned long lastProcessTime = 0;
-
-    // Vérifier la limitation de taux pour cet encodeur
     unsigned long currentTime = millis();
-    if (currentTime - lastSendTimePerEncoder[encoderId] < ENCODER_RATE_LIMIT_MS) {
-        return false;  // Trop tôt pour traiter
-    }
-
-    // Détection de doublons
-    if (encoderId == lastEncoderId && position == lastPosition &&
-        currentTime - lastProcessTime < DUPLICATE_CHECK_MS) {
-        return false;  // Éviter les doublons
-    }
-
-    // Mettre à jour les variables de tracking
-    lastEncoderId = encoderId;
-    lastPosition = position;
-    lastProcessTime = currentTime;
     lastSendTimePerEncoder[encoderId] = currentTime;
 
+    // Diagnostic: Message MIDI accepté
+    Serial.printf("MIDI Rate: Accepting EncoderId=%d Position=%ld (waited %lu ms)\n",
+                  encoderId,
+                  position,
+                  currentTime - lastSendTimePerEncoder[encoderId] + ENCODER_RATE_LIMIT_MS);
     return true;
 }
 

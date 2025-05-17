@@ -22,7 +22,8 @@ constexpr bool ENABLE_FULL_UI = true;
 
 // Sensibilité des contrôles
 constexpr float DEFAULT_ENCODER_SENSITIVITY = 1.0f;
-constexpr unsigned long ENCODER_RATE_LIMIT_MS = 8;  // 8ms entre messages (125Hz)
+constexpr unsigned long ENCODER_RATE_LIMIT_MS = 20;  // 30ms au lieu de 2ms -> limite à ~33Hz
+constexpr unsigned long DUPLICATE_CHECK_MS = 10;     // 15ms au lieu de 4ms
 
 // MIDI
 constexpr uint8_t DEFAULT_MIDI_CHANNEL = 0;  // Canal MIDI 1 (0-15)

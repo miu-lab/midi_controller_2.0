@@ -15,7 +15,7 @@ TeensyUsbMidiOut::TeensyUsbMidiOut() {
 void TeensyUsbMidiOut::sendControlChange(MidiChannel ch, MidiCC cc, uint8_t value) {
     // Envoyer via usbMIDI
     usbMIDI.sendControlChange(cc, value, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
-    
+
     // Appeler send_now pour assurer la transmission immédiate
     usbMIDI.send_now();
 }
@@ -26,7 +26,7 @@ void TeensyUsbMidiOut::sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocit
 
     // Envoyer via usbMIDI
     usbMIDI.sendNoteOn(note, velocity, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
-    
+
     // Appeler send_now pour assurer la transmission immédiate
     usbMIDI.send_now();
 }
@@ -37,7 +37,7 @@ void TeensyUsbMidiOut::sendNoteOff(MidiChannel ch, MidiNote note, uint8_t veloci
 
     // Envoyer via usbMIDI
     usbMIDI.sendNoteOff(note, velocity, ch + 1);  // Les canaux MIDI commencent à 1 pour Teensy
-    
+
     // Appeler send_now pour assurer la transmission immédiate
     usbMIDI.send_now();
 }

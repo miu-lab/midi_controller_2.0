@@ -1,17 +1,18 @@
 #pragma once
 
+#include <array>
 #include <memory>
 #include <unordered_map>
-#include <array>
 
-#include "core/ports/output/MidiOutputPort.hpp"
+#include "config/ConfigDefaults.hpp"
+#include "config/GlobalSettings.hpp"
+#include "config/MappingConfiguration.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/commands/midi/SendMidiCCCommand.hpp"
 #include "core/domain/commands/midi/SendMidiNoteCommand.hpp"
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
-#include "config/MappingConfiguration.hpp"
-#include "config/GlobalSettings.hpp"
+#include "core/ports/output/MidiOutputPort.hpp"
 
 /**
  * @brief Mapper qui gère la transformation des événements en commandes MIDI
@@ -58,15 +59,15 @@ public:
      */
     const MidiControl& getMidiControl(ControlId controlId) const;
 
-/**
+    /**
      * @brief Traite un changement d'encodeur
-     * 
+     *
      * Cette méthode est responsable de :
      * - Limiter le taux d'envoi des messages MIDI (via shouldProcessEncoder)
      * - Détecter et éliminer les doublons
      * - Suivre les positions des encodeurs
      * - Appliquer les stratégies de mapping MIDI appropriées
-     * 
+     *
      * @param encoderId ID de l'encodeur
      * @param position Position absolue de l'encodeur
      */
@@ -96,66 +97,67 @@ private:
     //=============================================================================
     // Constantes
     //=============================================================================
-    
+
     // Taille du pool d'objets pour les commandes MIDI
     static constexpr size_t COMMAND_POOL_SIZE = 16;
-    
+
     // Constantes de timing
-    static constexpr unsigned long ENCODER_RATE_LIMIT_MS = 16;  // 60Hz
-    static constexpr unsigned long DUPLICATE_CHECK_MS = 10;     // 10ms
+    static constexpr unsigned long ENCODER_RATE_LIMIT_MS =
+        ConfigDefaults::ENCODER_RATE_LIMIT_MS;                                               // 60Hz
+    static constexpr unsigned long DUPLICATE_CHECK_MS = ConfigDefaults::DUPLICATE_CHECK_MS;  // 10ms
 
     //=============================================================================
     // Types et structures
     //=============================================================================
-    
+
     // Structure pour stocker les informations de mapping
     struct MappingInfo {
         MidiControl control;
         std::unique_ptr<IMidiMappingStrategy> strategy;
         uint8_t lastMidiValue;
         int32_t lastEncoderPosition;
-        int32_t midiOffset = 0;   // Offset pour le référentiel flottant
+        int32_t midiOffset = 0;  // Offset pour le référentiel flottant
     };
 
     //=============================================================================
     // Méthodes utilitaires
     //=============================================================================
-    
+
     // Crée une clé composite à partir d'un ID de contrôle et d'un type
     static uint32_t makeCompositeKey(ControlId controlId, ControlType type);
-    
+
     // Obtient la prochaine commande CC disponible du pool
     SendMidiCCCommand& getNextCCCommand();
-    
+
     // Obtient la prochaine commande Note disponible du pool
     SendMidiNoteCommand& getNextNoteCommand();
-    
+
     // Fonction de log diagnostique conditionnelle
     void logDiagnostic(const char* format, ...) const;
-    
+
     // Vérifie si un contrôle est dédié à la navigation
     bool isNavigationControl(ControlId controlId) const;
-    
+
     // Vérifie si l'encodeur doit être traité en fonction de la limitation de taux
     bool shouldProcessEncoder(EncoderId encoderId, int32_t position);
-    
+
     // Applique la sensibilité à un delta d'encodeur
     int32_t applyEncoderSensitivity(int32_t delta, EncoderId encoderId);
-    
+
     // Calcule la nouvelle valeur MIDI en fonction du mode (relatif/absolu)
     int16_t calculateMidiValue(MappingInfo& info, int32_t delta, int32_t position);
-    
+
     // Traite les événements de type bouton (encodeur ou bouton standard)
     void processButtonEvent(ControlId buttonId, bool pressed, ControlType type);
 
     //=============================================================================
     // Membres
     //=============================================================================
-    
+
     // Pool d'objets pour les commandes MIDI CC
     std::array<SendMidiCCCommand, COMMAND_POOL_SIZE> midiCCCommandPool_;
     uint8_t nextCCCommandIndex_ = 0;
-    
+
     // Pool d'objets pour les commandes MIDI Note
     std::array<SendMidiNoteCommand, COMMAND_POOL_SIZE> midiNoteCommandPool_;
     uint8_t nextNoteCommandIndex_ = 0;
@@ -164,6 +166,6 @@ private:
     CommandManager& commandManager_;
     std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
     std::unordered_map<ControlId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
-    
+
     MidiControl defaultControl_;  // Contrôle par défaut retourné si non trouvé
 };

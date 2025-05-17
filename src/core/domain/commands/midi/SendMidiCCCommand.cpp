@@ -12,16 +12,15 @@ SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, u
       value_(value),
       source_(source),
       previousValue_(0),  // Sera mis à jour lors de l'exécution
-      hasExecuted_(false)
-{
-    #ifndef PERFORMANCE_MODE
+      hasExecuted_(false) {
+#ifndef PERFORMANCE_MODE
     Serial.print(F("SendMidiCCCommand created with source ID: "));
     Serial.println(source_);
-    #endif
+#endif
 }
 
-void SendMidiCCCommand::reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc,
-                             uint8_t value, uint8_t source) {
+void SendMidiCCCommand::reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value,
+                              uint8_t source) {
     midiOut_ = &midiOut;
     channel_ = channel;
     cc_ = cc;
@@ -32,8 +31,8 @@ void SendMidiCCCommand::reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t 
 }
 
 void SendMidiCCCommand::execute() {
-    if (!midiOut_) return; // Vérification de sécurité
-    
+    if (!midiOut_) return;  // Vérification de sécurité
+
     // Si c'est la première exécution, essayer de lire la valeur actuelle
     // Cela permet d'avoir un état pour l'annulation
     if (!hasExecuted_) {

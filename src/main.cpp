@@ -7,6 +7,7 @@
 #include "app/MidiControllerApp.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "config/ApplicationConfiguration.hpp"
+#include "config/ConfigDefaults.hpp"
 #include "tools/ErrorUtils.hpp"
 
 // Variables globales
@@ -35,10 +36,5 @@ void setup() {
 }
 
 void loop() {
-    unsigned long cycleStartTime = micros();
-
     if (app) app->update();
-
-    // Céder du temps CPU si possible (pour éviter la gigue MIDI)
-    if (micros() - cycleStartTime < 8000) yield();
 }

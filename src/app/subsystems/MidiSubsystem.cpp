@@ -47,7 +47,7 @@ Result<bool, std::string> MidiSubsystem::init() {
             return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
         }
     }
-    
+
     // Créer l'EventEnabledMidiOut qui va décorer directement TeensyUsbMidiOut
     auto eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*baseMidiOut);
     if (!eventEnabledMidiOut) {
@@ -143,20 +143,6 @@ void MidiSubsystem::update() {
     // Mettre à jour le MidiMapper (pour les commandes temporisées)
     if (midiMapper_) {
         midiMapper_->update();
-    }
-    
-    // Appeler usbMIDI.read() pour traiter les messages MIDI entrants
-    // Ceci est nécessaire pour que les callbacks MIDI entrants soient appelés
-    usbMIDI.read();
-
-    // Débogage périodique toutes les 60 secondes
-    static unsigned long lastDebugTime = 0;
-    unsigned long currentTime = millis();
-    if (currentTime - lastDebugTime > 60000) {
-        if (configuration_->isDebugEnabled()) {
-            Serial.println(F("MidiSubsystem: MIDI processed"));
-        }
-        lastDebugTime = currentTime;
     }
 }
 
