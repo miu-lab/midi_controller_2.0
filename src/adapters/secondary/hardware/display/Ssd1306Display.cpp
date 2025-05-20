@@ -148,3 +148,49 @@ unsigned long Ssd1306Display::getMinUpdateTime() const {
 void Ssd1306Display::resetPerformanceCounters() {
     profiler_.reset();
 }
+
+void Ssd1306Display::drawArc(int x, int y, int radius, int startAngle, int endAngle, uint16_t color, uint8_t thickness) {
+    if (!initialized_) return;
+    
+    // Assurer que endAngle > startAngle
+    if (startAngle > endAngle) {
+        int temp = startAngle;
+        startAngle = endAngle;
+        endAngle = temp;
+    }
+    
+    // Conversion en radians pour les calculs
+    float startRad = startAngle * DEG_TO_RAD;
+    float endRad = endAngle * DEG_TO_RAD;
+    
+    // Nombre de segments pour l'arc (plus le rayon est grand, plus il faut de segments)
+    int segments = radius * 3;
+    if (segments < 20) segments = 20;  // Minimum de segments pour que ce soit joli
+    
+    // Valeur angulaire totale de l'arc
+    float totalAngle = endRad - startRad;
+    
+    // Angle incrément par segment
+    float angleIncrement = totalAngle / segments;
+    
+    // Dessiner l'arc segment par segment
+    for (int i = 0; i < segments; i++) {
+        float currentAngle = startRad + (i * angleIncrement);
+        float nextAngle = startRad + ((i + 1) * angleIncrement);
+        
+        // Pour chaque niveau d'épaisseur
+        for (uint8_t t = 0; t < thickness; t++) {
+            int currentRadius = radius - t;
+            if (currentRadius <= 0) break;
+            
+            int x1 = x + cos(currentAngle) * currentRadius;
+            int y1 = y + sin(currentAngle) * currentRadius;
+            int x2 = x + cos(nextAngle) * currentRadius;
+            int y2 = y + sin(nextAngle) * currentRadius;
+            
+            display_.drawLine(x1, y1, x2, y2, color);
+        }
+    }
+    
+    isDirty_ = true;
+}

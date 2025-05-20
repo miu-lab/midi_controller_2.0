@@ -1,5 +1,8 @@
 #include "LastControlView.hpp"
 
+#include <math.h>
+
+#include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "core/utils/AppStrings.hpp"
 
 LastControlView::LastControlView(std::shared_ptr<DisplayPort> display)
@@ -28,45 +31,46 @@ void LastControlView::render() {
         return;
     }
 
-    // Informations sur le contrôle
-    char formatBuffer[32];  // Buffer pour la chaîne de format
     char outputBuffer[32];  // Buffer pour le résultat formaté
 
-    // Afficher l'ID du contrôle (encodeur ou bouton)
-    if (lastControlType_ == "Note On" || lastControlType_ == "Note Off") {
-        // Utiliser la chaîne en mémoire Flash pour "Button: %d"
-        FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_BUTTON_ID);
-        sprintf(outputBuffer, formatBuffer, lastControlId_);
+    // --- DESIGN MINIMALISTE ---
+
+    // 1. Identifiant du contrôle (en haut à gauche, format court)
+    if (lastControlType_ == "ON" || lastControlType_ == "OFF") {
+        sprintf(outputBuffer, "BTN %d", lastControlId_);
     } else {
-        // Utiliser la chaîne en mémoire Flash pour "Encoder: %d"
-        FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_ENCODER_ID);
-        sprintf(outputBuffer, formatBuffer, lastControlId_);
+        sprintf(outputBuffer, "ENC %d", lastControlId_);
     }
-    display_->drawText(4, 15, outputBuffer);
+    display_->drawText(4, 12, outputBuffer);
 
-    // Afficher le type et le canal
-    FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_TYPE_CH);
-    sprintf(outputBuffer, formatBuffer, lastControlType_.c_str(), lastChannel_);
-    display_->drawText(4, 25, outputBuffer);
+    // 2. Type et canal MIDI (en haut à droite, format minimal)
+    sprintf(outputBuffer,
+            "%s %d",
+            lastControlType_ == "Control Change" ? "CC"
+            : lastControlType_ == "Note On"      ? "NOTE"
+                                                 : lastControlType_.c_str(),
+            lastNumber_);
+    display_->drawText(124 - strlen(outputBuffer) * 6, 12, outputBuffer);
 
-    // Afficher le numéro (CC ou note)
-    FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_NUMBER);
-    sprintf(outputBuffer, formatBuffer, lastNumber_);
-    display_->drawText(4, 35, outputBuffer);
+    // 3. Cercle extérieur (contour) - légèrement plus petit
+    display_->drawCircle(64, 35, 22, false);
 
-    // Afficher la valeur
-    FlashStrings::copy(formatBuffer, sizeof(formatBuffer), FMT_VALUE);
-    sprintf(outputBuffer, formatBuffer, lastValue_);
-    display_->drawText(4, 45, outputBuffer);
+    // 4. Visualisation circulaire de la valeur sur 270 degrés
+    int endAngle = map(lastValue_, 0, 127, -225, 45);  // 270 degrés de -135 à +135
 
-    // Représentation graphique de la valeur sous forme de barre de progression
-    int progressWidth = map(lastValue_, 0, 127, 0, 120);
+    // Vérifier si nous avons accès à un display SSD1306 pour utiliser drawArc
+    auto* ssd1306Display = static_cast<Ssd1306Display*>(display_.get());
+    ssd1306Display
+        ->drawArc(64, 35, 22, -225, endAngle, 1, 5);  // 1 = couleur blanche, 2 = épaisseur
 
-    // Dessiner le contour
-    display_->drawRect(4, 50, 120, 10, false);
+    // 5. Valeur MIDI au centre (grand format)
+    sprintf(outputBuffer, "%d", lastValue_);
+    // Centrage approximatif basé sur le nombre de chiffres
+    int offsetX = lastValue_ < 10 ? 3 : (lastValue_ < 100 ? 6 : 9);
+    display_->drawText(64 - offsetX, 30, outputBuffer);  // Remonte de 1 pixel
 
-    // Dessiner la barre de progression
-    display_->drawRect(4, 50, progressWidth, 10, true);
+    // // Centrage approximatif
+    // display_->drawText(64 - strlen(outputBuffer) * 3, 48, outputBuffer);  // Remonte de 4 pixels
 }
 
 bool LastControlView::handleEvent(uint8_t eventType, int32_t data) {

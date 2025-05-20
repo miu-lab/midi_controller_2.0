@@ -40,6 +40,18 @@ public:
         maxTime = getMaxUpdateTime();
         minTime = getMinUpdateTime();
     }
+    
+    /**
+     * @brief Dessine un arc de cercle 
+     * @param x Position horizontale du centre
+     * @param y Position verticale du centre
+     * @param radius Rayon
+     * @param startAngle Angle de départ en degrés (0-360)
+     * @param endAngle Angle d'arrivée en degrés (0-360)
+     * @param color Couleur (1 = blanc, 0 = noir)
+     * @param thickness Épaisseur de l'arc en pixels
+     */
+    void drawArc(int x, int y, int radius, int startAngle, int endAngle, uint16_t color, uint8_t thickness = 1);
     /**
      * @brief Constructeur
      * @param width Largeur en pixels de l'écran (typiquement 128)
