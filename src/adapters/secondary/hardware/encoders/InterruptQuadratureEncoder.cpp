@@ -32,6 +32,16 @@ InterruptQuadratureEncoder::~InterruptQuadratureEncoder() {
 }
 
 int8_t InterruptQuadratureEncoder::readDelta() {
+    // Variables statiques pour le filtrage temporel
+    static uint32_t lastChangeTime = 0;
+    static const uint32_t MIN_CHANGE_INTERVAL_MS = 1;  // 5ms minimum entre changements
+
+    // Filtrage temporel de base
+    uint32_t currentTime = millis();
+    if (currentTime - lastChangeTime < MIN_CHANGE_INTERVAL_MS) {
+        return 0;  // Ignorer les changements trop rapides
+    }
+
     // Lire la position actuelle de l'encodeur
     int32_t newPosition = encoder_.read();
     int32_t delta = newPosition - lastPosition_;
@@ -39,27 +49,40 @@ int8_t InterruptQuadratureEncoder::readDelta() {
     // Si pas de changement, retourner immédiatement
     if (delta == 0) return 0;
 
-    // Mettre à jour la dernière position immédiatement
-    lastPosition_ = newPosition;
+    // Pour les valeurs extrêmes, appliquer un filtrage plus strict
+    if ((physicalPosition_ <= 1 && delta < 0) ||    // Proche de 0 et décroissant
+        (physicalPosition_ >= 126 && delta > 0)) {  // Proche de 127 et croissant
+        static uint32_t extremeChangeTime = 0;
+        static const uint32_t EXTREME_DEBOUNCE_MS = 4;  // Plus long aux extrémités
 
-    // Mettre à jour la position physique totale
+        if (currentTime - extremeChangeTime < EXTREME_DEBOUNCE_MS) {
+            return 0;  // Filtrage rigoureux aux extrémités
+        }
+
+        extremeChangeTime = currentTime;
+    }
+
+    // Enregistrer le moment du changement
+    lastChangeTime = currentTime;
+
+    // Mettre à jour la position
+    lastPosition_ = newPosition;
     physicalPosition_ += delta;
 
-    // Calculer le delta normalisé avec facteur d'échelle pour éviter la perte de précision
+    // Calculer le delta normalisé avec facteur d'échelle
     int32_t normalizedDelta = (delta * normalizationFactor_) >> 8;
 
-    // S'assurer qu'un mouvement physique réel produise toujours au moins 1 delta
+    // S'assurer qu'un mouvement physique réel produise au moins 1 delta
     if (delta != 0 && normalizedDelta == 0) {
         normalizedDelta = (delta > 0) ? 1 : -1;
     }
 
-    // Limiter le delta à la plage d'un int8_t en une seule opération
+    // Limiter le delta à la plage d'un int8_t
     int8_t result = (normalizedDelta > INT8_MAX)   ? INT8_MAX
                     : (normalizedDelta < INT8_MIN) ? INT8_MIN
                                                    : static_cast<int8_t>(normalizedDelta);
 
-    // Recalculer la position absolue directement à partir de la position physique totale
-    // pour garantir une cohérence parfaite entre les encodeurs de différents PPR
+    // Recalculer la position absolue
     absolutePosition_ = (physicalPosition_ * normalizationFactor_) >> 8;
 
     return result;
