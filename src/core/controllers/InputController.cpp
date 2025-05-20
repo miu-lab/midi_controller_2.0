@@ -2,8 +2,9 @@
 
 #include "UIController.hpp"
 
-InputController::InputController(std::shared_ptr<NavigationConfigService> navigationConfig)
-    : m_navigationConfig(navigationConfig), m_uiController(nullptr) {
+InputController::InputController(std::shared_ptr<NavigationConfigService> navigationConfig,
+                                 std::shared_ptr<OptimizedEventBus> eventBus)
+    : m_navigationConfig(navigationConfig), m_uiController(nullptr), eventBus_(eventBus) {
     // Initialiser les callbacks avec des fonctions vides pour éviter les nullptr
     auto emptyEncoderCallback = [](EncoderId, int32_t, int8_t) {};
     auto emptyEncoderButtonCallback = [](EncoderId, bool) {};
@@ -39,9 +40,11 @@ void InputController::setUIController(std::shared_ptr<UIController> uiController
 
 void InputController::processEncoderTurn(EncoderId id, int32_t absolutePosition,
                                          int8_t relativeChange) {
-    // Appel direct pour le chemin critique MIDI en premier si disponible
-    if (onEncoderChangedDirect) {
-        onEncoderChangedDirect(id, absolutePosition);
+    // Chemin événementiel optimisé pour les contrôles MIDI
+    if (eventBus_ && !m_navigationConfig->isNavigationControl(id)) {
+        // Créer un événement haute priorité pour le chemin critique MIDI
+        HighPriorityEncoderChangedEvent event(id, absolutePosition, relativeChange);
+        eventBus_->publishHighPriority(event);
     }
 
     // Déterminer si cet encodeur est dédié à la navigation
@@ -53,9 +56,11 @@ void InputController::processEncoderTurn(EncoderId id, int32_t absolutePosition,
 }
 
 void InputController::processEncoderButton(EncoderId id, bool pressed) {
-    // Appel direct pour le chemin critique MIDI en premier si disponible
-    if (onEncoderButtonDirect) {
-        onEncoderButtonDirect(id, pressed);
+    // Chemin événementiel optimisé pour les contrôles MIDI
+    if (eventBus_ && !m_navigationConfig->isNavigationControl(id)) {
+        // Créer un événement haute priorité pour le chemin critique MIDI
+        HighPriorityEncoderButtonEvent event(id, pressed);
+        eventBus_->publishHighPriority(event);
     }
 
     // Déterminer si ce bouton d'encodeur est dédié à la navigation
@@ -67,9 +72,11 @@ void InputController::processEncoderButton(EncoderId id, bool pressed) {
 }
 
 void InputController::processButtonPress(ButtonId id, bool pressed) {
-    // Appel direct pour le chemin critique MIDI en premier si disponible
-    if (onButtonDirect) {
-        onButtonDirect(id, pressed);
+    // Chemin événementiel optimisé pour les contrôles MIDI
+    if (eventBus_ && !m_navigationConfig->isNavigationControl(id)) {
+        // Créer un événement haute priorité pour le chemin critique MIDI
+        HighPriorityButtonPressEvent event(id, pressed);
+        eventBus_->publishHighPriority(event);
     }
 
     // Déterminer si ce bouton est dédié à la navigation

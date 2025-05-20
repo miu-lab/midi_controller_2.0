@@ -10,6 +10,8 @@
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/commands/midi/SendMidiCCCommand.hpp"
 #include "core/domain/commands/midi/SendMidiNoteCommand.hpp"
+#include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
@@ -19,8 +21,9 @@
  *
  * Cette classe utilise le Command Pattern et le Strategy Pattern
  * pour transformer les événements d'entrée en commandes MIDI.
+ * Elle implémente l'interface EventListener pour recevoir des événements optimisés.
  */
-class MidiMapper {
+class MidiMapper : public EventListener {
 public:
     /**
      * @brief Constructeur
@@ -28,6 +31,13 @@ public:
      * @param commandManager Gestionnaire de commandes
      */
     MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager);
+    
+    /**
+     * @brief Traite les événements reçus du bus d'événements
+     * @param event Événement à traiter
+     * @return true si l'événement a été traité, false sinon
+     */
+    bool onEvent(const Event& event) override;
 
     /**
      * @brief Définit le mapping pour un contrôle

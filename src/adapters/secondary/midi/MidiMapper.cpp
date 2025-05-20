@@ -6,6 +6,7 @@
 
 #include "config/GlobalSettings.hpp"
 #include "config/debug/DebugMacros.hpp"  // Pour avoir accès à PERFORMANCE_MODE
+#include "core/domain/events/core/EventTypes.hpp"
 #include "tools/Diagnostics.hpp"
 
 //=============================================================================
@@ -396,4 +397,65 @@ void MidiMapper::update() {
             ++it;
         }
     }
+}
+
+//=============================================================================
+// Gestion des événements
+//=============================================================================
+
+bool MidiMapper::onEvent(const Event& event) {
+    // Traiter les différents types d'événements
+    switch (event.getType()) {
+        case EventTypes::HighPriorityEncoderChanged: {
+            const HighPriorityEncoderChangedEvent& encEvent = 
+                static_cast<const HighPriorityEncoderChangedEvent&>(event);
+            processEncoderChange(encEvent.encoderId, encEvent.position);
+            return true;
+        }
+        
+        case EventTypes::HighPriorityEncoderButton: {
+            const HighPriorityEncoderButtonEvent& buttonEvent = 
+                static_cast<const HighPriorityEncoderButtonEvent&>(event);
+            processEncoderButton(buttonEvent.encoderId, buttonEvent.pressed);
+            return true;
+        }
+        
+        case EventTypes::HighPriorityButtonPress: {
+            const HighPriorityButtonPressEvent& buttonEvent = 
+                static_cast<const HighPriorityButtonPressEvent&>(event);
+            processButtonPress(buttonEvent.buttonId, buttonEvent.pressed);
+            return true;
+        }
+        
+        // Gérer aussi les types standard d'événements pour la compatibilité
+        case EventTypes::EncoderTurned: {
+            const EncoderTurnedEvent& encEvent = 
+                static_cast<const EncoderTurnedEvent&>(event);
+            processEncoderChange(encEvent.id, encEvent.position);
+            return true;
+        }
+        
+        case EventTypes::EncoderButton: {
+            const EncoderButtonEvent& buttonEvent = 
+                static_cast<const EncoderButtonEvent&>(event);
+            processEncoderButton(buttonEvent.id, buttonEvent.pressed);
+            return true;
+        }
+        
+        case EventTypes::ButtonPressed: {
+            const ButtonPressedEvent& buttonEvent = 
+                static_cast<const ButtonPressedEvent&>(event);
+            processButtonPress(buttonEvent.id, true);
+            return true;
+        }
+        
+        case EventTypes::ButtonReleased: {
+            const ButtonReleasedEvent& buttonEvent = 
+                static_cast<const ButtonReleasedEvent&>(event);
+            processButtonPress(buttonEvent.id, false);
+            return true;
+        }
+    }
+    
+    return false; // Evénement non traité
 }

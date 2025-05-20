@@ -4,7 +4,10 @@
 #include <memory>
 
 #include "app/services/NavigationConfigService.hpp"
+#include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/core/OptimizedEventBus.hpp"
 #include "core/domain/events/core/EventTypes.hpp"
+#include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/types.hpp"
 
 // Forward declaration
@@ -21,8 +24,10 @@ public:
     /**
      * @brief Constructeur avec injection de dépendances
      * @param navigationConfig Service de configuration de navigation
+     * @param eventBus Bus d'événements optimisé
      */
-    explicit InputController(std::shared_ptr<NavigationConfigService> navigationConfig);
+    InputController(std::shared_ptr<NavigationConfigService> navigationConfig,
+                    std::shared_ptr<OptimizedEventBus> eventBus = nullptr);
 
     /**
      * @brief Configure le contrôleur d'interface utilisateur
@@ -88,14 +93,10 @@ public:
      */
     void setMidiButtonCallback(std::function<void(ButtonId, bool)> callback);
 
-    // Callbacks directs pour les chemins critiques (contournement du bus d'événements)
-    std::function<void(EncoderId, int32_t)> onEncoderChangedDirect = nullptr;
-    std::function<void(EncoderId, bool)> onEncoderButtonDirect = nullptr;
-    std::function<void(ButtonId, bool)> onButtonDirect = nullptr;
-
 private:
     std::shared_ptr<NavigationConfigService> m_navigationConfig;
     std::shared_ptr<UIController> m_uiController;
+    std::shared_ptr<OptimizedEventBus> eventBus_; // Bus d'événements optimisé
 
     // Stockage des callbacks
     std::function<void(EncoderId, int32_t, int8_t)> m_navigationEncoderCallback;

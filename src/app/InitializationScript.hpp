@@ -54,6 +54,6 @@ private:
 
     static bool setupControllers(std::shared_ptr<DependencyContainer> container);
 
-    // Configuration des callbacks pour le chemin critique MIDI
-    static void setupMidiCallbacks(std::shared_ptr<DependencyContainer> container);
+    // Configuration des écouteurs MIDI prioritaires
+    static void setupMidiEventListeners(std::shared_ptr<DependencyContainer> container);
 };

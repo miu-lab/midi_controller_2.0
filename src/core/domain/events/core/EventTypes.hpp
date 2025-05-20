@@ -27,6 +27,11 @@ namespace EventTypes {
     constexpr EventType MidiPitchBend = 2004;
     constexpr EventType MidiMapping = 2005;
     
+    // Types d'événements MIDI haute performance (chemin critique) - plage 2500-2599
+    constexpr EventType HighPriorityEncoderChanged = 2500;
+    constexpr EventType HighPriorityEncoderButton = 2501;
+    constexpr EventType HighPriorityButtonPress = 2502;
+    
     // Types d'événements système - plage 3000-3999
     constexpr EventType SystemStartup = 3000;
     constexpr EventType SystemShutdown = 3001;

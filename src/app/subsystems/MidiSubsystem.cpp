@@ -107,33 +107,6 @@ Result<bool, std::string> MidiSubsystem::init() {
     return Result<bool, std::string>::success(true);
 }
 
-bool MidiSubsystem::configureCallbacks(std::shared_ptr<InputController> inputController) {
-    if (!initialized_ || !midiMapper_) {
-        return false;
-    }
-
-    if (!inputController) {
-        return false;
-    }
-
-    // Configuration des callbacks directs pour le chemin critique MIDI
-    // Capture de 'this' par référence pour éviter toute capture inutile d'instance
-    inputController->onEncoderChangedDirect = [this](EncoderId id, int32_t position) {
-        this->getMidiMapper().processEncoderChange(id, position);
-    };
-
-    inputController->onEncoderButtonDirect = [this](EncoderId id, bool pressed) {
-        this->getMidiMapper().processEncoderButton(id, pressed);
-    };
-
-    inputController->onButtonDirect = [this](ButtonId id, bool pressed) {
-        this->getMidiMapper().processButtonPress(id, pressed);
-    };
-
-    Serial.println(F("MidiSubsystem: Callbacks directs configurés"));
-    return true;
-}
-
 void MidiSubsystem::update() {
     // Traiter les messages MIDI entrants
     if (midiInHandler_) {

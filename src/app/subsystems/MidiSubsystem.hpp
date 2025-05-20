@@ -88,18 +88,6 @@ public:
      */
     MidiMapper& getMidiMapper() const;
 
-    /**
-     * @brief Configure les callbacks MIDI directs sur l'InputController fourni
-     *
-     * Cette méthode établit les connexions directes entre InputController et MidiMapper
-     * pour permettre le traitement des événements MIDI avec une latence minimale.
-     * Ces callbacks directs sont essentiels pour le chemin critique de traitement MIDI.
-     *
-     * @param inputController Pointeur vers l'InputController à configurer
-     * @return true si la configuration a réussi, false sinon
-     */
-    bool configureCallbacks(std::shared_ptr<InputController> inputController);
-
 private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<IConfiguration> configuration_;

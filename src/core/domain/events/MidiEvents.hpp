@@ -4,6 +4,69 @@
 #include "core/domain/events/core/EventTypes.hpp"
 
 /**
+ * @brief Événement haute priorité pour les changements d'encodeur (chemin critique MIDI)
+ */
+class HighPriorityEncoderChangedEvent : public Event {
+public:
+    /**
+     * @brief Constructeur optimisé pour les performances
+     * @param encoderId Identifiant de l'encodeur
+     * @param position Position absolue actuelle
+     * @param delta Changement relatif
+     */
+    HighPriorityEncoderChangedEvent(uint8_t encoderId, int32_t position, int32_t delta)
+        : Event(EventTypes::HighPriorityEncoderChanged, EventCategory::MIDI),
+          encoderId(encoderId), position(position), delta(delta) {}
+          
+    virtual const char* getEventName() const override { return "HighPriorityEncoderChanged"; }
+    
+    uint8_t encoderId;  // Identifiant de l'encodeur
+    int32_t position;   // Position absolue
+    int32_t delta;      // Changement relatif
+};
+
+/**
+ * @brief Événement haute priorité pour les boutons d'encodeur (chemin critique MIDI)
+ */
+class HighPriorityEncoderButtonEvent : public Event {
+public:
+    /**
+     * @brief Constructeur optimisé pour les performances
+     * @param encoderId Identifiant de l'encodeur
+     * @param pressed État du bouton (pressé ou relâché)
+     */
+    HighPriorityEncoderButtonEvent(uint8_t encoderId, bool pressed)
+        : Event(EventTypes::HighPriorityEncoderButton, EventCategory::MIDI),
+          encoderId(encoderId), pressed(pressed) {}
+          
+    virtual const char* getEventName() const override { return "HighPriorityEncoderButton"; }
+    
+    uint8_t encoderId;  // Identifiant de l'encodeur
+    bool pressed;       // État du bouton
+};
+
+/**
+ * @brief Événement haute priorité pour les pressions de bouton (chemin critique MIDI)
+ */
+class HighPriorityButtonPressEvent : public Event {
+public:
+    /**
+     * @brief Constructeur optimisé pour les performances
+     * @param buttonId Identifiant du bouton
+     * @param pressed État du bouton (pressé ou relâché)
+     */
+    HighPriorityButtonPressEvent(uint8_t buttonId, bool pressed)
+        : Event(EventTypes::HighPriorityButtonPress, EventCategory::MIDI),
+          buttonId(buttonId), pressed(pressed) {}
+          
+    virtual const char* getEventName() const override { return "HighPriorityButtonPress"; }
+    
+    uint8_t buttonId;   // Identifiant du bouton
+    bool pressed;       // État du bouton
+};
+
+
+/**
  * @brief Événement émis lorsqu'un message MIDI CC est envoyé
  */
 class MidiCCEvent : public Event {
