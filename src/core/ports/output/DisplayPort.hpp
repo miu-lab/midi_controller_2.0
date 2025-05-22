@@ -86,8 +86,58 @@ public:
 virtual void update() = 0;
 
 /**
- * @brief Définit la couleur du texte (pour les affichages monochromes, 1 = blanc, 0 = noir)
- * @param color Couleur (1 = blanc, 0 = noir)
- */
-virtual void setTextColor(uint16_t color) = 0;
+* @brief Définit la taille du texte
+* @param size Taille du texte (1 = standard, 2 = double, etc.)
+*/
+    virtual void setTextSize(uint8_t size) { /* Interface par défaut - ne fait rien */ }
+
+    /**
+     * @brief Définit la couleur du texte (pour les affichages monochromes, 1 = blanc, 0 = noir)
+     * @param color Couleur (1 = blanc, 0 = noir)
+     */
+    virtual void setTextColor(uint16_t color) = 0;
+
+    /**
+     * @brief Définit si le texte doit automatiquement passer à la ligne
+     * @param wrap true pour activer le retour à la ligne
+     */
+    virtual void setTextWrap(bool wrap) { /* Interface par défaut - ne fait rien */ }
+    
+    /**
+     * @brief Positionne le curseur pour le texte
+     * @param x Position horizontale
+     * @param y Position verticale
+     */
+    virtual void setCursor(int16_t x, int16_t y) { /* Interface par défaut - ne fait rien */ }
+    
+    /**
+     * @brief Calcule les dimensions d'un texte
+     * @param text Texte à mesurer
+     * @param w Largeur (sortie)
+     * @param h Hauteur (sortie)
+     */
+    virtual void getTextBounds(const char* text, uint16_t* w, uint16_t* h) { *w = 0; *h = 0; }
+    
+    /**
+     * @brief Affiche du texte centré horizontalement
+     * @param x Position horizontale du centre
+     * @param y Position verticale
+     * @param text Texte à afficher
+     */
+    virtual void drawCenteredText(int x, int y, const char* text) {
+        // Implémentation par défaut (sans calcul de la largeur)
+        drawText(x, y, text);
+    }
+    
+    /**
+     * @brief Affiche un texte formaté (similaire à printf)
+     * @param x Position horizontale
+     * @param y Position verticale
+     * @param format Format (comme printf)
+     * @param ... Arguments variables pour le format
+     */
+    virtual void drawFormattedText(int x, int y, const char* format, ...) {
+        // Implémentation par défaut (sans formatage)
+        drawText(x, y, format);
+    }
 };

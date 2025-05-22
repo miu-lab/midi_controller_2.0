@@ -52,6 +52,16 @@ public:
      * @param thickness Épaisseur de l'arc en pixels
      */
     void drawArc(int x, int y, int radius, int startAngle, int endAngle, uint16_t color, uint8_t thickness = 1);
+    
+    /**
+     * @brief Efface une zone circulaire (pour éviter le scintillement)
+     * @param x Position horizontale du centre
+     * @param y Position verticale du centre
+     * @param innerRadius Rayon intérieur de la zone à effacer
+     * @param outerRadius Rayon extérieur de la zone à effacer
+     */
+    void clearArcArea(int x, int y, int innerRadius, int outerRadius);
+    
     /**
      * @brief Constructeur
      * @param width Largeur en pixels de l'écran (typiquement 128)
@@ -114,6 +124,16 @@ public:
      * @param fill Si true, le cercle est rempli
      */
     void drawCircle(int x, int y, int radius, bool fill = false) override;
+    
+    /**
+     * @brief Dessine un cercle avec une couleur spécifique
+     * @param x Position horizontale du centre
+     * @param y Position verticale du centre
+     * @param radius Rayon
+     * @param fill Si true, le cercle est rempli
+     * @param color Couleur (1 = blanc, 0 = noir)
+     */
+    void drawCircle(int x, int y, int radius, bool fill, uint16_t color);
 
     /**
      * @brief Met à jour l'affichage
@@ -124,13 +144,51 @@ public:
      * @brief Définit la taille du texte
      * @param size Taille du texte (1 = standard, 2 = double, etc.)
      */
-    void setTextSize(uint8_t size);
+    void setTextSize(uint8_t size) override;
 
     /**
      * @brief Définit la couleur du texte (pour les affichages monochromes, 1 = blanc, 0 = noir)
      * @param color Couleur (1 = blanc, 0 = noir)
      */
-    void setTextColor(uint16_t color);
+    void setTextColor(uint16_t color) override;
+    
+    /**
+     * @brief Définit si le texte doit automatiquement passer à la ligne
+     * @param wrap true pour activer le retour à la ligne
+     */
+    void setTextWrap(bool wrap) override;
+    
+    /**
+     * @brief Positionne le curseur pour le texte
+     * @param x Position horizontale
+     * @param y Position verticale
+     */
+    void setCursor(int16_t x, int16_t y) override;
+    
+    /**
+     * @brief Calcule les dimensions d'un texte
+     * @param text Texte à mesurer
+     * @param w Largeur (sortie)
+     * @param h Hauteur (sortie)
+     */
+    void getTextBounds(const char* text, uint16_t* w, uint16_t* h) override;
+    
+    /**
+     * @brief Affiche du texte centré horizontalement
+     * @param x Position horizontale du centre
+     * @param y Position verticale
+     * @param text Texte à afficher
+     */
+    void drawCenteredText(int x, int y, const char* text) override;
+    
+    /**
+     * @brief Affiche un texte formaté (similaire à printf)
+     * @param x Position horizontale
+     * @param y Position verticale
+     * @param format Format (comme printf)
+     * @param ... Arguments variables pour le format
+     */
+    void drawFormattedText(int x, int y, const char* format, ...) override;
 
     /**
      * @brief Obtient le temps moyen de mise à jour de l'écran en microsecondes
@@ -164,4 +222,13 @@ private:
     bool initialized_;
     DisplayProfiler profiler_;
     bool isDirty_ = false;  // Flag indiquant si l'affichage a été modifié
+    
+    // Méthodes d'aide pour l'algorithme d'arc déterministe
+    void drawBresenhamArc(int cx, int cy, int radius, int startAngle, int endAngle, uint16_t color);
+    void drawArcPixelIfInRange(int cx, int cy, int dx, int dy, int startAngle, int endAngle, uint16_t color);
+    int fastAtan2Degrees(int y, int x);
+    int betterAtan2Degrees(int y, int x);
+    int normalizeAngle(int angle);
+    bool isAngleInRange(int angle, int startAngle, int endAngle);
+    bool isAngleInRangeWithTolerance(int angle, int startAngle, int endAngle);
 };

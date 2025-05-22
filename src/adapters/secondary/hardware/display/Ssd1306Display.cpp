@@ -1,6 +1,8 @@
 #include "Ssd1306Display.hpp"
 
 #include <Arduino.h>
+#include <stdarg.h>
+
 #include "core/utils/AppStrings.hpp"
 #include "core/utils/FlashStrings.hpp"
 
@@ -14,50 +16,36 @@ Ssd1306Display::Ssd1306Display(uint16_t width, uint16_t height, uint8_t i2cAddre
       initialized_(false) {}
 
 bool Ssd1306Display::init(int8_t resetPin) {
-    // Si déjà initialisé, retourner directement
     if (initialized_) {
         return true;
     }
 
-    // Afficher message d'initialisation
     Serial.print(F("SSD1306:"));
     Serial.println(F(" Initializing display..."));
 
-    // Initialisation de l'écran SSD1306
     if (!display_.begin(SSD1306_SWITCHCAPVCC, i2cAddress_, resetPin)) {
-        // Afficher message d'échec
         Serial.println(F("SSD1306 allocation failed"));
         return false;
     }
 
-    // Afficher message de succès
     Serial.print(F("SSD1306:"));
     Serial.println(F(" Display initialized successfully"));
 
-    // Effacer complètement l'écran et le buffer
     display_.clearDisplay();
-    display_.display();  // Mettre à jour l'écran physique
-
-    // Effacer à nouveau pour s'assurer que tout est propre
+    display_.display();
     display_.clearDisplay();
     display_.display();
 
-    // Configuration initiale
     display_.setTextColor(SSD1306_WHITE);
     display_.setTextSize(1);
     display_.setCursor(0, 0);
 
-    // Définir le flag d'initialisation
     initialized_ = true;
-
-    // Définir le dirty flag pour forcer une première mise à jour
     isDirty_ = true;
 
-    // Dessiner un pattern test pour confirmer que l'écran fonctionne
     display_.clearDisplay();
     display_.display();
 
-    // Afficher message de fin d'initialisation
     Serial.print(F("SSD1306:"));
     Serial.println(F(" Display ready"));
     return true;
@@ -66,13 +54,8 @@ bool Ssd1306Display::init(int8_t resetPin) {
 void Ssd1306Display::clear() {
     if (!initialized_) return;
 
-    // Effacer tout le buffer en RAM
     display_.clearDisplay();
-
-    // S'assurer que le curseur est remis à la position initiale
     display_.setCursor(0, 0);
-
-    // Marquer l'affichage comme modifié
     isDirty_ = true;
 }
 
@@ -109,17 +92,23 @@ void Ssd1306Display::drawCircle(int x, int y, int radius, bool fill) {
     isDirty_ = true;
 }
 
+void Ssd1306Display::drawCircle(int x, int y, int radius, bool fill, uint16_t color) {
+    if (!initialized_) return;
+    if (fill) {
+        display_.fillCircle(x, y, radius, color);
+    } else {
+        display_.drawCircle(x, y, radius, color);
+    }
+    isDirty_ = true;
+}
+
 void Ssd1306Display::update() {
     if (!initialized_) {
-        // Afficher message d'erreur
         Serial.print(F("SSD1306:"));
         Serial.println(F(" Update called but display not initialized"));
     }
 
-    // Envoyer les données du buffer à l'écran physique
     display_.display();
-
-    // Réinitialiser le dirty flag
     isDirty_ = false;
 }
 
@@ -131,6 +120,54 @@ void Ssd1306Display::setTextSize(uint8_t size) {
 void Ssd1306Display::setTextColor(uint16_t color) {
     if (!initialized_) return;
     display_.setTextColor(color);
+}
+
+void Ssd1306Display::setTextWrap(bool wrap) {
+    if (!initialized_) return;
+    display_.setTextWrap(wrap);
+}
+
+void Ssd1306Display::setCursor(int16_t x, int16_t y) {
+    if (!initialized_) return;
+    display_.setCursor(x, y);
+}
+
+void Ssd1306Display::getTextBounds(const char* text, uint16_t* w, uint16_t* h) {
+    if (!initialized_) {
+        *w = 0;
+        *h = 0;
+        return;
+    }
+
+    int16_t x1, y1;
+    display_.getTextBounds(text, 0, 0, &x1, &y1, w, h);
+}
+
+void Ssd1306Display::drawCenteredText(int x, int y, const char* text) {
+    if (!initialized_) return;
+
+    int16_t x1, y1;
+    uint16_t w, h;
+    display_.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
+
+    int posX = x - (w / 2);
+
+    display_.setCursor(posX, y);
+    display_.print(text);
+
+    isDirty_ = true;
+}
+
+void Ssd1306Display::drawFormattedText(int x, int y, const char* format, ...) {
+    if (!initialized_) return;
+
+    char buffer[128];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    drawText(x, y, buffer);
 }
 
 unsigned long Ssd1306Display::getAverageUpdateTime() const {
@@ -149,48 +186,39 @@ void Ssd1306Display::resetPerformanceCounters() {
     profiler_.reset();
 }
 
-void Ssd1306Display::drawArc(int x, int y, int radius, int startAngle, int endAngle, uint16_t color, uint8_t thickness) {
+// APPROCHE SIMPLE ET ROBUSTE POUR LES ARCS
+void Ssd1306Display::drawArc(int x, int y, int radius, int startAngle, int endAngle, uint16_t color,
+                             uint8_t thickness) {
     if (!initialized_) return;
-    
-    // Assurer que endAngle > startAngle
-    if (startAngle > endAngle) {
-        int temp = startAngle;
-        startAngle = endAngle;
-        endAngle = temp;
-    }
-    
-    // Conversion en radians pour les calculs
-    float startRad = startAngle * DEG_TO_RAD;
-    float endRad = endAngle * DEG_TO_RAD;
-    
-    // Nombre de segments pour l'arc (plus le rayon est grand, plus il faut de segments)
-    int segments = radius * 3;
-    if (segments < 20) segments = 20;  // Minimum de segments pour que ce soit joli
-    
-    // Valeur angulaire totale de l'arc
-    float totalAngle = endRad - startRad;
-    
-    // Angle incrément par segment
-    float angleIncrement = totalAngle / segments;
-    
-    // Dessiner l'arc segment par segment
-    for (int i = 0; i < segments; i++) {
-        float currentAngle = startRad + (i * angleIncrement);
-        float nextAngle = startRad + ((i + 1) * angleIncrement);
-        
-        // Pour chaque niveau d'épaisseur
-        for (uint8_t t = 0; t < thickness; t++) {
-            int currentRadius = radius - t;
-            if (currentRadius <= 0) break;
-            
-            int x1 = x + cos(currentAngle) * currentRadius;
-            int y1 = y + sin(currentAngle) * currentRadius;
-            int x2 = x + cos(nextAngle) * currentRadius;
-            int y2 = y + sin(nextAngle) * currentRadius;
-            
-            display_.drawLine(x1, y1, x2, y2, color);
+
+    // Normaliser les angles pour être entre 0 et 359
+    while (startAngle < 0) startAngle += 360;
+    while (endAngle < 0) endAngle += 360;
+    while (startAngle >= 360) startAngle -= 360;
+    while (endAngle >= 360) endAngle -= 360;
+
+    // Calculer la plage d'angles
+    int totalAngle =
+        (endAngle >= startAngle) ? (endAngle - startAngle) : (360 - startAngle + endAngle);
+
+    // Dessiner chaque niveau d'épaisseur
+    for (int t = 0; t < thickness; t++) {
+        int currentRadius = radius - t;
+        if (currentRadius <= 0) break;
+
+        // Dessiner pixel par pixel avec un pas de 1 degré pour éviter les trous
+        for (int angleStep = 0; angleStep <= totalAngle; angleStep++) {
+            int currentAngle = (startAngle + angleStep) % 360;
+
+            // Convertir en radians et calculer la position
+            float rad = currentAngle * DEG_TO_RAD;
+            int px = x + cos(rad) * currentRadius;
+            int py = y + sin(rad) * currentRadius;
+
+            // Dessiner le pixel
+            display_.drawPixel(px, py, color);
         }
     }
-    
+
     isDirty_ = true;
 }
