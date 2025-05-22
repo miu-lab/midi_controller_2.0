@@ -93,11 +93,6 @@ Result<bool, std::string> ConfigurationSubsystem::loadEncoderConfigs() {
         Serial.print(F(" pinB="));
         Serial.print(encoder.pinB);
         Serial.print(F(" pinButton="));
-        if (encoder.hasButton) {
-            Serial.println(encoder.pinButton);
-        } else {
-            Serial.println(F("No Button"));
-        }
     }
 
     Serial.print(encoderConfigs_.size());

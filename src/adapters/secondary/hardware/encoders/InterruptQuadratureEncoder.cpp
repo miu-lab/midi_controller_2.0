@@ -8,9 +8,9 @@ InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig &cfg)
       encoder_(cfg.pinA, cfg.pinB)  // Initialisation de l'objet Encoder
       ,
       ppr_(cfg.ppr),
-      hasButton_(cfg.hasButton),
-      buttonPin_(cfg.hasButton ? cfg.pinButton : 0),
-      activeLowButton_(cfg.activeLowButton),
+      hasButton_(cfg.buttonConfig.has_value()),
+      buttonPin_(hasButton_ ? cfg.buttonConfig->pin : 0),
+      activeLowButton_(hasButton_ ? cfg.buttonConfig->activeLow : false),
       lastPosition_(0),
       physicalPosition_(0),
       absolutePosition_(0) {
