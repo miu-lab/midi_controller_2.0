@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
 #include "adapters/secondary/hardware/buttons/DigitalButton.hpp"
-#include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
 #include "core/ports/input/ButtonPort.hpp"
 
 /**

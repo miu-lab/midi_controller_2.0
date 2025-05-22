@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
+#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
 
 /**

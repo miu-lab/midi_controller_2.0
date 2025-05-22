@@ -1,21 +1,22 @@
 #pragma once
 #include <cstdint>
 
-using ControlId = uint8_t;
-using EncoderId = ControlId;
-using ButtonId = ControlId;
-using MidiChannel = uint8_t;
-using MidiCC = uint8_t;
-using MidiNote = uint8_t;
+using DefaultId = uint16_t;
+using DefaultMidiId = uint8_t;
+
+using ControlId = DefaultId;
+using PinId = DefaultId;
+using EncoderId = DefaultId;
+using ButtonId = DefaultId;
+
+using MidiChannel = DefaultMidiId;
+using MidiCC = DefaultMidiId;
+using MidiNote = DefaultMidiId;
 
 /**
  * @brief Type de contrôle (encodeur, bouton d'encodeur, ou bouton séparé)
  */
-enum class ControlType {
-    ENCODER_ROTATION,
-    ENCODER_BUTTON,
-    BUTTON
-};
+enum class ControlType { ENCODER_ROTATION, ENCODER_BUTTON, BUTTON };
 
 /**
  * @brief Configuration d'un controle MIDI

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
+#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
 #include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
 #include "core/domain/types.hpp"
 #include "core/utils/Result.hpp"
@@ -16,7 +16,7 @@
 class IConfiguration {
 public:
     virtual ~IConfiguration() = default;
-    
+
     /**
      * @brief Initialise la configuration
      * @return Résultat de l'initialisation

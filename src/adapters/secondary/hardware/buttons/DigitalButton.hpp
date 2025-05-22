@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Bounce2.h>
 
-#include "adapters/secondary/hardware/buttons/DigitalButtonConfig.hpp"
+#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
 #include "core/ports/input/ButtonPort.hpp"
 
 /**
