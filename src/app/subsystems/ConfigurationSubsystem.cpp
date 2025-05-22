@@ -85,14 +85,6 @@ Result<bool, std::string> ConfigurationSubsystem::loadEncoderConfigs() {
     // Copier tous les encodeurs configurés
     for (const auto& encoder : configuredEncoders) {
         encoderConfigs_.push_back(encoder);
-
-        Serial.print(F("ConfigurationSubsystem: Added encoder ID="));
-        Serial.print(encoder.id);
-        Serial.print(F(" pinA="));
-        Serial.print(encoder.pinA);
-        Serial.print(F(" pinB="));
-        Serial.print(encoder.pinB);
-        Serial.print(F(" pinButton="));
     }
 
     Serial.print(encoderConfigs_.size());
@@ -114,13 +106,6 @@ Result<bool, std::string> ConfigurationSubsystem::loadButtonConfigs() {
     // Copier tous les boutons configurés
     for (const auto& button : configuredButtons) {
         buttonConfigs_.push_back(button);
-
-        Serial.print(F("ConfigurationSubsystem: Added button ID="));
-        Serial.print(button.id);
-        Serial.print(F(" pin="));
-        Serial.print(button.pin);
-        Serial.print(F(" mode="));
-        Serial.println(button.mode == ButtonMode::MOMENTARY ? F("MOMENTARY") : F("TOGGLE"));
     }
 
     Serial.print(buttonConfigs_.size());

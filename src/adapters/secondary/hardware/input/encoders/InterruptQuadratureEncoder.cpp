@@ -3,13 +3,13 @@
 
 #include <Arduino.h>
 
-InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig &cfg)
+InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig& cfg)
     : id_(cfg.id),
-      encoder_(cfg.pinA, cfg.pinB)  // Initialisation de l'objet Encoder
+      encoder_(cfg.pinA.pin, cfg.pinB.pin)  // Utiliser les nouvelles propriétés GpioPin
       ,
       ppr_(cfg.ppr),
       hasButton_(cfg.buttonConfig.has_value()),
-      buttonPin_(hasButton_ ? cfg.buttonConfig->pin : 0),
+      buttonPin_(hasButton_ ? cfg.buttonConfig->gpio.pin : 0),
       activeLowButton_(hasButton_ ? cfg.buttonConfig->activeLow : false),
       lastPosition_(0),
       physicalPosition_(0),
@@ -23,7 +23,11 @@ InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig &cfg)
     normalizationFactor_ = (REFERENCE_PPR << 8) / ppr_;
     // Configuration du bouton si présent
     if (hasButton_) {
-        pinMode(buttonPin_, activeLowButton_ ? INPUT_PULLUP : INPUT);
+        const auto& buttonCfg = cfg.buttonConfig.value();
+        int pinModeValue = (buttonCfg.gpio.mode == PinMode::PULLUP)     ? INPUT_PULLUP
+                           : (buttonCfg.gpio.mode == PinMode::PULLDOWN) ? INPUT_PULLDOWN
+                                                                        : INPUT;
+        pinMode(buttonPin_, pinModeValue);
     }
 }
 

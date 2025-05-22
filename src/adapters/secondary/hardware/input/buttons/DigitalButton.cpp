@@ -3,9 +3,15 @@
 
 DigitalButton::DigitalButton(const ButtonConfig& cfg)
     : cfg_(cfg), button_(), pressed_(false), toggleState_(false), prevPressed_(false) {
-    pinMode(cfg_.pin, cfg_.activeLow ? INPUT_PULLUP : INPUT);
-    button_.attach(cfg_.pin, cfg_.activeLow ? INPUT_PULLUP : INPUT);
-    button_.interval(5);  // debounce interval (ms)
+    // Utiliser la nouvelle structure GpioPin
+    uint8_t pinNumber = cfg_.gpio.pin;
+    int pinModeValue = (cfg_.gpio.mode == PinMode::PULLUP)     ? INPUT_PULLUP
+                       : (cfg_.gpio.mode == PinMode::PULLDOWN) ? INPUT_PULLDOWN
+                                                               : INPUT;
+
+    pinMode(pinNumber, pinModeValue);
+    button_.attach(pinNumber, pinModeValue);
+    button_.interval(cfg_.debounceMs);  // Utiliser le délai de debounce configuré
 
     // Lire l'état initial du bouton sans déclencher d'événement
     button_.update();

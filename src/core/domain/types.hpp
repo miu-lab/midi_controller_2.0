@@ -23,6 +23,31 @@ using MidiCC = DefaultMidiId;
 using MidiNote = DefaultMidiId;
 
 /**
+ * @brief Mode de configuration GPIO
+ */
+enum class PinMode {
+    PULLUP,    ///< Entrée avec résistance de tirage vers le haut
+    PULLDOWN,  ///< Entrée avec résistance de tirage vers le bas
+    RAW        ///< Entrée sans résistance de tirage
+};
+
+/**
+ * @brief Configuration sécurisée d'une broche GPIO
+ */
+struct GpioPin {
+    uint8_t pin;
+    PinMode mode = PinMode::PULLUP;
+
+    /**
+     * @brief Vérifie si la configuration de la broche est valide
+     * @return true si la broche est dans la plage valide (0-99 pour Teensy)
+     */
+    constexpr bool isValid() const {
+        return pin <= 99;  // Teensy 4.1 max pins
+    }
+};
+
+/**
  * @brief Type de mapping (encodeur, bouton d'encodeur)
  */
 enum class MappingType { ENCODER, BUTTON };
