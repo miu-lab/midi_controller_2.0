@@ -45,8 +45,7 @@ public:
      * @param midiControl Paramètres de contrôle MIDI
      * @param strategy Stratégie de mapping à utiliser
      */
-    void setMapping(ControlId controlId, const MidiControl& midiControl,
-                    std::unique_ptr<IMidiMappingStrategy> strategy);
+    void setMapping(const ControlMapping& mapping, std::unique_ptr<IMidiMappingStrategy> strategy);
 
     /**
      * @brief Supprime le mapping pour un contrôle

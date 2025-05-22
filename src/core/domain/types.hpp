@@ -27,7 +27,6 @@ struct MidiControl {
     MidiCC control{0};
     bool isRelative{true};
     std::optional<bool> isCentered{true};
-    ControlType controlType{ControlType::ENCODER_ROTATION};
 };
 
 /**
@@ -35,7 +34,8 @@ struct MidiControl {
  */
 struct ControlMapping {
     ControlId controlId;
-    MidiControl midiControl;
+    ControlType controlType{ControlType::ENCODER_ROTATION};
+    MidiControl midiMapping;
 };
 
 /**

@@ -43,7 +43,7 @@ public:
      * @brief Obtient tous les mappings MIDI
      * @return Un vecteur de tous les mappings MIDI configurés
      */
-    const std::vector<ControlMapping>& getAllMidiMappings() const;
+    const std::vector<ControlMapping>& getMappedControls() const;
 
     /**
      * @brief Obtient tous les contrôles de navigation

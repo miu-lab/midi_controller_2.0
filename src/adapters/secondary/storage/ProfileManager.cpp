@@ -17,7 +17,7 @@ std::vector<ControlMapping> ProfileManager::getAllMappings() const {
     result.reserve(bindings_.size());
 
     for (const auto& pair : bindings_) {
-        result.push_back({.controlId = pair.first, .midiControl = pair.second});
+        result.push_back({.controlId = pair.first, .midiMapping = pair.second});
     }
 
     return result;

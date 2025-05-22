@@ -79,20 +79,20 @@ Result<bool, std::string> MidiSubsystem::init() {
 
     // Charger les mappings MIDI depuis la configuration
     MappingConfiguration mappingConfig;
-    const auto& midiMappings = mappingConfig.getAllMidiMappings();
+    const auto& midiMappings = mappingConfig.getMappedControls();
 
     int mappingCount = 0;
     for (const auto& mapping : midiMappings) {
         // Créer une stratégie de mapping appropriée
         std::unique_ptr<IMidiMappingStrategy> strategy;
-        if (mapping.midiControl.isRelative) {
+        if (mapping.midiMapping.isRelative) {
             strategy = MidiMappingFactory::createRelative();
         } else {
             strategy = MidiMappingFactory::createAbsolute(0, 127);
         }
 
         // Ajouter le mapping au MidiMapper
-        midiMapper_->setMapping(mapping.controlId, mapping.midiControl, std::move(strategy));
+        midiMapper_->setMapping(mapping, std::move(strategy));
 
         mappingCount++;
     }

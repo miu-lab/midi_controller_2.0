@@ -16,8 +16,7 @@
 MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
       commandManager_(commandManager),
-      defaultControl_(
-          {0, 0, false, true, ControlType::ENCODER_ROTATION})  // Canal 1, CC 0, mode absolu
+      defaultControl_({0, 0, false, true})  // Canal 1, CC 0, mode absolu
 {
     // Initialisation préalable des pool d'objets
     for (auto& cmd : midiCCCommandPool_) {
@@ -70,18 +69,18 @@ bool MidiMapper::isNavigationControl(ControlId controlId) const {
 // Gestion des mappings
 //=============================================================================
 
-void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
+void MidiMapper::setMapping(const ControlMapping& mapping,
                             std::unique_ptr<IMidiMappingStrategy> strategy) {
     // Créer une nouvelle info de mapping
     MappingInfo info;
-    info.control = midiControl;
+    info.control = mapping.midiMapping;  // Utiliser midiMapping au lieu de midiControl
     info.strategy = std::move(strategy);
     info.lastMidiValue = 0;
-    info.lastEncoderPosition = 0;  // Initialisation à 0
+    info.lastEncoderPosition = 0;
     info.midiOffset = 0;
 
     // Créer une clé composite qui inclut le type de contrôle
-    uint32_t compositeKey = makeCompositeKey(controlId, midiControl.controlType);
+    uint32_t compositeKey = makeCompositeKey(mapping.controlId, mapping.controlType);
 
     // Supprimer l'ancien mapping s'il existe
     auto it = mappings_.find(compositeKey);
@@ -93,10 +92,10 @@ void MidiMapper::setMapping(ControlId controlId, const MidiControl& midiControl,
     mappings_[compositeKey] = std::move(info);
 
     logDiagnostic("Mapping ajouté: ID=%d CH=%d CC=%d Type=%d",
-                  controlId,
-                  midiControl.channel,
-                  midiControl.control,
-                  static_cast<int>(midiControl.controlType));
+                  mapping.controlId,
+                  mapping.midiMapping.channel,
+                  mapping.midiMapping.control,
+                  static_cast<int>(mapping.controlType));  // Utiliser mapping.controlType
 }
 
 bool MidiMapper::removeMapping(ControlId controlId) {
