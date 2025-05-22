@@ -12,8 +12,8 @@ void ProfileManager::setBinding(ControlId id, MidiControl binding) {
     bindings_[id] = binding;
 }
 
-std::vector<MidiControlMapping> ProfileManager::getAllMappings() const {
-    std::vector<MidiControlMapping> result;
+std::vector<ControlMapping> ProfileManager::getAllMappings() const {
+    std::vector<ControlMapping> result;
     result.reserve(bindings_.size());
 
     for (const auto& pair : bindings_) {
@@ -38,8 +38,10 @@ void ProfileManager::resetToDefaults() {
 
     // Ajouter ici les mappings par défaut
     // Par exemple :
-    setBinding(71, {.channel = 0, .control = 1, .relative = false});  // Encodeur 1 -> CC 1, Canal 1
-    setBinding(72, {.channel = 0, .control = 2, .relative = false});  // Encodeur 2 -> CC 2, Canal 1
+    setBinding(71,
+               {.channel = 0, .control = 1, .isRelative = false});  // Encodeur 1 -> CC 1, Canal 1
+    setBinding(72,
+               {.channel = 0, .control = 2, .isRelative = false});  // Encodeur 2 -> CC 2, Canal 1
     // ... etc.
 }
 

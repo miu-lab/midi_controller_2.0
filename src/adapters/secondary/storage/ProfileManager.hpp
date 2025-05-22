@@ -11,7 +11,7 @@ class ProfileManager : public ProfileStoragePort {
 public:
     std::optional<MidiControl> getBinding(ControlId id) const override;
     void setBinding(ControlId id, MidiControl binding) override;
-    std::vector<MidiControlMapping> getAllMappings() const override;
+    std::vector<ControlMapping> getAllMappings() const override;
     bool saveProfile() override;
     bool loadProfile() override;
     void resetToDefaults() override;

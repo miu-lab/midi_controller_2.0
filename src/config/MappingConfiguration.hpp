@@ -43,7 +43,7 @@ public:
      * @brief Obtient tous les mappings MIDI
      * @return Un vecteur de tous les mappings MIDI configurés
      */
-    const std::vector<MidiControlMapping>& getAllMidiMappings() const;
+    const std::vector<ControlMapping>& getAllMidiMappings() const;
 
     /**
      * @brief Obtient tous les contrôles de navigation
@@ -52,7 +52,7 @@ public:
     const std::vector<NavigationControl>& getNavigationControls() const;
 
 private:
-    std::vector<MidiControlMapping> midiMappings;
+    std::vector<ControlMapping> controlsMapping;
     std::vector<NavigationControl> navigationControls;
     std::unordered_map<uint32_t, std::size_t>
         midiMappingIndex;  // Pour accès rapide par ID composite (ID << 8 | type)

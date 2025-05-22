@@ -26,7 +26,7 @@ public:
      * @brief Obtient tous les mappings MIDI
      * @return Un vecteur de tous les mappings configurés
      */
-    std::vector<MidiControlMapping> getAllMappings() const;
+    std::vector<ControlMapping> getAllMappings() const;
 
     /**
      * @brief Obtient le mapping pour un contrôle spécifique

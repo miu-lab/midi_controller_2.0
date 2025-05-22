@@ -85,7 +85,7 @@ Result<bool, std::string> MidiSubsystem::init() {
     for (const auto& mapping : midiMappings) {
         // Créer une stratégie de mapping appropriée
         std::unique_ptr<IMidiMappingStrategy> strategy;
-        if (mapping.midiControl.relative) {
+        if (mapping.midiControl.isRelative) {
             strategy = MidiMappingFactory::createRelative();
         } else {
             strategy = MidiMappingFactory::createAbsolute(0, 127);

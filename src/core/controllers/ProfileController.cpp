@@ -3,7 +3,7 @@
 ProfileController::ProfileController(ProfileStoragePort& profileManager)
     : profileManager_(profileManager) {}
 
-std::vector<MidiControlMapping> ProfileController::getAllMappings() const {
+std::vector<ControlMapping> ProfileController::getAllMappings() const {
     return profileManager_.getAllMappings();
 }
 
@@ -14,7 +14,7 @@ MidiControl ProfileController::getMapping(ControlId controlId) const {
     }
 
     // Valeur par défaut si le mapping n'existe pas
-    return {.channel = 0, .control = 0, .relative = false};
+    return {.channel = 0, .control = 0, .isRelative = false};
 }
 
 void ProfileController::setMapping(ControlId controlId, const MidiControl& midiControl) {
@@ -45,7 +45,7 @@ std::unique_ptr<IMidiMappingStrategy> ProfileController::createMappingStrategy(
     bool isButton =
         controlId >= 50 && controlId < 70;  // Supposons que les IDs 50-69 sont des boutons
 
-    if (midiControl.relative) {
+    if (midiControl.isRelative) {
         // Mode relatif - bien pour les encodeurs
         return MidiMappingFactory::createRelative();
     } else {

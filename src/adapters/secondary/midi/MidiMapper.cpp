@@ -16,7 +16,8 @@
 MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
       commandManager_(commandManager),
-      defaultControl_({0, 0, false, ControlType::ENCODER_ROTATION})  // Canal 1, CC 0, mode absolu
+      defaultControl_(
+          {0, 0, false, true, ControlType::ENCODER_ROTATION})  // Canal 1, CC 0, mode absolu
 {
     // Initialisation préalable des pool d'objets
     for (auto& cmd : midiCCCommandPool_) {
@@ -213,7 +214,7 @@ int16_t MidiMapper::calculateMidiValue(MappingInfo& info, int32_t delta, int32_t
     const MidiControl& control = info.control;
     int16_t newValue;
 
-    if (control.relative) {
+    if (control.isRelative) {
         // Mode relatif avec sensibilité configurable
         float sensitivity =
             ConfigDefaults::DEFAULT_ENCODER_SENSITIVITY;  // Ajustez cette valeur selon vos besoins
@@ -290,7 +291,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
                   control.channel,
                   control.control,
                   newValue,
-                  control.relative ? "relatif" : "absolu");
+                  control.isRelative ? "relatif" : "absolu");
     // Débogage pour voir l'ID de l'encodeur
     Serial.print(F("MidiMapper: Sending MIDI for encoderId="));
     Serial.println(encoderId);

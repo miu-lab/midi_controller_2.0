@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <optional>
 
 using DefaultId = uint16_t;
 using DefaultMidiId = uint8_t;
@@ -24,14 +25,15 @@ enum class ControlType { ENCODER_ROTATION, ENCODER_BUTTON, BUTTON };
 struct MidiControl {
     MidiChannel channel{1};
     MidiCC control{0};
-    bool relative{true};
+    bool isRelative{true};
+    std::optional<bool> isCentered{true};
     ControlType controlType{ControlType::ENCODER_ROTATION};
 };
 
 /**
  * @brief Affectation d'un controle MIDI à un encodeur
  */
-struct MidiControlMapping {
+struct ControlMapping {
     ControlId controlId;
     MidiControl midiControl;
 };

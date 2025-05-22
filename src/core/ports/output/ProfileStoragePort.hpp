@@ -36,7 +36,7 @@ public:
      * @brief Obtient tous les mappings MIDI
      * @return Un vecteur de tous les mappings configurés
      */
-    virtual std::vector<MidiControlMapping> getAllMappings() const = 0;
+    virtual std::vector<ControlMapping> getAllMappings() const = 0;
 
     /**
      * @brief Sauvegarde les mappings actuels dans le stockage persistant
