@@ -1,5 +1,8 @@
 #include "InputSubsystem.hpp"
 
+#include <Arduino.h>
+#include <algorithm>
+
 #include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
 #include "adapters/secondary/hardware/input/encoders/EncoderManager.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
@@ -23,40 +26,16 @@ Result<bool, std::string> InputSubsystem::init() {
         return Result<bool, std::string>::error("Failed to resolve IConfiguration");
     }
 
-    // Obtenir les configurations des périphériques
-    auto encoderConfigs = configuration_->encoderConfigs();
-    auto buttonConfigs = configuration_->buttonConfigs();
-
-    // Créer les gestionnaires de périphériques avec les configurations
-    encoderManager_ = std::make_shared<EncoderManager>(encoderConfigs);
-    if (!encoderManager_) {
-        return Result<bool, std::string>::error("Failed to create EncoderManager");
+    // Charger les configurations unifiées
+    auto loadResult = loadUnifiedConfigurations();
+    if (loadResult.isError()) {
+        return loadResult;
     }
 
-    buttonManager_ = std::make_shared<DigitalButtonManager>(buttonConfigs);
-    if (!buttonManager_) {
-        return Result<bool, std::string>::error("Failed to create DigitalButtonManager");
-    }
-
-    // Créer les processeurs d'événements
-    processEncoders_ = std::make_unique<ProcessEncoders>(encoderManager_->getEncoders());
-    if (!processEncoders_) {
-        return Result<bool, std::string>::error("Failed to create ProcessEncoders");
-    }
-
-    processButtons_ = std::make_unique<ProcessButtons>(buttonManager_->getButtons());
-    if (!processButtons_) {
-        return Result<bool, std::string>::error("Failed to create ProcessButtons");
-    }
-
-    // Récupérer InputController depuis le conteneur
-    inputController_ = container_->resolve<InputController>();
-    if (!inputController_) {
-        return Result<bool, std::string>::error("Failed to resolve InputController");
-    } else {
-        // Connecter les processeurs au contrôleur d'entrée
-        processEncoders_->setInputController(inputController_.get());
-        processButtons_->setInputController(inputController_.get());
+    // Connecter le contrôleur d'entrée
+    auto controllerResult = connectInputController();
+    if (controllerResult.isError()) {
+        return controllerResult;
     }
 
     // Enregistrer ce sous-système comme implémentation de IInputSystem
@@ -95,24 +74,222 @@ void InputSubsystem::update() {
     }
 }
 
-Result<bool, std::string> InputSubsystem::configureEncoders(
-    const std::vector<EncoderConfig>& encoderConfigs) {
-    if (!encoderManager_) {
-        return Result<bool, std::string>::error("EncoderManager is not initialized");
+// === INTERFACE UNIFIÉE ===
+
+Result<bool, std::string> InputSubsystem::configureInputs(const std::vector<InputConfig>& inputConfigs) {
+    if (!initialized_) {
+        return Result<bool, std::string>::error("InputSubsystem not initialized");
     }
 
-    // Note: cette méthode n'est plus utilisée car les encodeurs sont configurés dans le
-    // constructeur Mais nous la conservons pour l'API publique
+    Serial.println(F("InputSubsystem: Configuring inputs with unified interface"));
+
+    // Extraire les configurations par type
+    auto encoderConfigs = extractEncoderConfigs(inputConfigs);
+    auto buttonConfigs = extractButtonConfigs(inputConfigs);
+
+    // Recréer les managers avec les nouvelles configurations
+    auto managerResult = createManagers(encoderConfigs, buttonConfigs);
+    if (managerResult.isError()) {
+        return managerResult;
+    }
+
+    // Réinitialiser les processeurs
+    auto processorResult = initializeProcessors();
+    if (processorResult.isError()) {
+        return processorResult;
+    }
+
+    Serial.print(F("InputSubsystem: Successfully configured "));
+    Serial.print(inputConfigs.size());
+    Serial.println(F(" inputs"));
+
     return Result<bool, std::string>::success(true);
 }
 
-Result<bool, std::string> InputSubsystem::configureButtons(
-    const std::vector<ButtonConfig>& buttonConfigs) {
-    if (!buttonManager_) {
-        return Result<bool, std::string>::error("ButtonManager is not initialized");
+std::vector<InputConfig> InputSubsystem::getAllActiveInputConfigurations() const {
+    if (!configuration_) {
+        return {};
+    }
+    
+    const auto& allConfigs = configuration_->getAllInputConfigurations();
+    std::vector<InputConfig> activeConfigs;
+    
+    // Filtrer seulement les configurations actives
+    for (const auto& config : allConfigs) {
+        if (config.enabled) {
+            activeConfigs.push_back(config);
+        }
+    }
+    
+    return activeConfigs;
+}
+
+std::optional<InputConfig> InputSubsystem::getInputConfigurationById(InputId id) const {
+    if (!configuration_) {
+        return std::nullopt;
+    }
+    
+    return configuration_->getInputConfigurationById(id);
+}
+
+size_t InputSubsystem::getActiveInputCountByType(InputType type) const {
+    const auto activeConfigs = getAllActiveInputConfigurations();
+    return std::count_if(activeConfigs.begin(), activeConfigs.end(),
+                        [type](const InputConfig& config) {
+                            return config.type == type;
+                        });
+}
+
+bool InputSubsystem::validateInputsStatus() const {
+    if (!initialized_) {
+        return false;
+    }
+    
+    // Vérifier que les managers sont créés
+    if (!encoderManager_ || !buttonManager_) {
+        return false;
+    }
+    
+    // Vérifier que les processeurs sont créés
+    if (!processEncoders_ || !processButtons_) {
+        return false;
+    }
+    
+    // Vérifier que le contrôleur est connecté
+    if (!inputController_) {
+        return false;
+    }
+    
+    return true;
+}
+
+// === MÉTHODES PRIVÉES ===
+
+Result<bool, std::string> InputSubsystem::loadUnifiedConfigurations() {
+    Serial.println(F("InputSubsystem: Loading unified input configurations"));
+
+    // Obtenir toutes les configurations d'entrée depuis la nouvelle interface
+    const auto& allInputConfigs = configuration_->getAllInputConfigurations();
+    
+    if (allInputConfigs.empty()) {
+        return Result<bool, std::string>::error("No input configurations found");
     }
 
-    // Note: cette méthode n'est plus utilisée car les boutons sont configurés dans le constructeur
-    // Mais nous la conservons pour l'API publique
+    // Valider toutes les configurations
+    if (!configuration_->validateAllConfigurations()) {
+        return Result<bool, std::string>::error("Some input configurations are invalid");
+    }
+
+    // Extraire les configurations par type
+    auto encoderConfigs = extractEncoderConfigs(allInputConfigs);
+    auto buttonConfigs = extractButtonConfigs(allInputConfigs);
+
+    Serial.print(F("InputSubsystem: Found "));
+    Serial.print(encoderConfigs.size());
+    Serial.print(F(" encoders and "));
+    Serial.print(buttonConfigs.size());
+    Serial.println(F(" buttons"));
+
+    // Créer les managers avec les configurations extraites
+    auto managerResult = createManagers(encoderConfigs, buttonConfigs);
+    if (managerResult.isError()) {
+        return managerResult;
+    }
+
+    // Initialiser les processeurs
+    auto processorResult = initializeProcessors();
+    if (processorResult.isError()) {
+        return processorResult;
+    }
+
+    Serial.println(F("InputSubsystem: Unified configurations loaded successfully"));
+    return Result<bool, std::string>::success(true);
+}
+
+std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vector<InputConfig>& inputConfigs) const {
+    std::vector<EncoderConfig> encoderConfigs;
+    
+    for (const auto& inputConfig : inputConfigs) {
+        if (inputConfig.type == InputType::ENCODER && inputConfig.enabled) {
+            if (auto encConfig = inputConfig.getConfig<EncoderConfig>()) {
+                encoderConfigs.push_back(*encConfig);
+            }
+        }
+    }
+    
+    return encoderConfigs;
+}
+
+std::vector<ButtonConfig> InputSubsystem::extractButtonConfigs(const std::vector<InputConfig>& inputConfigs) const {
+    std::vector<ButtonConfig> buttonConfigs;
+    
+    for (const auto& inputConfig : inputConfigs) {
+        if (inputConfig.type == InputType::BUTTON && inputConfig.enabled) {
+            if (auto btnConfig = inputConfig.getConfig<ButtonConfig>()) {
+                buttonConfigs.push_back(*btnConfig);
+            }
+        }
+    }
+    
+    return buttonConfigs;
+}
+
+Result<bool, std::string> InputSubsystem::createManagers(const std::vector<EncoderConfig>& encoderConfigs,
+                                                        const std::vector<ButtonConfig>& buttonConfigs) {
+    // Créer le gestionnaire d'encodeurs
+    encoderManager_ = std::make_shared<EncoderManager>(encoderConfigs);
+    if (!encoderManager_) {
+        return Result<bool, std::string>::error("Failed to create EncoderManager");
+    }
+
+    // Créer le gestionnaire de boutons
+    buttonManager_ = std::make_shared<DigitalButtonManager>(buttonConfigs);
+    if (!buttonManager_) {
+        return Result<bool, std::string>::error("Failed to create DigitalButtonManager");
+    }
+
+    Serial.println(F("InputSubsystem: Hardware managers created successfully"));
+    return Result<bool, std::string>::success(true);
+}
+
+Result<bool, std::string> InputSubsystem::initializeProcessors() {
+    // Créer les processeurs d'événements
+    processEncoders_ = std::make_unique<ProcessEncoders>(encoderManager_->getEncoders());
+    if (!processEncoders_) {
+        return Result<bool, std::string>::error("Failed to create ProcessEncoders");
+    }
+
+    processButtons_ = std::make_unique<ProcessButtons>(buttonManager_->getButtons());
+    if (!processButtons_) {
+        return Result<bool, std::string>::error("Failed to create ProcessButtons");
+    }
+
+    // Connecter les processeurs au contrôleur d'entrée si disponible
+    if (inputController_) {
+        processEncoders_->setInputController(inputController_.get());
+        processButtons_->setInputController(inputController_.get());
+    }
+
+    Serial.println(F("InputSubsystem: Event processors initialized successfully"));
+    return Result<bool, std::string>::success(true);
+}
+
+Result<bool, std::string> InputSubsystem::connectInputController() {
+    // Récupérer InputController depuis le conteneur
+    inputController_ = container_->resolve<InputController>();
+    if (!inputController_) {
+        return Result<bool, std::string>::error("Failed to resolve InputController");
+    }
+
+    // Connecter les processeurs si ils existent déjà
+    if (processEncoders_) {
+        processEncoders_->setInputController(inputController_.get());
+    }
+    
+    if (processButtons_) {
+        processButtons_->setInputController(inputController_.get());
+    }
+
+    Serial.println(F("InputSubsystem: InputController connected successfully"));
     return Result<bool, std::string>::success(true);
 }

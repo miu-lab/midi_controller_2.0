@@ -4,14 +4,12 @@
 #include <optional>
 
 #include "adapters/secondary/hardware/input/InputConfig.hpp"
-#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
-#include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
 
 /**
  * @brief Configuration matérielle des boutons et encodeurs
  *
  * Cette classe centralise toutes les configurations matérielles du contrôleur MIDI.
- * Migration vers InputConfig pour une interface unifiée.
+ * Interface unifiée basée sur InputConfig.
  */
 class HardwareConfiguration {
 public:
@@ -22,22 +20,6 @@ public:
      * @return Un vecteur constant de configurations d'entrée
      */
     const std::vector<InputConfig>& getAllInputConfigurations() const;
-
-    // === MÉTHODES DE COMPATIBILITÉ (dépréciées, seront supprimées plus tard) ===
-    
-    /**
-     * @brief Obtient la configuration des boutons de contrôle
-     * @return Un vecteur de configurations de boutons (pour compatibilité)
-     * @deprecated Utiliser getAllInputConfigurations() à la place
-     */
-    std::vector<ButtonConfig> getControlButtonConfigurations() const;
-
-    /**
-     * @brief Obtient la configuration des encodeurs
-     * @return Un vecteur de configurations d'encodeurs (pour compatibilité)
-     * @deprecated Utiliser getAllInputConfigurations() à la place
-     */
-    std::vector<EncoderConfig> getEncoderConfigurations() const;
 
     // === MÉTHODES UTILITAIRES ===
     
@@ -67,7 +49,7 @@ private:
     // Méthodes d'initialisation
     void setInputsConfiguration();
     
-    // Helpers pour la migration
+    // Helpers pour la création
     InputConfig createButtonInput(InputId id, const std::string& name, const std::string& label, 
                                  const ButtonConfig& buttonConfig, const std::string& group = "Control");
     InputConfig createEncoderInput(InputId id, const std::string& name, const std::string& label, 

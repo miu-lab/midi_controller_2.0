@@ -8,32 +8,6 @@ const std::vector<InputConfig>& HardwareConfiguration::getAllInputConfigurations
     return inputConfigurations_;
 }
 
-// === MÉTHODES DE COMPATIBILITÉ ===
-
-std::vector<ButtonConfig> HardwareConfiguration::getControlButtonConfigurations() const {
-    std::vector<ButtonConfig> buttons;
-    for (const auto& input : inputConfigurations_) {
-        if (input.type == InputType::BUTTON) {
-            if (auto btnConfig = input.getConfig<ButtonConfig>()) {
-                buttons.push_back(*btnConfig);
-            }
-        }
-    }
-    return buttons;
-}
-
-std::vector<EncoderConfig> HardwareConfiguration::getEncoderConfigurations() const {
-    std::vector<EncoderConfig> encoders;
-    for (const auto& input : inputConfigurations_) {
-        if (input.type == InputType::ENCODER) {
-            if (auto encConfig = input.getConfig<EncoderConfig>()) {
-                encoders.push_back(*encConfig);
-            }
-        }
-    }
-    return encoders;
-}
-
 // === MÉTHODES UTILITAIRES ===
 
 std::vector<InputConfig> HardwareConfiguration::getInputConfigurationsByType(InputType type) const {
