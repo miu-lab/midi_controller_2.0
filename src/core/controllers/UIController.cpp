@@ -13,8 +13,8 @@ void UIController::navigateToMainScreen() {
         menuController_.exitMenu();
     }
 
-    // Demander au ViewManager d'afficher l'écran principal
-    viewManager_.showMainScreen();
+    // Demander au ViewManager d'afficher la vue par défaut (home)
+    viewManager_.showHome();
     currentState_ = UIState::MAIN_SCREEN;
 }
 
@@ -30,9 +30,10 @@ void UIController::navigateToControlMonitor() {
         menuController_.exitMenu();
     }
 
-    // Demander au ViewManager d'afficher le moniteur de contrôles
-    viewManager_.showControlMonitor();
-    currentState_ = UIState::CONTROL_MONITOR;
+    // Dans l'architecture simplifiée, pas de vue spécifique pour le moniteur
+    // Retourner à la vue par défaut
+    viewManager_.showHome();
+    currentState_ = UIState::MAIN_SCREEN;
 }
 
 void UIController::navigateToDebugScreen() {
@@ -41,9 +42,10 @@ void UIController::navigateToDebugScreen() {
         menuController_.exitMenu();
     }
 
-    // Demander au ViewManager d'afficher l'écran de débogage
-    viewManager_.showDebugScreen();
-    currentState_ = UIState::DEBUG_SCREEN;
+    // Dans l'architecture simplifiée, pas de vue de débogage
+    // Retourner à la vue par défaut
+    viewManager_.showHome();
+    currentState_ = UIState::MAIN_SCREEN;
 }
 
 void UIController::showModalDialog(const String& message, const String& okLabel,
@@ -52,7 +54,7 @@ void UIController::showModalDialog(const String& message, const String& okLabel,
     // Pour cette démonstration, nous les ignorons
 
     // Demander au ViewManager d'afficher la boîte de dialogue
-    viewManager_.showModalDialog(message);
+    viewManager_.showModal(message);
     currentState_ = UIState::MODAL_DIALOG;
 }
 
@@ -61,34 +63,25 @@ void UIController::handleEncoderTurn(int8_t direction) {
     switch (currentState_) {
     case UIState::MENU:
         // Dans un menu, sélectionner l'élément suivant ou précédent
-        if (direction > 0) {
-            menuController_.selectNextItem();
-        } else {
-            menuController_.selectPreviousItem();
-        }
+        viewManager_.navigateMenu(direction);
         break;
 
     case UIState::CONTROL_MONITOR:
-        // Dans le moniteur de contrôles, navigation spécifique
-        // Par exemple, faire défiler la liste des contrôles
-        viewManager_.scrollControlMonitorByDelta(direction);
-        break;
-
     case UIState::DEBUG_SCREEN:
-        // Dans l'écran de débogage, faire défiler les logs
-        viewManager_.scrollDebugLogByDelta(direction);
+        // Ces vues n'existent plus, traiter comme l'écran principal
+        // Ne rien faire ou revenir au menu
         break;
 
     case UIState::MODAL_DIALOG:
-        // Dans une boîte de dialogue, basculer entre OK et Annuler
-        viewManager_.toggleModalDialogButton();
+        // Dans une boîte de dialogue, pour l'instant ne rien faire
+        // Ou basculer entre les boutons si implémenté
         break;
 
     case UIState::MAIN_SCREEN:
     default:
-        // Sur l'écran principal, comportement spécifique
-        // Par exemple, faire défiler les informations
-        viewManager_.scrollMainScreenByDelta(direction);
+        // Sur l'écran principal, ne rien faire pour l'instant
+        // Les changements d'encodeur devraient déclencher des événements MIDI
+        // qui seront gérés par ViewManagerEventListener
         break;
     }
 }
@@ -138,7 +131,7 @@ void UIController::handleEncoderClick() {
         // Pour cette démonstration, nous nous contentons de fermer la boîte de dialogue
 
         // Fermer la boîte de dialogue et revenir à l'écran précédent
-        viewManager_.hideModalDialog();
+        viewManager_.hideModal();
         // Revenir à l'état précédent, supposons MAIN_SCREEN pour simplifier
         currentState_ = UIState::MAIN_SCREEN;
         break;
@@ -169,7 +162,7 @@ void UIController::handleBackButton() {
         // Pour cette démonstration, nous nous contentons de fermer la boîte de dialogue
 
         // Fermer la boîte de dialogue et revenir à l'écran précédent
-        viewManager_.hideModalDialog();
+        viewManager_.hideModal();
         // Revenir à l'état précédent, supposons MAIN_SCREEN pour simplifier
         currentState_ = UIState::MAIN_SCREEN;
         break;
@@ -206,7 +199,7 @@ void UIController::handleOkButton() {
         // Pour cette démonstration, nous nous contentons de fermer la boîte de dialogue
 
         // Fermer la boîte de dialogue et revenir à l'écran précédent
-        viewManager_.hideModalDialog();
+        viewManager_.hideModal();
         // Revenir à l'état précédent, supposons MAIN_SCREEN pour simplifier
         currentState_ = UIState::MAIN_SCREEN;
         break;

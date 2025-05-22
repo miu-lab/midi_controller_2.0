@@ -18,26 +18,6 @@ InputController::InputController(std::shared_ptr<NavigationConfigService> naviga
     m_midiButtonCallback = emptyButtonCallback;
 }
 
-void InputController::setUIController(std::shared_ptr<UIController> uiController) {
-    m_uiController = uiController;
-
-    // Si l'UIController est défini, nous pouvons configurer les callbacks par défaut
-    // pour utiliser l'UIController au lieu de l'EventBus
-    if (m_uiController) {
-        m_navigationEncoderCallback = [this](EncoderId id, int32_t absPos, int8_t relChange) {
-            handleNavigationEncoderTurn(id, absPos, relChange);
-        };
-
-        m_navigationEncoderButtonCallback = [this](EncoderId id, bool pressed) {
-            handleNavigationEncoderButton(id, pressed);
-        };
-
-        m_navigationButtonCallback = [this](ButtonId id, bool pressed) {
-            handleNavigationButton(id, pressed);
-        };
-    }
-}
-
 void InputController::processEncoderTurn(EncoderId id, int32_t absolutePosition,
                                          int8_t relativeChange) {
     // Chemin événementiel optimisé pour les contrôles MIDI

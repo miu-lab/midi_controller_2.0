@@ -1,7 +1,6 @@
 #include "InitializationScript.hpp"
 
 // Inclusions nécessaires pour l'implémentation
-#include "core/domain/events/core/OptimizedEventBus.hpp"
 #include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
@@ -15,6 +14,7 @@
 #include "core/controllers/MenuController.hpp"
 #include "core/controllers/UIController.hpp"
 #include "core/domain/commands/CommandManager.hpp"
+#include "core/domain/events/core/OptimizedEventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"
 #include "core/domain/interfaces/IMidiSystem.hpp"
@@ -31,7 +31,7 @@ Result<bool, std::string> InitializationScript::initializeContainer(
 
     // Étape 1: Services de base
     registerBaseServices(container, config);
-    
+
     // Créer et enregistrer l'OptimizedEventBus
     auto optimizedEventBus = std::make_shared<OptimizedEventBus>();
     container->registerDependency<OptimizedEventBus>(optimizedEventBus);
@@ -97,11 +97,12 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
     if (!navConfig) {
         return Result<bool, std::string>::error("Impossible de résoudre NavigationConfigService");
     }
-    
+
     // Récupérer l'OptimizedEventBus
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
     if (!optimizedEventBus) {
-        Serial.println(F("AVERTISSEMENT: OptimizedEventBus non disponible, utilisant le mode legacy"));
+        Serial.println(
+            F("AVERTISSEMENT: OptimizedEventBus non disponible, utilisant le mode legacy"));
     }
 
     // Créer InputController avec l'OptimizedEventBus
@@ -178,9 +179,6 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
 
     // Configurer l'interaction entre InputController et UIController
     auto inputController = container->resolve<InputController>();
-    if (inputController && uiController) {
-        inputController->setUIController(uiController);
-    }
 
     return true;
 }
@@ -194,15 +192,15 @@ void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyCon
         Serial.println(F("Impossible de configurer les écouteurs MIDI"));
         return;
     }
-    
+
     // Récupérer le MidiMapper du MidiSubsystem
     MidiMapper& midiMapper = midiSystem->getMidiMapper();
-    
+
     // Enregistrer le MidiMapper comme écouteur de haute priorité
     optimizedEventBus->subscribeWithPriority(&midiMapper, EventPriority::PRIORITY_HIGH);
-    
+
     Serial.println(F("MidiMapper enregistré comme écouteur prioritaire d'événements"));
-    
+
     // Configurer la propagation des événements haute priorité
     optimizedEventBus->setPropagateHighPriorityEvents(false);
 }

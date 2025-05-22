@@ -13,34 +13,32 @@ NavigateMenuCommand::NavigateMenuCommand(ViewManager& viewManager, Action action
 
 void NavigateMenuCommand::execute() {
     if (!hasExecuted_) {
-        // Sauvegarder l'état actuel pour l'annulation
-        previousIndex_ = viewManager_.getCurrentMenuIndex();
-        previousState_ = viewManager_.isInMenu();
+        // Dans l'architecture simplifiée, pas besoin de sauvegarder l'état
+        // previousIndex_ = 0; // Plus nécessaire 
+        // previousState_ = false; // Plus nécessaire
         hasExecuted_ = true;
     }
 
     // Exécuter l'action en fonction du type
     switch (action_) {
     case Action::ENTER:
-        viewManager_.enterMenu();
+        viewManager_.showMenu();
         break;
 
     case Action::EXIT:
-        viewManager_.exitMenu();
+        viewManager_.showHome();
         break;
 
     case Action::NEXT_ITEM:
-        viewManager_.selectNextMenuItem();
+        viewManager_.navigateMenu(1);
         break;
 
     case Action::PREVIOUS_ITEM:
-        viewManager_.selectPreviousMenuItem();
+        viewManager_.navigateMenu(-1);
         break;
 
     case Action::HOME:
-        if (itemIndex_ >= 0) {
-            viewManager_.selectMenuItem(itemIndex_);
-        }
+        viewManager_.selectMenuItem();
         break;
     }
 }
@@ -50,19 +48,9 @@ bool NavigateMenuCommand::undo() {
         return false;
     }
 
-    // Restaurer l'état précédent
-    if (previousState_ != viewManager_.isInMenu()) {
-        if (previousState_) {
-            viewManager_.enterMenu();
-        } else {
-            viewManager_.exitMenu();
-        }
-    }
-
-    if (previousIndex_ >= 0) {
-        viewManager_.selectMenuItem(previousIndex_);
-    }
-
+    // Dans l'architecture simplifiée, juste revenir à la vue par défaut
+    viewManager_.showHome();
+    
     return true;
 }
 

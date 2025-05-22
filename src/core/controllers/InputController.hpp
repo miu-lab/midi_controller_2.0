@@ -4,10 +4,10 @@
 #include <memory>
 
 #include "app/services/NavigationConfigService.hpp"
-#include "core/domain/events/core/EventBus.hpp"
-#include "core/domain/events/core/OptimizedEventBus.hpp"
-#include "core/domain/events/core/EventTypes.hpp"
 #include "core/domain/events/MidiEvents.hpp"
+#include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/core/EventTypes.hpp"
+#include "core/domain/events/core/OptimizedEventBus.hpp"
 #include "core/domain/types.hpp"
 
 // Forward declaration
@@ -28,12 +28,6 @@ public:
      */
     InputController(std::shared_ptr<NavigationConfigService> navigationConfig,
                     std::shared_ptr<OptimizedEventBus> eventBus = nullptr);
-
-    /**
-     * @brief Configure le contrôleur d'interface utilisateur
-     * @param uiController Contrôleur d'interface utilisateur
-     */
-    void setUIController(std::shared_ptr<UIController> uiController);
 
     /**
      * @brief Traite la rotation d'un encodeur
@@ -96,7 +90,7 @@ public:
 private:
     std::shared_ptr<NavigationConfigService> m_navigationConfig;
     std::shared_ptr<UIController> m_uiController;
-    std::shared_ptr<OptimizedEventBus> eventBus_; // Bus d'événements optimisé
+    std::shared_ptr<OptimizedEventBus> eventBus_;  // Bus d'événements optimisé
 
     // Stockage des callbacks
     std::function<void(EncoderId, int32_t, int8_t)> m_navigationEncoderCallback;

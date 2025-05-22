@@ -69,6 +69,20 @@ private:
      */
     bool handleUIEvent(const Event& event);
     
+    /**
+     * @brief Mappe un numéro de CC à un nom de paramètre lisible
+     * @param ccNumber Numéro de Control Change
+     * @return Nom du paramètre
+     */
+    String mapCCToParameterName(uint8_t ccNumber);
+    
+    /**
+     * @brief Détermine si un bouton est un bouton de navigation
+     * @param buttonId ID du bouton
+     * @return true si c'est un bouton de navigation
+     */
+    bool isNavigationButton(uint8_t buttonId);
+    
     ViewManager& m_viewManager;        // Gestionnaire de vues à mettre à jour
     SubscriptionId m_subscriptionId;   // ID d'abonnement aux événements
 };

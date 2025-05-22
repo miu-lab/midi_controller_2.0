@@ -52,56 +52,31 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
             // Traiter les événements CC MIDI
             auto& ccEvent = static_cast<const MidiCCEvent&>(event);
             
-            Serial.print(F("\nMIDI CC Event received: source="));
-            Serial.print(ccEvent.source);
-            Serial.print(F(" channel="));
+            Serial.print(F("\nMIDI CC Event: CH"));
             Serial.print(ccEvent.channel);
-            Serial.print(F(" controller="));
+            Serial.print(F(" CC"));
             Serial.print(ccEvent.controller);
-            Serial.print(F(" value="));
+            Serial.print(F(" = "));
             Serial.println(ccEvent.value);
             
-            // Mettre à jour l'écran de surveillance des contrôles avec les informations CC
-            m_viewManager.updateControlMonitorInfo(
-                ccEvent.source,
-                "CC",
-                ccEvent.channel,
+            // Mapper le CC à un nom de paramètre
+            String paramName = mapCCToParameterName(ccEvent.controller);
+            
+            // Afficher directement la vue ParameterFocus
+            m_viewManager.showParameterFocus(
                 ccEvent.controller,
-                ccEvent.value
+                ccEvent.channel,
+                ccEvent.value,
+                paramName
             );
             
             return true;
         }
         
-        case EventTypes::MidiNoteOn: {
-            // Traiter les événements Note On MIDI
-            auto& noteOnEvent = static_cast<const MidiNoteOnEvent&>(event);
-            
-            // Mettre à jour l'écran de surveillance des contrôles avec les informations Note On
-            m_viewManager.updateControlMonitorInfo(
-                noteOnEvent.source,
-                "Note On",
-                noteOnEvent.channel,
-                noteOnEvent.note,
-                noteOnEvent.velocity
-            );
-            
-            return true;
-        }
-        
+        case EventTypes::MidiNoteOn:
         case EventTypes::MidiNoteOff: {
-            // Traiter les événements Note Off MIDI
-            auto& noteOffEvent = static_cast<const MidiNoteOffEvent&>(event);
-            
-            // Mettre à jour l'écran de surveillance des contrôles avec les informations Note Off
-            m_viewManager.updateControlMonitorInfo(
-                noteOffEvent.source,
-                "Note Off",
-                noteOffEvent.channel,
-                noteOffEvent.note,
-                noteOffEvent.velocity
-            );
-            
+            // Pour les notes, on peut ignorer ou traiter différemment
+            Serial.println(F("MIDI Note event received (ignored for now)"));
             return true;
         }
         
@@ -109,31 +84,13 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
             // Traiter les événements de mapping MIDI
             auto& mappingEvent = static_cast<const MidiMappingEvent&>(event);
             
-            // Mettre à jour l'interface utilisateur avec les informations de mapping
-            // Par exemple, afficher un message temporaire sur l'écran principal
             String message = "Mapping: ";
             message += String(mappingEvent.controlId);
-            message += " -> ";
-            
-            if (mappingEvent.midiType == 0) {
-                message += "CC";
-            } else if (mappingEvent.midiType == 1) {
-                message += "Note";
-            } else {
-                message += "Type ";
-                message += String(mappingEvent.midiType);
-            }
-            
-            message += " Ch:";
-            message += String(mappingEvent.midiChannel);
-            message += " #";
+            message += " -> CC";
             message += String(mappingEvent.midiNumber);
             
             // Afficher le message dans une boîte de dialogue modale
-            m_viewManager.showModalDialog(message);
-            
-            // Fermer automatiquement la boîte de dialogue après un certain temps
-            // REMARQUE: Cela nécessiterait un système de temporisation que nous n'avons pas implémenté ici
+            m_viewManager.showModal(message);
             
             return true;
         }
@@ -149,8 +106,15 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
             // Traiter les événements d'encodeur tourné
             auto& encoderEvent = static_cast<const EncoderTurnedEvent&>(event);
             
-            // Mettre à jour l'écran principal avec la position de l'encodeur
-            m_viewManager.updateEncoderPosition(encoderEvent.id, encoderEvent.position);
+            // Si on est déjà en vue ParameterFocus, mettre à jour la valeur
+            // sinon déclencher l'affichage d'un nouveau paramètre
+            Serial.print(F("Encoder "));
+            Serial.print(encoderEvent.id);
+            Serial.print(F(" position: "));
+            Serial.println(encoderEvent.position);
+            
+            // Pour l'instant, on peut simplement logger
+            // L'implémentation dépendra de comment vous voulez mapper les encodeurs aux paramètres
             
             return true;
         }
@@ -159,8 +123,10 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
             // Traiter les événements de bouton d'encodeur
             auto& buttonEvent = static_cast<const EncoderButtonEvent&>(event);
             
-            // Mettre à jour l'écran principal avec l'état du bouton
-            m_viewManager.updateEncoderButtonState(buttonEvent.id, buttonEvent.pressed);
+            Serial.print(F("Encoder button "));
+            Serial.print(buttonEvent.id);
+            Serial.print(F(" "));
+            Serial.println(buttonEvent.pressed ? "pressed" : "released");
             
             return true;
         }
@@ -168,14 +134,33 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
         case EventTypes::ButtonPressed:
         case EventTypes::ButtonReleased: {
             // Traiter les événements de bouton
-            uint8_t id = (event.getType() == EventTypes::ButtonPressed) ?
-                static_cast<const ButtonPressedEvent&>(event).id :
-                static_cast<const ButtonReleasedEvent&>(event).id;
-                
+            uint8_t id;
             bool pressed = (event.getType() == EventTypes::ButtonPressed);
             
-            // Mettre à jour l'écran principal avec l'état du bouton
-            m_viewManager.updateButtonState(id, pressed);
+            if (pressed) {
+                id = static_cast<const ButtonPressedEvent&>(event).id;
+            } else {
+                id = static_cast<const ButtonReleasedEvent&>(event).id;
+            }
+                
+            Serial.print(F("Button "));
+            Serial.print(id);
+            Serial.print(F(" "));
+            Serial.println(pressed ? "pressed" : "released");
+            
+            // Déterminer si c'est un bouton de navigation
+            if (pressed && isNavigationButton(id)) {
+                Serial.print(F("Navigation button pressed: "));
+                Serial.println(id);
+                
+                if (id == 51) { // Bouton MENU
+                    Serial.println(F("Showing menu via navigation button"));
+                    m_viewManager.showMenu();
+                } else if (id == 52) { // Bouton HOME/VALIDATION
+                    Serial.println(F("Showing home via navigation button"));
+                    m_viewManager.showHome();
+                }
+            }
             
             return true;
         }
@@ -189,4 +174,30 @@ bool ViewManagerEventListener::handleUIEvent(const Event& event) {
     // Pour le moment, aucun événement UI à traiter
     // À implémenter si nécessaire
     return false;
+}
+
+// Fonctions utilitaires
+String ViewManagerEventListener::mapCCToParameterName(uint8_t ccNumber) {
+    switch (ccNumber) {
+        case 1: return "MOD WHEEL";
+        case 7: return "VOLUME";
+        case 10: return "PAN";
+        case 11: return "EXPRESSION";
+        case 71: return "RESONANCE";
+        case 72: return "RELEASE";
+        case 73: return "ATTACK";
+        case 74: return "FREQUENCY";
+        case 75: return "DECAY";
+        case 91: return "REVERB";
+        case 93: return "CHORUS";
+        case 127: return "CUTOFF";
+        default:
+            return "CC " + String(ccNumber);
+    }
+}
+
+bool ViewManagerEventListener::isNavigationButton(uint8_t buttonId) {
+    // Définir quels boutons sont des boutons de navigation
+    // Basé sur MappingConfiguration : 51 (Menu), 52 (Validation)
+    return (buttonId == 51 || buttonId == 52);
 }

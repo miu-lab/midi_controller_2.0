@@ -5,21 +5,19 @@
  * @brief Types de vues disponibles
  */
 enum class ViewType {
-    Menu,
-    ControlMonitor,
-    Debug,
-    ContextualView,
-    Modal,
     SplashScreen,
-    LastControl,
-    Performance
+    ParameterFocus,
+    Menu,
+    Modal
 };
 
 /**
- * @brief Gestionnaire de vues pour l'interface utilisateur
+ * @brief Gestionnaire de vues simplifié pour l'interface utilisateur
  *
- * Cette classe est responsable de la gestion des différentes vues
- * et de la navigation entre elles.
+ * Architecture simple avec seulement 3 vues principales :
+ * - SplashScreen : Écran d'initialisation
+ * - ParameterFocus : Vue par défaut pour affichage paramètres MIDI
+ * - Menu : Navigation et configuration
  */
 class ViewManager {
 public:
@@ -35,140 +33,56 @@ public:
     virtual void update() = 0;
     
     /**
-     * @brief Définit la vue active
-     * @param type Type de vue à activer
-     */
-    virtual void setActiveView(ViewType type) = 0;
-    
-    /**
      * @brief Rend les vues actives sur l'écran
      */
     virtual void render() = 0;
 
     /**
-     * @brief Entre dans un menu
+     * @brief Affiche la vue de focus paramètre (vue par défaut)
+     * @param ccNumber Numéro de Control Change (0-127)
+     * @param channel Canal MIDI (1-16)
+     * @param value Valeur du paramètre (0-127)
+     * @param parameterName Nom du paramètre
      */
-    virtual void enterMenu() = 0;
+    virtual void showParameterFocus(uint8_t ccNumber, uint8_t channel, uint8_t value, const String& parameterName) = 0;
 
     /**
-     * @brief Sort d'un menu
+     * @brief Met à jour la valeur dans la vue de focus paramètre
+     * @param value Nouvelle valeur (0-127)
      */
-    virtual void exitMenu() = 0;
+    virtual void updateParameterValue(uint8_t value) = 0;
 
     /**
-     * @brief Sélectionne l'élément de menu suivant
+     * @brief Affiche le menu de navigation
      */
-    virtual void selectNextMenuItem() = 0;
+    virtual void showMenu() = 0;
 
     /**
-     * @brief Sélectionne l'élément de menu précédent
+     * @brief Retourne à la vue par défaut (ParameterFocus)
      */
-    virtual void selectPreviousMenuItem() = 0;
-
-    /**
-     * @brief Sélectionne directement un élément de menu
-     * @param index Index de l'élément à sélectionner
-     */
-    virtual void selectMenuItem(int index) = 0;
-
-    /**
-     * @brief Obtient l'index du menu actuellement sélectionné
-     * @return Index du menu actuel, ou -1 si aucun
-     */
-    virtual int getCurrentMenuIndex() const = 0;
-
-    /**
-     * @brief Vérifie si l'utilisateur est dans un menu
-     * @return true si dans un menu, false sinon
-     */
-    virtual bool isInMenu() const = 0;
-
-    /**
-     * @brief Affiche l'écran principal
-     */
-    virtual void showMainScreen() = 0;
-
-    /**
-     * @brief Affiche le moniteur de contrôles
-     */
-    virtual void showControlMonitor() = 0;
-
-    /**
-     * @brief Affiche l'écran de débogage
-     */
-    virtual void showDebugScreen() = 0;
+    virtual void showHome() = 0;
 
     /**
      * @brief Affiche une boîte de dialogue modale
      * @param message Message à afficher
      */
-    virtual void showModalDialog(const String& message) = 0;
+    virtual void showModal(const String& message) = 0;
 
     /**
      * @brief Masque la boîte de dialogue modale
      */
-    virtual void hideModalDialog() = 0;
+    virtual void hideModal() = 0;
 
     /**
-     * @brief Bascule entre les boutons de la boîte de dialogue
+     * @brief Navigation dans le menu (encodeur)
+     * @param direction Direction de navigation (+1 suivant, -1 précédent)
      */
-    virtual void toggleModalDialogButton() = 0;
+    virtual void navigateMenu(int8_t direction) = 0;
 
     /**
-     * @brief Vérifie si le bouton OK est sélectionné dans la boîte de dialogue
-     * @return true si OK est sélectionné, false sinon
+     * @brief Sélection d'élément de menu (bouton/clic encodeur)
      */
-    virtual bool isModalDialogOkSelected() const = 0;
-
-    /**
-     * @brief Fait défiler l'écran principal
-     * @param delta Quantité de défilement
-     */
-    virtual void scrollMainScreenByDelta(int8_t delta) = 0;
-
-    /**
-     * @brief Fait défiler le moniteur de contrôles
-     * @param delta Quantité de défilement
-     */
-    virtual void scrollControlMonitorByDelta(int8_t delta) = 0;
-
-    /**
-     * @brief Fait défiler les logs de débogage
-     * @param delta Quantité de défilement
-     */
-    virtual void scrollDebugLogByDelta(int8_t delta) = 0;
-
-    /**
-     * @brief Met à jour les informations de contrôle sur le moniteur
-     * @param controlId ID du contrôle source
-     * @param type Type de message ("CC", "Note On", etc.)
-     * @param channel Canal MIDI
-     * @param number Numéro (CC ou note)
-     * @param value Valeur
-     */
-    virtual void updateControlMonitorInfo(uint8_t controlId, const String& type, 
-                                         uint8_t channel, uint8_t number, uint8_t value) = 0;
-
-    /**
-     * @brief Met à jour la position d'un encodeur sur l'interface
-     * @param encoderId ID de l'encodeur
-     * @param position Position actuelle
-     */
-    virtual void updateEncoderPosition(uint8_t encoderId, int32_t position) = 0;
-
-    /**
-     * @brief Met à jour l'état du bouton d'un encodeur sur l'interface
-     * @param encoderId ID de l'encodeur
-     * @param pressed État du bouton (pressé ou non)
-     */
-    virtual void updateEncoderButtonState(uint8_t encoderId, bool pressed) = 0;
-
-    /**
-     * @brief Met à jour l'état d'un bouton standard sur l'interface
-     * @param buttonId ID du bouton
-     * @param pressed État du bouton (pressé ou non)
-     */
-    virtual void updateButtonState(uint8_t buttonId, bool pressed) = 0;
+    virtual void selectMenuItem() = 0;
 
     /**
      * @brief Destructeur virtuel

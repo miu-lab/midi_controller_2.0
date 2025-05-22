@@ -8,19 +8,12 @@ MenuView::MenuView(std::shared_ptr<DisplayPort> display)
     : View(display), selectedIndex_(0), scrollOffset_(0), maxVisibleItems_(4) {}
 
 bool MenuView::init() {
-    // Initialiser les éléments de menu par défaut si nécessaire
-    // Dans un cas réel, ces éléments seraient probablement définis ailleurs
+    // Initialiser les éléments de menu simplifiés
     
-    // Ajouter quelques éléments de menu pour les tests
-    addItem("Main Screen", 0);
-    addItem("Control Monitor", 1);
-    addItem("Debug Log", 2);
-    addItem("Performance", 3);
-    addItem("MIDI Settings", 4);
-    addItem("Display Settings", 5);
-    addItem("Save Config", 6);
-    addItem("Load Config", 7);
-    addItem("Factory Reset", 8);
+    // Menu simplifié avec seulement les options essentielles
+    addItem("Home", 0);
+    addItem("Parameters", 1);
+    addItem("Settings", 2);
     
     // Utiliser la chaîne partagée MENU
     char buffer[16];
@@ -128,22 +121,18 @@ void MenuView::selectItem(int index) {
         if (viewManager_) {
             // Convertir l'ID d'item de menu en action correspondante
             switch (items_[selectedIndex_].id) {
-                case 0: // Main Screen
-                    viewManager_->showMainScreen();
+                case 0: // Home/Main Screen
+                    viewManager_->showHome();
                     break;
-                case 1: // Control Monitor
-                    viewManager_->showControlMonitor();
+                case 1: // Retour aux paramètres
+                    viewManager_->showParameterFocus(7, 1, 100, "VOLUME"); // Exemple
                     break;
-                case 2: // Debug Log
-                    viewManager_->showDebugScreen();
+                case 2: // Configuration (pour l'instant rien)
+                    // TODO: implémenter vue de configuration
                     break;
-                case 3: // Performance
-                    // Utiliser la méthode dédiée de DefaultViewManager pour la vue de performances
-                    viewManager_->setActiveView(ViewType::Performance);
-                    break;
-                // Cas pour d'autres options de menu
                 default:
-                    // Ne rien faire pour les autres options de menu pour l'instant
+                    // Retourner à la vue par défaut
+                    viewManager_->showHome();
                     break;
             }
         }

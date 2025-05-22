@@ -314,8 +314,13 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 //=============================================================================
 
 void MidiMapper::processButtonEvent(ControlId buttonId, bool pressed, ControlType type) {
-    // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
+    // Si c'est un contrôle de navigation, ne pas traiter en MIDI mais laisser passer
     if (isNavigationControl(buttonId)) {
+        Serial.print(F("Navigation control detected: "));
+        Serial.print(buttonId);
+        Serial.print(F(" pressed: "));
+        Serial.println(pressed);
+        // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
         return;
     }
 

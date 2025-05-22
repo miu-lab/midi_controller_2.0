@@ -162,35 +162,33 @@ void MappingConfiguration::initializeMidiMappings() {
                          .controlType = ControlType::ENCODER_BUTTON}},  // Bouton Encodeur 8 -> Note
                                                                         // 43, Canal 1
 
-        // Boutons indépendants
+        // Boutons de navigation
         {.controlId = 51,
          .midiControl = {.channel = 0,
                          .control = 44,
                          .relative = true,
-                         .controlType = ControlType::BUTTON}},  // Bouton Menu -> Note 44, Canal 1
+                         .controlType = ControlType::BUTTON}},  // Bouton Home -> Note 44, Canal 1
 
         {.controlId = 52,
          .midiControl = {.channel = 0,
                          .control = 45,
                          .relative = true,
-                         .controlType =
-                             ControlType::BUTTON}},  // Bouton Validation -> Note 45, Canal 1
+                         .controlType = ControlType::BUTTON}},  // Bouton Retour -> Note 45, Canal 1
 
         // Encodeur de navigation (pour quand il n'est pas utilisé pour la navigation)
         {.controlId = 79,
          .midiControl = {.channel = 0,
                          .control = 9,
                          .relative = true,
-                         .controlType = ControlType::ENCODER_ROTATION}},  // Encodeur navigation ->
-                                                                          // CC 9, Canal 1
+                         .controlType = ControlType::ENCODER_ROTATION}},  // Encodeur de navigation,
+                                                                          // sert de selecteur
 
         {.controlId = 79,
-         .midiControl =
-             {.channel = 0,
-              .control = 46,
-              .relative = true,
-              .controlType =
-                  ControlType::ENCODER_BUTTON}},  // Bouton encodeur navigation -> Note 46, Canal 1
+         .midiControl = {.channel = 0,
+                         .control = 46,
+                         .relative = true,
+                         .controlType = ControlType::ENCODER_BUTTON}},  // Bouton encodeur sert de
+                                                                        // bouton de validation
     };
 }
 

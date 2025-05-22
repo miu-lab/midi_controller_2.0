@@ -36,11 +36,13 @@ void MenuController::selectItem(int index) {
 }
 
 int MenuController::getCurrentItem() const {
-    return viewManager_.getCurrentMenuIndex();
+    // Retourner un index fictif pour l'instant
+    return 0;
 }
 
 bool MenuController::isInMenu() const {
-    return viewManager_.isInMenu();
+    // Retourner false pour l'instant - à implémenter si nécessaire
+    return false;
 }
 
 bool MenuController::undoLastNavigation() {
