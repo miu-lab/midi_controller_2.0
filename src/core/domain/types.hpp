@@ -17,7 +17,7 @@ using MidiNote = DefaultMidiId;
 /**
  * @brief Type de contrôle (encodeur, bouton d'encodeur, ou bouton séparé)
  */
-enum class ControlType { ENCODER_ROTATION, ENCODER_BUTTON, BUTTON };
+enum class MappingType { ENCODER, BUTTON, SIMPLE_BUTTON };
 
 /**
  * @brief Configuration d'un controle MIDI
@@ -34,7 +34,7 @@ struct MidiControl {
  */
 struct ControlMapping {
     ControlId controlId;
-    ControlType controlType{ControlType::ENCODER_ROTATION};
+    MappingType mappingType{MappingType::ENCODER};
     MidiControl midiMapping;
 };
 

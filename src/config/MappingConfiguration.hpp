@@ -30,7 +30,7 @@ public:
      * @return Le mapping MIDI correspondant, ou nullptr si aucun mapping n'est défini
      */
     const MidiControl* getMidiMappingForControl(
-        ControlId controlId, ControlType controlType = ControlType::ENCODER_ROTATION) const;
+        ControlId controlId, MappingType controlType = MappingType::ENCODER) const;
 
     /**
      * @brief Vérifie si un contrôle est dédié à la navigation
