@@ -16,7 +16,8 @@
 MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
       commandManager_(commandManager),
-      defaultControl_({0, 0, false, true})  // Canal 1, CC 0, mode absolu
+      defaultControl_(
+          {0, 0, MidiEventType::CONTROL_CHANGE, false, true})  // Canal 1, CC 0, mode absolu
 {
     // Initialisation préalable des pool d'objets
     for (auto& cmd : midiCCCommandPool_) {
@@ -32,7 +33,7 @@ MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
 // Implémentation des méthodes utilitaires
 //=============================================================================
 
-uint32_t MidiMapper::makeCompositeKey(ControlId controlId, MappingType type) {
+uint32_t MidiMapper::makeCompositeKey(InputId controlId, MappingType type) {
     return static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(type);
 }
 
@@ -59,7 +60,7 @@ void MidiMapper::logDiagnostic(const char* format, ...) const {
 #endif
 }
 
-bool MidiMapper::isNavigationControl(ControlId controlId) const {
+bool MidiMapper::isNavigationControl(InputId controlId) const {
     // Utiliser MappingConfiguration pour savoir si c'est un contrôle de navigation
     static MappingConfiguration mappingConfig;
     return mappingConfig.isNavigationControl(controlId);
@@ -69,7 +70,7 @@ bool MidiMapper::isNavigationControl(ControlId controlId) const {
 // Gestion des mappings
 //=============================================================================
 
-void MidiMapper::setMapping(const ControlMapping& mapping,
+void MidiMapper::setMapping(const InputMapping& mapping,
                             std::unique_ptr<IMidiMappingStrategy> strategy) {
     // Créer une nouvelle info de mapping
     MappingInfo info;
@@ -98,7 +99,7 @@ void MidiMapper::setMapping(const ControlMapping& mapping,
                   static_cast<int>(mapping.mappingType));  // Utiliser mapping.controlType
 }
 
-bool MidiMapper::removeMapping(ControlId controlId) {
+bool MidiMapper::removeMapping(InputId controlId) {
     // Nous devons vérifier tous les types de contrôle possibles
     bool removed = false;
 
@@ -125,7 +126,7 @@ bool MidiMapper::removeMapping(ControlId controlId) {
     return removed;
 }
 
-bool MidiMapper::hasMapping(ControlId controlId) const {
+bool MidiMapper::hasMapping(InputId controlId) const {
     // Vérifier tous les types de contrôle possibles
     uint32_t encoderKey = makeCompositeKey(controlId, MappingType::ENCODER);
     if (mappings_.find(encoderKey) != mappings_.end()) {
@@ -140,7 +141,7 @@ bool MidiMapper::hasMapping(ControlId controlId) const {
     return false;
 }
 
-const MidiControl& MidiMapper::getMidiControl(ControlId controlId) const {
+const MidiControl& MidiMapper::getMidiControl(InputId controlId) const {
     // Vérifier pour encoder en premier
     uint32_t encoderKey = makeCompositeKey(controlId, MappingType::ENCODER);
     auto encoderIt = mappings_.find(encoderKey);
@@ -313,7 +314,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 // Méthodes de traitement des boutons
 //=============================================================================
 
-void MidiMapper::processButtonEvent(ControlId buttonId, bool pressed, MappingType type) {
+void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingType type) {
     // Si c'est un contrôle de navigation, ne pas traiter en MIDI mais laisser passer
     if (isNavigationControl(buttonId)) {
         Serial.print(F("Navigation control detected: "));
@@ -380,7 +381,7 @@ void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
 }
 
 void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
-    processButtonEvent(buttonId, pressed, MappingType::SIMPLE_BUTTON);
+    processButtonEvent(buttonId, pressed, MappingType::BUTTON);
 }
 
 //=============================================================================

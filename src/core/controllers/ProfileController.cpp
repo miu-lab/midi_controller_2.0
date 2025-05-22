@@ -3,11 +3,11 @@
 ProfileController::ProfileController(ProfileStoragePort& profileManager)
     : profileManager_(profileManager) {}
 
-std::vector<ControlMapping> ProfileController::getAllMappings() const {
+std::vector<InputMapping> ProfileController::getAllMappings() const {
     return profileManager_.getAllMappings();
 }
 
-MidiControl ProfileController::getMapping(ControlId controlId) const {
+MidiControl ProfileController::getMapping(InputId controlId) const {
     auto mapping = profileManager_.getBinding(controlId);
     if (mapping) {
         return *mapping;
@@ -17,11 +17,11 @@ MidiControl ProfileController::getMapping(ControlId controlId) const {
     return {.channel = 0, .control = 0, .isRelative = false};
 }
 
-void ProfileController::setMapping(ControlId controlId, const MidiControl& midiControl) {
+void ProfileController::setMapping(InputId controlId, const MidiControl& midiControl) {
     profileManager_.setBinding(controlId, midiControl);
 }
 
-bool ProfileController::removeMapping(ControlId controlId) {
+bool ProfileController::removeMapping(InputId controlId) {
     return profileManager_.removeBinding(controlId);
 }
 
@@ -38,7 +38,7 @@ bool ProfileController::loadProfile() {
 }
 
 std::unique_ptr<IMidiMappingStrategy> ProfileController::createMappingStrategy(
-    ControlId controlId, const MidiControl& midiControl) const {
+    InputId controlId, const MidiControl& midiControl) const {
     // Déterminer si c'est un encodeur ou un bouton
     bool isEncoder =
         controlId >= 70 && controlId < 90;  // Supposons que les IDs 70-89 sont des encodeurs

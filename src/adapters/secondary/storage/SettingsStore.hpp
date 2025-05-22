@@ -10,9 +10,9 @@
  */
 class SettingsStore {
 public:
-    void saveMapping(ControlId id, MidiControl binding);
-    std::optional<MidiControl> loadMapping(ControlId id) const;
+    void saveMapping(InputId id, MidiControl binding);
+    std::optional<MidiControl> loadMapping(InputId id) const;
 
 private:
-    std::unordered_map<ControlId, MidiControl> storage_;
+    std::unordered_map<InputId, MidiControl> storage_;
 };

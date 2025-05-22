@@ -39,11 +39,11 @@ Result<bool, std::string> ConfigurationSubsystem::init() {
     return Result<bool, std::string>::success(true);
 }
 
-bool ConfigurationSubsystem::isNavigationControl(ControlId id) const {
+bool ConfigurationSubsystem::isNavigationControl(InputId id) const {
     return navService_->isNavigationControl(id);
 }
 
-void ConfigurationSubsystem::setControlForNavigation(ControlId id, bool isNavigation) {
+void ConfigurationSubsystem::setControlForNavigation(InputId id, bool isNavigation) {
     navService_->setControlForNavigation(id, isNavigation);
 }
 

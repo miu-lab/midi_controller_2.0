@@ -45,28 +45,28 @@ public:
      * @param midiControl Paramètres de contrôle MIDI
      * @param strategy Stratégie de mapping à utiliser
      */
-    void setMapping(const ControlMapping& mapping, std::unique_ptr<IMidiMappingStrategy> strategy);
+    void setMapping(const InputMapping& mapping, std::unique_ptr<IMidiMappingStrategy> strategy);
 
     /**
      * @brief Supprime le mapping pour un contrôle
      * @param controlId ID du contrôle
      * @return true si le mapping a été supprimé, false s'il n'existait pas
      */
-    bool removeMapping(ControlId controlId);
+    bool removeMapping(InputId controlId);
 
     /**
      * @brief Vérifie si un contrôle a un mapping
      * @param controlId ID du contrôle
      * @return true si le contrôle a un mapping, false sinon
      */
-    bool hasMapping(ControlId controlId) const;
+    bool hasMapping(InputId controlId) const;
 
     /**
      * @brief Obtient le mapping MIDI pour un contrôle
      * @param controlId ID du contrôle
      * @return Paramètres du contrôle MIDI, ou une valeur par défaut si non trouvé
      */
-    const MidiControl& getMidiControl(ControlId controlId) const;
+    const MidiControl& getMidiControl(InputId controlId) const;
 
     /**
      * @brief Traite un changement d'encodeur
@@ -133,7 +133,7 @@ private:
     //=============================================================================
 
     // Crée une clé composite à partir d'un ID de contrôle et d'un type
-    static uint32_t makeCompositeKey(ControlId controlId, MappingType type);
+    static uint32_t makeCompositeKey(InputId controlId, MappingType type);
 
     // Obtient la prochaine commande CC disponible du pool
     SendMidiCCCommand& getNextCCCommand();
@@ -145,7 +145,7 @@ private:
     void logDiagnostic(const char* format, ...) const;
 
     // Vérifie si un contrôle est dédié à la navigation
-    bool isNavigationControl(ControlId controlId) const;
+    bool isNavigationControl(InputId controlId) const;
 
     // Vérifie si l'encodeur doit être traité en fonction de la limitation de taux
     bool shouldProcessEncoder(EncoderId encoderId, int32_t position);
@@ -157,7 +157,7 @@ private:
     int16_t calculateMidiValue(MappingInfo& info, int32_t delta, int32_t position);
 
     // Traite les événements de type bouton (encodeur ou bouton standard)
-    void processButtonEvent(ControlId buttonId, bool pressed, MappingType type);
+    void processButtonEvent(InputId buttonId, bool pressed, MappingType type);
 
     //=============================================================================
     // Membres
@@ -174,7 +174,7 @@ private:
     MidiOutputPort& midiOut_;
     CommandManager& commandManager_;
     std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
-    std::unordered_map<ControlId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
+    std::unordered_map<InputId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
 
     MidiControl defaultControl_;  // Contrôle par défaut retourné si non trouvé
 };

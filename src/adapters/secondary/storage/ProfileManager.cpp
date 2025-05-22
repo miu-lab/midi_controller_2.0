@@ -1,6 +1,6 @@
 #include "adapters/secondary/storage/ProfileManager.hpp"
 
-std::optional<MidiControl> ProfileManager::getBinding(ControlId id) const {
+std::optional<MidiControl> ProfileManager::getBinding(InputId id) const {
     auto it = bindings_.find(id);
     if (it != bindings_.end()) {
         return it->second;
@@ -8,12 +8,12 @@ std::optional<MidiControl> ProfileManager::getBinding(ControlId id) const {
     return std::nullopt;
 }
 
-void ProfileManager::setBinding(ControlId id, MidiControl binding) {
+void ProfileManager::setBinding(InputId id, MidiControl binding) {
     bindings_[id] = binding;
 }
 
-std::vector<ControlMapping> ProfileManager::getAllMappings() const {
-    std::vector<ControlMapping> result;
+std::vector<InputMapping> ProfileManager::getAllMappings() const {
+    std::vector<InputMapping> result;
     result.reserve(bindings_.size());
 
     for (const auto& pair : bindings_) {
@@ -45,7 +45,7 @@ void ProfileManager::resetToDefaults() {
     // ... etc.
 }
 
-bool ProfileManager::removeBinding(ControlId id) {
+bool ProfileManager::removeBinding(InputId id) {
     auto it = bindings_.find(id);
     if (it != bindings_.end()) {
         bindings_.erase(it);

@@ -24,8 +24,8 @@ public:
     virtual Result<bool, std::string> init() = 0;
 
     // Méthodes de NavigationConfigService
-    virtual bool isNavigationControl(ControlId id) const = 0;
-    virtual void setControlForNavigation(ControlId id, bool isNavigation = true) = 0;
+    virtual bool isNavigationControl(InputId id) const = 0;
+    virtual void setControlForNavigation(InputId id, bool isNavigation = true) = 0;
 
     // Méthodes de ConfigurationService
     virtual const std::vector<EncoderConfig>& encoderConfigs() const = 0;

@@ -1,6 +1,6 @@
 #include "app/services/NavigationConfigService.hpp"
 
-void NavigationConfigService::setControlForNavigation(ControlId id, bool isNavigation) {
+void NavigationConfigService::setControlForNavigation(InputId id, bool isNavigation) {
     if (isNavigation) {
         // Ajouter à l'ensemble des contrôles de navigation
         navigationControls_.insert(id);
@@ -10,7 +10,7 @@ void NavigationConfigService::setControlForNavigation(ControlId id, bool isNavig
     }
 }
 
-bool NavigationConfigService::isNavigationControl(ControlId id) const {
+bool NavigationConfigService::isNavigationControl(InputId id) const {
     // Vérifie si l'identifiant est présent dans l'ensemble des contrôles de navigation
     return navigationControls_.find(id) != navigationControls_.end();
 }

@@ -29,5 +29,5 @@ public:
      * @brief Identifiant unique du contrôle
      * @return ID du bouton
      */
-    virtual ControlId getId() const = 0;
+    virtual InputId getId() const = 0;
 };

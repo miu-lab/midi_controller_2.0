@@ -10,7 +10,7 @@
  * @brief Structure définissant un contrôle (encodeur ou bouton) dédié à la navigation
  */
 struct NavigationControl {
-    ControlId id;
+    InputId id;
 };
 
 /**
@@ -30,20 +30,20 @@ public:
      * @return Le mapping MIDI correspondant, ou nullptr si aucun mapping n'est défini
      */
     const MidiControl* getMidiMappingForControl(
-        ControlId controlId, MappingType controlType = MappingType::ENCODER) const;
+        InputId controlId, MappingType controlType = MappingType::ENCODER) const;
 
     /**
      * @brief Vérifie si un contrôle est dédié à la navigation
      * @param controlId L'ID du contrôle à vérifier
      * @return true si le contrôle est dédié à la navigation, false sinon
      */
-    bool isNavigationControl(ControlId controlId) const;
+    bool isNavigationControl(InputId controlId) const;
 
     /**
      * @brief Obtient tous les mappings MIDI
      * @return Un vecteur de tous les mappings MIDI configurés
      */
-    const std::vector<ControlMapping>& getMappedControls() const;
+    const std::vector<InputMapping>& getMappedControls() const;
 
     /**
      * @brief Obtient tous les contrôles de navigation
@@ -52,7 +52,7 @@ public:
     const std::vector<NavigationControl>& getNavigationControls() const;
 
 private:
-    std::vector<ControlMapping> controlsMapping;
+    std::vector<InputMapping> controlsMapping;
     std::vector<NavigationControl> navigationControls;
     std::unordered_map<uint32_t, std::size_t>
         midiMappingIndex;  // Pour accès rapide par ID composite (ID << 8 | type)

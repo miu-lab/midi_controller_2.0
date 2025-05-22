@@ -23,20 +23,20 @@ public:
      * @param id Identifiant du contrôle
      * @return Le mapping MIDI s'il existe, std::nullopt sinon
      */
-    virtual std::optional<MidiControl> getBinding(ControlId id) const = 0;
+    virtual std::optional<MidiControl> getBinding(InputId id) const = 0;
 
     /**
      * @brief Définit un mapping MIDI pour un contrôle
      * @param id Identifiant du contrôle
      * @param binding Mapping MIDI à associer
      */
-    virtual void setBinding(ControlId id, MidiControl binding) = 0;
+    virtual void setBinding(InputId id, MidiControl binding) = 0;
 
     /**
      * @brief Obtient tous les mappings MIDI
      * @return Un vecteur de tous les mappings configurés
      */
-    virtual std::vector<ControlMapping> getAllMappings() const = 0;
+    virtual std::vector<InputMapping> getAllMappings() const = 0;
 
     /**
      * @brief Sauvegarde les mappings actuels dans le stockage persistant
@@ -60,5 +60,5 @@ public:
      * @param id Identifiant du contrôle
      * @return true si le mapping a été supprimé, false s'il n'existait pas
      */
-    virtual bool removeBinding(ControlId id) = 0;
+    virtual bool removeBinding(InputId id) = 0;
 };

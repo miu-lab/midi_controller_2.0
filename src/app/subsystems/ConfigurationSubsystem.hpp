@@ -52,7 +52,7 @@ public:
      * @param id Identifiant du contrôle à vérifier
      * @return true si le contrôle est utilisé pour la navigation, false sinon
      */
-    bool isNavigationControl(ControlId id) const override;
+    bool isNavigationControl(InputId id) const override;
 
     /**
      * @brief Définit si un contrôle est utilisé pour la navigation
@@ -60,7 +60,7 @@ public:
      * @param id Identifiant du contrôle à configurer
      * @param isNavigation true pour définir le contrôle comme contrôle de navigation, false sinon
      */
-    void setControlForNavigation(ControlId id, bool isNavigation = true) override;
+    void setControlForNavigation(InputId id, bool isNavigation = true) override;
 
     /**
      * @brief Obtient les configurations des encodeurs

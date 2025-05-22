@@ -18,15 +18,15 @@ public:
      * @param isNavigation Indique si le contrôle est pour la navigation (true) ou MIDI normal
      * (false)
      */
-    void setControlForNavigation(ControlId id, bool isNavigation = true);
+    void setControlForNavigation(InputId id, bool isNavigation = true);
 
     /**
      * @brief Vérifie si un contrôle est dédié à la navigation
      * @param id Identifiant du contrôle à vérifier
      * @return true si le contrôle est dédié à la navigation, false sinon
      */
-    bool isNavigationControl(ControlId id) const;
+    bool isNavigationControl(InputId id) const;
 
 private:
-    std::set<ControlId> navigationControls_;
+    std::set<InputId> navigationControls_;
 };
