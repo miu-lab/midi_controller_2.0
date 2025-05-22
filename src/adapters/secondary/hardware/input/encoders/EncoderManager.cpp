@@ -1,5 +1,5 @@
-// adapters/secondary/hardware/encoders/EncoderManager.cpp
-#include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
+// adapters/secondary/hardware/input/encoders/EncoderManager.cpp
+#include "adapters/secondary/hardware/input/encoders/EncoderManager.hpp"
 
 EncoderManager::EncoderManager(const std::vector<EncoderConfig>& cfgs) {
     for (auto& cfg : cfgs) {

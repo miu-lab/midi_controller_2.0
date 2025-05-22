@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
-#include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
+#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
+#include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"

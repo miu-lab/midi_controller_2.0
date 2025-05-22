@@ -1,10 +1,10 @@
-// adapters/secondary/hardware/encoders/EncoderManager.hpp
+// adapters/secondary/hardware/input/encoders/EncoderManager.hpp
 #pragma once
 #include <memory>
 #include <vector>
 
-#include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
-#include "adapters/secondary/hardware/encoders/InterruptQuadratureEncoder.hpp"
+#include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
+#include "adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.hpp"
 #include "core/ports/input/EncoderPort.hpp"
 
 /**

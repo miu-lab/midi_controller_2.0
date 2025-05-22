@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
-#include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
+#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
+#include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
 #include "core/domain/types.hpp"
 #include "core/utils/Result.hpp"
 

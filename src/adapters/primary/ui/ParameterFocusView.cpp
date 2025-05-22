@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
+#include "adapters/secondary/hardware/output/display/Ssd1306Display.hpp"
 #include "core/utils/AppStrings.hpp"
 
 ParameterFocusView::ParameterFocusView(std::shared_ptr<DisplayPort> display)

@@ -1,4 +1,4 @@
-// adapters/secondary/hardware/buttons/ButtonConfig.hpp
+// adapters/secondary/hardware/input/buttons/ButtonConfig.hpp
 #pragma once
 #include "core/domain/types.hpp"
 

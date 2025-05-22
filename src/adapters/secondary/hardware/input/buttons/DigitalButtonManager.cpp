@@ -1,5 +1,5 @@
-// adapters/secondary/hardware/buttons/DigitalButtonManager.cpp
-#include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
+// adapters/secondary/hardware/input/buttons/DigitalButtonManager.cpp
+#include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
 
 #include <Arduino.h>
 

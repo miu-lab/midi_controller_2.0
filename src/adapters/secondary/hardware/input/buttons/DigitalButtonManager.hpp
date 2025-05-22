@@ -1,11 +1,11 @@
-// adapters/secondary/hardware/buttons/DigitalButtonManager.hpp
+// adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp
 #pragma once
 
 #include <memory>
 #include <vector>
 
-#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
-#include "adapters/secondary/hardware/buttons/DigitalButton.hpp"
+#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
+#include "adapters/secondary/hardware/input/buttons/DigitalButton.hpp"
 #include "core/ports/input/ButtonPort.hpp"
 
 /**

@@ -1,5 +1,5 @@
-// adapters/secondary/hardware/encoders/InterruptQuadratureEncoder.cpp
-#include "adapters/secondary/hardware/encoders/InterruptQuadratureEncoder.hpp"
+// adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.cpp
+#include "adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.hpp"
 
 #include <Arduino.h>
 

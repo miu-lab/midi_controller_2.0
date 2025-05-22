@@ -1,10 +1,10 @@
-// adapters/secondary/hardware/encoders/InterruptQuadratureEncoder.hpp
+// adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.hpp
 #pragma once
 
 #include <Arduino.h>
 #include <Encoder.h>  // Ajout de la bibliothèque Encoder
 
-#include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
+#include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
 #include "config/debug/DebugConfig.hpp"  // Configuration des modes de debug
 #include "core/ports/input/EncoderPort.hpp"
 
@@ -45,7 +45,7 @@ private:
 
     // Position absolue normalisée (cumulative)
     int32_t absolutePosition_;
-    
+
     // Facteur de normalisation pré-calculé
     int32_t normalizationFactor_;
 };

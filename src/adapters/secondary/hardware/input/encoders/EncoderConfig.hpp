@@ -1,8 +1,8 @@
-// adapters/secondary/hardware/encoders/EncoderConfig.hpp
+// adapters/secondary/hardware/input/encoders/EncoderConfig.hpp
 #pragma once
 #include <optional>
 
-#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
+#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
 #include "core/domain/types.hpp"
 
 /**

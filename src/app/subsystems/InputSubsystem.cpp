@@ -1,7 +1,7 @@
 #include "InputSubsystem.hpp"
 
-#include "adapters/secondary/hardware/buttons/DigitalButtonManager.hpp"
-#include "adapters/secondary/hardware/encoders/EncoderManager.hpp"
+#include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
+#include "adapters/secondary/hardware/input/encoders/EncoderManager.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"

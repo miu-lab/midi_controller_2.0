@@ -1,9 +1,9 @@
-// adapters/secondary/hardware/buttons/DigitalButton.hpp
+// adapters/secondary/hardware/input/buttons/DigitalButton.hpp
 #pragma once
 #include <Arduino.h>
 #include <Bounce2.h>
 
-#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
+#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
 #include "core/ports/input/ButtonPort.hpp"
 
 /**

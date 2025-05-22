@@ -2,7 +2,7 @@
 
 // Inclusions nécessaires pour l'implémentation
 #include "adapters/primary/ui/DefaultViewManager.hpp"
-#include "adapters/secondary/hardware/display/Ssd1306Display.hpp"
+#include "adapters/secondary/hardware/output/display/Ssd1306Display.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
 #include "app/services/NavigationConfigService.hpp"

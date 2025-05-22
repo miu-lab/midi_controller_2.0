@@ -1,5 +1,5 @@
-// adapters/secondary/hardware/buttons/DigitalButton.cpp
-#include "adapters/secondary/hardware/buttons/DigitalButton.hpp"
+// adapters/secondary/hardware/input/buttons/DigitalButton.cpp
+#include "adapters/secondary/hardware/input/buttons/DigitalButton.hpp"
 
 DigitalButton::DigitalButton(const ButtonConfig& cfg)
     : cfg_(cfg), button_(), pressed_(false), toggleState_(false), prevPressed_(false) {

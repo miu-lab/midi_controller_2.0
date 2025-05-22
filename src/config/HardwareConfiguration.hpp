@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "adapters/secondary/hardware/buttons/ButtonConfig.hpp"
-#include "adapters/secondary/hardware/encoders/EncoderConfig.hpp"
+#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
+#include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
 
 /**
  * @brief Configuration matérielle des boutons et encodeurs
@@ -31,6 +31,5 @@ private:
     std::vector<EncoderConfig> controlsConfiguration;
 
     // Méthodes d'initialisation
-    void initializeControlButtonConfigurations();
     void setInputsConfiguration();
 };
