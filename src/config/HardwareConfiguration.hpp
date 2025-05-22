@@ -28,9 +28,9 @@ public:
 
 private:
     std::vector<ButtonConfig> controlButtonConfigurations;
-    std::vector<EncoderConfig> encoderConfigurations;
+    std::vector<EncoderConfig> controlsConfiguration;
 
     // Méthodes d'initialisation
     void initializeControlButtonConfigurations();
-    void initializeEncoderConfigurations();
+    void setInputsConfiguration();
 };
