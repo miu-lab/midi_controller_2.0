@@ -19,21 +19,14 @@ public:
      * @param display Référence à l'adaptateur d'affichage
      * @param intervalMs Intervalle minimum entre les mises à jour en ms (limite le framerate)
      */
-    DisplayUpdateTask(std::shared_ptr<DisplayPort> display, uint32_t intervalMs = TaskTiming::UI_MIN_PERIOD_MS)
+    DisplayUpdateTask(std::shared_ptr<DisplayPort> display,
+                      uint32_t intervalMs = TaskTiming::UI_MIN_PERIOD_MS)
         : display_(display), needsUpdate_(false), intervalMs_(intervalMs) {}
 
     /**
      * @brief Exécute la tâche si une mise à jour est nécessaire
      */
     void execute() {
-        // Pour le débogage, ajouter un log périodique pour vérifier que la tâche s'exécute
-        static uint32_t taskCallCount = 0;
-        if (++taskCallCount % 100 == 0) {  // Log toutes les 100 exécutions environ
-            Serial.printf("DisplayUpdateTask: Called %lu times, needs update: %s\n",
-                          taskCallCount,
-                          needsUpdate_ ? "yes" : "no");
-        }
-
         if (needsUpdate_) {
 // Mesurer le temps d'affichage en mode debug
 #ifdef DEBUG_DISPLAY_PERFORMANCE

@@ -168,15 +168,6 @@ bool MidiMapper::shouldProcessEncoder(EncoderId encoderId, int32_t position) {
     // et de détection de doublons pour les encodeurs dans le système.
 
     // Limiteur de taux pour les messages d'encodeur
-    static unsigned long lastSendTimePerEncoder[256] = {0};  // Temps du dernier envoi par encodeur
-    unsigned long currentTime = millis();
-    lastSendTimePerEncoder[encoderId] = currentTime;
-
-    // Diagnostic: Message MIDI accepté
-    Serial.printf("MIDI Rate: Accepting EncoderId=%d Position=%ld (waited %lu ms)\n",
-                  encoderId,
-                  position,
-                  currentTime - lastSendTimePerEncoder[encoderId] + ENCODER_RATE_LIMIT_MS);
     return true;
 }
 
