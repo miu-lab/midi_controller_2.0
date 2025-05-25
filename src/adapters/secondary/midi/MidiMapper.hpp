@@ -133,7 +133,7 @@ private:
     //=============================================================================
 
     // Crée une clé composite à partir d'un ID de contrôle et d'un type
-    static uint32_t makeCompositeKey(InputId controlId, MappingType type);
+    static uint32_t makeCompositeKey(InputId controlId, MappingControlType type);
 
     // Obtient la prochaine commande CC disponible du pool
     SendMidiCCCommand& getNextCCCommand();
@@ -157,7 +157,7 @@ private:
     int16_t calculateMidiValue(MappingInfo& info, int32_t delta, int32_t position);
 
     // Traite les événements de type bouton (encodeur ou bouton standard)
-    void processButtonEvent(InputId buttonId, bool pressed, MappingType type);
+    void processButtonEvent(InputId buttonId, bool pressed, MappingControlType type);
 
     //=============================================================================
     // Membres

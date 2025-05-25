@@ -7,13 +7,6 @@
 #include "core/domain/types.hpp"
 
 /**
- * @brief Structure définissant un contrôle (encodeur ou bouton) dédié à la navigation
- */
-struct NavigationControl {
-    InputId id;
-};
-
-/**
  * @brief Configuration des mappings MIDI et des contrôles de navigation
  *
  * Cette classe centralise toutes les configurations de mapping entre les contrôles
@@ -30,7 +23,7 @@ public:
      * @return Le mapping MIDI correspondant, ou nullptr si aucun mapping n'est défini
      */
     const MidiControl* getMidiMappingForControl(
-        InputId controlId, MappingType controlType = MappingType::ENCODER) const;
+        InputId controlId, MappingControlType controlType = MappingControlType::ENCODER) const;
 
     /**
      * @brief Vérifie si un contrôle est dédié à la navigation
@@ -55,10 +48,10 @@ private:
     std::vector<InputMapping> controlsMapping;
     std::vector<NavigationControl> navigationControls;
     std::unordered_map<uint32_t, std::size_t>
-        midiMappingIndex;  // Pour accès rapide par ID composite (ID << 8 | type)
+        mappingIndex;  // Pour accès rapide par ID composite (ID << 8 | type)
 
     // Méthodes d'initialisation
-    void initializeMidiMappings();
+    void setupMapping();
     void initializeNavigationControls();
     void buildMappingIndex();
 };

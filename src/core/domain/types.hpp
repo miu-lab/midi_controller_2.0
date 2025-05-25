@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <optional>
+#include <set>
 #include <string>
 
 using DefaultId = uint16_t;
@@ -12,6 +13,9 @@ using InputName = DefaultName;
 using InputLabel = DefaultName;
 using InputDescription = DefaultName;
 using InputGroup = DefaultName;
+
+using NavigationName = InputName;
+using NavigationGroup = InputGroup;
 
 using PinId = DefaultId;
 
@@ -50,12 +54,12 @@ struct GpioPin {
 /**
  * @brief Type de mapping (encodeur, bouton d'encodeur)
  */
-enum class MappingType { ENCODER, BUTTON };
+enum class MappingControlType { ENCODER, BUTTON };
 
 /**
  * @brief Type de contrôle (encodeur, bouton d'encodeur)
  */
-using InputType = MappingType;
+using InputType = MappingControlType;
 
 /**
  * @brief Type de contrôle (encodeur, bouton d'encodeur, ou bouton séparé)
@@ -72,6 +76,10 @@ enum class MidiEventType {
     CLOCK,
     COMMON,
 };
+/**
+ * @brief Type de contrôle (encodeur, bouton d'encodeur, ou bouton séparé)
+ */
+enum class MappingRole { MIDI, NAVIGATION };
 
 /**
  * @brief Configuration d'un controle MIDI
@@ -84,13 +92,19 @@ struct MidiControl {
     std::optional<bool> isCentered{true};
 };
 
+struct NavigationControl {
+    NavigationName name{"HOME"};  ///< Nom du contrôle de navigation
+};
+
 /**
  * @brief Affectation d'un controle MIDI à un encodeur
  */
 struct InputMapping {
     InputId controlId;
-    MappingType mappingType{MappingType::ENCODER};
+    std::set<MappingRole> roles;
+    MappingControlType mappingType{MappingControlType::ENCODER};
     MidiControl midiMapping;
+    NavigationControl navigationMapping;
 };
 
 /**

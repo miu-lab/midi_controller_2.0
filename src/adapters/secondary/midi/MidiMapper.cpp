@@ -33,7 +33,7 @@ MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
 // Implémentation des méthodes utilitaires
 //=============================================================================
 
-uint32_t MidiMapper::makeCompositeKey(InputId controlId, MappingType type) {
+uint32_t MidiMapper::makeCompositeKey(InputId controlId, MappingControlType type) {
     return static_cast<uint32_t>(controlId) << 8 | static_cast<uint8_t>(type);
 }
 
@@ -104,7 +104,7 @@ bool MidiMapper::removeMapping(InputId controlId) {
     bool removed = false;
 
     // Essayer de supprimer le mapping pour l'encodeur
-    uint32_t encoderKey = makeCompositeKey(controlId, MappingType::ENCODER);
+    uint32_t encoderKey = makeCompositeKey(controlId, MappingControlType::ENCODER);
     auto encoderIt = mappings_.find(encoderKey);
     if (encoderIt != mappings_.end()) {
         mappings_.erase(encoderIt);
@@ -112,7 +112,7 @@ bool MidiMapper::removeMapping(InputId controlId) {
     }
 
     // Essayer de supprimer le mapping pour le bouton d'encodeur
-    uint32_t buttonKey = makeCompositeKey(controlId, MappingType::BUTTON);
+    uint32_t buttonKey = makeCompositeKey(controlId, MappingControlType::BUTTON);
     auto buttonIt = mappings_.find(buttonKey);
     if (buttonIt != mappings_.end()) {
         mappings_.erase(buttonIt);
@@ -128,12 +128,12 @@ bool MidiMapper::removeMapping(InputId controlId) {
 
 bool MidiMapper::hasMapping(InputId controlId) const {
     // Vérifier tous les types de contrôle possibles
-    uint32_t encoderKey = makeCompositeKey(controlId, MappingType::ENCODER);
+    uint32_t encoderKey = makeCompositeKey(controlId, MappingControlType::ENCODER);
     if (mappings_.find(encoderKey) != mappings_.end()) {
         return true;
     }
 
-    uint32_t buttonKey = makeCompositeKey(controlId, MappingType::BUTTON);
+    uint32_t buttonKey = makeCompositeKey(controlId, MappingControlType::BUTTON);
     if (mappings_.find(buttonKey) != mappings_.end()) {
         return true;
     }
@@ -143,14 +143,14 @@ bool MidiMapper::hasMapping(InputId controlId) const {
 
 const MidiControl& MidiMapper::getMidiControl(InputId controlId) const {
     // Vérifier pour encoder en premier
-    uint32_t encoderKey = makeCompositeKey(controlId, MappingType::ENCODER);
+    uint32_t encoderKey = makeCompositeKey(controlId, MappingControlType::ENCODER);
     auto encoderIt = mappings_.find(encoderKey);
     if (encoderIt != mappings_.end()) {
         return encoderIt->second.control;
     }
 
     // Puis vérifier pour bouton d'encodeur
-    uint32_t buttonKey = makeCompositeKey(controlId, MappingType::BUTTON);
+    uint32_t buttonKey = makeCompositeKey(controlId, MappingControlType::BUTTON);
     auto buttonIt = mappings_.find(buttonKey);
     if (buttonIt != mappings_.end()) {
         return buttonIt->second.control;
@@ -238,7 +238,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     }
 
     // Rechercher le mapping avec l'ID de l'encodeur et le type ENCODER_ROTATION
-    uint32_t encoderKey = makeCompositeKey(encoderId, MappingType::ENCODER);
+    uint32_t encoderKey = makeCompositeKey(encoderId, MappingControlType::ENCODER);
     auto it = mappings_.find(encoderKey);
     if (it == mappings_.end()) {
         logDiagnostic("No mapping found for encoder %d", encoderId);
@@ -307,7 +307,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 // Méthodes de traitement des boutons
 //=============================================================================
 
-void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingType type) {
+void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingControlType type) {
     // Si c'est un contrôle de navigation, ne pas traiter en MIDI mais laisser passer
     if (isNavigationControl(buttonId)) {
         Serial.print(F("Navigation control detected: "));
@@ -323,7 +323,7 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingType 
 
     auto it = mappings_.find(buttonKey);
     if (it == mappings_.end()) {
-        const char* typeStr = (type == MappingType::BUTTON) ? "encoder button" : "button";
+        const char* typeStr = (type == MappingControlType::BUTTON) ? "encoder button" : "button";
         logDiagnostic("No mapping found for %s %d", typeStr, buttonId);
         return;  // Pas de mapping pour ce bouton
     }
@@ -334,7 +334,7 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingType 
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
 
-    const char* typeStr = (type == MappingType::BUTTON) ? "Bouton encodeur" : "Bouton";
+    const char* typeStr = (type == MappingControlType::BUTTON) ? "Bouton encodeur" : "Bouton";
     logDiagnostic("%s MIDI: ID=%d CH=%d Note=%d Vel=%d",
                   typeStr,
                   buttonId,
@@ -370,11 +370,11 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingType 
 }
 
 void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
-    processButtonEvent(encoderId, pressed, MappingType::BUTTON);
+    processButtonEvent(encoderId, pressed, MappingControlType::BUTTON);
 }
 
 void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
-    processButtonEvent(buttonId, pressed, MappingType::BUTTON);
+    processButtonEvent(buttonId, pressed, MappingControlType::BUTTON);
 }
 
 //=============================================================================
