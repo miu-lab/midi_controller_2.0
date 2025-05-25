@@ -74,18 +74,16 @@ void InputSubsystem::update() {
     }
 }
 
-// === INTERFACE UNIFIÉE ===
-
-Result<bool, std::string> InputSubsystem::configureInputs(const std::vector<InputConfig>& inputConfigs) {
+Result<bool, std::string> InputSubsystem::configureInputs(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!initialized_) {
         return Result<bool, std::string>::error("InputSubsystem not initialized");
     }
 
-    Serial.println(F("InputSubsystem: Configuring inputs with unified interface"));
+    Serial.println(F("InputSubsystem: Configuring inputs with ControlDefinition interface"));
 
     // Extraire les configurations par type
-    auto encoderConfigs = extractEncoderConfigs(inputConfigs);
-    auto buttonConfigs = extractButtonConfigs(inputConfigs);
+    auto encoderConfigs = extractEncoderConfigs(controlDefinitions);
+    auto buttonConfigs = extractButtonConfigs(controlDefinitions);
 
     // Recréer les managers avec les nouvelles configurations
     auto managerResult = createManagers(encoderConfigs, buttonConfigs);
@@ -100,43 +98,43 @@ Result<bool, std::string> InputSubsystem::configureInputs(const std::vector<Inpu
     }
 
     Serial.print(F("InputSubsystem: Successfully configured "));
-    Serial.print(inputConfigs.size());
-    Serial.println(F(" inputs"));
+    Serial.print(controlDefinitions.size());
+    Serial.println(F(" controls"));
 
     return Result<bool, std::string>::success(true);
 }
 
-std::vector<InputConfig> InputSubsystem::getAllActiveInputConfigurations() const {
+std::vector<ControlDefinition> InputSubsystem::getAllActiveControlDefinitions() const {
     if (!configuration_) {
         return {};
     }
     
-    const auto& allConfigs = configuration_->getAllInputConfigurations();
-    std::vector<InputConfig> activeConfigs;
+    const auto& allControls = configuration_->getAllControlDefinitions();
+    std::vector<ControlDefinition> activeControls;
     
-    // Filtrer seulement les configurations actives
-    for (const auto& config : allConfigs) {
-        if (config.enabled) {
-            activeConfigs.push_back(config);
+    // Filtrer seulement les contrôles actifs
+    for (const auto& control : allControls) {
+        if (control.enabled) {
+            activeControls.push_back(control);
         }
     }
     
-    return activeConfigs;
+    return activeControls;
 }
 
-std::optional<InputConfig> InputSubsystem::getInputConfigurationById(InputId id) const {
+std::optional<ControlDefinition> InputSubsystem::getControlDefinitionById(InputId id) const {
     if (!configuration_) {
         return std::nullopt;
     }
     
-    return configuration_->getInputConfigurationById(id);
+    return configuration_->getControlDefinitionById(id);
 }
 
 size_t InputSubsystem::getActiveInputCountByType(InputType type) const {
-    const auto activeConfigs = getAllActiveInputConfigurations();
-    return std::count_if(activeConfigs.begin(), activeConfigs.end(),
-                        [type](const InputConfig& config) {
-                            return config.type == type;
+    const auto activeControls = getAllActiveControlDefinitions();
+    return std::count_if(activeControls.begin(), activeControls.end(),
+                        [type](const ControlDefinition& control) {
+                            return control.hardware.type == type;
                         });
 }
 
@@ -163,26 +161,24 @@ bool InputSubsystem::validateInputsStatus() const {
     return true;
 }
 
-// === MÉTHODES PRIVÉES ===
-
 Result<bool, std::string> InputSubsystem::loadUnifiedConfigurations() {
-    Serial.println(F("InputSubsystem: Loading unified input configurations"));
+    Serial.println(F("InputSubsystem: Loading unified control definitions"));
 
-    // Obtenir toutes les configurations d'entrée depuis la nouvelle interface
-    const auto& allInputConfigs = configuration_->getAllInputConfigurations();
+    // Obtenir toutes les définitions de contrôles depuis la nouvelle interface
+    const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
     
-    if (allInputConfigs.empty()) {
-        return Result<bool, std::string>::error("No input configurations found");
+    if (allControlDefinitions.empty()) {
+        return Result<bool, std::string>::error("No control definitions found");
     }
 
-    // Valider toutes les configurations
+    // Valider toutes les définitions
     if (!configuration_->validateAllConfigurations()) {
-        return Result<bool, std::string>::error("Some input configurations are invalid");
+        return Result<bool, std::string>::error("Some control definitions are invalid");
     }
 
     // Extraire les configurations par type
-    auto encoderConfigs = extractEncoderConfigs(allInputConfigs);
-    auto buttonConfigs = extractButtonConfigs(allInputConfigs);
+    auto encoderConfigs = extractEncoderConfigs(allControlDefinitions);
+    auto buttonConfigs = extractButtonConfigs(allControlDefinitions);
 
     Serial.print(F("InputSubsystem: Found "));
     Serial.print(encoderConfigs.size());
@@ -202,17 +198,43 @@ Result<bool, std::string> InputSubsystem::loadUnifiedConfigurations() {
         return processorResult;
     }
 
-    Serial.println(F("InputSubsystem: Unified configurations loaded successfully"));
+    Serial.println(F("InputSubsystem: Unified control definitions loaded successfully"));
     return Result<bool, std::string>::success(true);
 }
 
-std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vector<InputConfig>& inputConfigs) const {
+std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
     std::vector<EncoderConfig> encoderConfigs;
     
-    for (const auto& inputConfig : inputConfigs) {
-        if (inputConfig.type == InputType::ENCODER && inputConfig.enabled) {
-            if (auto encConfig = inputConfig.getConfig<EncoderConfig>()) {
-                encoderConfigs.push_back(*encConfig);
+    for (const auto& controlDef : controlDefinitions) {
+        if (controlDef.hardware.type == InputType::ENCODER && controlDef.enabled) {
+            // Extraire la configuration d'encodeur depuis ControlDefinition
+            if (auto encConfig = std::get_if<ControlDefinition::EncoderConfig>(&controlDef.hardware.config)) {
+                EncoderConfig hwConfig;
+                hwConfig.id = controlDef.id;
+                hwConfig.pinA = encConfig->pinA;
+                hwConfig.pinB = encConfig->pinB;
+                hwConfig.ppr = encConfig->ppr;
+                hwConfig.sensitivity = encConfig->sensitivity;
+                hwConfig.enableAcceleration = encConfig->enableAcceleration;
+                hwConfig.stepsPerDetent = encConfig->stepsPerDetent;
+                hwConfig.invertDirection = false;      // Valeur par défaut
+                hwConfig.accelerationThreshold = 100;  // Valeur par défaut
+                hwConfig.maxAcceleration = 5.0f;       // Valeur par défaut
+                
+                // Ajouter le bouton si présent
+                if (controlDef.hardware.encoderButtonPin) {
+                    ButtonConfig btnConfig;
+                    btnConfig.id = controlDef.getEncoderButtonId();
+                    btnConfig.gpio = *controlDef.hardware.encoderButtonPin;
+                    btnConfig.activeLow = true;
+                    btnConfig.mode = ButtonMode::MOMENTARY;
+                    btnConfig.debounceMs = controlDef.hardware.encoderButtonDebounceMs.value_or(30);
+                    btnConfig.enableLongPress = false;
+                    btnConfig.longPressMs = 800;
+                    hwConfig.buttonConfig = btnConfig;
+                }
+                
+                encoderConfigs.push_back(hwConfig);
             }
         }
     }
@@ -220,13 +242,28 @@ std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vect
     return encoderConfigs;
 }
 
-std::vector<ButtonConfig> InputSubsystem::extractButtonConfigs(const std::vector<InputConfig>& inputConfigs) const {
+std::vector<ButtonConfig> InputSubsystem::extractButtonConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
     std::vector<ButtonConfig> buttonConfigs;
     
-    for (const auto& inputConfig : inputConfigs) {
-        if (inputConfig.type == InputType::BUTTON && inputConfig.enabled) {
-            if (auto btnConfig = inputConfig.getConfig<ButtonConfig>()) {
-                buttonConfigs.push_back(*btnConfig);
+    for (const auto& controlDef : controlDefinitions) {
+        if (controlDef.hardware.type == InputType::BUTTON && controlDef.enabled) {
+            // Extraire la configuration de bouton depuis ControlDefinition
+            if (auto btnConfig = std::get_if<ControlDefinition::ButtonConfig>(&controlDef.hardware.config)) {
+                ButtonConfig hwConfig;
+                hwConfig.id = controlDef.id;
+                hwConfig.gpio = btnConfig->pin;
+                hwConfig.activeLow = btnConfig->activeLow;
+                hwConfig.mode = btnConfig->mode;
+                hwConfig.debounceMs = btnConfig->debounceMs;
+                if (btnConfig->longPressMs.has_value()) {
+                    hwConfig.longPressMs = *btnConfig->longPressMs;
+                    hwConfig.enableLongPress = true;
+                } else {
+                    hwConfig.longPressMs = 800;  // Valeur par défaut
+                    hwConfig.enableLongPress = false;
+                }
+                
+                buttonConfigs.push_back(hwConfig);
             }
         }
     }

@@ -27,6 +27,11 @@ public:
     // === REQUÊTES ===
 
     /**
+     * @brief Obtient tous les contrôles définis
+     */
+    const std::vector<ControlDefinition>& getAllControls() const;
+
+    /**
      * @brief Trouve un contrôle par ID
      */
     std::optional<ControlDefinition> findControlById(InputId id) const;

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <memory>
 
-#include "adapters/secondary/hardware/input/InputConfig.hpp"  // Pour InputConfig
+#include "config/unified/ControlDefinition.hpp"  // Pour ControlDefinition
 #include "adapters/secondary/midi/DummyUsbMidi.hpp"
 #include "adapters/secondary/midi/MidiInHandler.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
@@ -99,41 +99,10 @@ private:
 
     bool initialized_ = false;
     
-    // === MÉTHODES PRIVÉES POUR MIGRATION UNIFIÉE ===
+    std::vector<InputMapping> loadMidiMappingsFromControlDefinitions() const;
+    std::vector<InputMapping> generateMidiMappingsFromControlDefinition(const ControlDefinition& controlDef) const;
     
-    /**
-     * @brief Charge les mappings MIDI depuis le système unifié
-     * @return Vecteur des mappings MIDI trouvés
-     */
-    std::vector<InputMapping> loadMidiMappingsFromUnifiedSystem() const;
-    
-    /**
-     * @brief Génère les mappings MIDI depuis une InputConfig
-     * @param inputConfig Configuration d'entrée à convertir
-     * @return Vecteur des mappings MIDI générés
-     */
-    std::vector<InputMapping> generateMidiMappingsFromInputConfig(const InputConfig& inputConfig) const;
-    
-    // === MÉTHODES UTILITAIRES PRIVÉES ===
-    
-    /**
-     * @brief Extrait le numéro CC MIDI depuis un ID d'entrée
-     * @param inputId ID de l'entrée
-     * @return Numéro CC MIDI correspondant
-     */
     uint8_t extractCCFromInputId(InputId inputId) const;
-    
-    /**
-     * @brief Vérifie si un encodeur a un bouton
-     * @param inputConfig Configuration de l'encodeur
-     * @return true si l'encodeur a un bouton
-     */
-    bool hasEncoderButton(const InputConfig& inputConfig) const;
-    
-    /**
-     * @brief Obtient l'ID du bouton d'un encodeur
-     * @param encoderId ID de l'encodeur
-     * @return ID du bouton correspondant
-     */
+    bool hasEncoderButton(const ControlDefinition& controlDef) const;
     InputId getEncoderButtonId(InputId encoderId) const;
 };

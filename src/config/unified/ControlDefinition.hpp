@@ -1,23 +1,23 @@
 #pragma once
 
-#include <vector>
+#include <algorithm>
 #include <optional>
 #include <variant>
-#include <algorithm>
+#include <vector>
+
 #include "core/domain/types.hpp"
-#include "adapters/secondary/hardware/input/InputConfig.hpp"
 
 /**
  * @brief Définition complète d'un contrôle unifiant hardware et mappings
- * 
+ *
  * Cette structure combine la configuration hardware et tous les mappings
  * associés à un contrôle, éliminant la duplication et garantissant la cohérence.
  */
 struct ControlDefinition {
     // === IDENTITÉ ===
-    InputId id;                      ///< ID unique du contrôle principal
-    std::string name;                ///< Nom technique (ex: "encoder_1")
-    std::string label;               ///< Label affiché (ex: "Volume")
+    InputId id;         ///< ID unique du contrôle principal
+    std::string name;   ///< Nom technique (ex: "encoder_1")
+    std::string label;  ///< Label affiché (ex: "Volume")
 
     // === HARDWARE ===
     struct EncoderConfig {
@@ -38,7 +38,7 @@ struct ControlDefinition {
     };
 
     struct HardwareSpec {
-        InputType type;              ///< ENCODER ou BUTTON
+        InputType type;  ///< ENCODER ou BUTTON
 
         // Configuration spécifique au type
         std::variant<EncoderConfig, ButtonConfig> config;
@@ -68,10 +68,10 @@ struct ControlDefinition {
     std::vector<MappingSpec> mappings;
 
     // === MÉTADONNÉES ===
-    std::string group = "General";   ///< Groupe logique
-    std::string description = "";    ///< Description détaillée
-    bool enabled = true;             ///< Actif/Inactif
-    uint8_t displayOrder = 0;        ///< Ordre d'affichage
+    std::string group = "General";  ///< Groupe logique
+    std::string description = "";   ///< Description détaillée
+    bool enabled = true;            ///< Actif/Inactif
+    uint8_t displayOrder = 0;       ///< Ordre d'affichage
 
     // === MÉTHODES UTILITAIRES ===
 
@@ -90,8 +90,9 @@ struct ControlDefinition {
      * @brief Vérifie si ce contrôle a un rôle spécifique
      */
     bool hasRole(MappingRole role) const {
-        return std::any_of(mappings.begin(), mappings.end(),
-            [role](const MappingSpec& m) { return m.role == role; });
+        return std::any_of(mappings.begin(), mappings.end(), [role](const MappingSpec& m) {
+            return m.role == role;
+        });
     }
 
     /**
@@ -99,8 +100,10 @@ struct ControlDefinition {
      */
     std::vector<MappingSpec> getMappingsForRole(MappingRole role) const {
         std::vector<MappingSpec> result;
-        std::copy_if(mappings.begin(), mappings.end(), std::back_inserter(result),
-            [role](const MappingSpec& m) { return m.role == role; });
+        std::copy_if(mappings.begin(),
+                     mappings.end(),
+                     std::back_inserter(result),
+                     [role](const MappingSpec& m) { return m.role == role; });
         return result;
     }
 };

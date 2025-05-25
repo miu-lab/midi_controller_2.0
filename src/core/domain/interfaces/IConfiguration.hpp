@@ -3,7 +3,7 @@
 #include <vector>
 #include <optional>
 
-#include "adapters/secondary/hardware/input/InputConfig.hpp"
+#include "config/unified/ControlDefinition.hpp"
 #include "core/domain/types.hpp"
 #include "core/utils/Result.hpp"
 
@@ -12,7 +12,7 @@
  *
  * Cette interface définit les méthodes que tous les systèmes
  * de configuration doivent implémenter.
- * Interface unifiée basée sur InputConfig.
+ * Interface unifiée basée sur ControlDefinition.
  */
 class IConfiguration {
 public:
@@ -27,31 +27,31 @@ public:
     // === INTERFACE UNIFIÉE ===
     
     /**
-     * @brief Obtient toutes les configurations d'entrée unifiées
-     * @return Un vecteur constant de configurations d'entrée
+     * @brief Obtient toutes les définitions de contrôles unifiées
+     * @return Un vecteur constant de définitions de contrôles
      */
-    virtual const std::vector<InputConfig>& getAllInputConfigurations() const = 0;
+    virtual const std::vector<ControlDefinition>& getAllControlDefinitions() const = 0;
     
     /**
-     * @brief Filtre les configurations par type
+     * @brief Filtre les définitions par type
      * @param type Type d'entrée à filtrer (BUTTON ou ENCODER)
-     * @return Vecteur des configurations du type demandé
+     * @return Vecteur des définitions du type demandé
      */
-    virtual std::vector<InputConfig> getInputConfigurationsByType(InputType type) const = 0;
+    virtual std::vector<ControlDefinition> getControlDefinitionsByType(InputType type) const = 0;
     
     /**
-     * @brief Obtient une configuration par ID
+     * @brief Obtient une définition par ID
      * @param id Identifiant de l'entrée
-     * @return Configuration trouvée ou std::nullopt
+     * @return Définition trouvée ou std::nullopt
      */
-    virtual std::optional<InputConfig> getInputConfigurationById(InputId id) const = 0;
+    virtual std::optional<ControlDefinition> getControlDefinitionById(InputId id) const = 0;
     
     /**
-     * @brief Filtre les configurations par groupe
+     * @brief Filtre les définitions par groupe
      * @param group Nom du groupe à filtrer
-     * @return Vecteur des configurations du groupe demandé
+     * @return Vecteur des définitions du groupe demandé
      */
-    virtual std::vector<InputConfig> getInputConfigurationsByGroup(const std::string& group) const = 0;
+    virtual std::vector<ControlDefinition> getControlDefinitionsByGroup(const std::string& group) const = 0;
 
     // === MÉTHODES DE NAVIGATION ===
     
@@ -92,8 +92,8 @@ public:
     // === MÉTHODES UTILITAIRES ===
     
     /**
-     * @brief Valide toutes les configurations
-     * @return true si toutes les configurations sont valides
+     * @brief Valide toutes les définitions de contrôles
+     * @return true si toutes les définitions sont valides
      */
     virtual bool validateAllConfigurations() const = 0;
     

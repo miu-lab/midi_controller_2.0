@@ -31,6 +31,10 @@ void UnifiedConfiguration::addControl(ControlDefinition control) {
     }
 }
 
+const std::vector<ControlDefinition>& UnifiedConfiguration::getAllControls() const {
+    return controls_;
+}
+
 std::optional<ControlDefinition> UnifiedConfiguration::findControlById(InputId id) const {
     auto it = idIndex_.find(id);
     if (it != idIndex_.end()) {

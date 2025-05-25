@@ -36,6 +36,14 @@ enum class PinMode {
 };
 
 /**
+ * @brief Mode de fonctionnement d'un bouton
+ */
+enum class ButtonMode {
+    MOMENTARY,  ///< Mode par défaut : actif uniquement lorsqu'il est pressé
+    TOGGLE      ///< Mode toggle : chaque pression inverse l'état
+};
+
+/**
  * @brief Configuration sécurisée d'une broche GPIO
  */
 struct GpioPin {

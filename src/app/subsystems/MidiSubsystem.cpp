@@ -4,7 +4,6 @@
 
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
-// #include "config/MappingConfiguration.hpp"  // SUPPRIMÉ - Migration vers interface unifiée
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/strategies/AbsoluteMappingStrategy.hpp"
 #include "core/domain/strategies/MidiMappingFactory.hpp"
@@ -77,9 +76,8 @@ Result<bool, std::string> MidiSubsystem::init() {
     }
     Serial.println(F("MidiSubsystem: MidiInHandler created"));
 
-    // === MIGRATION VERS INTERFACE UNIFIÉE ===
-    // Charger les mappings MIDI depuis l'interface IConfiguration
-    const auto& midiMappings = loadMidiMappingsFromUnifiedSystem();
+    // Charger les mappings MIDI depuis les ControlDefinition
+    const auto& midiMappings = loadMidiMappingsFromControlDefinitions();
     if (midiMappings.empty()) {
         Serial.println(F("MidiSubsystem: Warning - No MIDI mappings found"));
     }
@@ -176,9 +174,7 @@ MidiMapper& MidiSubsystem::getMidiMapper() const {
     return *midiMapper_;
 }
 
-// === MÉTHODES PRIVÉES POUR MIGRATION UNIFIÉE ===
-
-std::vector<InputMapping> MidiSubsystem::loadMidiMappingsFromUnifiedSystem() const {
+std::vector<InputMapping> MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     std::vector<InputMapping> midiMappings;
     
     if (!configuration_) {
@@ -186,102 +182,91 @@ std::vector<InputMapping> MidiSubsystem::loadMidiMappingsFromUnifiedSystem() con
         return midiMappings;
     }
     
-    // Obtenir toutes les configurations d'entrée depuis le système unifié
-    const auto& allInputConfigs = configuration_->getAllInputConfigurations();
+    // Obtenir toutes les définitions de contrôles depuis le système unifié
+    const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
     
     Serial.print(F("MidiSubsystem: Processing "));
-    Serial.print(allInputConfigs.size());
-    Serial.println(F(" input configurations for MIDI mappings"));
+    Serial.print(allControlDefinitions.size());
+    Serial.println(F(" control definitions for MIDI mappings"));
     
-    // Convertir les InputConfig en InputMapping pour les contrôles avec mappings MIDI
-    for (const auto& inputConfig : allInputConfigs) {
-        if (!inputConfig.enabled) continue;
+    // Utiliser directement les mappings intégrés dans ControlDefinition
+    for (const auto& controlDef : allControlDefinitions) {
+        if (!controlDef.enabled) continue;
         
-        // Générer les mappings MIDI en fonction du type et du groupe
-        auto mappings = generateMidiMappingsFromInputConfig(inputConfig);
+        // Générer les mappings MIDI depuis les mappings intégrés
+        auto mappings = generateMidiMappingsFromControlDefinition(controlDef);
         midiMappings.insert(midiMappings.end(), mappings.begin(), mappings.end());
     }
     
     Serial.print(F("MidiSubsystem: Generated "));
     Serial.print(midiMappings.size());
-    Serial.println(F(" MIDI mappings from unified system"));
+    Serial.println(F(" MIDI mappings from control definitions"));
     
     return midiMappings;
 }
 
-std::vector<InputMapping> MidiSubsystem::generateMidiMappingsFromInputConfig(const InputConfig& inputConfig) const {
+std::vector<InputMapping> MidiSubsystem::generateMidiMappingsFromControlDefinition(const ControlDefinition& controlDef) const {
     std::vector<InputMapping> mappings;
     
-    // Ignorer les contrôles qui ne sont pas dans le groupe MIDI
-    if (inputConfig.group != "MIDI" && inputConfig.group != "Precision") {
-        return mappings;  // Pas de mappings MIDI pour les autres groupes
+    // Utiliser directement les mappings intégrés dans ControlDefinition
+    for (const auto& mappingSpec : controlDef.mappings) {
+        // Ne traiter que les mappings MIDI
+        if (mappingSpec.role != MappingRole::MIDI) {
+            continue;
+        }
+        
+        // Vérifier que c'est bien un mapping MIDI
+        if (auto midiConfig = std::get_if<ControlDefinition::MidiConfig>(&mappingSpec.config)) {
+            InputMapping inputMapping;
+            inputMapping.controlId = controlDef.id;
+            inputMapping.mappingType = mappingSpec.appliesTo;
+            inputMapping.roles = {MappingRole::MIDI};
+            
+            // Créer le mapping MIDI depuis la configuration intégrée
+            inputMapping.midiMapping = {
+                .channel = static_cast<MidiChannel>(midiConfig->channel),
+                .control = static_cast<MidiCC>(midiConfig->control),
+                .type = (mappingSpec.appliesTo == MappingControlType::ENCODER) ? 
+                        MidiEventType::CONTROL_CHANGE : MidiEventType::NOTE_ON,
+                .isRelative = midiConfig->isRelative,
+                .isCentered = std::nullopt
+            };
+            
+            mappings.push_back(inputMapping);
+        }
     }
     
-    // Générer les mappings selon le type de contrôle
-    if (inputConfig.type == InputType::ENCODER) {
-        // Mapping pour l'encodeur (rotation)
-        InputMapping encoderMapping;
-        encoderMapping.controlId = inputConfig.id;
-        encoderMapping.mappingType = MappingControlType::ENCODER;
-        encoderMapping.roles = {MappingRole::MIDI};
+    // Ajouter les mappings pour le bouton d'encodeur si présent
+    if (controlDef.hardware.type == InputType::ENCODER && controlDef.hardware.encoderButtonPin) {
+        InputId buttonId = controlDef.getEncoderButtonId();
         
-        // Générer le CC MIDI basé sur l'ID (comme dans l'ancien système)
-        uint8_t ccNumber = extractCCFromInputId(inputConfig.id);
-        encoderMapping.midiMapping = {
-            .channel = static_cast<MidiChannel>(configuration_->midiChannel()),
-            .control = static_cast<MidiCC>(ccNumber),
-            .type = MidiEventType::CONTROL_CHANGE,
-            .isRelative = true,
-            .isCentered = std::nullopt  // Pas centré pour les encodeurs relatifs
-        };
-        
-        mappings.push_back(encoderMapping);
-        
-        // Vérifier s'il y a un bouton d'encodeur (ID + 100 pattern de l'ancien système)
-        if (hasEncoderButton(inputConfig)) {
-            InputMapping buttonMapping;
-            buttonMapping.controlId = getEncoderButtonId(inputConfig.id);
-            buttonMapping.mappingType = MappingControlType::BUTTON;
-            buttonMapping.roles = {MappingRole::MIDI};
-            
-            // Générer la Note MIDI (CC + 35 comme dans l'ancien système)
-            uint8_t noteNumber = ccNumber + 35;
-            buttonMapping.midiMapping = {
-                .channel = static_cast<MidiChannel>(configuration_->midiChannel()),
-                .control = static_cast<MidiCC>(noteNumber),  // Note stockée dans control pour simplicité
-                .type = MidiEventType::NOTE_ON,
-                .isRelative = false,
-                .isCentered = std::nullopt
-            };
-            
-            mappings.push_back(buttonMapping);
-        }
-    } else if (inputConfig.type == InputType::BUTTON) {
-        // Mapping pour bouton standalone (seulement si dans groupe MIDI)
-        if (inputConfig.group == "MIDI") {
-            InputMapping buttonMapping;
-            buttonMapping.controlId = inputConfig.id;
-            buttonMapping.mappingType = MappingControlType::BUTTON;
-            buttonMapping.roles = {MappingRole::MIDI};
-            
-            // Générer une note MIDI basée sur l'ID
-            uint8_t noteNumber = static_cast<uint8_t>(inputConfig.id);  // Simple mapping direct
-            buttonMapping.midiMapping = {
-                .channel = static_cast<MidiChannel>(configuration_->midiChannel()),
-                .control = static_cast<MidiCC>(noteNumber),
-                .type = MidiEventType::NOTE_ON,
-                .isRelative = false,
-                .isCentered = std::nullopt
-            };
-            
-            mappings.push_back(buttonMapping);
+        // Chercher les mappings qui s'appliquent aux boutons
+        for (const auto& mappingSpec : controlDef.mappings) {
+            if (mappingSpec.role == MappingRole::MIDI && 
+                mappingSpec.appliesTo == MappingControlType::BUTTON) {
+                
+                if (auto midiConfig = std::get_if<ControlDefinition::MidiConfig>(&mappingSpec.config)) {
+                    InputMapping buttonMapping;
+                    buttonMapping.controlId = buttonId;
+                    buttonMapping.mappingType = MappingControlType::BUTTON;
+                    buttonMapping.roles = {MappingRole::MIDI};
+                    
+                    buttonMapping.midiMapping = {
+                        .channel = static_cast<MidiChannel>(midiConfig->channel),
+                        .control = static_cast<MidiCC>(midiConfig->control),
+                        .type = MidiEventType::NOTE_ON,
+                        .isRelative = false,
+                        .isCentered = std::nullopt
+                    };
+                    
+                    mappings.push_back(buttonMapping);
+                }
+            }
         }
     }
     
     return mappings;
 }
-
-// === MÉTHODES UTILITAIRES PRIVÉES ===
 
 uint8_t MidiSubsystem::extractCCFromInputId(InputId inputId) const {
     // Extraire le numéro CC depuis l'ID (logique de l'ancien système)
@@ -295,12 +280,10 @@ uint8_t MidiSubsystem::extractCCFromInputId(InputId inputId) const {
     return static_cast<uint8_t>(inputId % 128);
 }
 
-bool MidiSubsystem::hasEncoderButton(const InputConfig& inputConfig) const {
-    // Vérifier si l'encodeur a un bouton (basé sur la structure EncoderConfig)
-    if (inputConfig.type == InputType::ENCODER) {
-        // Assumons que si c'est un encodeur MIDI, il a un bouton
-        // (logique simplifiée - dans un vrai système, on vérifierait les pins)
-        return inputConfig.group == "MIDI";
+bool MidiSubsystem::hasEncoderButton(const ControlDefinition& controlDef) const {
+    // Vérifier si l'encodeur a un bouton (directement depuis ControlDefinition)
+    if (controlDef.hardware.type == InputType::ENCODER) {
+        return controlDef.hardware.encoderButtonPin.has_value();
     }
     return false;
 }
