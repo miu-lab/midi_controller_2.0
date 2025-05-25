@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "config/unified/ControlDefinition.hpp"
 #include "core/ports/output/ProfileStoragePort.hpp"
 
 /**
@@ -9,14 +10,14 @@
  */
 class ProfileManager : public ProfileStoragePort {
 public:
-    std::optional<MidiControl> getBinding(InputId id) const override;
-    void setBinding(InputId id, MidiControl binding) override;
-    std::vector<InputMapping> getAllMappings() const override;
+    std::optional<ControlDefinition> getControlDefinition(InputId id) const override;
+    void setControlDefinition(const ControlDefinition& controlDef) override;
+    std::vector<ControlDefinition> getAllControlDefinitions() const override;
     bool saveProfile() override;
     bool loadProfile() override;
     void resetToDefaults() override;
     bool removeBinding(InputId id) override;
 
 private:
-    std::unordered_map<InputId, MidiControl> bindings_;
+    std::unordered_map<InputId, ControlDefinition> controlDefinitions_;
 };

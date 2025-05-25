@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "config/unified/ControlDefinition.hpp"
 #include "core/domain/strategies/MidiMappingFactory.hpp"
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
@@ -23,25 +24,23 @@ public:
     ProfileController(ProfileStoragePort& profileManager);
 
     /**
-     * @brief Obtient tous les mappings MIDI
-     * @return Un vecteur de tous les mappings configurés
+     * @brief Obtient toutes les définitions de contrôles
+     * @return Un vecteur de toutes les définitions configurées
      */
-    std::vector<InputMapping> getAllMappings() const;
+    std::vector<ControlDefinition> getAllControlDefinitions() const;
 
     /**
-     * @brief Obtient le mapping pour un contrôle spécifique
+     * @brief Obtient la définition pour un contrôle spécifique
      * @param controlId ID du contrôle
-     * @return Le mapping MIDI, ou une valeur par défaut si non trouvé
+     * @return La définition complète, ou une valeur par défaut si non trouvée
      */
-    MidiControl getMapping(InputId controlId) const;
+    std::optional<ControlDefinition> getControlDefinition(InputId controlId) const;
 
     /**
-     * @brief Définit le mapping pour un contrôle
-     * @param controlId ID du contrôle
-     * @param midiControl Paramètres MIDI
-     * @param relative Si true, utilise un mode relatif
+     * @brief Définit la configuration complète pour un contrôle
+     * @param controlDef Définition complète du contrôle
      */
-    void setMapping(InputId controlId, const MidiControl& midiControl);
+    void setControlDefinition(const ControlDefinition& controlDef);
 
     /**
      * @brief Supprime le mapping pour un contrôle
@@ -70,11 +69,11 @@ public:
     /**
      * @brief Crée une stratégie de mapping appropriée pour un contrôle
      * @param controlId ID du contrôle
-     * @param midiControl Paramètres MIDI
+     * @param controlDef Définition complète du contrôle
      * @return Une stratégie de mapping appropriée
      */
     std::unique_ptr<IMidiMappingStrategy> createMappingStrategy(
-        InputId controlId, const MidiControl& midiControl) const;
+        InputId controlId, const ControlDefinition& controlDef) const;
 
 private:
     ProfileStoragePort& profileManager_;

@@ -77,26 +77,7 @@ Result<bool, std::string> MidiSubsystem::init() {
     Serial.println(F("MidiSubsystem: MidiInHandler created"));
 
     // Charger les mappings MIDI depuis les ControlDefinition
-    const auto& midiMappings = loadMidiMappingsFromControlDefinitions();
-    if (midiMappings.empty()) {
-        Serial.println(F("MidiSubsystem: Warning - No MIDI mappings found"));
-    }
-
-    int mappingCount = 0;
-    for (const auto& mapping : midiMappings) {
-        // Créer une stratégie de mapping appropriée
-        std::unique_ptr<IMidiMappingStrategy> strategy;
-        if (mapping.midiMapping.isRelative) {
-            strategy = MidiMappingFactory::createRelative();
-        } else {
-            strategy = MidiMappingFactory::createAbsolute(0, 127);
-        }
-
-        // Ajouter le mapping au MidiMapper
-        midiMapper_->setMapping(mapping, std::move(strategy));
-
-        mappingCount++;
-    }
+    loadMidiMappingsFromControlDefinitions();
 
     // Enregistrer ce sous-système comme implémentation de IMidiSystem
     container_->registerImplementation<IMidiSystem, MidiSubsystem>(
@@ -174,12 +155,10 @@ MidiMapper& MidiSubsystem::getMidiMapper() const {
     return *midiMapper_;
 }
 
-std::vector<InputMapping> MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
-    std::vector<InputMapping> midiMappings;
-    
+void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     if (!configuration_) {
         Serial.println(F("MidiSubsystem: No configuration available"));
-        return midiMappings;
+        return;
     }
     
     // Obtenir toutes les définitions de contrôles depuis le système unifié
@@ -189,83 +168,59 @@ std::vector<InputMapping> MidiSubsystem::loadMidiMappingsFromControlDefinitions(
     Serial.print(allControlDefinitions.size());
     Serial.println(F(" control definitions for MIDI mappings"));
     
+    int mappingCount = 0;
+    
     // Utiliser directement les mappings intégrés dans ControlDefinition
     for (const auto& controlDef : allControlDefinitions) {
         if (!controlDef.enabled) continue;
         
-        // Générer les mappings MIDI depuis les mappings intégrés
-        auto mappings = generateMidiMappingsFromControlDefinition(controlDef);
-        midiMappings.insert(midiMappings.end(), mappings.begin(), mappings.end());
+        // Configurer les mappings MIDI depuis cette définition de contrôle
+        setupMidiMappingFromControlDefinition(controlDef);
+        mappingCount++;
     }
     
-    Serial.print(F("MidiSubsystem: Generated "));
-    Serial.print(midiMappings.size());
-    Serial.println(F(" MIDI mappings from control definitions"));
-    
-    return midiMappings;
+    Serial.print(F("MidiSubsystem: Configured "));
+    Serial.print(mappingCount);
+    Serial.println(F(" control definitions with MIDI mappings"));
 }
 
-std::vector<InputMapping> MidiSubsystem::generateMidiMappingsFromControlDefinition(const ControlDefinition& controlDef) const {
-    std::vector<InputMapping> mappings;
-    
-    // Utiliser directement les mappings intégrés dans ControlDefinition
+void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinition& controlDef) const {
+    // Vérifier s'il y a des mappings MIDI dans cette définition
+    bool hasMidiMappings = false;
     for (const auto& mappingSpec : controlDef.mappings) {
-        // Ne traiter que les mappings MIDI
-        if (mappingSpec.role != MappingRole::MIDI) {
-            continue;
-        }
-        
-        // Vérifier que c'est bien un mapping MIDI
-        if (auto midiConfig = std::get_if<ControlDefinition::MidiConfig>(&mappingSpec.config)) {
-            InputMapping inputMapping;
-            inputMapping.controlId = controlDef.id;
-            inputMapping.mappingType = mappingSpec.appliesTo;
-            inputMapping.roles = {MappingRole::MIDI};
-            
-            // Créer le mapping MIDI depuis la configuration intégrée
-            inputMapping.midiMapping = {
-                .channel = static_cast<MidiChannel>(midiConfig->channel),
-                .control = static_cast<MidiCC>(midiConfig->control),
-                .type = (mappingSpec.appliesTo == MappingControlType::ENCODER) ? 
-                        MidiEventType::CONTROL_CHANGE : MidiEventType::NOTE_ON,
-                .isRelative = midiConfig->isRelative,
-                .isCentered = std::nullopt
-            };
-            
-            mappings.push_back(inputMapping);
+        if (mappingSpec.role == MappingRole::MIDI) {
+            hasMidiMappings = true;
+            break;
         }
     }
     
-    // Ajouter les mappings pour le bouton d'encodeur si présent
-    if (controlDef.hardware.type == InputType::ENCODER && controlDef.hardware.encoderButtonPin) {
-        InputId buttonId = controlDef.getEncoderButtonId();
-        
-        // Chercher les mappings qui s'appliquent aux boutons
-        for (const auto& mappingSpec : controlDef.mappings) {
-            if (mappingSpec.role == MappingRole::MIDI && 
-                mappingSpec.appliesTo == MappingControlType::BUTTON) {
-                
-                if (auto midiConfig = std::get_if<ControlDefinition::MidiConfig>(&mappingSpec.config)) {
-                    InputMapping buttonMapping;
-                    buttonMapping.controlId = buttonId;
-                    buttonMapping.mappingType = MappingControlType::BUTTON;
-                    buttonMapping.roles = {MappingRole::MIDI};
-                    
-                    buttonMapping.midiMapping = {
-                        .channel = static_cast<MidiChannel>(midiConfig->channel),
-                        .control = static_cast<MidiCC>(midiConfig->control),
-                        .type = MidiEventType::NOTE_ON,
-                        .isRelative = false,
-                        .isCentered = std::nullopt
-                    };
-                    
-                    mappings.push_back(buttonMapping);
-                }
+    if (!hasMidiMappings) {
+        return; // Pas de mappings MIDI pour ce contrôle
+    }
+    
+    // Déterminer le type de stratégie à utiliser en fonction du premier mapping MIDI
+    std::unique_ptr<IMidiMappingStrategy> strategy;
+    
+    for (const auto& mappingSpec : controlDef.mappings) {
+        if (mappingSpec.role == MappingRole::MIDI) {
+            const auto& midiConfig = std::get<ControlDefinition::MidiConfig>(mappingSpec.config);
+            
+            if (midiConfig.isRelative) {
+                strategy = MidiMappingFactory::createRelative();
+            } else {
+                strategy = MidiMappingFactory::createAbsolute(0, 127);
             }
+            break; // Utiliser le premier mapping trouvé pour déterminer la stratégie
         }
     }
     
-    return mappings;
+    if (strategy) {
+        // Configurer le mapping dans MidiMapper en utilisant la nouvelle méthode
+        midiMapper_->setMappingFromControlDefinition(controlDef, std::move(strategy));
+        
+        Serial.print(F("MidiSubsystem: Configured MIDI mapping for control ID "));
+        Serial.println(controlDef.id);
+    }
 }
 
 uint8_t MidiSubsystem::extractCCFromInputId(InputId inputId) const {

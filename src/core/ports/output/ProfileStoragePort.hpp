@@ -3,6 +3,7 @@
 #include <optional>
 #include <vector>
 
+#include "config/unified/ControlDefinition.hpp"
 #include "core/domain/types.hpp"
 
 /**
@@ -19,24 +20,23 @@ public:
     virtual ~ProfileStoragePort() = default;
 
     /**
-     * @brief Obtient le mapping MIDI pour un contrôle
+     * @brief Obtient la définition de contrôle complète pour un ID
      * @param id Identifiant du contrôle
-     * @return Le mapping MIDI s'il existe, std::nullopt sinon
+     * @return La définition complète s'elle existe, std::nullopt sinon
      */
-    virtual std::optional<MidiControl> getBinding(InputId id) const = 0;
+    virtual std::optional<ControlDefinition> getControlDefinition(InputId id) const = 0;
 
     /**
-     * @brief Définit un mapping MIDI pour un contrôle
-     * @param id Identifiant du contrôle
-     * @param binding Mapping MIDI à associer
+     * @brief Définit une définition de contrôle complète
+     * @param controlDef Définition complète du contrôle
      */
-    virtual void setBinding(InputId id, MidiControl binding) = 0;
+    virtual void setControlDefinition(const ControlDefinition& controlDef) = 0;
 
     /**
-     * @brief Obtient tous les mappings MIDI
-     * @return Un vecteur de tous les mappings configurés
+     * @brief Obtient toutes les définitions de contrôles
+     * @return Un vecteur de toutes les définitions configurées
      */
-    virtual std::vector<InputMapping> getAllMappings() const = 0;
+    virtual std::vector<ControlDefinition> getAllControlDefinitions() const = 0;
 
     /**
      * @brief Sauvegarde les mappings actuels dans le stockage persistant

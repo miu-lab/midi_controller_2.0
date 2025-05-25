@@ -6,6 +6,7 @@
 
 #include "config/ConfigDefaults.hpp"
 #include "config/GlobalSettings.hpp"
+#include "config/unified/ControlDefinition.hpp"
 #include "core/domain/types.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/commands/midi/SendMidiCCCommand.hpp"
@@ -40,12 +41,11 @@ public:
     bool onEvent(const Event& event) override;
 
     /**
-     * @brief Définit le mapping pour un contrôle
-     * @param controlId ID du contrôle
-     * @param midiControl Paramètres de contrôle MIDI
+     * @brief Définit le mapping pour un contrôle à partir d'une définition complète
+     * @param controlDef Définition complète du contrôle avec mappings intégrés
      * @param strategy Stratégie de mapping à utiliser
      */
-    void setMapping(const InputMapping& mapping, std::unique_ptr<IMidiMappingStrategy> strategy);
+    void setMappingFromControlDefinition(const ControlDefinition& controlDef, std::unique_ptr<IMidiMappingStrategy> strategy);
 
     /**
      * @brief Supprime le mapping pour un contrôle
@@ -62,11 +62,11 @@ public:
     bool hasMapping(InputId controlId) const;
 
     /**
-     * @brief Obtient le mapping MIDI pour un contrôle
+     * @brief Obtient la configuration MIDI pour un contrôle
      * @param controlId ID du contrôle
-     * @return Paramètres du contrôle MIDI, ou une valeur par défaut si non trouvé
+     * @return Configuration MIDI du contrôle, ou une valeur par défaut si non trouvé
      */
-    const MidiControl& getMidiControl(InputId controlId) const;
+    ControlDefinition::MidiConfig getMidiConfig(InputId controlId) const;
 
     /**
      * @brief Traite un changement d'encodeur
@@ -121,7 +121,7 @@ private:
 
     // Structure pour stocker les informations de mapping
     struct MappingInfo {
-        MidiControl control;
+        ControlDefinition::MidiConfig midiConfig;
         std::unique_ptr<IMidiMappingStrategy> strategy;
         uint8_t lastMidiValue;
         int32_t lastEncoderPosition;
@@ -176,5 +176,5 @@ private:
     std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
     std::unordered_map<InputId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
 
-    MidiControl defaultControl_;  // Contrôle par défaut retourné si non trouvé
+    ControlDefinition::MidiConfig defaultConfig_;  // Configuration par défaut retournée si non trouvée
 };

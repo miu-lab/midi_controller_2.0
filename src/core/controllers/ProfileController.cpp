@@ -1,24 +1,18 @@
-#include "ProfileController.hpp"
+#include "core/controllers/ProfileController.hpp"
 
 ProfileController::ProfileController(ProfileStoragePort& profileManager)
     : profileManager_(profileManager) {}
 
-std::vector<InputMapping> ProfileController::getAllMappings() const {
-    return profileManager_.getAllMappings();
+std::vector<ControlDefinition> ProfileController::getAllControlDefinitions() const {
+    return profileManager_.getAllControlDefinitions();
 }
 
-MidiControl ProfileController::getMapping(InputId controlId) const {
-    auto mapping = profileManager_.getBinding(controlId);
-    if (mapping) {
-        return *mapping;
-    }
-
-    // Valeur par défaut si le mapping n'existe pas
-    return {.channel = 0, .control = 0, .isRelative = false};
+std::optional<ControlDefinition> ProfileController::getControlDefinition(InputId controlId) const {
+    return profileManager_.getControlDefinition(controlId);
 }
 
-void ProfileController::setMapping(InputId controlId, const MidiControl& midiControl) {
-    profileManager_.setBinding(controlId, midiControl);
+void ProfileController::setControlDefinition(const ControlDefinition& controlDef) {
+    profileManager_.setControlDefinition(controlDef);
 }
 
 bool ProfileController::removeMapping(InputId controlId) {
@@ -38,28 +32,27 @@ bool ProfileController::loadProfile() {
 }
 
 std::unique_ptr<IMidiMappingStrategy> ProfileController::createMappingStrategy(
-    InputId controlId, const MidiControl& midiControl) const {
-    // Déterminer si c'est un encodeur ou un bouton
-    bool isEncoder =
-        controlId >= 70 && controlId < 90;  // Supposons que les IDs 70-89 sont des encodeurs
-    bool isButton =
-        controlId >= 50 && controlId < 70;  // Supposons que les IDs 50-69 sont des boutons
+    InputId controlId, const ControlDefinition& controlDef) const {
+    
+    // Chercher le premier mapping MIDI dans la définition
+    for (const auto& mappingSpec : controlDef.mappings) {
+        if (mappingSpec.role == MappingRole::MIDI) {
+            const auto& midiConfig = std::get<ControlDefinition::MidiConfig>(mappingSpec.config);
+            
+            // Déterminer si c'est un bouton ou un encodeur
+            bool isButton = (controlDef.hardware.type == InputType::BUTTON) ||
+                           (mappingSpec.appliesTo == MappingControlType::BUTTON);
 
-    if (midiControl.isRelative) {
-        // Mode relatif - bien pour les encodeurs
-        return MidiMappingFactory::createRelative();
-    } else {
-        // Mode absolu
-        if (isEncoder) {
-            // Pour les encodeurs en mode absolu, utiliser une plage dynamique
-            // qui s'adapte à la position actuelle de l'encodeur
-            return MidiMappingFactory::createDynamicRange(0, 127);
-        } else if (isButton) {
-            // Pour les boutons, c'est toujours 0 ou 127
-            return MidiMappingFactory::createAbsolute(0, 1);
-        } else {
-            // Par défaut
-            return MidiMappingFactory::createAbsolute(0, 127);
+            if (midiConfig.isRelative && !isButton) {
+                // Mode relatif pour les encodeurs
+                return MidiMappingFactory::createRelative();
+            } else {
+                // Mode absolu pour les boutons ou encodeurs absolus
+                return MidiMappingFactory::createAbsolute(0, 127);
+            }
         }
     }
+    
+    // Par défaut, retourner une stratégie relative
+    return MidiMappingFactory::createRelative();
 }

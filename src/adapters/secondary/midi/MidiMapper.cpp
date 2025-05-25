@@ -16,8 +16,8 @@
 MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
       commandManager_(commandManager),
-      defaultControl_(
-          {0, 0, MidiEventType::CONTROL_CHANGE, false, true})  // Canal 1, CC 0, mode absolu
+      defaultConfig_(
+          {0, 0, false})  // Canal 0, CC 0, mode absolu
 {
     // Initialisation préalable des pool d'objets
     for (auto& cmd : midiCCCommandPool_) {
@@ -77,33 +77,44 @@ bool MidiMapper::isNavigationControl(InputId controlId) const {
 // Gestion des mappings
 //=============================================================================
 
-void MidiMapper::setMapping(const InputMapping& mapping,
+void MidiMapper::setMappingFromControlDefinition(const ControlDefinition& controlDef,
                             std::unique_ptr<IMidiMappingStrategy> strategy) {
-    // Créer une nouvelle info de mapping
-    MappingInfo info;
-    info.control = mapping.midiMapping;  // Utiliser midiMapping au lieu de midiControl
-    info.strategy = std::move(strategy);
-    info.lastMidiValue = 0;
-    info.lastEncoderPosition = 0;
-    info.midiOffset = 0;
+    // Traiter le premier mapping MIDI trouvé dans la définition de contrôle
+    for (const auto& mappingSpec : controlDef.mappings) {
+        if (mappingSpec.role == MappingRole::MIDI) {
+            // Extraire la configuration MIDI
+            const auto& midiConfig = std::get<ControlDefinition::MidiConfig>(mappingSpec.config);
+            
+            // Créer une nouvelle info de mapping
+            MappingInfo info;
+            info.midiConfig = midiConfig;
+            info.strategy = std::move(strategy);  // Déplacer la stratégie unique
+            info.lastMidiValue = 0;
+            info.lastEncoderPosition = 0;
+            info.midiOffset = 0;
 
-    // Créer une clé composite qui inclut le type de contrôle
-    uint32_t compositeKey = makeCompositeKey(mapping.controlId, mapping.mappingType);
+            // Créer une clé composite qui inclut le type de contrôle
+            uint32_t compositeKey = makeCompositeKey(controlDef.id, mappingSpec.appliesTo);
 
-    // Supprimer l'ancien mapping s'il existe
-    auto it = mappings_.find(compositeKey);
-    if (it != mappings_.end()) {
-        mappings_.erase(it);
+            // Supprimer l'ancien mapping s'il existe
+            auto it = mappings_.find(compositeKey);
+            if (it != mappings_.end()) {
+                mappings_.erase(it);
+            }
+
+            // Ajouter le nouveau mapping
+            mappings_[compositeKey] = std::move(info);
+
+            logDiagnostic("Mapping ajouté: ID=%d CH=%d CC=%d Type=%d",
+                          controlDef.id,
+                          midiConfig.channel,
+                          midiConfig.control,
+                          static_cast<int>(mappingSpec.appliesTo));
+                          
+            // Traiter seulement le premier mapping MIDI pour cette version
+            break;
+        }
     }
-
-    // Ajouter le nouveau mapping
-    mappings_[compositeKey] = std::move(info);
-
-    logDiagnostic("Mapping ajouté: ID=%d CH=%d CC=%d Type=%d",
-                  mapping.controlId,
-                  mapping.midiMapping.channel,
-                  mapping.midiMapping.control,
-                  static_cast<int>(mapping.mappingType));  // Utiliser mapping.controlType
 }
 
 bool MidiMapper::removeMapping(InputId controlId) {
@@ -148,22 +159,22 @@ bool MidiMapper::hasMapping(InputId controlId) const {
     return false;
 }
 
-const MidiControl& MidiMapper::getMidiControl(InputId controlId) const {
+ControlDefinition::MidiConfig MidiMapper::getMidiConfig(InputId controlId) const {
     // Vérifier pour encoder en premier
     uint32_t encoderKey = makeCompositeKey(controlId, MappingControlType::ENCODER);
     auto encoderIt = mappings_.find(encoderKey);
     if (encoderIt != mappings_.end()) {
-        return encoderIt->second.control;
+        return encoderIt->second.midiConfig;
     }
 
     // Puis vérifier pour bouton d'encodeur
     uint32_t buttonKey = makeCompositeKey(controlId, MappingControlType::BUTTON);
     auto buttonIt = mappings_.find(buttonKey);
     if (buttonIt != mappings_.end()) {
-        return buttonIt->second.control;
+        return buttonIt->second.midiConfig;
     }
 
-    return defaultControl_;
+    return defaultConfig_;
 }
 
 //=============================================================================
@@ -207,10 +218,10 @@ int32_t MidiMapper::applyEncoderSensitivity(int32_t delta, EncoderId encoderId) 
 }
 
 int16_t MidiMapper::calculateMidiValue(MappingInfo& info, int32_t delta, int32_t position) {
-    const MidiControl& control = info.control;
+    const ControlDefinition::MidiConfig& midiConfig = info.midiConfig;
     int16_t newValue;
 
-    if (control.isRelative) {
+    if (midiConfig.isRelative) {
         // Mode relatif avec sensibilité configurable
         float sensitivity =
             ConfigDefaults::DEFAULT_ENCODER_SENSITIVITY;  // Ajustez cette valeur selon vos besoins
@@ -253,7 +264,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     }
 
     auto& [key, mappingInfo] = *it;
-    const MidiControl& control = mappingInfo.control;
+    const ControlDefinition::MidiConfig& midiConfig = mappingInfo.midiConfig;
 
     // Calculer le delta de mouvement
     int32_t delta = position - mappingInfo.lastEncoderPosition;
@@ -288,10 +299,10 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 #ifndef PERFORMANCE_MODE
     logDiagnostic("Envoi MIDI: Enc=%d CH=%d CC=%d Val=%d (mode %s)",
                   encoderId,
-                  control.channel,
-                  control.control,
+                  midiConfig.channel,
+                  midiConfig.control,
                   newValue,
-                  control.isRelative ? "relatif" : "absolu");
+                  midiConfig.isRelative ? "relatif" : "absolu");
     // Débogage pour voir l'ID de l'encodeur
     Serial.print(F("MidiMapper: Sending MIDI for encoderId="));
     Serial.println(encoderId);
@@ -303,8 +314,8 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Utiliser le pool de commandes
     SendMidiCCCommand& command = getNextCCCommand();
     command.reset(midiOut_,
-                  control.channel,
-                  control.control,
+                  midiConfig.channel,
+                  midiConfig.control,
                   static_cast<uint8_t>(newValue),
                   encoderId);
     commandManager_.executeShared(command);
@@ -336,7 +347,7 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingContr
     }
 
     MappingInfo& info = it->second;
-    const MidiControl& control = info.control;
+    const ControlDefinition::MidiConfig& midiConfig = info.midiConfig;
 
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
@@ -345,21 +356,21 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingContr
     logDiagnostic("%s MIDI: ID=%d CH=%d Note=%d Vel=%d",
                   typeStr,
                   buttonId,
-                  control.channel,
-                  control.control,
+                  midiConfig.channel,
+                  midiConfig.control,
                   velocity);
 
     // Utiliser le pool d'objets pour créer la commande
     SendMidiNoteCommand& command = getNextNoteCommand();
-    command.reset(midiOut_, control.channel, control.control, velocity);
+    command.reset(midiOut_, midiConfig.channel, midiConfig.control, velocity);
 
     // Si c'est une note on, la stocker pour pouvoir la couper plus tard
     if (pressed) {
         // Pour les notes actives, nous gardons toujours des objets gérés par smart pointers
         // car elles doivent persister longtemps
         auto noteCmd = std::make_unique<SendMidiNoteCommand>(midiOut_,
-                                                             control.channel,
-                                                             control.control,
+                                                             midiConfig.channel,
+                                                             midiConfig.control,
                                                              velocity);
         activeNotes_[buttonId] = std::move(noteCmd);
         activeNotes_[buttonId]->execute();

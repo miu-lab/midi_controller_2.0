@@ -99,8 +99,8 @@ private:
 
     bool initialized_ = false;
     
-    std::vector<InputMapping> loadMidiMappingsFromControlDefinitions() const;
-    std::vector<InputMapping> generateMidiMappingsFromControlDefinition(const ControlDefinition& controlDef) const;
+    void loadMidiMappingsFromControlDefinitions() const;
+    void setupMidiMappingFromControlDefinition(const ControlDefinition& controlDef) const;
     
     uint8_t extractCCFromInputId(InputId inputId) const;
     bool hasEncoderButton(const ControlDefinition& controlDef) const;

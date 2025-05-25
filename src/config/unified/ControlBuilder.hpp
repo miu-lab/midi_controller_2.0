@@ -15,6 +15,10 @@ public:
         control_.name = name;
         control_.label = name;  // Par défaut, peut être changé
     }
+    
+    // Constructeur alternatif pour const char*
+    ControlBuilder(InputId id, const char* name) : ControlBuilder(id, std::string(name)) {}
+
 
     // === CONFIGURATION DE BASE ===
 

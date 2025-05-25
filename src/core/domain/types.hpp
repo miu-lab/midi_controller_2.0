@@ -1,76 +1,65 @@
 #pragma once
 #include <cstdint>
-#include <optional>
-#include <set>
 #include <string>
 
-using DefaultId = uint16_t;
-using DefaultMidiId = uint8_t;
-using DefaultName = std::string;
+// =====================================================
+// TYPES DE BASE - PHILOSOPHIE UNIFIÉE
+// =====================================================
 
-using InputId = DefaultId;
-using InputName = DefaultName;
-using InputLabel = DefaultName;
-using InputDescription = DefaultName;
-using InputGroup = DefaultName;
+// === IDENTIFIANTS ===
+using InputId = uint16_t;        ///< ID unique pour tous contrôles
+using ButtonId = uint16_t;       ///< ID spécifique boutons
+using EncoderId = uint16_t;      ///< ID spécifique encodeurs
 
-using NavigationName = InputName;
-using NavigationGroup = InputGroup;
+// === TYPES MIDI ===
+using MidiChannel = uint8_t;     ///< Canal MIDI (1-16)
+using MidiCC = uint8_t;          ///< Numéro CC MIDI (0-127)
+using MidiNote = uint8_t;        ///< Note MIDI (0-127)
 
-using PinId = DefaultId;
-
-using EncoderId = DefaultId;
-using ButtonId = DefaultId;
-
-using MidiChannel = DefaultMidiId;
-using MidiCC = DefaultMidiId;
-using MidiNote = DefaultMidiId;
+// =====================================================
+// ENUMS HARDWARE
+// =====================================================
 
 /**
  * @brief Mode de configuration GPIO
  */
 enum class PinMode {
-    PULLUP,    ///< Entrée avec résistance de tirage vers le haut
-    PULLDOWN,  ///< Entrée avec résistance de tirage vers le bas
-    RAW        ///< Entrée sans résistance de tirage
+    PULLUP,                      ///< Résistance de tirage vers le haut
+    PULLDOWN,                    ///< Résistance de tirage vers le bas
+    RAW                          ///< Sans résistance de tirage
 };
 
 /**
  * @brief Mode de fonctionnement d'un bouton
  */
 enum class ButtonMode {
-    MOMENTARY,  ///< Mode par défaut : actif uniquement lorsqu'il est pressé
-    TOGGLE      ///< Mode toggle : chaque pression inverse l'état
+    MOMENTARY,                   ///< Actif seulement quand pressé
+    TOGGLE                       ///< Chaque pression inverse l'état
+};
+
+// =====================================================
+// TYPES DE CONTRÔLES
+// =====================================================
+
+/**
+ * @brief Type de contrôle physique
+ */
+enum class MappingControlType { 
+    ENCODER,                     ///< Encodeur rotatif
+    BUTTON                       ///< Bouton poussoir
 };
 
 /**
- * @brief Configuration sécurisée d'une broche GPIO
- */
-struct GpioPin {
-    uint8_t pin;
-    PinMode mode = PinMode::PULLUP;
-
-    /**
-     * @brief Vérifie si la configuration de la broche est valide
-     * @return true si la broche est dans la plage valide (0-99 pour Teensy)
-     */
-    constexpr bool isValid() const {
-        return pin <= 99;  // Teensy 4.1 max pins
-    }
-};
-
-/**
- * @brief Type de mapping (encodeur, bouton d'encodeur)
- */
-enum class MappingControlType { ENCODER, BUTTON };
-
-/**
- * @brief Type de contrôle (encodeur, bouton d'encodeur)
+ * @brief Alias pour compatibilité
  */
 using InputType = MappingControlType;
 
+// =====================================================
+// ENUMS MIDI ET MAPPINGS
+// =====================================================
+
 /**
- * @brief Type de contrôle (encodeur, bouton d'encodeur, ou bouton séparé)
+ * @brief Types d'événements MIDI
  */
 enum class MidiEventType {
     NOTE_ON,
@@ -82,40 +71,47 @@ enum class MidiEventType {
     PROGRAM_CHANGE,
     SYSEX,
     CLOCK,
-    COMMON,
-};
-/**
- * @brief Type de contrôle (encodeur, bouton d'encodeur, ou bouton séparé)
- */
-enum class MappingRole { MIDI, NAVIGATION };
-
-/**
- * @brief Configuration d'un controle MIDI
- */
-struct MidiControl {
-    MidiChannel channel{1};
-    MidiCC control{0};
-    MidiEventType type{MidiEventType::CONTROL_CHANGE};
-    bool isRelative{true};
-    std::optional<bool> isCentered{true};
-};
-
-struct NavigationControl {
-    NavigationName name{"HOME"};  ///< Nom du contrôle de navigation
+    COMMON
 };
 
 /**
- * @brief Affectation d'un controle MIDI à un encodeur
+ * @brief Rôles des mappings dans le système unifié
  */
-struct InputMapping {
-    InputId controlId;
-    std::set<MappingRole> roles;
-    MappingControlType mappingType{MappingControlType::ENCODER};
-    MidiControl midiMapping;
-    NavigationControl navigationMapping;
+enum class MappingRole { 
+    MIDI,                        ///< Contrôle MIDI
+    NAVIGATION                   ///< Navigation interface
 };
 
+// =====================================================
+// STRUCTURES HARDWARE
+// =====================================================
+
 /**
- * @brief Evénement d'un bouton
+ * @brief Configuration sécurisée d'une broche GPIO
  */
-enum class ButtonEvent { None, Pressed, Released, LongPress };
+struct GpioPin {
+    uint8_t pin;
+    PinMode mode = PinMode::PULLUP;
+
+    /**
+     * @brief Vérifie la validité de la configuration
+     * @return true si la broche est valide pour Teensy 4.1
+     */
+    constexpr bool isValid() const {
+        return pin <= 99;            // Teensy 4.1 max pins
+    }
+};
+
+// =====================================================
+// ÉVÉNEMENTS
+// =====================================================
+
+/**
+ * @brief Types d'événements bouton
+ */
+enum class ButtonEvent { 
+    None, 
+    Pressed, 
+    Released, 
+    LongPress 
+};
