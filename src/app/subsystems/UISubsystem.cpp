@@ -142,11 +142,10 @@ void UISubsystem::update() {
         // Le gestionnaire de vues gère maintenant lui-même les rendus uniquement si nécessaire
         viewManager_->update();
 
-        // Forcer périodiquement une mise à jour du display pour vérifier que le système fonctionne
-        static uint32_t updateCounter = 0;
-        if (++updateCounter % 500 == 0 && displayTask_) {
-            // Tous les 500 cycles (environ 10 secondes), forcer une mise à jour
+        // Vérifier si le ViewManager a demandé une mise à jour de l'affichage
+        if (viewManager_->needsDisplayUpdate()) {
             displayTask_->requestUpdate();
+            viewManager_->clearDisplayUpdateFlag();
         }
     }
 }

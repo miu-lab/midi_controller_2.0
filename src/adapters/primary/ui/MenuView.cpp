@@ -91,7 +91,10 @@ bool MenuView::isActive() const {
 }
 
 void MenuView::setActive(bool active) {
-    active_ = active;
+    if (active_ != active) {
+        active_ = active;
+        setDirty(true);  // Marquer la vue comme modifiée lors de l'activation/désactivation
+    }
 }
 
 void MenuView::addItem(const String& label, int id, bool enabled) {
@@ -103,6 +106,7 @@ void MenuView::selectNext() {
     
     selectedIndex_ = (selectedIndex_ + 1) % items_.size();
     updateScrollOffsetIfNeeded();
+    setDirty(true);  // Marquer la vue comme modifiée
 }
 
 void MenuView::selectPrevious() {
@@ -110,6 +114,7 @@ void MenuView::selectPrevious() {
     
     selectedIndex_ = (selectedIndex_ - 1 + items_.size()) % items_.size();
     updateScrollOffsetIfNeeded();
+    setDirty(true);  // Marquer la vue comme modifiée
 }
 
 void MenuView::selectItem(int index) {

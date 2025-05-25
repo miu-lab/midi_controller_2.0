@@ -51,6 +51,17 @@ public:
     // Navigation menu
     void navigateMenu(int8_t direction) override;
     void selectMenuItem() override;
+    
+    /**
+     * @brief Vérifie si l'affichage a besoin d'être mis à jour
+     * @return true si une mise à jour est nécessaire
+     */
+    bool needsDisplayUpdate() const override { return needsDisplayUpdate_; }
+    
+    /**
+     * @brief Réinitialise le flag de mise à jour
+     */
+    void clearDisplayUpdateFlag() override { needsDisplayUpdate_ = false; }
 
 private:
     // Affichage
@@ -65,6 +76,7 @@ private:
     // État actuel
     ViewType currentView_ = ViewType::SplashScreen;
     bool initialized_ = false;
+    bool needsDisplayUpdate_ = false;  // Flag pour indiquer qu'une mise à jour est nécessaire
     
     // Méthodes privées
     void activateView(ViewType type);

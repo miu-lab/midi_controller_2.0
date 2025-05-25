@@ -5,6 +5,7 @@
 #include "app/di/DependencyContainer.hpp"
 #include "config/debug/DebugMacros.hpp"
 #include "config/debug/TaskSchedulerConfig.hpp"
+#include "core/TaskScheduler.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"
@@ -40,8 +41,21 @@ Result<bool, std::string> MidiControllerApp::init() {
 }
 
 void MidiControllerApp::update() {
+    // Mettre à jour le scheduler de tâches en premier
+    scheduler.update();
+
     // Mettre à jour le sous-système d'entrée
     if (m_inputSystem) {
         m_inputSystem->update();
+    }
+
+    // // Mettre à jour le sous-système MIDI
+    // if (m_midiSystem) {
+    //     m_midiSystem->update();
+    // }
+
+    // Mettre à jour le sous-système UI
+    if (m_uiSystem) {
+        m_uiSystem->update();
     }
 }

@@ -85,6 +85,17 @@ public:
     virtual void selectMenuItem() = 0;
 
     /**
+     * @brief Vérifie si l'affichage a besoin d'être mis à jour
+     * @return true si une mise à jour est nécessaire
+     */
+    virtual bool needsDisplayUpdate() const = 0;
+    
+    /**
+     * @brief Réinitialise le flag de mise à jour
+     */
+    virtual void clearDisplayUpdateFlag() = 0;
+
+    /**
      * @brief Destructeur virtuel
      */
     virtual ~ViewManager() = default;

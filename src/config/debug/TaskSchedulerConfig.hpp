@@ -7,10 +7,10 @@
 #define TASK_SCHEDULER_STATS_INTERVAL 500
 
 // Budget CPU par défaut par cycle (en microsecondes)
-#define DEFAULT_CPU_BUDGET_MICROS 5000
+#define DEFAULT_CPU_BUDGET_MICROS 800
 
 // Nombre initial de tâches à allouer
-#define INITIAL_TASK_COUNT 8
+#define INITIAL_TASK_COUNT 3
 
 // Priorités prédéfinies pour le TaskScheduler
 #define TASK_PRIORITY_CRITICAL 0  // Plus haute priorité
@@ -21,10 +21,10 @@
 
 // Budget temporel pour les différents sous-systèmes (en microsecondes)
 namespace TaskTiming {
-static constexpr unsigned long MAX_INPUT_TIME_US = 1000;  // 1ms pour l'input (critique)
-static constexpr unsigned long MAX_MIDI_TIME_US = 2000;   // 2ms pour MIDI (critique)
-static constexpr unsigned long MAX_UI_TIME_US = 16000;    // 16ms pour l'UI (moins critique)
+static constexpr unsigned long MAX_INPUT_TIME_US = 150;  // 1ms pour l'input (critique)
+static constexpr unsigned long MAX_MIDI_TIME_US = 500;   // 2ms pour MIDI (critique)
+static constexpr unsigned long MAX_UI_TIME_US = 16000;   // 16ms pour l'UI (moins critique)
 
 // Période minimale d'exécution pour certaines tâches
-static constexpr unsigned long UI_MIN_PERIOD_MS = 16;  // 60Hz max pour l'UI
+static constexpr unsigned long UI_MIN_PERIOD_MS = 33;  // 30Hz max pour l'UI
 }  // namespace TaskTiming
