@@ -12,8 +12,8 @@ ApplicationConfiguration::ApplicationConfiguration()
                            ConfigDefaults::MAX_UI_TIME_US};
 
     // Initialisation des paramètres d'interface utilisateur
-    uiSettings = {ConfigDefaults::UI_REFRESH_RATE_HZ,
-                  ConfigDefaults::UI_REFRESH_PERIOD_MS,
+    uiSettings = {ConfigDefaults::DISPLAY_REFRESH_RATE_HZ,
+                  ConfigDefaults::DISPLAY_REFRESH_PERIOD_MS,
                   ConfigDefaults::SHOW_DEBUG_INFO,
                   ConfigDefaults::ENABLE_FULL_UI};
 
@@ -140,8 +140,8 @@ void ApplicationConfiguration::resetToDefaults() {
                            ConfigDefaults::MAX_UI_TIME_US};
 
     // Réinitialiser UI
-    uiSettings = {ConfigDefaults::UI_REFRESH_RATE_HZ,
-                  ConfigDefaults::UI_REFRESH_PERIOD_MS,
+    uiSettings = {ConfigDefaults::DISPLAY_REFRESH_RATE_HZ,
+                  ConfigDefaults::DISPLAY_REFRESH_PERIOD_MS,
                   ConfigDefaults::SHOW_DEBUG_INFO,
                   ConfigDefaults::ENABLE_FULL_UI};
 

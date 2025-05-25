@@ -15,8 +15,8 @@ constexpr unsigned long MAX_MIDI_TIME_US = 2000;     // 2ms
 constexpr unsigned long MAX_UI_TIME_US = 2000;       // 2ms
 
 // Interface utilisateur
-constexpr int UI_REFRESH_RATE_HZ = 60;
-constexpr unsigned long UI_REFRESH_PERIOD_MS = 1000 / UI_REFRESH_RATE_HZ;  // ~16.67ms
+constexpr int DISPLAY_REFRESH_RATE_HZ = 60;
+constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = 1000 / DISPLAY_REFRESH_RATE_HZ;  // ~16.67ms
 constexpr bool SHOW_DEBUG_INFO = false;
 constexpr bool ENABLE_FULL_UI = true;
 

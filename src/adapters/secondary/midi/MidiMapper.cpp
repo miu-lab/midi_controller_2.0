@@ -164,10 +164,8 @@ const MidiControl& MidiMapper::getMidiControl(InputId controlId) const {
 //=============================================================================
 
 bool MidiMapper::shouldProcessEncoder(EncoderId encoderId, int32_t position) {
-    // Cette méthode centralise désormais toute la logique de limitation de taux
-    // et de détection de doublons pour les encodeurs dans le système.
-
-    // Limiteur de taux pour les messages d'encodeur
+    // TODO: Implémenter la limitation de taux et la détection de doublons
+    // Pour l'instant, tous les événements sont traités
     return true;
 }
 
@@ -231,17 +229,11 @@ int16_t MidiMapper::calculateMidiValue(MappingInfo& info, int32_t delta, int32_t
 }
 
 void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
-    // Note: Depuis la refactorisation, MidiMapper est responsable de tout le traitement des
-    // encodeurs, y compris la limitation de taux, le suivi des positions et la détection des
-    // doublons.
+    // MidiMapper est responsable de tout le traitement des encodeurs MIDI,
+    // y compris la limitation de taux, le suivi des positions et la détection des doublons.
 
     // Vérifier si l'encodeur doit être traité (limitation de taux)
     if (!shouldProcessEncoder(encoderId, position)) {
-        return;
-    }
-
-    // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
-    if (isNavigationControl(encoderId)) {
         return;
     }
 
@@ -253,11 +245,11 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;  // Pas de mapping pour cet encodeur
     }
 
-    MappingInfo& info = it->second;
-    const MidiControl& control = info.control;
+    auto& [key, mappingInfo] = *it;
+    const MidiControl& control = mappingInfo.control;
 
     // Calculer le delta de mouvement
-    int32_t delta = position - info.lastEncoderPosition;
+    int32_t delta = position - mappingInfo.lastEncoderPosition;
     if (delta == 0) {
         return;  // Pas de changement
     }
@@ -266,13 +258,23 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     delta = applyEncoderSensitivity(delta, encoderId);
 
     // Mettre à jour la dernière position
-    info.lastEncoderPosition = position;
+    mappingInfo.lastEncoderPosition = position;
+
+    // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
+    if (isNavigationControl(encoderId)) {
+        Serial.print(F("Navigation control detected: "));
+        Serial.print(encoderId);
+        Serial.print(F(" position: "));
+        Serial.println(mappingInfo.lastEncoderPosition);
+        // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
+        return;
+    }
 
     // Calculer la nouvelle valeur MIDI selon le mode
-    int16_t newValue = calculateMidiValue(info, delta, position);
+    int16_t newValue = calculateMidiValue(mappingInfo, delta, position);
 
     // Ne rien faire si la valeur n'a pas changé
-    if (newValue == info.lastMidiValue) {
+    if (newValue == mappingInfo.lastMidiValue) {
         return;
     }
 
@@ -289,7 +291,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 #endif
 
     // Mettre à jour et envoyer la nouvelle valeur
-    info.lastMidiValue = static_cast<uint8_t>(newValue);
+    mappingInfo.lastMidiValue = static_cast<uint8_t>(newValue);
 
     // Utiliser le pool de commandes
     SendMidiCCCommand& command = getNextCCCommand();

@@ -17,7 +17,12 @@ class UIController;
  * @brief Contrôleur dédié à la gestion des entrées physiques
  *
  * Ce contrôleur est responsable du routage des entrées physiques (encodeurs, boutons)
- * vers les contrôleurs appropriés (navigation ou MIDI) en fonction de la configuration.
+ * vers les contrôleurs appropriés en fonction de la configuration.
+ * 
+ * Architecture:
+ * - Les contrôles de navigation utilisent des callbacks directs
+ * - Les contrôles MIDI utilisent le bus d'événements haute priorité (OptimizedEventBus)
+ * - Cette séparation permet d'optimiser les performances pour les événements MIDI critiques
  */
 class InputController {
 public:
@@ -58,22 +63,10 @@ public:
     void setNavigationEncoderCallback(std::function<void(EncoderId, int32_t, int8_t)> callback);
 
     /**
-     * @brief Définit le callback pour les encodeurs MIDI
-     * @param callback Fonction à appeler lors de la rotation d'un encodeur MIDI
-     */
-    void setMidiEncoderCallback(std::function<void(EncoderId, int32_t, int8_t)> callback);
-
-    /**
      * @brief Définit le callback pour les boutons d'encodeur de navigation
      * @param callback Fonction à appeler lors de l'appui sur un bouton d'encodeur de navigation
      */
     void setNavigationEncoderButtonCallback(std::function<void(EncoderId, bool)> callback);
-
-    /**
-     * @brief Définit le callback pour les boutons d'encodeur MIDI
-     * @param callback Fonction à appeler lors de l'appui sur un bouton d'encodeur MIDI
-     */
-    void setMidiEncoderButtonCallback(std::function<void(EncoderId, bool)> callback);
 
     /**
      * @brief Définit le callback pour les boutons de navigation
@@ -81,27 +74,12 @@ public:
      */
     void setNavigationButtonCallback(std::function<void(ButtonId, bool)> callback);
 
-    /**
-     * @brief Définit le callback pour les boutons MIDI
-     * @param callback Fonction à appeler lors de l'appui sur un bouton MIDI
-     */
-    void setMidiButtonCallback(std::function<void(ButtonId, bool)> callback);
-
 private:
     std::shared_ptr<NavigationConfigService> m_navigationConfig;
-    std::shared_ptr<UIController> m_uiController;
     std::shared_ptr<OptimizedEventBus> eventBus_;  // Bus d'événements optimisé
 
-    // Stockage des callbacks
+    // Stockage des callbacks de navigation uniquement
     std::function<void(EncoderId, int32_t, int8_t)> m_navigationEncoderCallback;
-    std::function<void(EncoderId, int32_t, int8_t)> m_midiEncoderCallback;
     std::function<void(EncoderId, bool)> m_navigationEncoderButtonCallback;
-    std::function<void(EncoderId, bool)> m_midiEncoderButtonCallback;
     std::function<void(ButtonId, bool)> m_navigationButtonCallback;
-    std::function<void(ButtonId, bool)> m_midiButtonCallback;
-
-    // Méthodes pour traiter les entrées via l'UIController
-    void handleNavigationEncoderTurn(EncoderId id, int32_t absolutePosition, int8_t relativeChange);
-    void handleNavigationEncoderButton(EncoderId id, bool pressed);
-    void handleNavigationButton(ButtonId id, bool pressed);
 };
