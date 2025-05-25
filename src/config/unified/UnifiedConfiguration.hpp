@@ -90,4 +90,9 @@ private:
      * @brief Génère un EncoderConfig depuis une définition
      */
     EncoderConfig toEncoderConfig(const ControlDefinition& def) const;
+    
+    /**
+     * @brief Crée un InputConfig pour le bouton d'un encodeur
+     */
+    InputConfig createEncoderButtonInputConfig(const ControlDefinition& def) const;
 };
