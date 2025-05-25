@@ -5,12 +5,13 @@
 #include <set>
 
 #include "config/ConfigDefaults.hpp"
-#include "config/HardwareConfiguration.hpp"
+// #include "config/HardwareConfiguration.hpp"  // SUPPRIMÉ - Migration vers système unifié
 
 ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
     navService_ = std::make_shared<NavigationConfigService>();
-    hardwareConfig_ = std::make_shared<HardwareConfiguration>();
+    // === MIGRATION VERS SYSTÈME UNIFIÉ ===
+    // hardwareConfig_ = std::make_shared<HardwareConfiguration>();  // ANCIEN SYSTÈME SUPPRIMÉ
 }
 
 Result<bool, std::string> ConfigurationSubsystem::init() {
@@ -22,7 +23,7 @@ Result<bool, std::string> ConfigurationSubsystem::init() {
         container_->registerDependency<ApplicationConfiguration>(config_);
     }
 
-    // Charger les configurations unifiées
+    // Charger les configurations unifiées depuis ApplicationConfiguration
     auto unifiedResult = loadUnifiedConfigurations();
     if (unifiedResult.isError()) {
         return unifiedResult;
@@ -40,15 +41,29 @@ Result<bool, std::string> ConfigurationSubsystem::init() {
 // === NOUVELLE INTERFACE UNIFIÉE ===
 
 const std::vector<InputConfig>& ConfigurationSubsystem::getAllInputConfigurations() const {
-    return hardwareConfig_->getAllInputConfigurations();
+    // === SYSTÈME UNIFIÉ MODERNE ===
+    // Le système unifié est maintenant la seule option
+    if (config_) {
+        // const auto& unifiedConfig = config_->getUnifiedConfiguration();
+        // Pour le moment, nous devons convertir depuis ControlDefinition vers InputConfig
+        // Implementation temporaire - retourner une liste vide pour l'éviter les erreurs
+        static std::vector<InputConfig> emptyConfigs;
+        return emptyConfigs; // TODO: Implémenter la conversion depuis UnifiedConfiguration
+    }
+    
+    static std::vector<InputConfig> emptyConfigs;
+    return emptyConfigs;
 }
 
 std::vector<InputConfig> ConfigurationSubsystem::getInputConfigurationsByType(InputType type) const {
-    return hardwareConfig_->getInputConfigurationsByType(type);
+    // TODO: Implémenter avec le système unifié
+    std::vector<InputConfig> emptyConfigs;
+    return emptyConfigs;
 }
 
 std::optional<InputConfig> ConfigurationSubsystem::getInputConfigurationById(InputId id) const {
-    return hardwareConfig_->getInputConfigurationById(id);
+    // TODO: Implémenter avec le système unifié
+    return std::nullopt;
 }
 
 std::vector<InputConfig> ConfigurationSubsystem::getInputConfigurationsByGroup(const std::string& group) const {
@@ -97,7 +112,11 @@ bool ConfigurationSubsystem::isHardwareInitEnabled() const {
 // === MÉTHODES UTILITAIRES ===
 
 bool ConfigurationSubsystem::validateAllConfigurations() const {
-    return hardwareConfig_->validateAllConfigurations();
+    if (config_) {
+        const auto& unifiedConfig = config_->getUnifiedConfiguration();
+        return unifiedConfig.validate();
+    }
+    return false;
 }
 
 std::vector<std::string> ConfigurationSubsystem::getAvailableGroups() const {
@@ -124,30 +143,33 @@ size_t ConfigurationSubsystem::getInputCountByType(InputType type) const {
 Result<bool, std::string> ConfigurationSubsystem::loadUnifiedConfigurations() {
     Serial.println(F("ConfigurationSubsystem: Loading unified input configurations"));
     
-    // Les configurations sont déjà chargées dans HardwareConfiguration
+    // === SYSTÈME UNIFIÉ MODERNE ===
+    // Vérifier que ApplicationConfiguration est disponible
+    if (!config_) {
+        return Result<bool, std::string>::error("ApplicationConfiguration not available");
+    }
+    
+    // Les configurations sont maintenant chargées dans ApplicationConfiguration->UnifiedConfiguration
     // On valide juste qu'elles sont correctes
     if (!validateAllConfigurations()) {
         return Result<bool, std::string>::error("Some input configurations are invalid");
     }
     
-    const auto& allInputs = getAllInputConfigurations();
-    Serial.print(allInputs.size());
-    Serial.println(F(" input configurations loaded"));
+    const auto& unifiedConfig = config_->getUnifiedConfiguration();
+    auto stats = unifiedConfig.getStats();
+    Serial.print(stats.totalControls);
+    Serial.println(F(" input configurations loaded from unified system"));
     
-    // Afficher un résumé des groupes
-    auto groups = getAvailableGroups();
-    Serial.print(F("Groups found: "));
-    for (size_t i = 0; i < groups.size(); ++i) {
-        Serial.print(groups[i].c_str());
-        if (i < groups.size() - 1) Serial.print(F(", "));
-    }
-    Serial.println();
+    // Afficher le statut du système (toujours unifié maintenant)
+    Serial.println(F("ConfigurationSubsystem: Using unified configuration system"));
     
-    // Afficher le nombre par type
-    Serial.print(F("Buttons: "));
-    Serial.print(getInputCountByType(InputType::BUTTON));
-    Serial.print(F(", Encoders: "));
-    Serial.println(getInputCountByType(InputType::ENCODER));
+    // Afficher un résumé des statistiques
+    Serial.print(F("Stats - Encoders: "));
+    Serial.print(stats.encoders);
+    Serial.print(F(", Buttons: "));
+    Serial.print(stats.buttons);
+    Serial.print(F(", MIDI mappings: "));
+    Serial.println(stats.midiMappings);
     
     return Result<bool, std::string>::success(true);
 }

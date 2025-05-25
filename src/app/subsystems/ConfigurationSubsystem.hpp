@@ -11,7 +11,8 @@
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/utils/Result.hpp"
 
-class HardwareConfiguration;
+// Forward declarations
+// class HardwareConfiguration;  // SUPPRIMÉ - Plus nécessaire avec le système unifié
 
 /**
  * @brief Sous-système de configuration
@@ -58,7 +59,7 @@ private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<ApplicationConfiguration> config_;
     std::shared_ptr<NavigationConfigService> navService_;
-    std::shared_ptr<HardwareConfiguration> hardwareConfig_;
+    // std::shared_ptr<HardwareConfiguration> hardwareConfig_;  // SUPPRIMÉ - Migration vers système unifié
 
     // Méthodes privées d'initialisation
     Result<bool, std::string> loadUnifiedConfigurations();

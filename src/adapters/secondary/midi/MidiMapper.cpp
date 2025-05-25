@@ -61,9 +61,16 @@ void MidiMapper::logDiagnostic(const char* format, ...) const {
 }
 
 bool MidiMapper::isNavigationControl(InputId controlId) const {
-    // Utiliser MappingConfiguration pour savoir si c'est un contrôle de navigation
-    static MappingConfiguration mappingConfig;
-    return mappingConfig.isNavigationControl(controlId);
+    // Vérification directe des contrôles de navigation connus
+    // (basé sur ConfigurationFactory - évite les dépendances)
+    switch (controlId) {
+        case 79:  // Encodeur de navigation
+        case 51:  // Bouton menu
+        case 52:  // Bouton OK
+            return true;
+        default:
+            return false;
+    }
 }
 
 //=============================================================================

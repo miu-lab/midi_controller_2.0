@@ -1,5 +1,6 @@
 #include "config/unified/ConfigurationFactory.hpp"
 #include "config/unified/ControlBuilder.hpp"
+#include <Arduino.h>  // Pour F() macro
 
 std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfiguration() {
     auto config = std::make_unique<UnifiedConfiguration>();

@@ -6,7 +6,7 @@
 
 #include "config/ConfigDefaults.hpp"
 #include "config/GlobalSettings.hpp"
-#include "config/MappingConfiguration.hpp"
+#include "core/domain/types.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/commands/midi/SendMidiCCCommand.hpp"
 #include "core/domain/commands/midi/SendMidiNoteCommand.hpp"

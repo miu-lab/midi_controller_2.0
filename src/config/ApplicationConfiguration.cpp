@@ -1,9 +1,23 @@
 #include "config/ApplicationConfiguration.hpp"
 
 #include <Arduino.h>
+#include "config/unified/UnifiedConfiguration.hpp"
+#include "config/unified/ConfigurationFactory.hpp"  // Pour la factory STL
 
-ApplicationConfiguration::ApplicationConfiguration()
-    : hardwareConfiguration(), mappingConfiguration() {
+ApplicationConfiguration::ApplicationConfiguration() {
+    // === INITIALISATION DU SYSTÈME UNIFIÉ MODERNE ===
+    
+    unifiedConfig_ = ConfigurationFactory::createDefaultConfiguration();
+    if (!unifiedConfig_) {
+        // En cas d'échec critique, impossible de continuer
+        Serial.println(F("ERREUR CRITIQUE: Impossible de créer la configuration unifiée!"));
+        return;
+    }
+    
+    // Affichage des statistiques (Serial peut ne pas être initialisé ici)
+    // Serial.println(F("ApplicationConfiguration: Système unifié initialisé"));
+    // Serial.print(F("Controls: "));
+    // Serial.println(unifiedConfig_->getStats().totalControls);
     // Initialisation des paramètres de performance
     performanceSettings = {ConfigDefaults::PERFORMANCE_MODE,
                            ConfigDefaults::MAX_UPDATE_TIME_US,
@@ -30,13 +44,11 @@ ApplicationConfiguration::ApplicationConfiguration()
     systemSettings = {ConfigDefaults::SERIAL_BAUD_RATE, ConfigDefaults::MAX_COMMAND_HISTORY};
 }
 
-const HardwareConfiguration& ApplicationConfiguration::getHardwareConfiguration() const {
-    return hardwareConfiguration;
-}
-
-const MappingConfiguration& ApplicationConfiguration::getMappingConfiguration() const {
-    return mappingConfiguration;
-}
+// === MÉTHODES LEGACY SUPPRIMÉES ===
+// const HardwareConfiguration& ApplicationConfiguration::getHardwareConfiguration() const
+// const MappingConfiguration& ApplicationConfiguration::getMappingConfiguration() const
+// void ApplicationConfiguration::enableLegacySystem()
+// bool ApplicationConfiguration::isUsingUnifiedSystem() const
 
 const ApplicationConfiguration::PerformanceSettings&
 ApplicationConfiguration::getPerformanceSettings() const {
@@ -180,3 +192,28 @@ void ApplicationConfiguration::notifyChange(const std::string& paramName) {
         }
     }
 }
+
+// === IMPLÉMENTATION DES NOUVELLES MÉTHODES POUR LE SYSTÈME UNIFIÉ ===
+
+const UnifiedConfiguration& ApplicationConfiguration::getUnifiedConfiguration() const {
+    if (unifiedConfig_) {
+        return *unifiedConfig_;
+    }
+    // Fallback - ne devrait jamais arriver mais pour sécurité
+    static UnifiedConfiguration emptyConfig;
+    return emptyConfig;
+}
+
+// === MÉTHODE SUPPRIMÉE - Système embarqué désactivé ===
+// const EmbeddedUnifiedConfiguration& ApplicationConfiguration::getEmbeddedConfiguration() const
+
+void ApplicationConfiguration::enableUnifiedSystem() {
+    // === MÉTHODE SIMPLIFIÉE ===
+    // Le système unifié est maintenant toujours actif
+    Serial.println(F("ApplicationConfiguration: Unified system is always active"));
+    notifyChange("configurationSystem");
+}
+
+// === MÉTHODES LEGACY SUPPRIMÉES (implémentation) ===
+// void ApplicationConfiguration::enableLegacySystem() - SUPPRIMÉ
+// bool ApplicationConfiguration::isUsingUnifiedSystem() - SUPPRIMÉ (toujours true)

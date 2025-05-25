@@ -5,8 +5,14 @@
 #include <vector>
 
 #include "config/ConfigDefaults.hpp"
-#include "config/HardwareConfiguration.hpp"
-#include "config/MappingConfiguration.hpp"
+// === INCLUDES LEGACY SUPPRIMÉS ===
+// #include "config/HardwareConfiguration.hpp"  // SUPPRIMÉ - Ancien système
+// #include "config/MappingConfiguration.hpp"   // SUPPRIMÉ - Ancien système
+// #include "config/embedded/EmbeddedConfig.hpp"  // SUPPRIMÉ - Système embarqué
+#include "config/unified/UnifiedConfiguration.hpp"  // Système unifié moderne
+
+// Forward declarations pour compatibilité
+class UnifiedConfiguration;
 
 /**
  * @brief Configuration centrale de l'application
@@ -83,17 +89,18 @@ public:
      */
     ApplicationConfiguration();
 
-    /**
-     * @brief Obtient la configuration matérielle
-     * @return Une référence à la configuration matérielle
-     */
-    const HardwareConfiguration& getHardwareConfiguration() const;
+    // === CONTRÔLE DE COPIE/MOUVEMENT ===
+    // ApplicationConfiguration ne peut pas être copiée (contient des unique_ptr)
+    ApplicationConfiguration(const ApplicationConfiguration&) = delete;
+    ApplicationConfiguration& operator=(const ApplicationConfiguration&) = delete;
 
-    /**
-     * @brief Obtient la configuration des mappings
-     * @return Une référence à la configuration des mappings
-     */
-    const MappingConfiguration& getMappingConfiguration() const;
+    // Mais peut être déplacée
+    ApplicationConfiguration(ApplicationConfiguration&&) = default;
+    ApplicationConfiguration& operator=(ApplicationConfiguration&&) = default;
+
+    // === MÉTHODES LEGACY SUPPRIMÉES ===
+    // const HardwareConfiguration& getHardwareConfiguration() const;  // SUPPRIMÉ - Pas utilisé
+    // const MappingConfiguration& getMappingConfiguration() const;    // SUPPRIMÉ - Pas utilisé
 
     /**
      * @brief Obtient les paramètres de performance
@@ -171,10 +178,37 @@ public:
      * @param callback Fonction à supprimer
      */
     void unregisterChangeCallback(const ChangeCallback& callback);
+    
+    // === NOUVELLES MÉTHODES POUR LE SYSTÈME UNIFIÉ ===
+    
+    /**
+     * @brief Accède au système de configuration unifié
+     * @return Référence vers la configuration unifiée
+     */
+    const UnifiedConfiguration& getUnifiedConfiguration() const;
+    
+    // === MÉTHODE SUPPRIMÉE - Système embarqué désactivé ===
+    // const EmbeddedUnifiedConfiguration& getEmbeddedConfiguration() const;
+    
+    /**
+     * @brief Active le mode système unifié (par défaut)
+     */
+    void enableUnifiedSystem();
+    
+    // === MÉTHODES LEGACY SUPPRIMÉES ===
+    // void enableLegacySystem();    // SUPPRIMÉ - Plus de système legacy
+    // bool isUsingUnifiedSystem() const;  // SUPPRIMÉ - Toujours true maintenant
 
 private:
-    HardwareConfiguration hardwareConfiguration;
-    MappingConfiguration mappingConfiguration;
+    // === SYSTÈME UNIFIÉ MODERNE ===
+    std::unique_ptr<UnifiedConfiguration> unifiedConfig_;
+    
+    // === DONNÉES LEGACY SUPPRIMÉES ===
+    // std::unique_ptr<HardwareConfiguration> generatedHwConfig_;  // SUPPRIMÉ - Plus nécessaire
+    // std::unique_ptr<MappingConfiguration> generatedMapConfig_;   // SUPPRIMÉ - Plus nécessaire
+    // bool useUnifiedSystem_ = true;                              // SUPPRIMÉ - Toujours true
+    // HardwareConfiguration legacyHardwareConfiguration;          // SUPPRIMÉ - Ancien système
+    // MappingConfiguration legacyMappingConfiguration;            // SUPPRIMÉ - Ancien système
 
     PerformanceSettings performanceSettings;
     UISettings uiSettings;

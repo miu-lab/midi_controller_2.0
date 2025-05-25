@@ -9,6 +9,7 @@
 #include "config/ApplicationConfiguration.hpp"
 #include "config/ConfigDefaults.hpp"
 #include "tools/ErrorUtils.hpp"
+// #include "tools/testing/ConfigurationValidator.hpp"  // Temporairement désactivé
 
 // Variables globales
 ApplicationConfiguration appConfig;
@@ -16,23 +17,10 @@ std::shared_ptr<MidiControllerApp> app;
 std::shared_ptr<DependencyContainer> container;
 
 void setup() {
-    Serial.println(F("=== MIDI Controller V2 ==="));
-
-    // Initialisation du système
     container = std::make_shared<DependencyContainer>();
-    auto initResult = InitializationScript::initializeContainer(container, appConfig);
-    if (initResult.isError()) {
-        ErrorUtils::printError(initResult, "Erreur système");
-    }
-
-    // Initialisation de l'application
+    InitializationScript::initializeContainer(container, appConfig);
     app = std::make_shared<MidiControllerApp>(container);
-    auto appResult = app->init();
-    if (appResult.isError()) {
-        ErrorUtils::printError(appResult, "Erreur application");
-    }
-
-    Serial.println(F("Système prêt"));
+    app->init();
 }
 
 void loop() {

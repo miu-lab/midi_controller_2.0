@@ -57,9 +57,14 @@ Result<bool, std::string> InitializationScript::initializeContainer(
 
 void InitializationScript::registerBaseServices(std::shared_ptr<DependencyContainer> container,
                                                 const ApplicationConfiguration& config) {
-    // Configuration de l'application
-    container->registerDependency<ApplicationConfiguration>(
-        std::make_shared<ApplicationConfiguration>(config));
+    // Configuration de l'application - Créer un shared_ptr vers la référence existante
+    // Note: On assume que config reste valide pendant la durée de vie du container
+    std::shared_ptr<ApplicationConfiguration> configPtr(
+        const_cast<ApplicationConfiguration*>(&config), 
+        [](ApplicationConfiguration*) {
+            // Custom deleter qui ne fait rien car on ne possède pas l'objet
+        });
+    container->registerDependency<ApplicationConfiguration>(configPtr);
 
     // Service de navigation
     container->registerDependency<NavigationConfigService>(
