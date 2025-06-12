@@ -33,7 +33,16 @@ Ili9341TgxDisplay::Ili9341TgxDisplay(const Config& config)
       currentTextSize_(1),
       currentCursorX_(0),
       currentCursorY_(0),
-      textWrap_(false) {}
+      textWrap_(false) {
+    Serial.println(F("Ili9341TgxDisplay: Constructor called"));
+    Serial.print(F("Ili9341TgxDisplay: internalBuffer_ = 0x"));
+    Serial.println((unsigned long)internalBuffer_, HEX);
+}
+
+Ili9341TgxDisplay::~Ili9341TgxDisplay() {
+    Serial.println(F("Ili9341TgxDisplay: Destructor called"));
+    // Destructeur explicite pour forcer la génération de la vtable
+}
 
 //=============================================================================
 // Initialisation
@@ -44,9 +53,16 @@ bool Ili9341TgxDisplay::init() {
         return true;
     }
 
-    Serial.println(F("ILI9341_TGX: Initializing display with TGX graphics..."));
-
-    // Créer le driver ILI9341_T4
+    pinMode(config_.cs_pin, OUTPUT);
+    pinMode(config_.dc_pin, OUTPUT);
+    if (config_.rst_pin != 255) {
+        pinMode(config_.rst_pin, OUTPUT);
+        // Reset de l'écran
+        digitalWrite(config_.rst_pin, LOW);
+        delay(10);
+        digitalWrite(config_.rst_pin, HIGH);
+        delay(100);
+    }
     tft_ = std::make_unique<ILI9341_T4::ILI9341Driver>(config_.cs_pin,
                                                        config_.dc_pin,
                                                        config_.sck_pin,
@@ -64,7 +80,8 @@ bool Ili9341TgxDisplay::init() {
 
     // Configuration selon le modèle fonctionnel
     tft_->setRotation(config_.rotation);
-    tft_->setFramebuffer(internalBuffer_);  // ⚠️ CRITIQUE !
+    tft_->setFramebuffer(internal_framebuffer);  // ⚠️ CRITIQUE !
+    tft_->update(internal_framebuffer);
 
     // Créer les diff buffers
     diff1_ = std::make_unique<ILI9341_T4::DiffBuffStatic<4096>>();
@@ -85,21 +102,14 @@ bool Ili9341TgxDisplay::init() {
         return false;
     }
 
-    // Test initial - effacer l'écran
+    // Test initial - plusieurs éléments visuels
     canvas_->fillScreen(tgx::RGB565_Black);
-    canvas_->drawCircle({120, 160}, 50, tgx::RGB565_White);
-    tft_->update(internalBuffer_);  // Utiliser internalBuffer pour update
+    // Format iBox2 : {minX, maxX, minY, maxY}
+    canvas_->drawLine({0, 0}, {239, 319}, tgx::RGB565_White);  // Ligne diagonale blanche
+    tft_->update(internalBuffer_);
+    delay(500);  // Attendre 500 ms pour voir le test
 
-    initialized_ = true;
-
-    Serial.print(F("ILI9341_TGX: Display initialized successfully ("));
-    uint16_t w, h;
-    getDimensions(w, h);
-    Serial.print(w);
-    Serial.print(F("x"));
-    Serial.print(h);
-    Serial.println(F(") with TGX acceleration"));
-
+    initialized_ = true;  // Marquer comme initialisé
     return true;
 }
 

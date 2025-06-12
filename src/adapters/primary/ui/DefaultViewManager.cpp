@@ -56,8 +56,8 @@ void DefaultViewManager::update() {
         // Serial.println(F("Checking splash screen completion..."));
         if (splashView_ && splashView_->isSplashScreenCompleted()) {
             Serial.println(F("DefaultViewManager: Splash completed, switching to ParameterFocus"));
-            // showHome();  // Vue par défaut
-            return;  // showHome() appelle déjà render()
+            showHome();  // Vue par défaut
+            return;      // showHome() appelle déjà render()
         }
     }
 

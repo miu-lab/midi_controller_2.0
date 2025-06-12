@@ -38,17 +38,6 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         if (!viewManager_->init()) {
             return Result<bool, std::string>::error("Failed to initialize ViewManager");
         }
-
-        // Créer la tâche d'affichage et l'écouteur d'événements
-        char buffer[80];
-        char temp[64];
-
-        // Construire "UISubsystem: Creating display task..."
-        FlashStrings::copy(temp, sizeof(temp), PFX_UI);
-        strcpy(buffer, temp);
-        FlashStrings::copy(temp, sizeof(temp), MSG_CREATING_TASK);
-        strcat(buffer, temp);
-        Serial.println(buffer);
         displayTask_ = std::make_shared<DisplayUpdateTask>(
             display_,
             TaskTiming::UI_MIN_PERIOD_MS);  // Utilise la constante globale pour le taux de
@@ -57,17 +46,7 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
                                           displayTask_->getIntervalMicros(),
                                           displayTask_->getPriority(),
                                           displayTask_->getName());
-        // Afficher "UISubsystem: Display task added with index X"
-        FlashStrings::copy(temp, sizeof(temp), PFX_UI);
-        strcpy(buffer, temp);
-        FlashStrings::copy(temp, sizeof(temp), MSG_TASK_ADDED);
-        strcat(buffer, temp);
-        Serial.print(buffer);
-        Serial.println(taskIndex);
-
-        // Forcer une mise à jour immédiate pour vérifier que l'écran fonctionne
         displayTask_->requestUpdate();
-        displayTask_->execute();  // Exécution directe pour tester
 
         // Créer et enregistrer l'écouteur d'événements d'affichage
         displayEventListener_ = std::make_unique<DisplayEventListener>(displayTask_);
@@ -86,12 +65,7 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
                            : F("FAILED"));
         Serial.print(F("Total event bus subscribers: "));
         Serial.println(EventBus::getInstance().getCount());
-        // Afficher "UISubsystem: Created and subscribed ViewManagerEventListener"
-        FlashStrings::copy(temp, sizeof(temp), PFX_UI);
-        strcpy(buffer, temp);
-        FlashStrings::copy(temp, sizeof(temp), MSG_VIEW_MANAGER);
-        strcat(buffer, temp);
-        Serial.println(buffer);
+        Serial.println(F("UISubsystem: Created and subscribed ViewManagerEventListener"));
 
         // Enregistrer le ViewManager dans le conteneur
         container_->registerImplementation<ViewManager, DefaultViewManager>(

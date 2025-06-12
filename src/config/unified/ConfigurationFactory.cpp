@@ -72,12 +72,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .build());
 
     // Encodeur 4
+    // NOTE: Pin A changée de 13 vers 25 pour éviter conflit avec SCK du SPI
     config->addControl(ControlBuilder(74, "encoder_4")
                            .withLabel("Enc 4")
                            .inGroup("MIDI")
                            .withDescription("Encodeur Enc 4")
                            .withDisplayOrder(4)
-                           .asEncoder(13, 14, 24)
+                           .asEncoder(25, 14, 24)  // Changé pin A de 13 vers 25
                            .withEncoderButton(41, 30)
                            .withAcceleration(true, 4)
                            .withMidiCC(4, 0, true)
@@ -137,6 +138,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .build());
 
     // === ENCODEUR DE NAVIGATION ===
+    // NOTE: Pins changées de 9,10 vers 4,5 pour éviter conflit avec l'écran (CS=9, DC=10)
 
     config->addControl(
         ControlBuilder(79, "nav_encoder")
@@ -144,7 +146,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
             .inGroup("Navigation")
             .withDescription("Encodeur Navigation")
             .withDisplayOrder(9)
-            .asEncoder(9, 10, 96)  // Higher resolution
+            .asEncoder(4, 5, 96)  // Changé de 9,10 vers 4,5 - Higher resolution
             .withEncoderButton(8, 30)
             .withSensitivity(1.5f)
             .withAcceleration(true, 4)

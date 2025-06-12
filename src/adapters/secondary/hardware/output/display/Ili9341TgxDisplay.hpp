@@ -43,7 +43,7 @@ public:
     /**
      * @brief Destructeur
      */
-    ~Ili9341TgxDisplay() override = default;
+    ~Ili9341TgxDisplay() override;
 
     // === INTERFACE DisplayPort ===
 

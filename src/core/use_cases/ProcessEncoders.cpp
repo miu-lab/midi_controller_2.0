@@ -34,7 +34,7 @@ void ProcessEncoders::update() {
         // Lire les valeurs actuelles
         int32_t absPos = encoder->getAbsolutePosition();
         int8_t delta = encoder->readDelta();
-        
+
         // Transmettre les rotations uniquement si delta est non nul
         // Note: Le filtrage supplémentaire et la limitation de taux sont gérés par MidiMapper
         if (delta != 0) {
@@ -46,13 +46,13 @@ void ProcessEncoders::update() {
                 DEBUG_ERROR("ProcessEncoders: NO HANDLER FOR ENCODER EVENTS!");
             }
         }
-        
+
         // Gérer les boutons d'encodeur (détecter uniquement les changements d'état)
         bool pressed = encoder->isPressed();
         if (pressed != lastPressed_[i]) {
             lastPressed_[i] = pressed;
-            
-            #ifndef PERFORMANCE_MODE
+
+#ifndef PERFORMANCE_MODE
             // Diagnostic pour le changement d'état du bouton d'encodeur
             char diagEvent[60];
             snprintf(diagEvent,
@@ -61,8 +61,8 @@ void ProcessEncoders::update() {
                      encoder->getId(),
                      pressed ? "pressé" : "relâché");
             DIAG_ON_EVENT(diagEvent);
-            #endif
-            
+#endif
+
             if (onEncoderButtonCallback_) {
                 onEncoderButtonCallback_(encoder->getId(), pressed);
             } else if (useInputController_) {

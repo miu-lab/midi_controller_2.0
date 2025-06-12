@@ -21,30 +21,40 @@ void SplashScreenView::update() {
 void SplashScreenView::render() {
     if (!active_) return;
     
+    // Dimensions pour ILI9341 : 240x320
+    const int screenWidth = 240;
+    const int screenHeight = 320;
+    
     // Dessiner le cadre
-    display_->drawRect(0, 0, 128, 64, false);
+    display_->drawRect(0, 0, screenWidth, screenHeight, false);
     
     // Titre centré en haut
     int titleWidth = title_.length() * 6; // Approximatif pour la police standard
-    int titleX = (128 - titleWidth) / 2;
-    display_->drawText(titleX, 15, title_.c_str());
+    int titleX = (screenWidth - titleWidth) / 2;
+    display_->drawText(titleX, 50, title_.c_str());
     
     // Sous-titre centré au milieu
     int subtitleWidth = subtitle_.length() * 6;
-    int subtitleX = (128 - subtitleWidth) / 2;
-    display_->drawText(subtitleX, 30, subtitle_.c_str());
+    int subtitleX = (screenWidth - subtitleWidth) / 2;
+    display_->drawText(subtitleX, 100, subtitle_.c_str());
     
     // Version en bas à droite
-    display_->drawText(85, 50, version_.c_str());
+    display_->drawText(screenWidth - 50, screenHeight - 30, version_.c_str());
 
     // Animation : afficher une barre de progression qui représente le temps écoulé
     unsigned long currentTime = millis();
     unsigned long elapsed = currentTime - startTime_;
     
     if (elapsed <= duration_) {
-        int progressWidth = map(elapsed, 0, duration_, 0, 108);
-        display_->drawRect(10, 45, progressWidth, 4, true); // Barre de progression remplie
-        display_->drawRect(10, 45, 108, 4, false); // Contour de la barre
+        // Calcul manuel du mapping car map() pourrait ne pas être disponible
+        int barWidth = screenWidth - 40; // Marge de 20 pixels de chaque côté
+        int progressWidth = (elapsed * barWidth) / duration_;
+        int barY = screenHeight - 80; // Position de la barre
+        
+        if (progressWidth > 0) {
+            display_->drawRect(20, barY, progressWidth, 10, true); // Barre de progression remplie
+        }
+        display_->drawRect(20, barY, barWidth, 10, false); // Contour de la barre
     }
 }
 
