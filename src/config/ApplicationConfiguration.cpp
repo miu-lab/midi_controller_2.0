@@ -1,19 +1,20 @@
 #include "config/ApplicationConfiguration.hpp"
 
 #include <Arduino.h>
-#include "config/unified/UnifiedConfiguration.hpp"
+
 #include "config/unified/ConfigurationFactory.hpp"  // Pour la factory STL
+#include "config/unified/UnifiedConfiguration.hpp"
 
 ApplicationConfiguration::ApplicationConfiguration() {
     // === INITIALISATION DU SYSTÈME UNIFIÉ MODERNE ===
-    
+
     unifiedConfig_ = ConfigurationFactory::createDefaultConfiguration();
     if (!unifiedConfig_) {
         // En cas d'échec critique, impossible de continuer
         Serial.println(F("ERREUR CRITIQUE: Impossible de créer la configuration unifiée!"));
         return;
     }
-    
+
     // Affichage des statistiques (Serial peut ne pas être initialisé ici)
     // Serial.println(F("ApplicationConfiguration: Système unifié initialisé"));
     // Serial.print(F("Controls: "));
@@ -43,12 +44,6 @@ ApplicationConfiguration::ApplicationConfiguration() {
     // Initialisation des paramètres système
     systemSettings = {ConfigDefaults::SERIAL_BAUD_RATE, ConfigDefaults::MAX_COMMAND_HISTORY};
 }
-
-// === MÉTHODES LEGACY SUPPRIMÉES ===
-// const HardwareConfiguration& ApplicationConfiguration::getHardwareConfiguration() const
-// const MappingConfiguration& ApplicationConfiguration::getMappingConfiguration() const
-// void ApplicationConfiguration::enableLegacySystem()
-// bool ApplicationConfiguration::isUsingUnifiedSystem() const
 
 const ApplicationConfiguration::PerformanceSettings&
 ApplicationConfiguration::getPerformanceSettings() const {
@@ -204,16 +199,7 @@ const UnifiedConfiguration& ApplicationConfiguration::getUnifiedConfiguration() 
     return emptyConfig;
 }
 
-// === MÉTHODE SUPPRIMÉE - Système embarqué désactivé ===
-// const EmbeddedUnifiedConfiguration& ApplicationConfiguration::getEmbeddedConfiguration() const
-
 void ApplicationConfiguration::enableUnifiedSystem() {
-    // === MÉTHODE SIMPLIFIÉE ===
-    // Le système unifié est maintenant toujours actif
     Serial.println(F("ApplicationConfiguration: Unified system is always active"));
     notifyChange("configurationSystem");
 }
-
-// === MÉTHODES LEGACY SUPPRIMÉES (implémentation) ===
-// void ApplicationConfiguration::enableLegacySystem() - SUPPRIMÉ
-// bool ApplicationConfiguration::isUsingUnifiedSystem() - SUPPRIMÉ (toujours true)

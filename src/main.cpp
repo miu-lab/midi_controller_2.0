@@ -9,9 +9,7 @@
 #include "config/ApplicationConfiguration.hpp"
 #include "config/ConfigDefaults.hpp"
 #include "tools/ErrorUtils.hpp"
-// #include "tools/testing/ConfigurationValidator.hpp"  // Temporairement désactivé
 
-// Variables globales
 ApplicationConfiguration appConfig;
 std::shared_ptr<MidiControllerApp> app;
 std::shared_ptr<DependencyContainer> container;

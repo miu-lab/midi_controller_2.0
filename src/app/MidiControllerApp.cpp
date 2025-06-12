@@ -49,11 +49,6 @@ void MidiControllerApp::update() {
         m_inputSystem->update();
     }
 
-    // // Mettre à jour le sous-système MIDI
-    // if (m_midiSystem) {
-    //     m_midiSystem->update();
-    // }
-
     // Mettre à jour le sous-système UI
     if (m_uiSystem) {
         m_uiSystem->update();
