@@ -2,7 +2,6 @@
 
 #include <math.h>
 
-#include "adapters/secondary/hardware/output/display/Ssd1306Display.hpp"
 #include "core/utils/AppStrings.hpp"
 
 ParameterFocusView::ParameterFocusView(std::shared_ptr<DisplayPort> display)
@@ -128,14 +127,10 @@ void ParameterFocusView::drawLabels() {
 }
 
 void ParameterFocusView::drawParameterCircle() {
-    auto* ssd1306Display = static_cast<Ssd1306Display*>(display_.get());
+    // auto* ssd1306Display = static_cast<Ssd1306Display*>(display_.get());
 
     // Dessiner le cercle de base (contour)
-    ssd1306Display->drawCircle(CIRCLE_CENTER_X,
-                               CIRCLE_CENTER_Y,
-                               CIRCLE_RADIUS,
-                               false,
-                               SSD1306_WHITE);
+    // ssd1306Display->drawCircle(CIRCLE_CENTER_X, CIRCLE_CENTER_Y, CIRCLE_RADIUS, false, 1);
 
     // Calculer et dessiner le remplissage
     float fillRatio = calculateFillRatio();
@@ -153,38 +148,32 @@ void ParameterFocusView::drawParameterName() {
 
 void ParameterFocusView::drawFilledCircleArc(int centerX, int centerY, int radius,
                                              float fillRatio) {
-    auto* ssd1306Display = static_cast<Ssd1306Display*>(display_.get());
+    // auto* ssd1306Display = static_cast<Ssd1306Display*>(display_.get());
 
-    if (fillRatio <= 0.0f) {
-        return;  // Rien à dessiner
-    }
+    // if (fillRatio <= 0.0f) {
+    //     return;  // Rien à dessiner
+    // }
 
-    // Limiter le ratio entre 0 et 1
-    fillRatio = constrain(fillRatio, 0.0f, 1.0f);
+    // // Limiter le ratio entre 0 et 1
+    // fillRatio = constrain(fillRatio, 0.0f, 1.0f);
 
-    // Calculer l'angle final basé sur le ratio (cercle complet = 360°)
-    // Commencer à -90° (haut du cercle) et aller dans le sens horaire
-    int startAngle = -225;
-    int sweepAngle = (int)(fillRatio * 270.0f);
-    int endAngle = startAngle + sweepAngle;
+    // // Calculer l'angle final basé sur le ratio (cercle complet = 360°)
+    // // Commencer à -90° (haut du cercle) et aller dans le sens horaire
+    // int startAngle = -225;
+    // int sweepAngle = (int)(fillRatio * 270.0f);
+    // int endAngle = startAngle + sweepAngle;
 
-    // Utiliser la fonction drawArc existante avec plusieurs passes pour créer un effet de
-    // remplissage
-    for (int r = radius - CIRCLE_THICKNESS; r < radius; r += CIRCLE_THICKNESS) {
-        ssd1306Display
-            ->drawArc(centerX, centerY, r, startAngle, endAngle, SSD1306_WHITE, CIRCLE_THICKNESS);
-    }
+    // // Utiliser la fonction drawArc existante avec plusieurs passes pour créer un effet de
+    // // remplissage
+    // for (int r = radius - CIRCLE_THICKNESS; r < radius; r += CIRCLE_THICKNESS) {
+    //     ssd1306Display->drawArc(centerX, centerY, r, startAngle, endAngle, 1, CIRCLE_THICKNESS);
+    // }
 
-    // Ajouter un arc plus épais sur le bord pour définir clairement la zone remplie
-    if (sweepAngle > 0) {
-        ssd1306Display->drawArc(centerX,
-                                centerY,
-                                radius,
-                                startAngle,
-                                endAngle,
-                                SSD1306_WHITE,
-                                CIRCLE_THICKNESS);
-    }
+    // // Ajouter un arc plus épais sur le bord pour définir clairement la zone remplie
+    // if (sweepAngle > 0) {
+    //     ssd1306Display
+    //         ->drawArc(centerX, centerY, radius, startAngle, endAngle, 1, CIRCLE_THICKNESS);
+    // }
 }
 
 float ParameterFocusView::calculateFillRatio() const {

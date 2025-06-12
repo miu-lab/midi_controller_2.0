@@ -3,7 +3,7 @@
 #include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "adapters/primary/ui/DisplayEventListener.hpp"
 #include "adapters/primary/ui/ViewManagerEventListener.hpp"
-#include "adapters/secondary/hardware/output/display/Ssd1306Display.hpp"
+
 #include "config/debug/TaskSchedulerConfig.hpp"
 #include "core/tasks/DisplayUpdateTask.hpp"
 #include "core/utils/AppStrings.hpp"
@@ -25,30 +25,10 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         return Result<bool, std::string>::error("Failed to resolve IConfiguration");
     }
 
-    // Essayer de récupérer un displayPort existant
+    // Récupérer le DisplayPort qui doit avoir été initialisé par InitializationScript
     display_ = container_->resolve<DisplayPort>();
-
     if (!display_) {
-        // Aucun DisplayPort disponible, créer un SSD1306Display
-        auto ssd1306Display = std::make_shared<Ssd1306Display>();
-
-        // Initialiser l'écran SSD1306
-        if (!ssd1306Display->init()) {
-            // Si l'initialisation échoue, créer un MockDisplay pour les tests
-            std::cout << "SSD1306 initialization failed, creating MockDisplay instead" << std::endl;
-
-            if (!display_) {
-                return Result<bool, std::string>::error("Failed to create display");
-            }
-
-        } else {
-            // SSD1306 initialisé avec succès
-            display_ = ssd1306Display;
-
-            // Enregistrer le SSD1306Display dans le conteneur
-            container_->registerImplementation<DisplayPort, Ssd1306Display>(
-                std::static_pointer_cast<Ssd1306Display>(display_));
-        }
+        return Result<bool, std::string>::error("Display not initialized by InitializationScript");
     }
 
     // Créer le gestionnaire de vues si l'UI complète est activée

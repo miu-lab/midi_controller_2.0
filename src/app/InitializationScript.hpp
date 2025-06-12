@@ -12,7 +12,7 @@
 class NavigationConfigService;
 class CommandManager;
 class TeensyUsbMidiOut;
-class Ssd1306Display;
+class Ili9341TgxDisplay;
 class ProfileManager;
 class ConfigurationSubsystem;
 class InputController;

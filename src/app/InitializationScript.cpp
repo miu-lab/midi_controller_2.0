@@ -2,7 +2,7 @@
 
 // Inclusions nécessaires pour l'implémentation
 #include "adapters/primary/ui/DefaultViewManager.hpp"
-#include "adapters/secondary/hardware/output/display/Ssd1306Display.hpp"
+#include "adapters/secondary/hardware/output/display/Ili9341TgxDisplay.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
 #include "app/services/NavigationConfigService.hpp"
@@ -80,9 +80,9 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     container->registerDependency<MidiOutputPort>(std::make_shared<TeensyUsbMidiOut>());
 
     // Écran
-    auto display = std::make_shared<Ssd1306Display>();
+    auto display = std::make_shared<Ili9341TgxDisplay>();
     if (!display->init()) {
-        return Result<bool, std::string>::error("Échec d'initialisation de l'écran SSD1306");
+        return Result<bool, std::string>::error("Échec d'initialisation de l'écran ILI9341_TGX");
     }
 
     container->registerDependency<DisplayPort>(display);

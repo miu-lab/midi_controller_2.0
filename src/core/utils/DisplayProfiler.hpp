@@ -12,6 +12,14 @@
 class DisplayProfiler {
 public:
     /**
+     * @brief Enregistre directement une durée de mise à jour
+     * @param duration Durée en microsecondes
+     */
+    void recordUpdate(unsigned long duration) {
+        updateHistory(duration);
+    }
+    
+    /**
      * @brief Commence une mesure de temps
      */
     void startMeasurement() {
