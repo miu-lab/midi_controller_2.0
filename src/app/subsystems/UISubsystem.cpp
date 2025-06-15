@@ -42,10 +42,10 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
             display_,
             TaskTiming::UI_MIN_PERIOD_MS);  // Utilise la constante globale pour le taux de
                                             // rafraîchissement
-        int taskIndex = scheduler.addTask(displayTask_->getTaskFunction(),
-                                          displayTask_->getIntervalMicros(),
-                                          displayTask_->getPriority(),
-                                          displayTask_->getName());
+        scheduler.addTask(displayTask_->getTaskFunction(),
+                          displayTask_->getIntervalMicros(),
+                          displayTask_->getPriority(),
+                          displayTask_->getName());
         displayTask_->requestUpdate();
 
         // Créer et enregistrer l'écouteur d'événements d'affichage

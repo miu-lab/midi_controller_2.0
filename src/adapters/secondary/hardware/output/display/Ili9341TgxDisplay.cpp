@@ -33,7 +33,9 @@ Ili9341TgxDisplay::Ili9341TgxDisplay(const Config& config)
       currentTextSize_(1),
       currentCursorX_(0),
       currentCursorY_(0),
-      textWrap_(false) {
+      textWrap_(false),
+      currentFont_(&font_tgx_Arial_14),
+      currentFontSize_(FontSize::NORMAL) {
     Serial.println(F("Ili9341TgxDisplay: Constructor called"));
     Serial.print(F("Ili9341TgxDisplay: internalBuffer_ = 0x"));
     Serial.println((unsigned long)internalBuffer_, HEX);
@@ -131,35 +133,21 @@ void Ili9341TgxDisplay::clear() {
 }
 
 void Ili9341TgxDisplay::drawText(int x, int y, const char* text) {
-    if (!initialized_ || !canvas_ || !text) return;
+    if (!initialized_ || !canvas_ || !text || !currentFont_) return;
 
-    // TGX nécessite une font - pour simplifier, on dessine pixel par pixel
-    // ou on utilise une approche alternative
-    // Pour l'instant, utilisons drawPixel pour dessiner du texte basique
-    int startX = x;
-    int currentX = x;
-    int currentY = y;
-
-    // Dessin simple lettre par lettre (approximation)
-    for (const char* p = text; *p; p++) {
-        char c = *p;
-        if (c == '\n') {
-            currentX = startX;
-            currentY += 12;  // Hauteur approximative
-            continue;
-        }
-
-        // Dessiner un rectangle simple pour chaque caractère (placeholder)
-        tgx::iBox2 charRect = {currentX, currentX + 5, currentY, currentY + 7};
-        canvas_->drawRect(charRect, currentTextColor_);
-
-        currentX += 6;  // Largeur approximative
-    }
+    // Utiliser l'API TGX native pour dessiner du texte avec la fonte courante
+    tgx::iVec2 position(x, y);
+    
+    // Dessiner le texte avec la fonte TGX
+    canvas_->drawText(text, position, *currentFont_, currentTextColor_);
 
     // Mettre à jour la position du curseur si textWrap activé
     if (textWrap_) {
-        currentCursorX_ = currentX;
-        currentCursorY_ = currentY;
+        // Calculer la nouvelle position du curseur
+        tgx::iVec2 position(x, y);
+        auto bbox = canvas_->measureText(text, position, *currentFont_);
+        currentCursorX_ = x + bbox.lx();
+        currentCursorY_ = y;
     }
 }
 
@@ -243,17 +231,18 @@ void Ili9341TgxDisplay::setCursor(int16_t x, int16_t y) {
 }
 
 void Ili9341TgxDisplay::getTextBounds(const char* text, uint16_t* w, uint16_t* h) {
-    if (!initialized_ || !text || !w || !h) {
+    if (!initialized_ || !text || !w || !h || !currentFont_) {
         if (w) *w = 0;
         if (h) *h = 0;
         return;
     }
 
-    // Estimation basique basée sur la taille du texte
-    // TGX a des méthodes plus précises mais nécessitent une font spécifique
-    int len = strlen(text);
-    *w = len * currentTextSize_ * 6;  // Approximation
-    *h = currentTextSize_ * 8;        // Approximation
+    // Utiliser la mesure précise de TGX
+    tgx::iVec2 position(0, 0);  // Position de référence pour la mesure
+    auto bbox = canvas_->measureText(text, position, *currentFont_);
+    
+    *w = bbox.lx();  // Largeur du texte
+    *h = bbox.ly();  // Hauteur du texte
 }
 
 //=============================================================================
@@ -294,6 +283,21 @@ void Ili9341TgxDisplay::getPerformanceStats(unsigned long& avgTime, unsigned lon
     avgTime = profiler_.getAverageUpdateTime();
     maxTime = profiler_.getMaxUpdateTime();
     minTime = profiler_.getMinUpdateTime();
+}
+
+//=============================================================================
+// Gestion des fontes TGX
+//=============================================================================
+
+void Ili9341TgxDisplay::setFont(FontSize size) {
+    if (!initialized_) return;
+    
+    currentFontSize_ = size;
+    currentFont_ = getFontForSize(size);
+}
+
+const ILI9341_t3_font_t* Ili9341TgxDisplay::getCurrentFont() const {
+    return currentFont_;
 }
 
 //=============================================================================
@@ -375,24 +379,18 @@ tgx::RGB565 Ili9341TgxDisplay::convertToTgxColor(uint16_t color) const {
     return tgx::RGB565(color);
 }
 
-const void* Ili9341TgxDisplay::getFontForSize(int size) const {
-    // Retourner des fonts TGX selon la taille demandée
-    // Note: Nécessite l'inclusion de fonts spécifiques de tgx-font
-    // Pour l'instant, retourner nullptr et utiliser la font par défaut
-
+const ILI9341_t3_font_t* Ili9341TgxDisplay::getFontForSize(FontSize size) const {
+    // Retourner les fontes TGX selon la taille FontSize demandée
     switch (size) {
-    case 1:
-        // return &font_tgx_Arial_8; // Si disponible
-        break;
-    case 2:
-        // return &font_tgx_Arial_12; // Si disponible
-        break;
-    case 3:
-        // return &font_tgx_Arial_16; // Si disponible
-        break;
+    case FontSize::SMALL:
+        return &font_tgx_Arial_10;  // 10pt pour infos secondaires
+    case FontSize::NORMAL:
+        return &font_tgx_Arial_14;  // 14pt pour texte standard
+    case FontSize::LARGE:
+        return &font_tgx_Arial_20;  // 20pt pour valeurs importantes
+    case FontSize::TITLE:
+        return &font_tgx_Arial_24;  // 24pt pour titres
     default:
-        break;
+        return &font_tgx_Arial_14;  // Fonte par défaut
     }
-
-    return nullptr;  // Utiliser font par défaut TGX
 }

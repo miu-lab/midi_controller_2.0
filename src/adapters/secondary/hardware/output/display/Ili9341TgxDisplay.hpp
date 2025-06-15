@@ -4,6 +4,10 @@
 #include <ILI9341_T4.h>
 #include <tgx.h>
 
+// Fontes TGX pour le rendu de texte
+#include <font_tgx_Arial.h>
+#include <font_tgx_OpenSans.h>
+
 #include <memory>
 
 #include "core/ports/output/DisplayPort.hpp"
@@ -20,6 +24,14 @@
  */
 class Ili9341TgxDisplay : public DisplayPort {
 public:
+    //@brief Énumération pour les tailles de fonte standard
+    enum class FontSize {
+        SMALL,   // 8-10px pour infos secondaires
+        NORMAL,  // 12-14px pour texte standard
+        LARGE,   // 16-20px pour valeurs importantes
+        TITLE    // 24px+ pour titres
+    };
+
     /**
      * @brief Configuration matérielle pour ILI9341
      */
@@ -66,6 +78,20 @@ public:
     void getTextBounds(const char* text, uint16_t* w, uint16_t* h) override;
     void drawCenteredText(int x, int y, const char* text) override;
     void drawFormattedText(int x, int y, const char* format, ...) override;
+
+    // === GESTION DES FONTES ===
+    
+    /**
+     * @brief Définit la fonte à utiliser
+     * @param size Taille de fonte standard
+     */
+    void setFont(FontSize size);
+    
+    /**
+     * @brief Obtient la fonte TGX courante
+     * @return Pointeur vers la fonte TGX
+     */
+    const ILI9341_t3_font_t* getCurrentFont() const;
 
     // === IDENTIFICATION ===
 
@@ -148,6 +174,10 @@ private:
     int currentTextSize_;
     int currentCursorX_, currentCursorY_;
     bool textWrap_;
+    
+    // Gestion des fontes TGX
+    const ILI9341_t3_font_t* currentFont_;
+    FontSize currentFontSize_;
 
     // Performance tracking
     DisplayProfiler profiler_;
@@ -183,7 +213,7 @@ private:
     void updateDimensions();
 
     /**
-     * @brief Obtient la font TGX selon la taille
+     * @brief Obtient la fonte TGX selon la taille FontSize
      */
-    const void* getFontForSize(int size) const;
+    const ILI9341_t3_font_t* getFontForSize(FontSize size) const;
 };
