@@ -39,7 +39,7 @@ void SplashScreenView::render() {
     display_->drawText(subtitleX, 100, subtitle_.c_str());
     
     // Version en bas à droite
-    display_->drawText(screenWidth - 50, screenHeight - 30, version_.c_str());
+    display_->drawText(screenWidth - 30, screenHeight - 30, version_.c_str());
 
     // Animation : afficher une barre de progression qui représente le temps écoulé
     unsigned long currentTime = millis();
