@@ -2,7 +2,7 @@
 
 // Inclusions nécessaires pour l'implémentation
 #include "adapters/primary/ui/DefaultViewManager.hpp"
-#include "adapters/secondary/hardware/output/display/Ili9341TgxDisplay.hpp"
+#include "adapters/secondary/hardware/output/display/Ili9341LvglDisplay.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
 #include "app/services/NavigationConfigService.hpp"
@@ -79,10 +79,10 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     // MIDI Out
     container->registerDependency<MidiOutputPort>(std::make_shared<TeensyUsbMidiOut>());
 
-    // Écran
-    auto display = std::make_shared<Ili9341TgxDisplay>();
+    // Écran LVGL
+    auto display = std::make_shared<Ili9341LvglDisplay>();
     if (!display->init()) {
-        return Result<bool, std::string>::error("Échec d'initialisation de l'écran ILI9341_TGX");
+        return Result<bool, std::string>::error("Échec d'initialisation de l'écran ILI9341_LVGL");
     }
 
     container->registerDependency<DisplayPort>(display);
@@ -153,7 +153,7 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
         if (result.isError()) {
             // Convertir le std::string en const char* pour la concaténation Arduino
             std::string errorMsg = *(result.error());
-            char msgBuffer[256];
+            char msgBuffer[128];
             snprintf(msgBuffer,
                      sizeof(msgBuffer),
                      "Échec d'initialisation du sous-système %s: %s",
