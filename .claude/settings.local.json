@@ -5,7 +5,8 @@
       "Bash(true)",
       "Bash(rg:*)",
       "Bash(mv:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }
