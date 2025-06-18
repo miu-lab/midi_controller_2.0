@@ -35,12 +35,7 @@ Ili9341LvglDisplay::Ili9341LvglDisplay(const Config& config)
       framebuffer_(main_framebuffer),
       display_(nullptr),
       lvgl_buf1_(lvgl_buffer1),
-      lvgl_buf2_(lvgl_buffer2),
-      currentTextColor_(1),     // Blanc par défaut
-      currentTextSize_(1),
-      currentCursorX_(0),
-      currentCursorY_(0),
-      textWrap_(false) {
+      lvgl_buf2_(lvgl_buffer2) {
     Serial.println(F("Ili9341LvglDisplay: Constructor called"));
     Serial.print(F("Ili9341LvglDisplay: framebuffer_ = 0x"));
     Serial.println((unsigned long)framebuffer_, HEX);
@@ -118,12 +113,19 @@ bool Ili9341LvglDisplay::init() {
         return false;
     }
 
-    // Test initial - écran noir
-    clear();
-    update();
+    // Test initial - effacer l'écran
+    lv_obj_t* screen = lv_screen_active();
+    if (screen) {
+        lv_obj_clean(screen);
+    }
+    lv_timer_handler(); // Forcer un rendu LVGL
 
     Serial.println(F("ILI9341_LVGL: Initialization complete"));
     initialized_ = true;
+    
+    // DEBUG: Afficher diagnostics mémoire
+    debugMemory();
+    
     return true;
 }
 
@@ -206,209 +208,43 @@ Ili9341LvglDisplay* Ili9341LvglDisplay::getInstance(lv_display_t* disp) {
 }
 
 //=============================================================================
-// Interface DisplayPort - Méthodes de base
+// Méthodes test et debug (temporaires Phase 1)
 //=============================================================================
 
-void Ili9341LvglDisplay::clear() {
-    if (!initialized_ || !display_) return;
-
-    unsigned long startTime = micros();
-
-    // Effacer l'écran LVGL
-    lv_obj_t* screen = lv_screen_active();
-    if (screen) {
-        lv_obj_clean(screen);
-    }
-
-    // Reset curseur
-    currentCursorX_ = 0;
-    currentCursorY_ = 0;
-
-    unsigned long endTime = micros();
-    profiler_.recordUpdate(endTime - startTime);
-}
-
-void Ili9341LvglDisplay::drawText(int x, int y, const char* text) {
-    if (!initialized_ || !display_ || !text) return;
-
-    // Créer un label LVGL
-    lv_obj_t* label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, text);
-    lv_obj_set_pos(label, x, y);
-
-    // Appliquer la couleur actuelle
-    if (currentTextColor_ == 0) {
-        lv_obj_set_style_text_color(label, lv_color_black(), 0);
-    } else {
-        lv_obj_set_style_text_color(label, lv_color_white(), 0);
-    }
-
-    // Mettre à jour la position du curseur
-    currentCursorX_ = x;
-    currentCursorY_ = y;
-}
-
-void Ili9341LvglDisplay::drawLine(int x0, int y0, int x1, int y1) {
-    if (!initialized_ || !display_) return;
-
-    // Créer une ligne LVGL
-    lv_obj_t* line_obj = lv_line_create(lv_screen_active());
+void Ili9341LvglDisplay::debugMemory() const {
+    Serial.println(F("=== DEBUG MEMORY ==="));
+    Serial.print(F("Framebuffer (240x320): 0x")); Serial.println((uint32_t)framebuffer_, HEX);
+    Serial.print(F("Framebuffer size: ")); Serial.println(240 * 320 * 2); // 153,600 bytes
     
-    static lv_point_precise_t line_points[] = {{0, 0}, {0, 0}};
-    line_points[0].x = x0;
-    line_points[0].y = y0;
-    line_points[1].x = x1;
-    line_points[1].y = y1;
+    Serial.print(F("LVGL buf1 (40 lines): 0x")); Serial.println((uint32_t)lvgl_buf1_, HEX);
+    Serial.print(F("LVGL buf2 (40 lines): 0x")); Serial.println((uint32_t)lvgl_buf2_, HEX);
+    Serial.print(F("LVGL buffer size each: ")); Serial.println(240 * 40 * 2); // 19,200 bytes each
     
-    lv_line_set_points(line_obj, line_points, 2);
+    Serial.print(F("Diff buf1: 0x")); Serial.println((uint32_t)diff1_.get(), HEX);
+    Serial.print(F("Diff buf2: 0x")); Serial.println((uint32_t)diff2_.get(), HEX);
     
-    // Couleur de la ligne
-    if (currentTextColor_ == 0) {
-        lv_obj_set_style_line_color(line_obj, lv_color_black(), 0);
-    } else {
-        lv_obj_set_style_line_color(line_obj, lv_color_white(), 0);
-    }
-}
-
-void Ili9341LvglDisplay::drawRect(int x, int y, int width, int height, bool fill) {
-    if (!initialized_ || !display_) return;
-
-    // Créer un rectangle LVGL
-    lv_obj_t* rect = lv_obj_create(lv_screen_active());
-    lv_obj_set_pos(rect, x, y);
-    lv_obj_set_size(rect, width, height);
-
-    if (fill) {
-        // Rectangle rempli
-        if (currentTextColor_ == 0) {
-            lv_obj_set_style_bg_color(rect, lv_color_black(), 0);
-        } else {
-            lv_obj_set_style_bg_color(rect, lv_color_white(), 0);
-        }
-        lv_obj_set_style_bg_opa(rect, LV_OPA_COVER, 0);
-    } else {
-        // Rectangle vide (contour seulement)
-        lv_obj_set_style_bg_opa(rect, LV_OPA_TRANSP, 0);
-        lv_obj_set_style_border_width(rect, 1, 0);
-        if (currentTextColor_ == 0) {
-            lv_obj_set_style_border_color(rect, lv_color_black(), 0);
-        } else {
-            lv_obj_set_style_border_color(rect, lv_color_white(), 0);
-        }
-    }
-}
-
-void Ili9341LvglDisplay::drawCircle(int x, int y, int radius, bool fill) {
-    if (!initialized_ || !display_) return;
-
-    // Créer un cercle LVGL avec arc
-    lv_obj_t* circle = lv_arc_create(lv_screen_active());
-    lv_obj_set_pos(circle, x - radius, y - radius);
-    lv_obj_set_size(circle, radius * 2, radius * 2);
+    Serial.print(F("Display initialized: ")); Serial.println(initialized_);
+    Serial.print(F("LVGL display: 0x")); Serial.println((uint32_t)display_, HEX);
     
-    // Configuration de l'arc pour faire un cercle complet
-    lv_arc_set_angles(circle, 0, 360);
-    lv_arc_set_bg_angles(circle, 0, 360);
+    // Vérifier si c'est bien en DMAMEM (addresses 0x2020xxxx pour Teensy 4.1)
+    bool fb_in_dmamem = ((uint32_t)framebuffer_ >= 0x20200000) && ((uint32_t)framebuffer_ < 0x20280000);
+    bool buf1_in_dmamem = ((uint32_t)lvgl_buf1_ >= 0x20200000) && ((uint32_t)lvgl_buf1_ < 0x20280000);
+    bool buf2_in_dmamem = ((uint32_t)lvgl_buf2_ >= 0x20200000) && ((uint32_t)lvgl_buf2_ < 0x20280000);
     
-    if (fill) {
-        lv_obj_set_style_arc_width(circle, radius, 0);
-    } else {
-        lv_obj_set_style_arc_width(circle, 1, 0);
-    }
+    Serial.print(F("Framebuffer in DMAMEM: ")); Serial.println(fb_in_dmamem ? "YES" : "NO");
+    Serial.print(F("LVGL buf1 in DMAMEM: ")); Serial.println(buf1_in_dmamem ? "YES" : "NO");
+    Serial.print(F("LVGL buf2 in DMAMEM: ")); Serial.println(buf2_in_dmamem ? "YES" : "NO");
     
-    // Couleur
-    if (currentTextColor_ == 0) {
-        lv_obj_set_style_arc_color(circle, lv_color_black(), 0);
-    } else {
-        lv_obj_set_style_arc_color(circle, lv_color_white(), 0);
-    }
-}
-
-void Ili9341LvglDisplay::update() {
-    if (!initialized_ || !tft_) return;
-
-    unsigned long startTime = micros();
-
-    // LVGL se charge automatiquement du rendu via les callbacks
-    // On déclenche juste la boucle de traitement LVGL
-    lv_timer_handler();
-
-    unsigned long endTime = micros();
-    profiler_.recordUpdate(endTime - startTime);
+    // Total DMAMEM utilisé
+    uint32_t total_dmamem = (240 * 320 * 2) + (240 * 40 * 2) + (240 * 40 * 2) + 4096 + 4096;
+    Serial.print(F("Total DMAMEM used: ")); Serial.println(total_dmamem);
+    Serial.print(F("DMAMEM available on T4.1: ")); Serial.println(524288); // 512KB
+    
+    Serial.println(F("=================="));
 }
 
 //=============================================================================
-// Interface DisplayPort - Configuration du texte
-//=============================================================================
-
-void Ili9341LvglDisplay::setTextSize(uint8_t size) {
-    if (!initialized_) return;
-    currentTextSize_ = size;
-    // Note: Avec LVGL, la taille est gérée par les fontes, pas par un facteur multiplicateur
-}
-
-void Ili9341LvglDisplay::setTextColor(uint16_t color) {
-    if (!initialized_) return;
-    currentTextColor_ = color;
-}
-
-void Ili9341LvglDisplay::setTextWrap(bool wrap) {
-    if (!initialized_) return;
-    textWrap_ = wrap;
-}
-
-void Ili9341LvglDisplay::setCursor(int16_t x, int16_t y) {
-    if (!initialized_) return;
-    currentCursorX_ = x;
-    currentCursorY_ = y;
-}
-
-void Ili9341LvglDisplay::getTextBounds(const char* text, uint16_t* w, uint16_t* h) {
-    if (!initialized_ || !text || !w || !h) {
-        if (w) *w = 0;
-        if (h) *h = 0;
-        return;
-    }
-
-    // Mesurer avec la fonte par défaut LVGL
-    lv_point_t size;
-    lv_text_get_size(&size, text, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-    
-    *w = size.x;
-    *h = size.y;
-}
-
-//=============================================================================
-// Interface DisplayPort - Méthodes avancées
-//=============================================================================
-
-void Ili9341LvglDisplay::drawCenteredText(int x, int y, const char* text) {
-    if (!initialized_ || !display_ || !text) return;
-
-    // Calculer les dimensions du texte
-    uint16_t w, h;
-    getTextBounds(text, &w, &h);
-
-    // Centrer horizontalement
-    int centeredX = x - (w / 2);
-
-    drawText(centeredX, y, text);
-}
-
-void Ili9341LvglDisplay::drawFormattedText(int x, int y, const char* format, ...) {
-    if (!initialized_ || !format) return;
-
-    char buffer[64];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-
-    drawText(x, y, buffer);
-}
-
-//=============================================================================
-// Performance et identification
+// Performance et métriques
 //=============================================================================
 
 void Ili9341LvglDisplay::getPerformanceStats(unsigned long& avgTime, unsigned long& maxTime,
@@ -417,10 +253,6 @@ void Ili9341LvglDisplay::getPerformanceStats(unsigned long& avgTime, unsigned lo
     maxTime = profiler_.getMaxUpdateTime();
     minTime = profiler_.getMinUpdateTime();
 }
-
-//=============================================================================
-// Méthodes étendues
-//=============================================================================
 
 void Ili9341LvglDisplay::setRotation(uint8_t rotation) {
     if (!initialized_ || !tft_) return;
@@ -469,14 +301,3 @@ lv_obj_t* Ili9341LvglDisplay::createTestScreen() {
     return screen;
 }
 
-//=============================================================================
-// Méthodes privées
-//=============================================================================
-
-lv_color_t Ili9341LvglDisplay::convertMonoColor(uint16_t monoColor) const {
-    return (monoColor == 0) ? lv_color_black() : lv_color_white();
-}
-
-void Ili9341LvglDisplay::updateDimensions() {
-    // Les dimensions sont gérées par LVGL selon la rotation
-}

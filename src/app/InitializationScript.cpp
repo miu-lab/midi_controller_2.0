@@ -85,7 +85,11 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
         return Result<bool, std::string>::error("Échec d'initialisation de l'écran ILI9341_LVGL");
     }
 
-    container->registerDependency<DisplayPort>(display);
+    // TODO Phase 1: Temporairement désactivé - plus de DisplayPort
+    // container->registerDependency<DisplayPort>(display);
+    
+    // Enregistrer le display hardware directement
+    container->registerDependency<Ili9341LvglDisplay>(display);
 
     // Stockage de profils
     auto profileManager = std::make_shared<ProfileManager>();

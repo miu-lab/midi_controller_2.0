@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/ports/output/DisplayPort.hpp"
 #include "core/utils/DisplayProfiler.hpp"
 
 #include <ILI9341_T4.h>
@@ -7,12 +8,12 @@
 #include <memory>
 
 /**
- * @brief Driver hardware LVGL + ILI9341_t4 pur
+ * @brief Implémentation LVGL + ILI9341_t4 du DisplayPort
  * 
- * Cette classe fournit uniquement l'interface hardware pour LVGL.
+ * Cette classe utilise LVGL pour le rendu et ILI9341_t4 pour le transfert hardware optimisé.
  * Architecture: LVGL (rendu) → Buffer LVGL → ILI9341_t4 (DMA) → Écran
  */
-class Ili9341LvglDisplay {
+class Ili9341LvglDisplay : public DisplayPort {
 public:
     /**
      * @brief Configuration hardware pour ILI9341
@@ -37,15 +38,51 @@ public:
     /**
      * @brief Destructeur
      */
-    ~Ili9341LvglDisplay();
+    ~Ili9341LvglDisplay() override;
 
-    // === INTERFACE LVGL HARDWARE ===
+    // === INTERFACE DisplayPort ===
 
     /**
      * @brief Initialise l'écran et LVGL
      * @return true si l'initialisation a réussi
      */
     bool init();
+
+    void clear() override;
+    void drawText(int x, int y, const char* text) override;
+    void drawLine(int x0, int y0, int x1, int y1) override;
+    void drawRect(int x, int y, int width, int height, bool fill = false) override;
+    void drawCircle(int x, int y, int radius, bool fill = false) override;
+    void update() override;
+    void setTextSize(uint8_t size) override;
+    void setTextColor(uint16_t color) override;
+    void setTextWrap(bool wrap) override;
+    void setCursor(int16_t x, int16_t y) override;
+    void getTextBounds(const char* text, uint16_t* w, uint16_t* h) override;
+    void drawCenteredText(int x, int y, const char* text) override;
+    void drawFormattedText(int x, int y, const char* format, ...) override;
+
+    // === IDENTIFICATION ===
+
+    const char* getDisplayType() const override {
+        return "ILI9341_LVGL";
+    }
+
+    bool isSsd1306Display() const override {
+        return false;
+    }
+
+    // === PERFORMANCE ===
+
+    void getPerformanceStats(unsigned long& avgTime, unsigned long& maxTime,
+                             unsigned long& minTime) const override;
+
+    /**
+     * @brief Configuration par défaut optimisée pour Teensy 4.1
+     */
+    static Config getDefaultConfig();
+
+    // === MÉTHODES ÉTENDUES LVGL ===
 
     /**
      * @brief Obtient le display LVGL pour utilisation directe
@@ -65,32 +102,10 @@ public:
     void getDimensions(uint16_t& width, uint16_t& height) const;
 
     /**
-     * @brief Obtient le type d'affichage
-     */
-    const char* getDisplayType() const {
-        return "ILI9341_LVGL";
-    }
-
-    // === PERFORMANCE ===
-
-    void getPerformanceStats(unsigned long& avgTime, unsigned long& maxTime,
-                             unsigned long& minTime) const;
-
-    /**
-     * @brief Configuration par défaut optimisée pour Teensy 4.1
-     */
-    static Config getDefaultConfig();
-
-    /**
-     * @brief Créer une vue LVGL de test simple (temporaire pour validation)
+     * @brief Créer une vue LVGL de test simple
      * @return Pointeur vers l'écran LVGL créé
      */
     lv_obj_t* createTestScreen();
-
-    /**
-     * @brief Ajouter debug mémoire (temporaire pour Phase 1)
-     */
-    void debugMemory() const;
 
 private:
     // Hardware et configuration
@@ -117,6 +132,12 @@ private:
     static constexpr int SCREEN_WIDTH = 240;
     static constexpr int SCREEN_HEIGHT = 320;
     static constexpr int LVGL_BUFFER_LINES = 40;  // Nombre de lignes dans le buffer LVGL
+
+    // État du texte (pour compatibilité DisplayPort)
+    uint16_t currentTextColor_;
+    uint8_t currentTextSize_;
+    int16_t currentCursorX_, currentCursorY_;
+    bool textWrap_;
 
     // Performance tracking
     DisplayProfiler profiler_;
