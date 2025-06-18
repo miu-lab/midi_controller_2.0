@@ -119,3 +119,7 @@ Pour ajouter un nouveau sous-système :
 - `src/app/InitializationScript.hpp` : Configuration de l'injection de dépendances
 - `src/config/unified/UnifiedConfiguration.cpp` : Gestion de la configuration
 - `platformio.ini` : Configuration de compilation
+
+## Memories
+
+- Concernant l'intégration LVGL (2024-01-01) : Plan d'action détaillé à élaborer dans `docs/ui/lvgl_integration.md` avec une approche structurée pour l'intégration de la bibliothèque graphique LVGL dans le contrôleur MIDI
