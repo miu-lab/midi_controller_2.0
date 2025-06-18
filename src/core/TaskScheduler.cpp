@@ -142,13 +142,13 @@ uint32_t TaskScheduler::executeTask(int taskIndex) {
 
 void TaskScheduler::printDebugStats() {
 #ifdef DEBUG
-    // Ajout d'un séparateur pour améliorer la lisibilité
-    DEBUG_SCHEDULER("========== STATISTIQUES SCHEDULER ===========");
-    
-    // Informations de base (toujours disponibles si DEBUG_TASK_SCHEDULER est activé)
-    DEBUG_SCHEDULER("CPU: %.2f%% | Cycles: %u | Overruns: %u", 
-                  getCpuUsage(), cycleCount, overruns);
-                  
+    // // Ajout d'un séparateur pour améliorer la lisibilité
+    // DEBUG_SCHEDULER("========== STATISTIQUES SCHEDULER ===========");
+
+    // // Informations de base (toujours disponibles si DEBUG_TASK_SCHEDULER est activé)
+    // DEBUG_SCHEDULER("CPU: %.2f%% | Cycles: %u | Overruns: %u",
+    //               getCpuUsage(), cycleCount, overruns);
+
     // Pour le mode verbose, afficher les détails des tâches
     if (DEBUG_TASK_SCHEDULER_LEVEL >= 2) {
         DEBUG_SCHEDULER_VERBOSE("Détails des tâches actives:");
@@ -172,9 +172,6 @@ void TaskScheduler::printDebugStats() {
             }
         }
     }
-    
-    // Terminateur
-    DEBUG_SCHEDULER("============================================");
 #endif
 }
 

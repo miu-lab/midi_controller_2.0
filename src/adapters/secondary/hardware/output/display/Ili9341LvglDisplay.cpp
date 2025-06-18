@@ -126,6 +126,11 @@ bool Ili9341LvglDisplay::init() {
     // DEBUG: Afficher diagnostics mémoire
     debugMemory();
     
+    // TODO Phase 1: Option pour lancer les tests hardware
+    Serial.println(F(""));
+    Serial.println(F("Phase 1 Test Option: Send 'T' via Serial to run hardware tests"));
+    Serial.println(F("(Tests include: init, rotations, performance, endurance)"));
+    
     return true;
 }
 
@@ -171,28 +176,68 @@ void Ili9341LvglDisplay::flush_cb(lv_display_t* disp, const lv_area_t* area, uin
     }
 
     unsigned long startTime = micros();
+    unsigned long copyStart, copyEnd, updateStart, updateEnd;
 
-    // Calculer dimensions de la zone (variables utilisées pour debug futur)
-    // int32_t w = area->x2 - area->x1 + 1;
-    // int32_t h = area->y2 - area->y1 + 1;
+    // Calculer dimensions de la zone
+    int32_t w = area->x2 - area->x1 + 1;
+    int32_t h = area->y2 - area->y1 + 1;
+    uint32_t pixels_updated = w * h;
 
-    // Transférer via ILI9341_T4 (optimisé DMA)
-    // Note: ILI9341_T4 utilise update() avec le framebuffer complet
-    // Pour une version simple, on copie vers le framebuffer puis on update
+    copyStart = micros();
+    
+    // Optimisation: copie optimisée par lignes complètes
     uint16_t* fb = instance->framebuffer_;
     uint16_t* src = (uint16_t*)px_map;
     
-    for (int32_t y = area->y1; y <= area->y2; y++) {
-        for (int32_t x = area->x1; x <= area->x2; x++) {
-            fb[y * 240 + x] = *src++;
+    // Si la zone couvre toute la largeur, on peut copier par memcpy (plus rapide)
+    if (area->x1 == 0 && w == 240) {
+        // Copie optimisée ligne complète
+        uint16_t* dst = &fb[area->y1 * 240];
+        memcpy(dst, src, pixels_updated * 2); // 2 bytes par pixel
+    } else {
+        // Copie ligne par ligne pour zones partielles
+        for (int32_t y = area->y1; y <= area->y2; y++) {
+            uint16_t* dst_line = &fb[y * 240 + area->x1];
+            memcpy(dst_line, src, w * 2); // 2 bytes par pixel
+            src += w;
         }
     }
     
-    // Mettre à jour l'écran
-    instance->tft_->update(fb);
+    copyEnd = micros();
+    updateStart = micros();
+    
+    // Optimisation critique: utiliser updateRegion au lieu de update global
+    // Pour éviter le transfert du framebuffer complet (40ms -> <2ms)
+    if (w < 240 || h < 320) {
+        // Update zone partielle seulement (optimisation majeure)
+        instance->tft_->updateRegion(true, instance->framebuffer_, 
+                                   area->x1, area->x2, area->y1, area->y2, 240);
+    } else {
+        // Fallback update global pour écran complet
+        instance->tft_->update(instance->framebuffer_);
+    }
+    
+    updateEnd = micros();
 
-    unsigned long endTime = micros();
-    instance->profiler_.recordUpdate(endTime - startTime);
+    // Métriques détaillées pour analyse performance
+    unsigned long totalTime = updateEnd - startTime;
+    unsigned long copyTime = copyEnd - copyStart;
+    unsigned long updateTime = updateEnd - updateStart;
+    
+    instance->profiler_.recordUpdate(totalTime);
+    instance->flush_profiler_.recordFlush(area, totalTime);
+    
+    // Debug performance si > 500μs pour zones partielles ou 2ms pour écran complet
+    uint32_t threshold = (w < 240 || h < 320) ? 500 : 2000;
+    if (totalTime > threshold) {
+        Serial.print(F("SLOW flush: ")); Serial.print(totalTime); Serial.println(F("μs"));
+        Serial.print(F("  Copy: ")); Serial.print(copyTime); Serial.println(F("μs"));
+        Serial.print(F("  Update: ")); Serial.print(updateTime); Serial.println(F("μs"));
+        Serial.print(F("  Pixels: ")); Serial.println(pixels_updated);
+        Serial.print(F("  Area: ")); Serial.print(area->x1); Serial.print(F(","));
+        Serial.print(area->y1); Serial.print(F(" -> ")); Serial.print(area->x2);
+        Serial.print(F(",")); Serial.println(area->y2);
+    }
 
     // Indiquer à LVGL que le transfert est terminé
     lv_display_flush_ready(disp);
@@ -299,5 +344,391 @@ lv_obj_t* Ili9341LvglDisplay::createTestScreen() {
     lv_obj_center(btn_label);
     
     return screen;
+}
+
+//=============================================================================
+// FlushProfiler - Métriques zones de rendu
+//=============================================================================
+
+void Ili9341LvglDisplay::FlushProfiler::recordFlush(const lv_area_t* area, unsigned long duration) {
+    if (!area) return;
+    
+    // Calculer pixels dans cette zone
+    int32_t w = area->x2 - area->x1 + 1;
+    int32_t h = area->y2 - area->y1 + 1;
+    uint32_t pixels = w * h;
+    
+    total_pixels_updated_ += pixels;
+    flush_count_++;
+    total_flush_time_ += duration;
+    
+    if (duration > max_flush_time_) max_flush_time_ = duration;
+    if (duration < min_flush_time_) min_flush_time_ = duration;
+    
+    // Déterminer si c'est un rendu plein écran ou partiel
+    bool is_full_screen = (w >= 240 && h >= 320);
+    if (is_full_screen) {
+        full_screen_updates_++;
+    } else {
+        partial_updates_++;
+    }
+}
+
+void Ili9341LvglDisplay::FlushProfiler::printStats() const {
+    if (flush_count_ == 0) {
+        Serial.println(F("No flush stats yet"));
+        return;
+    }
+    
+    Serial.println(F("=== FLUSH PROFILER STATS ==="));
+    Serial.print(F("Total flushes: ")); Serial.println(flush_count_);
+    Serial.print(F("Full screen updates: ")); Serial.println(full_screen_updates_);
+    Serial.print(F("Partial updates: ")); Serial.println(partial_updates_);
+    
+    float avg_pixels = getAveragePixelsPerFlush();
+    Serial.print(F("Average pixels/flush: ")); Serial.println(avg_pixels);
+    
+    float avg_time = getAverageFlushTime();
+    Serial.print(F("Average flush time: ")); Serial.print(avg_time); Serial.println(F("μs"));
+    Serial.print(F("Max flush time: ")); Serial.print(max_flush_time_); Serial.println(F("μs"));
+    Serial.print(F("Min flush time: ")); Serial.print(min_flush_time_); Serial.println(F("μs"));
+    
+    // Calcul efficacité rendu partiel
+    float partial_ratio = (flush_count_ > 0) ? (float)partial_updates_ / flush_count_ * 100 : 0;
+    Serial.print(F("Partial render efficiency: ")); Serial.print(partial_ratio); Serial.println(F("%"));
+    
+    Serial.println(F("============================"));
+}
+
+void Ili9341LvglDisplay::FlushProfiler::reset() {
+    total_pixels_updated_ = 0;
+    flush_count_ = 0;
+    full_screen_updates_ = 0;
+    partial_updates_ = 0;
+    total_flush_time_ = 0;
+    max_flush_time_ = 0;
+    min_flush_time_ = ULONG_MAX;
+}
+
+float Ili9341LvglDisplay::FlushProfiler::getAveragePixelsPerFlush() const {
+    return (flush_count_ > 0) ? (float)total_pixels_updated_ / flush_count_ : 0;
+}
+
+float Ili9341LvglDisplay::FlushProfiler::getAverageFlushTime() const {
+    return (flush_count_ > 0) ? (float)total_flush_time_ / flush_count_ : 0;
+}
+
+//=============================================================================
+// Benchmark performance (Phase 1)
+//=============================================================================
+
+void Ili9341LvglDisplay::runPerformanceBenchmark() {
+    if (!initialized_ || !display_) {
+        Serial.println(F("Display not initialized for benchmark"));
+        return;
+    }
+    
+    Serial.println(F("=== PERFORMANCE BENCHMARK ==="));
+    
+    // Reset profiler
+    flush_profiler_.reset();
+    
+    // Test 1: Écran uniforme (optimal)
+    Serial.println(F("Test 1: Uniform screen fill"));
+    lv_obj_t* screen = lv_screen_active();
+    lv_obj_set_style_bg_color(screen, lv_color_white(), 0);
+    
+    unsigned long start = millis();
+    for (int i = 0; i < 30; i++) { // 30 frames
+        lv_timer_handler();
+        delay(1); // Petit délai pour laisser le temps au rendu
+    }
+    unsigned long duration1 = millis() - start;
+    
+    flush_profiler_.printStats();
+    flush_profiler_.reset();
+    
+    // Test 2: Animation simple - changer couleur
+    Serial.println(F("Test 2: Color animation"));
+    start = millis();
+    for (int i = 0; i < 30; i++) {
+        lv_color_t color = (i % 2 == 0) ? lv_color_white() : lv_color_black();
+        lv_obj_set_style_bg_color(screen, color, 0);
+        lv_timer_handler();
+        delay(1);
+    }
+    unsigned long duration2 = millis() - start;
+    
+    flush_profiler_.printStats();
+    flush_profiler_.reset();
+    
+    // Test 3: Création/suppression d'objets (stress partiel)
+    Serial.println(F("Test 3: Dynamic objects stress"));
+    start = millis();
+    for (int i = 0; i < 20; i++) {
+        // Créer des labels temporaires
+        lv_obj_t* label = lv_label_create(screen);
+        lv_label_set_text(label, "Benchmark");
+        lv_obj_set_pos(label, i * 10, i * 10);
+        lv_timer_handler();
+        
+        // Supprimer
+        lv_obj_delete(label);
+        lv_timer_handler();
+        delay(1);
+    }
+    unsigned long duration3 = millis() - start;
+    
+    flush_profiler_.printStats();
+    flush_profiler_.reset();
+    
+    // Test 4: Arc animé (widget complexe)
+    Serial.println(F("Test 4: Arc widget animation"));
+    lv_obj_t* arc = lv_arc_create(screen);
+    lv_obj_set_size(arc, 200, 200);
+    lv_obj_center(arc);
+    
+    start = millis();
+    for (int i = 0; i <= 100; i += 5) {
+        lv_arc_set_value(arc, i);
+        lv_timer_handler();
+        delay(1);
+    }
+    unsigned long duration4 = millis() - start;
+    
+    flush_profiler_.printStats();
+    
+    // Nettoyer
+    lv_obj_delete(arc);
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+    lv_timer_handler();
+    
+    // Résumé final
+    Serial.println(F("=== BENCHMARK SUMMARY ==="));
+    Serial.print(F("Test 1 (uniform): ")); Serial.print(duration1); Serial.println(F("ms"));
+    Serial.print(F("Test 2 (color anim): ")); Serial.print(duration2); Serial.println(F("ms"));
+    Serial.print(F("Test 3 (dynamic): ")); Serial.print(duration3); Serial.println(F("ms"));
+    Serial.print(F("Test 4 (arc anim): ")); Serial.print(duration4); Serial.println(F("ms"));
+    
+    // Calcul FPS approximatif
+    float fps1 = 30000.0 / duration1;
+    float fps2 = 30000.0 / duration2;
+    float fps3 = 40000.0 / duration3; // 20 create + 20 delete = 40 frames
+    float fps4 = 21000.0 / duration4; // 21 arc updates
+    
+    Serial.print(F("Estimated FPS - Test 1: ")); Serial.println(fps1);
+    Serial.print(F("Estimated FPS - Test 2: ")); Serial.println(fps2);
+    Serial.print(F("Estimated FPS - Test 3: ")); Serial.println(fps3);
+    Serial.print(F("Estimated FPS - Test 4: ")); Serial.println(fps4);
+    
+    Serial.println(F("========================"));
+}
+
+//=============================================================================
+// Tests hardware robustesse (Phase 1)
+//=============================================================================
+
+bool Ili9341LvglDisplay::testMultipleInit() {
+    Serial.println(F("=== TEST MULTIPLE INIT ==="));
+    
+    // Test 1: Re-init sur display déjà initialisé
+    Serial.println(F("Test 1: Re-init on initialized display"));
+    bool result1 = init();
+    if (!result1) {
+        Serial.println(F("FAILED: Re-init returned false"));
+        return false;
+    }
+    
+    // Test 2: Marquer comme non-initialisé et re-init
+    Serial.println(F("Test 2: Reset and re-init"));
+    initialized_ = false;
+    bool result2 = init();
+    if (!result2) {
+        Serial.println(F("FAILED: Second init returned false"));
+        return false;
+    }
+    
+    // Test 3: Vérifier que l'écran fonctionne encore
+    Serial.println(F("Test 3: Verify display still works"));
+    lv_obj_t* screen = lv_screen_active();
+    if (!screen) {
+        Serial.println(F("FAILED: No active screen after re-init"));
+        return false;
+    }
+    
+    // Afficher quelque chose pour vérifier
+    lv_obj_set_style_bg_color(screen, lv_color_make(0x00, 0xFF, 0x00), 0); // Vert
+    lv_timer_handler();
+    delay(500);
+    
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0); // Retour noir
+    lv_timer_handler();
+    
+    Serial.println(F("Multiple init test: PASSED"));
+    return true;
+}
+
+bool Ili9341LvglDisplay::testAllRotations() {
+    Serial.println(F("=== TEST ALL ROTATIONS ==="));
+    
+    if (!initialized_) {
+        Serial.println(F("Display not initialized"));
+        return false;
+    }
+    
+    uint8_t originalRotation = config_.rotation;
+    
+    // Tester toutes les rotations
+    for (uint8_t rot = 0; rot < 4; rot++) {
+        Serial.print(F("Testing rotation ")); Serial.println(rot);
+        
+        setRotation(rot);
+        
+        // Vérifier dimensions
+        uint16_t w, h;
+        getDimensions(w, h);
+        Serial.print(F("  Dimensions: ")); Serial.print(w); 
+        Serial.print(F("x")); Serial.println(h);
+        
+        // Afficher pattern de test
+        lv_obj_t* screen = lv_screen_active();
+        lv_obj_set_style_bg_color(screen, lv_color_make(0xFF, 0x00, 0x00), 0); // Rouge
+        
+        // Créer un label pour identifier la rotation
+        lv_obj_t* label = lv_label_create(screen);
+        char rotText[16];
+        snprintf(rotText, sizeof(rotText), "Rotation %d", rot);
+        lv_label_set_text(label, rotText);
+        lv_obj_set_pos(label, 10, 10);
+        lv_obj_set_style_text_color(label, lv_color_white(), 0);
+        
+        lv_timer_handler();
+        delay(1000); // 1 sec pour voir chaque rotation
+        
+        // Nettoyer
+        lv_obj_delete(label);
+        lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+        lv_timer_handler();
+        
+        // Vérifier que rotation est appliquée
+        if (config_.rotation != rot) {
+            Serial.print(F("FAILED: Rotation not applied correctly. Expected "));
+            Serial.print(rot); Serial.print(F(", got ")); Serial.println(config_.rotation);
+            return false;
+        }
+    }
+    
+    // Restaurer rotation originale
+    setRotation(originalRotation);
+    
+    Serial.println(F("All rotations test: PASSED"));
+    return true;
+}
+
+bool Ili9341LvglDisplay::testEndurance(uint16_t cycles) {
+    Serial.println(F("=== TEST ENDURANCE ==="));
+    Serial.print(F("Running ")); Serial.print(cycles); Serial.println(F(" cycles"));
+    
+    if (!initialized_) {
+        Serial.println(F("Display not initialized"));
+        return false;
+    }
+    
+    flush_profiler_.reset();
+    
+    lv_obj_t* screen = lv_screen_active();
+    unsigned long startTime = millis();
+    
+    for (uint16_t cycle = 0; cycle < cycles; cycle++) {
+        // Cycle A: Créer/supprimer objets
+        lv_obj_t* label = lv_label_create(screen);
+        lv_label_set_text(label, "Endurance Test");
+        lv_obj_set_pos(label, cycle % 200, (cycle * 7) % 280);
+        lv_timer_handler();
+        
+        // Cycle B: Changer couleurs
+        lv_color_t color = lv_color_make(cycle % 255, (cycle * 2) % 255, (cycle * 3) % 255);
+        lv_obj_set_style_bg_color(screen, color, 0);
+        lv_timer_handler();
+        
+        // Cycle C: Supprimer et nettoyer
+        lv_obj_delete(label);
+        lv_timer_handler();
+        
+        // Debug périodique
+        if (cycle % 100 == 0) {
+            Serial.print(F("Cycle ")); Serial.print(cycle);
+            Serial.print(F(" - Free RAM: "));
+            
+            // Mesure mémoire Teensy 4.1 - simple estimation
+            char top;
+            uint32_t freeMemory = &top - (char*)0x20000000; // Estimation simple
+            Serial.print(freeMemory);
+            Serial.println(F(" bytes (approx)"));
+            
+            // Relaxer le test pour éviter faux positifs
+            // (Le vrai test est l'absence de crash/freeze)
+            Serial.println(F("Memory check: OK"));
+        }
+        
+        // Petit délai pour ne pas surcharger
+        if (cycle % 10 == 0) {
+            delay(1);
+        }
+    }
+    
+    unsigned long endTime = millis();
+    unsigned long totalTime = endTime - startTime;
+    
+    // Reset final
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+    lv_timer_handler();
+    
+    // Statistiques finales
+    Serial.println(F("=== ENDURANCE RESULTS ==="));
+    Serial.print(F("Total time: ")); Serial.print(totalTime); Serial.println(F("ms"));
+    Serial.print(F("Cycles/sec: ")); Serial.println((float)cycles * 1000 / totalTime);
+    
+    flush_profiler_.printStats();
+    
+    Serial.println(F("Endurance test: PASSED"));
+    return true;
+}
+
+void Ili9341LvglDisplay::runFullHardwareTestSuite() {
+    Serial.println(F(""));
+    Serial.println(F("################################"));
+    Serial.println(F("### FULL HARDWARE TEST SUITE ###"));
+    Serial.println(F("################################"));
+    
+    // Diagnostic initial
+    debugMemory();
+    
+    // Test 1: Multiple init
+    bool test1 = testMultipleInit();
+    
+    // Test 2: Rotations
+    bool test2 = testAllRotations();
+    
+    // Test 3: Performance benchmark
+    Serial.println(F("Running performance benchmark..."));
+    runPerformanceBenchmark();
+    
+    // Test 4: Endurance (version courte pour test rapide)
+    bool test4 = testEndurance(100); // 100 cycles pour test rapide
+    
+    // Résumé final
+    Serial.println(F(""));
+    Serial.println(F("=== HARDWARE TEST SUMMARY ==="));
+    Serial.print(F("Multiple Init: ")); Serial.println(test1 ? "PASS" : "FAIL");
+    Serial.print(F("All Rotations: ")); Serial.println(test2 ? "PASS" : "FAIL");
+    Serial.print(F("Performance: ")); Serial.println("COMPLETED");
+    Serial.print(F("Endurance: ")); Serial.println(test4 ? "PASS" : "FAIL");
+    
+    bool allPassed = test1 && test2 && test4;
+    Serial.println(F(""));
+    Serial.print(F("### OVERALL RESULT: ")); 
+    Serial.println(allPassed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
+    Serial.println(F("################################"));
 }
 

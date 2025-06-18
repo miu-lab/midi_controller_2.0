@@ -92,6 +92,49 @@ public:
      */
     void debugMemory() const;
 
+    /**
+     * @brief Profiler pour zones de rendu (Phase 1)
+     */
+    class FlushProfiler {
+    private:
+        uint32_t total_pixels_updated_;
+        uint32_t flush_count_;
+        uint32_t full_screen_updates_;
+        uint32_t partial_updates_;
+        unsigned long total_flush_time_;
+        unsigned long max_flush_time_;
+        unsigned long min_flush_time_;
+        
+    public:
+        FlushProfiler() : total_pixels_updated_(0), flush_count_(0), 
+                         full_screen_updates_(0), partial_updates_(0),
+                         total_flush_time_(0), max_flush_time_(0), min_flush_time_(ULONG_MAX) {}
+        
+        void recordFlush(const lv_area_t* area, unsigned long duration);
+        void printStats() const;
+        void reset();
+        float getAveragePixelsPerFlush() const;
+        float getAverageFlushTime() const;
+    };
+    
+    /**
+     * @brief Obtient le profiler de flush (temporaire Phase 1)
+     */
+    FlushProfiler& getFlushProfiler() { return flush_profiler_; }
+
+    /**
+     * @brief Benchmark performance patterns (temporaire Phase 1)
+     */
+    void runPerformanceBenchmark();
+
+    /**
+     * @brief Tests hardware robustesse (Phase 1)
+     */
+    bool testMultipleInit();
+    bool testAllRotations(); 
+    bool testEndurance(uint16_t cycles = 1000);
+    void runFullHardwareTestSuite();
+
 private:
     // Hardware et configuration
     Config config_;
@@ -120,6 +163,7 @@ private:
 
     // Performance tracking
     DisplayProfiler profiler_;
+    FlushProfiler flush_profiler_;  // Tracking zones de rendu (Phase 1)
 
     // === CALLBACKS LVGL STATIQUES ===
 
