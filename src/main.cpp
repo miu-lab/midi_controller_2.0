@@ -1,48 +1,229 @@
+// #include <Arduino.h>
+// #include <Wire.h>
+
+// #include <memory>
+
+// #include "app/InitializationScript.hpp"
+// #include "app/MidiControllerApp.hpp"
+// #include "app/di/DependencyContainer.hpp"
+// #include "config/ApplicationConfiguration.hpp"
+// #include "config/ConfigDefaults.hpp"
+// #include "tools/ErrorUtils.hpp"
+// #include "adapters/secondary/hardware/output/display/Ili9341LvglDisplay.hpp"
+
+// ApplicationConfiguration appConfig;
+// std::shared_ptr<MidiControllerApp> app;
+// std::shared_ptr<DependencyContainer> container;
+
+// void setup() {
+//     Serial.println(F("=== MIDI Controller 2.0 - Phase 1 Hardware Test ==="));
+//     Serial.println(F("Initializing..."));
+
+//     container = std::make_shared<DependencyContainer>();
+//     InitializationScript::initializeContainer(container, appConfig);
+//     app = std::make_shared<MidiControllerApp>(container);
+//     app->init();
+
+//     Serial.println(F("Setup complete. Send 'T' to run hardware tests."));
+// }
+
+// void loop() {
+//     // Phase 1: Check for hardware test command
+//     if (Serial.available()) {
+//         char command = Serial.read();
+//         if (command == 'T' || command == 't') {
+//             Serial.println(F("Hardware test requested - accessing display..."));
+
+//             // Récupérer le display depuis le container
+//             auto display = container->resolve<Ili9341LvglDisplay>();
+//             if (display) {
+//                 display->runFullHardwareTestSuite();
+//             } else {
+//                 Serial.println(F("ERROR: Could not access display for testing"));
+//             }
+//         }
+//     }
+
+//     if (app) app->update();
+// }
+
+/**
+ * @file main_hardware_test.cpp
+ * @brief Programme de test dédié pour validation hardware Phase 1
+ *
+ * Ce fichier peut être compilé séparément pour valider uniquement
+ * le layer hardware sans l'application complète.
+ */
+
 #include <Arduino.h>
-#include <Wire.h>
 
-#include <memory>
-
-#include "app/InitializationScript.hpp"
-#include "app/MidiControllerApp.hpp"
-#include "app/di/DependencyContainer.hpp"
-#include "config/ApplicationConfiguration.hpp"
-#include "config/ConfigDefaults.hpp"
-#include "tools/ErrorUtils.hpp"
 #include "adapters/secondary/hardware/output/display/Ili9341LvglDisplay.hpp"
 
-ApplicationConfiguration appConfig;
-std::shared_ptr<MidiControllerApp> app;
-std::shared_ptr<DependencyContainer> container;
+// Instance de test
+std::unique_ptr<Ili9341LvglDisplay> testDisplay;
 
 void setup() {
-    Serial.println(F("=== MIDI Controller 2.0 - Phase 1 Hardware Test ==="));
-    Serial.println(F("Initializing..."));
-    
-    container = std::make_shared<DependencyContainer>();
-    InitializationScript::initializeContainer(container, appConfig);
-    app = std::make_shared<MidiControllerApp>(container);
-    app->init();
-    
-    Serial.println(F("Setup complete. Send 'T' to run hardware tests."));
+    Serial.begin(115200);
+    delay(2000);  // Attendre ouverture Serial Monitor
+
+    Serial.println(F(""));
+    Serial.println(F("========================================="));
+    Serial.println(F("=== HARDWARE TEST SUITE - PHASE 1 ==="));
+    Serial.println(F("========================================="));
+    Serial.println(F(""));
+
+    // Créer et initialiser le display
+    Serial.println(F("Initializing display hardware..."));
+    testDisplay = std::make_unique<Ili9341LvglDisplay>();
+
+    if (!testDisplay->init()) {
+        Serial.println(F("FATAL: Display initialization failed!"));
+        while (1) {
+            delay(1000);
+            Serial.println(F("Hardware test cannot continue - check connections"));
+        }
+    }
+
+    Serial.println(F("Display initialized successfully!"));
+    Serial.println(F(""));
+
+    // Lancer la suite de tests complète
+    Serial.println(F("Starting automated test suite..."));
+    testDisplay->runFullHardwareTestSuite();
+
+    Serial.println(F(""));
+    Serial.println(F("=========================================="));
+    Serial.println(F("=== INTERACTIVE TEST MODE AVAILABLE ==="));
+    Serial.println(F("=========================================="));
+    Serial.println(F("Commands:"));
+    Serial.println(F("  T - Run full test suite again"));
+    Serial.println(F("  I - Test multiple init"));
+    Serial.println(F("  R - Test all rotations"));
+    Serial.println(F("  P - Run performance benchmark"));
+    Serial.println(F("  E - Run endurance test (1000 cycles)"));
+    Serial.println(F("  M - Show memory diagnostics"));
+    Serial.println(F("  S - Show flush profiler stats"));
+    Serial.println(F("  C - Clear screen test"));
+    Serial.println(F("  D - Demo screen"));
+    Serial.println(F("  W - ParameterWidget visual demo"));
+    Serial.println(F(""));
 }
 
 void loop() {
-    // Phase 1: Check for hardware test command
+    // Mode interactif pour tests manuels
     if (Serial.available()) {
         char command = Serial.read();
-        if (command == 'T' || command == 't') {
-            Serial.println(F("Hardware test requested - accessing display..."));
-            
-            // Récupérer le display depuis le container
-            auto display = container->resolve<Ili9341LvglDisplay>();
-            if (display) {
-                display->runFullHardwareTestSuite();
+        Serial.print(F("Command received: "));
+        Serial.println(command);
+
+        switch (command) {
+        case 'T':
+        case 't':
+            Serial.println(F("Running full test suite..."));
+            testDisplay->runFullHardwareTestSuite();
+            break;
+
+        case 'I':
+        case 'i':
+            Serial.println(F("Testing multiple init..."));
+            if (testDisplay->testMultipleInit()) {
+                Serial.println(F("Multiple init: PASSED"));
             } else {
-                Serial.println(F("ERROR: Could not access display for testing"));
+                Serial.println(F("Multiple init: FAILED"));
             }
+            break;
+
+        case 'R':
+        case 'r':
+            Serial.println(F("Testing all rotations..."));
+            if (testDisplay->testAllRotations()) {
+                Serial.println(F("All rotations: PASSED"));
+            } else {
+                Serial.println(F("All rotations: FAILED"));
+            }
+            break;
+
+        case 'P':
+        case 'p':
+            Serial.println(F("Running performance benchmark..."));
+            testDisplay->runPerformanceBenchmark();
+            break;
+
+        case 'E':
+        case 'e':
+            Serial.println(F("Running endurance test (1000 cycles)..."));
+            if (testDisplay->testEndurance(1000)) {
+                Serial.println(F("Endurance: PASSED"));
+            } else {
+                Serial.println(F("Endurance: FAILED"));
+            }
+            break;
+
+        case 'M':
+        case 'm':
+            Serial.println(F("Memory diagnostics:"));
+            testDisplay->debugMemory();
+            break;
+
+        case 'S':
+        case 's':
+            Serial.println(F("Flush profiler stats:"));
+            testDisplay->getFlushProfiler().printStats();
+            break;
+
+        case 'C':
+        case 'c':
+            Serial.println(F("Clear screen test..."));
+            {
+                lv_obj_t* screen = lv_screen_active();
+                lv_obj_clean(screen);
+                lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+                lv_timer_handler();
+                Serial.println(F("Screen cleared"));
+            }
+            break;
+
+        case 'D':
+        case 'd':
+            Serial.println(F("Demo screen..."));
+            {
+                lv_obj_t* demo = testDisplay->createTestScreen();
+                if (demo) {
+                    lv_screen_load(demo);
+                    lv_timer_handler();
+                    Serial.println(F("Demo screen loaded"));
+                }
+            }
+            break;
+
+        case 'W':
+        case 'w':
+            Serial.println(F("ParameterWidget visual demo..."));
+            if (testDisplay->demoParameterWidget()) {
+                Serial.println(F("ParameterWidget demo: COMPLETED"));
+            } else {
+                Serial.println(F("ParameterWidget demo: FAILED"));
+            }
+            break;
+
+        default:
+            Serial.println(F("Unknown command. Available: T,I,R,P,E,M,S,C,D,W"));
+            break;
         }
+
+        Serial.println(F("Ready for next command..."));
     }
-    
-    if (app) app->update();
+
+    // Traitement LVGL continu
+    lv_timer_handler();
+    delay(5);  // Petit délai pour ne pas surcharger
 }
+
+/**
+ * @brief Point d'entrée alternatif pour compilation séparée
+ *
+ * Usage: Pour compiler seulement ce test:
+ * 1. Temporairement renommer main.cpp
+ * 2. Compiler avec ce fichier comme main
+ * 3. Tester uniquement le hardware layer
+ */
