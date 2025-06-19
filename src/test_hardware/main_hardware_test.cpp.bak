@@ -55,6 +55,7 @@ void setup() {
     Serial.println(F("  S - Show flush profiler stats"));
     Serial.println(F("  C - Clear screen test"));
     Serial.println(F("  D - Demo screen"));
+    Serial.println(F("  W - ParameterWidget visual demo"));
     Serial.println(F(""));
 }
 
@@ -144,8 +145,18 @@ void loop() {
                 }
                 break;
                 
+            case 'W':
+            case 'w':
+                Serial.println(F("ParameterWidget visual demo..."));
+                if (testDisplay->demoParameterWidget()) {
+                    Serial.println(F("ParameterWidget demo: COMPLETED"));
+                } else {
+                    Serial.println(F("ParameterWidget demo: FAILED"));
+                }
+                break;
+                
             default:
-                Serial.println(F("Unknown command. Available: T,I,R,P,E,M,S,C,D"));
+                Serial.println(F("Unknown command. Available: T,I,R,P,E,M,S,C,D,W"));
                 break;
         }
         

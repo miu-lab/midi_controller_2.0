@@ -6,7 +6,8 @@
       "Bash(rg:*)",
       "Bash(mv:*)",
       "Bash(grep:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio.exe run -e MIDI_CONTROLLER_DEVELOPMENT -t upload)"
     ],
     "deny": []
   }
