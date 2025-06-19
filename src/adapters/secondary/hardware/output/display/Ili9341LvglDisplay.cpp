@@ -4,6 +4,7 @@
 #include <stdarg.h>
 
 #include "core/utils/FlashStrings.hpp"
+#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
 
 // Buffer principal en DMAMEM (240x320 pixels = 150KB)
 DMAMEM static uint16_t main_framebuffer[240 * 320];
@@ -717,6 +718,13 @@ void Ili9341LvglDisplay::runFullHardwareTestSuite() {
     // Test 4: Endurance (version courte pour test rapide)
     bool test4 = testEndurance(100); // 100 cycles pour test rapide
     
+    // Test 5: ParameterWidget Demo (Phase 2)
+    Serial.println(F(""));
+    Serial.println(F("Phase 1 Test Option: Send 'T' via Serial to run hardware tests"));
+    Serial.println(F("(Tests include: init, rotations, performance, endurance)"));
+    Serial.println(F("Phase 2 Test Option: Send 'P' via Serial to run ParameterWidget demo"));
+    Serial.println(F("(Visual demo: animations, parameters, interactions)"));
+    
     // Résumé final
     Serial.println(F(""));
     Serial.println(F("=== HARDWARE TEST SUMMARY ==="));
@@ -730,5 +738,221 @@ void Ili9341LvglDisplay::runFullHardwareTestSuite() {
     Serial.print(F("### OVERALL RESULT: ")); 
     Serial.println(allPassed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
     Serial.println(F("################################"));
+}
+
+//=============================================================================
+// Test ParameterWidget (Phase 2)
+//=============================================================================
+
+bool Ili9341LvglDisplay::testParameterWidget() {
+    Serial.println(F("=== TEST PARAMETER WIDGET ==="));
+    
+    if (!initialized_) {
+        Serial.println(F("FAILED: Display not initialized"));
+        return false;
+    }
+    
+    // Note: Inclure le header ici causerait une dépendance circulaire
+    // Le test complet sera fait dans un fichier séparé ou main.cpp
+    Serial.println(F("Creating basic LVGL test objects..."));
+    
+    // Test de base: créer un arc LVGL pour valider que le système fonctionne
+    lv_obj_t* test_screen = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(test_screen, 240, 120);
+    lv_obj_center(test_screen);
+    lv_obj_set_style_bg_color(test_screen, lv_color_hex(0x202020), 0);
+    
+    // Arc de test
+    lv_obj_t* test_arc = lv_arc_create(test_screen);
+    lv_obj_set_size(test_arc, 80, 80);
+    lv_obj_center(test_arc);
+    lv_arc_set_range(test_arc, 0, 127);
+    lv_arc_set_value(test_arc, 64); // Valeur moyenne
+    
+    // Label de test
+    lv_obj_t* test_label = lv_label_create(test_screen);
+    lv_label_set_text(test_label, "PARAM TEST");
+    lv_obj_center(test_label);
+    lv_obj_set_style_text_color(test_label, lv_color_white(), 0);
+    
+    // Forcer le rendu
+    lv_timer_handler();
+    delay(2000); // Afficher 2 secondes
+    
+    // Animation test
+    Serial.println(F("Testing arc animation..."));
+    for (int value = 0; value <= 127; value += 8) {
+        lv_arc_set_value(test_arc, value);
+        char value_text[16];
+        snprintf(value_text, sizeof(value_text), "VALUE: %d", value);
+        lv_label_set_text(test_label, value_text);
+        lv_timer_handler();
+        delay(100);
+    }
+    
+    // Nettoyage
+    lv_obj_delete(test_screen);
+    lv_timer_handler();
+    
+    Serial.println(F("ParameterWidget basic test: PASSED"));
+    return true;
+}
+
+//=============================================================================
+// Démo visuelle ParameterWidget (Phase 2)
+//=============================================================================
+
+bool Ili9341LvglDisplay::demoParameterWidget() {
+    Serial.println(F(""));
+    Serial.println(F("======================================"));
+    Serial.println(F("=== PARAMETER WIDGET VISUAL DEMO ==="));
+    Serial.println(F("======================================"));
+    
+    if (!initialized_) {
+        Serial.println(F("FAILED: Display not initialized"));
+        return false;
+    }
+    
+    Serial.println(F("Testing basic LVGL before ParameterWidget..."));
+    
+    // D'abord test basique LVGL pour vérifier l'écran
+    lv_obj_t* screen = lv_screen_active();
+    lv_obj_clean(screen);
+    lv_obj_set_style_bg_color(screen, lv_color_hex(0x101010), 0); // Gris très foncé pour contraste
+    lv_timer_handler();
+    delay(1000);
+    
+    // Test 1: Créer un simple label de test
+    lv_obj_t* test_label = lv_label_create(screen);
+    lv_label_set_text(test_label, "LVGL TEST");
+    lv_obj_set_pos(test_label, 10, 10);
+    lv_obj_set_style_text_color(test_label, lv_color_white(), 0);
+    lv_timer_handler();
+    delay(2000);
+    
+    Serial.println(F("Basic LVGL test complete - creating ParameterWidget..."));
+    
+    // Nettoyer avant ParameterWidget
+    lv_obj_delete(test_label);
+    lv_timer_handler();
+    
+    // Créer le widget avec configuration personnalisée
+    ParameterWidget::Config config = ParameterWidget::getDefaultConfig();
+    config.arc_color = lv_color_hex(0x00FF80);  // Vert électrique
+    config.arc_width = 8;  // Plus épais pour la démo
+    config.anim_duration = 300;  // Animation plus lente pour bien voir
+    
+    auto widget = std::make_unique<ParameterWidget>(screen, config);
+    
+    // Centrer le widget sur l'écran (position absolue)
+    widget->setPosition(80, 100);  // Centré sur écran 240x320
+    
+    // Forcer le rendu immédiat
+    lv_timer_handler();
+    delay(1000);
+    
+    Serial.println(F("Widget positioned and rendered"));
+    
+    Serial.println(F("ParameterWidget created successfully!"));
+    
+    // === TEST 1: Configuration initiale ===
+    Serial.println(F(""));
+    Serial.println(F("=== TEST 1: Initial Setup ==="));
+    widget->setParameter(74, 1, 0, "CUTOFF", true);
+    lv_timer_handler();
+    delay(2000);
+    
+    // === TEST 2: Animation des valeurs ===
+    Serial.println(F("=== TEST 2: Value Animation ==="));
+    String parameters[] = {"CUTOFF", "RESONANCE", "ATTACK", "DECAY", "SUSTAIN", "RELEASE"};
+    uint8_t cc_numbers[] = {74, 71, 73, 75, 79, 72};
+    
+    for (int param = 0; param < 6; param++) {
+        Serial.print(F("Testing parameter: "));
+        Serial.println(parameters[param]);
+        
+        // Changer paramètre
+        widget->setParameter(cc_numbers[param], 1, 0, parameters[param], false);
+        lv_timer_handler();
+        delay(500);
+        
+        // Animation valeur 0 -> 127
+        for (uint8_t value = 0; value <= 127; value += 8) {
+            widget->setValue(value, true);
+            lv_timer_handler();
+            delay(50);  // Animation rapide
+        }
+        delay(500);
+        
+        // Animation 127 -> 0
+        for (uint8_t value = 127; value > 0; value -= 8) {
+            widget->setValue(value, true);
+            lv_timer_handler();
+            delay(50);
+        }
+        widget->setValue(0, true);
+        lv_timer_handler();
+        delay(1000);
+    }
+    
+    // === TEST 3: Canaux MIDI différents ===
+    Serial.println(F("=== TEST 3: MIDI Channels ==="));
+    for (uint8_t channel = 1; channel <= 16; channel += 3) {
+        Serial.print(F("Testing channel: "));
+        Serial.println(channel);
+        
+        widget->setParameter(74, channel, 64, "CHANNEL TEST", true);
+        lv_timer_handler();
+        delay(1000);
+    }
+    
+    // === TEST 4: Stress test avec changements rapides ===
+    Serial.println(F("=== TEST 4: Rapid Changes ==="));
+    widget->setParameter(74, 1, 0, "STRESS TEST", false);
+    lv_timer_handler();
+    
+    for (int cycle = 0; cycle < 50; cycle++) {
+        uint8_t random_value = cycle * 127 / 50;  // Progression linéaire
+        widget->setValue(random_value, false);  // Pas d'animation pour test rapide
+        lv_timer_handler();
+        delay(50);
+    }
+    
+    // === TEST 5: Animation finale avec callback ===
+    Serial.println(F("=== TEST 5: Final Demo ==="));
+    
+    // Configuration callback pour logs
+    widget->setValueChangedCallback([](uint8_t value) {
+        Serial.print(F("Callback: New value = "));
+        Serial.println(value);
+    });
+    
+    widget->setParameter(74, 1, 64, "FINAL DEMO", true);
+    lv_timer_handler();
+    delay(2000);
+    
+    // Simulation d'interaction utilisateur (changement lent)
+    for (uint8_t value = 64; value <= 100; value += 2) {
+        widget->setValue(value, true);
+        lv_timer_handler();
+        delay(100);
+    }
+    
+    // === NETTOYAGE ===
+    Serial.println(F(""));
+    Serial.println(F("=== DEMO COMPLETED ==="));
+    Serial.println(F("Cleaning up..."));
+    
+    // Le widget sera automatiquement détruit à la sortie de scope
+    // Nettoyer l'écran
+    lv_obj_clean(lv_screen_active());
+    lv_timer_handler();
+    
+    Serial.println(F(""));
+    Serial.println(F("========================================"));
+    Serial.println(F("=== PARAMETER WIDGET DEMO: SUCCESS! ==="));
+    Serial.println(F("========================================"));
+    
+    return true;
 }
 

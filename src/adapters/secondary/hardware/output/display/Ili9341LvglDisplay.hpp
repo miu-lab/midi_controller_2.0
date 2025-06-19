@@ -88,6 +88,18 @@ public:
     lv_obj_t* createTestScreen();
 
     /**
+     * @brief Test ParameterWidget pour validation Phase 2
+     * @return true si le test réussit
+     */
+    bool testParameterWidget();
+
+    /**
+     * @brief Démo visuelle interactive du ParameterWidget
+     * @return true si le test réussit
+     */
+    bool demoParameterWidget();
+
+    /**
      * @brief Ajouter debug mémoire (temporaire pour Phase 1)
      */
     void debugMemory() const;
