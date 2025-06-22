@@ -12,6 +12,7 @@
 #include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
+#include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 
 MidiControllerApp::MidiControllerApp(std::shared_ptr<DependencyContainer> container)
     : m_container(container) {}
@@ -30,9 +31,14 @@ Result<bool, std::string> MidiControllerApp::init() {
     m_inputSystem = m_container->resolve<IInputSystem>();
     m_midiSystem = m_container->resolve<IMidiSystem>();
     m_uiSystem = m_container->resolve<IUISystem>();
+    m_lvglBridge = m_container->resolve<Ili9341LvglBridge>();
 
     if (!m_configSystem || !m_inputSystem || !m_midiSystem || !m_uiSystem) {
         return Result<bool, std::string>::error("Sous-systèmes manquants");
+    }
+    
+    if (!m_lvglBridge) {
+        Serial.println(F("AVERTISSEMENT: Bridge LVGL non disponible"));
     }
 
     // Le décorateur MIDI pour les événements est maintenant créé et géré par MidiSubsystem
@@ -52,5 +58,10 @@ void MidiControllerApp::update() {
     // Mettre à jour le sous-système UI
     if (m_uiSystem) {
         m_uiSystem->update();
+    }
+    
+    // Rafraîchir l'affichage LVGL
+    if (m_lvglBridge) {
+        m_lvglBridge->refreshDisplay();
     }
 }

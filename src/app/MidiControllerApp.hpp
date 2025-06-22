@@ -11,6 +11,7 @@ class IInputSystem;
 class IMidiSystem;
 class IUISystem;
 class EventEnabledMidiOut;
+class Ili9341LvglBridge;
 
 /**
  * @brief Application principale du contrôleur MIDI
@@ -33,4 +34,7 @@ private:
     std::shared_ptr<IInputSystem> m_inputSystem;
     std::shared_ptr<IMidiSystem> m_midiSystem;
     std::shared_ptr<IUISystem> m_uiSystem;
+    
+    // Bridge LVGL pour le rafraîchissement de l'affichage
+    std::shared_ptr<Ili9341LvglBridge> m_lvglBridge;
 };
