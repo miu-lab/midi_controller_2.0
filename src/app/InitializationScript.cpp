@@ -4,7 +4,6 @@
 #include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341Driver.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
-#include "adapters/secondary/hardware/display/LvglDisplayPortAdapter.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
 #include "app/services/NavigationConfigService.hpp"
@@ -21,7 +20,6 @@
 #include "core/domain/interfaces/IInputSystem.hpp"
 #include "core/domain/interfaces/IMidiSystem.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
-#include "core/ports/output/DisplayPort.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
 #include "core/ports/output/ProfileStoragePort.hpp"
 
@@ -101,16 +99,10 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     }
     Serial.println(F("LVGL bridge initialized successfully"));
     
-    // 3. Créer l'adaptateur DisplayPort qui utilise le bridge LVGL
-    Serial.println(F("Creating DisplayPort adapter..."));
-    auto displayAdapter = std::make_shared<LvglDisplayPortAdapter>(bridge);
-    Serial.println(F("DisplayPort adapter created successfully"));
-    
-    // 4. Enregistrer les composants dans le container
+    // 3. Enregistrer les composants dans le container
     container->registerDependency<Ili9341Driver>(driver);
     container->registerDependency<Ili9341LvglBridge>(bridge);
-    container->registerDependency<DisplayPort>(displayAdapter);
-    Serial.println(F("All display components registered in container"));
+    Serial.println(F("LVGL display components registered in container"));
 
     // Stockage de profils
     auto profileManager = std::make_shared<ProfileManager>();

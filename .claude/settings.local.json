@@ -12,7 +12,8 @@
       "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/platformio.exe run -e MIDI_CONTROLLER_DEVELOPMENT -t upload)",
       "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/platformio.exe device monitor --baud 115200)",
       "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio device monitor)",
-      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio.exe run -e MIDI_CONTROLLER_PRODUCTION)"
+      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio.exe run -e MIDI_CONTROLLER_PRODUCTION)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

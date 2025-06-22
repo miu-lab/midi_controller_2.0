@@ -1,16 +1,17 @@
 #pragma once
 
 #include <Arduino.h>
+
 #include <memory>
 #include <vector>
 
+#include "LvglMenuView.hpp"
+#include "LvglModalView.hpp"
+#include "LvglParameterView.hpp"
+#include "LvglSplashScreenView.hpp"
 #include "ViewManager.hpp"
-#include "View.hpp"
-#include "MenuView.hpp"
-#include "ModalView.hpp"
-#include "SplashScreenView.hpp"
-#include "ParameterFocusView.hpp"
-#include "core/ports/output/DisplayPort.hpp"
+#include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
+#include "config/unified/UnifiedConfiguration.hpp"
 
 /**
  * @brief Implémentation simplifiée du gestionnaire de vues
@@ -23,11 +24,13 @@
 class DefaultViewManager : public ViewManager {
 public:
     /**
-     * @brief Constructeur avec dépendance sur l'affichage
-     * @param display Référence à l'adaptateur d'affichage
+     * @brief Constructeur
+     * @param lvglBridge Bridge LVGL
+     * @param unifiedConfig Configuration unifiée
      */
-    explicit DefaultViewManager(std::shared_ptr<DisplayPort> display);
-    
+    explicit DefaultViewManager(std::shared_ptr<Ili9341LvglBridge> lvglBridge,
+                                std::shared_ptr<UnifiedConfiguration> unifiedConfig);
+
     /**
      * @brief Destructeur
      */
@@ -64,15 +67,16 @@ public:
     void clearDisplayUpdateFlag() override { needsDisplayUpdate_ = false; }
 
 private:
-    // Affichage
-    std::shared_ptr<DisplayPort> display_;
-    
-    // Les 4 vues seulement
-    std::shared_ptr<SplashScreenView> splashView_;
-    std::shared_ptr<ParameterFocusView> parameterView_;  // VUE PAR DÉFAUT
-    std::shared_ptr<MenuView> menuView_;
-    std::shared_ptr<ModalView> modalView_;
-    
+    // Dépendances
+    std::shared_ptr<Ili9341LvglBridge> lvglBridge_;
+    std::shared_ptr<UnifiedConfiguration> unifiedConfig_;
+
+    // Les vues principales (100% LVGL)
+    std::shared_ptr<LvglSplashScreenView> splashView_;
+    std::shared_ptr<LvglParameterView> parameterView_;
+    std::shared_ptr<LvglMenuView> menuView_;
+    std::shared_ptr<LvglModalView> modalView_;
+
     // État actuel
     ViewType currentView_ = ViewType::SplashScreen;
     bool initialized_ = false;

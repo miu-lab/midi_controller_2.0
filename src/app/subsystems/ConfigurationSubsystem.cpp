@@ -5,6 +5,7 @@
 #include <set>
 
 #include "config/ConfigDefaults.hpp"
+#include "config/unified/UnifiedConfiguration.hpp"
 
 ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
@@ -31,6 +32,17 @@ Result<bool, std::string> ConfigurationSubsystem::init() {
         std::shared_ptr<ConfigurationSubsystem>(this, [](ConfigurationSubsystem*) {
             // Ne rien faire lors de la destruction (le conteneur ne possède pas cet objet)
         }));
+
+    // Enregistrer UnifiedConfiguration pour l'accès direct
+    if (config_) {
+        auto unifiedConfigPtr = std::shared_ptr<UnifiedConfiguration>(
+            const_cast<UnifiedConfiguration*>(&config_->getUnifiedConfiguration()),
+            [](UnifiedConfiguration*) {
+                // Custom deleter qui ne fait rien car on ne possède pas l'objet
+            });
+        container_->registerDependency<UnifiedConfiguration>(unifiedConfigPtr);
+        Serial.println(F("ConfigurationSubsystem: UnifiedConfiguration enregistrée dans le conteneur"));
+    }
 
     return Result<bool, std::string>::success(true);
 }

@@ -7,11 +7,8 @@
 #include "app/di/DependencyContainer.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IUISystem.hpp"
-#include "core/ports/output/DisplayPort.hpp"
 #include "core/utils/Result.hpp"
 #include "adapters/primary/ui/ViewManagerEventListener.hpp"
-#include "adapters/primary/ui/DisplayEventListener.hpp"
-#include "core/tasks/DisplayUpdateTask.hpp"
 
 class ViewManager;
 
@@ -65,11 +62,8 @@ public:
 private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<IConfiguration> configuration_;
-    std::shared_ptr<DisplayPort> display_;
     std::shared_ptr<ViewManager> viewManager_;
     std::unique_ptr<ViewManagerEventListener> eventListener_;
-    std::shared_ptr<DisplayUpdateTask> displayTask_;
-    std::unique_ptr<DisplayEventListener> displayEventListener_;
 
     bool fullUIEnabled_ = false;
     bool initialized_ = false;

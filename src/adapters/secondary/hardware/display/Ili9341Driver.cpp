@@ -2,28 +2,28 @@
 
 #include <Arduino.h>
 
-// Buffers statiques DMAMEM (240x320 pixels = 150KB)
-DMAMEM static uint16_t main_framebuffer[240 * 320];
+#include "DisplayConfig.hpp"
+
+// Buffers statiques DMAMEM - Taille selon orientation configurée
+DMAMEM static uint16_t main_framebuffer[DisplayConfig::FRAMEBUFFER_SIZE];
 
 // Buffers de différence statiques DMAMEM pour optimisation (4KB chacun)
-DMAMEM static uint8_t diffbuffer1[8192];
-DMAMEM static uint8_t diffbuffer2[8192];
+DMAMEM static uint8_t diffbuffer1[DisplayConfig::DIFFBUFFER_SIZE];
+DMAMEM static uint8_t diffbuffer2[DisplayConfig::DIFFBUFFER_SIZE];
 
 //=============================================================================
 // Configuration et constructeur
 //=============================================================================
 
 Ili9341Driver::Config Ili9341Driver::getDefaultConfig() {
-    return {
-        .cs_pin = 9,            // CS sur pin 9
-        .dc_pin = 10,           // DC sur pin 10
-        .rst_pin = 6,           // RST sur pin 6
-        .mosi_pin = 11,         // MOSI sur pin 11 (SPI standard)
-        .sck_pin = 13,          // SCK sur pin 13 (SPI standard)
-        .miso_pin = 12,         // MISO sur pin 12 (SPI standard)
-        .spi_speed = 40000000,  // 40MHz - vitesse optimale pour ILI9341 sur Teensy 4.1
-        .rotation = 1           // Paysage (0=Portrait, 1=Paysage, 2=Portrait inversé, 3=Paysage inversé)
-    };
+    return {.cs_pin = DisplayConfig::CS_PIN,
+            .dc_pin = DisplayConfig::DC_PIN,
+            .rst_pin = DisplayConfig::RST_PIN,
+            .mosi_pin = DisplayConfig::MOSI_PIN,
+            .sck_pin = DisplayConfig::SCK_PIN,
+            .miso_pin = DisplayConfig::MISO_PIN,
+            .spi_speed = DisplayConfig::SPI_SPEED,
+            .rotation = DisplayConfig::ROTATION};
 }
 
 Ili9341Driver::Ili9341Driver(const Config& config)
@@ -67,7 +67,6 @@ bool Ili9341Driver::initialize() {
     // Initialiser le driver
     tft_->begin(config_.spi_speed);
     tft_->setRotation(config_.rotation);
-    
     // IMPORTANT: Donner au driver son propre framebuffer interne
     tft_->setFramebuffer(framebuffer_);
 
@@ -103,9 +102,9 @@ void Ili9341Driver::setupDiffBuffers() {
 
 void Ili9341Driver::setupPerformance() {
     // Configuration performance optimisée (selon exemple officiel)
-    tft_->setDiffGap(4);        // gap petit avec buffers diff 4K
-    tft_->setVSyncSpacing(2);   // minimiser tearing
-    tft_->setRefreshRate(120);  // 100Hz pour performance élevée
+    tft_->setDiffGap(8);        // gap petit avec buffers diff 4K
+    tft_->setVSyncSpacing(1);   // minimiser tearing
+    tft_->setRefreshRate(60);  // 100Hz pour performance élevée
 }
 
 //=============================================================================

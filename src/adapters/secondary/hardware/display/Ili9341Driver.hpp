@@ -1,7 +1,10 @@
 #pragma once
 
 #include <ILI9341_T4.h>
+
 #include <memory>
+
+#include "DisplayConfig.hpp"
 
 /**
  * @brief Driver hardware pur pour écran ILI9341 via ILI9341_T4
@@ -17,14 +20,14 @@ public:
      * @brief Configuration hardware pour ILI9341
      */
     struct Config {
-        uint8_t cs_pin = 9;            ///< SPI Chip Select
-        uint8_t dc_pin = 10;           ///< Data/Command 
-        uint8_t rst_pin = 6;           ///< Reset
-        uint8_t mosi_pin = 11;         ///< SPI MOSI
-        uint8_t sck_pin = 13;          ///< SPI Clock
-        uint8_t miso_pin = 12;         ///< SPI MISO
-        uint32_t spi_speed = 40000000; ///< Vitesse SPI en Hz
-        uint8_t rotation = 1;          ///< Rotation écran (0-3)
+        uint8_t cs_pin = DisplayConfig::CS_PIN;         ///< SPI Chip Select
+        uint8_t dc_pin = DisplayConfig::DC_PIN;         ///< Data/Command
+        uint8_t rst_pin = DisplayConfig::RST_PIN;       ///< Reset
+        uint8_t mosi_pin = DisplayConfig::MOSI_PIN;     ///< SPI MOSI
+        uint8_t sck_pin = DisplayConfig::SCK_PIN;       ///< SPI Clock
+        uint8_t miso_pin = DisplayConfig::MISO_PIN;     ///< SPI MISO
+        uint32_t spi_speed = DisplayConfig::SPI_SPEED;  ///< Vitesse SPI en Hz
+        uint8_t rotation = DisplayConfig::ROTATION;     ///< Rotation écran (0-3)
     };
 
     /**

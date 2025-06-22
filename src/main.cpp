@@ -1,15 +1,15 @@
 /**
  * @file main.cpp
- * @brief Point d'entrée principal - Mode production
+ * @brief Point d'entrée principal avec switch mode production/test
  *
- * Pour basculer en mode test :
- * 1. Commenter le code de production ci-dessous
- * 2. Décommenter le code de test en bas
- * 3. Recompiler avec MIDI_CONTROLLER_DEVELOPMENT
+ * Pour basculer en mode test : décommenter TEST_MODE_ENABLED
+ * Pour le mode production : commenter TEST_MODE_ENABLED
  */
 
 #include <Arduino.h>
+#include <lvgl.h>
 
+#include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "app/InitializationScript.hpp"
 #include "app/MidiControllerApp.hpp"
 #include "app/di/DependencyContainer.hpp"
@@ -21,10 +21,9 @@ std::shared_ptr<DependencyContainer> container;
 
 void setup() {
     delay(2000);
-    Serial.begin(115200);
     Serial.println(F("Démarrage de l'application MIDI Controller..."));
     container = std::make_shared<DependencyContainer>();
-    
+
     Serial.println(F("Initialisation du conteneur..."));
     auto initResult = InitializationScript::initializeContainer(container, appConfig);
     if (initResult.isError()) {
@@ -33,7 +32,7 @@ void setup() {
         return;
     }
     Serial.println(F("Conteneur initialisé avec succès"));
-    
+
     app = std::make_shared<MidiControllerApp>(container);
     auto appInitResult = app->init();
     if (appInitResult.isError()) {

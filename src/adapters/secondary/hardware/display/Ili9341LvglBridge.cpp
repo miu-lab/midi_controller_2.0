@@ -8,16 +8,15 @@
  */
 
 #include "Ili9341LvglBridge.hpp"
-#include <lvgl.h>
+
 #include <Arduino.h>
+#include <lvgl.h>
 
-// Static DMAMEM buffers pour performance optimale (320 * 60 lignes paysage)
-static constexpr size_t BUFFER_WIDTH = 320;
-static constexpr size_t BUFFER_HEIGHT = 60;
-static constexpr size_t BUFFER_SIZE = BUFFER_WIDTH * BUFFER_HEIGHT;
+#include "DisplayConfig.hpp"
 
-DMAMEM static lv_color_t lvgl_buffer_1[BUFFER_SIZE];
-DMAMEM static lv_color_t lvgl_buffer_2[BUFFER_SIZE];
+// Static DMAMEM buffers pour performance optimale - Taille selon orientation configurée
+DMAMEM static lv_color_t lvgl_buffer_1[DisplayConfig::LVGL_BUFFER_SIZE];
+DMAMEM static lv_color_t lvgl_buffer_2[DisplayConfig::LVGL_BUFFER_SIZE];
 
 // Instance statique pour callbacks
 static Ili9341LvglBridge* bridge_instance_ = nullptr;
@@ -95,23 +94,26 @@ bool Ili9341LvglBridge::setupLvglCore() {
 }
 
 bool Ili9341LvglBridge::setupLvglDisplay() {
-    // Créer display LVGL v9
-    display_ = lv_display_create(320, 240);
+    // Créer display LVGL v9 - Dimensions selon configuration centralisée
+    display_ = lv_display_create(DisplayConfig::SCREEN_WIDTH, DisplayConfig::SCREEN_HEIGHT);
     if (!display_) {
         Serial.println(F("Bridge: Failed to create display"));
         return false;
     }
     
     // Configurer les buffers
-    lv_display_set_buffers(display_, lvgl_buf1_, lvgl_buf2_, 
-                          BUFFER_SIZE * sizeof(lv_color_t), LV_DISPLAY_RENDER_MODE_PARTIAL);
-    
+    lv_display_set_buffers(display_,
+                           lvgl_buf1_,
+                           lvgl_buf2_,
+                           DisplayConfig::LVGL_BUFFER_SIZE * sizeof(lv_color_t),
+                           LV_DISPLAY_RENDER_MODE_PARTIAL);
+
     // Définir callback flush
     lv_display_set_flush_cb(display_, flush_callback);
     
     // Stocker référence dans user_data pour callback
     lv_display_set_user_data(display_, this);
-    
+
     Serial.println(F("Bridge: Display configured"));
     return true;
 }
@@ -122,7 +124,7 @@ bool Ili9341LvglBridge::allocateLvglBuffers() {
     lvgl_buf2_ = config_.double_buffering ? lvgl_buffer_2 : nullptr;
     
     Serial.print(F("Bridge: Allocated buffers - Size: "));
-    Serial.print(BUFFER_SIZE * sizeof(lv_color_t));
+    Serial.print(DisplayConfig::LVGL_BUFFER_SIZE * sizeof(lv_color_t));
     Serial.println(F(" bytes"));
     return true;
 }
@@ -134,11 +136,9 @@ void Ili9341LvglBridge::freeLvglBuffers() {
 }
 
 Ili9341LvglBridge::LvglConfig Ili9341LvglBridge::getDefaultLvglConfig() {
-    return {
-        .buffer_lines = 60,
-        .double_buffering = true,
-        .lvgl_memory_kb = 48
-    };
+    return {.buffer_lines = DisplayConfig::LVGL_BUFFER_LINES,  ///< Lignes dans buffer LVGL
+            .double_buffering = true,
+            .lvgl_memory_kb = 48};
 }
 
 Ili9341LvglBridge* Ili9341LvglBridge::getInstance(lv_display_t* disp) {
