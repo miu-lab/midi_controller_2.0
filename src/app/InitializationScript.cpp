@@ -2,7 +2,9 @@
 
 // Inclusions nécessaires pour l'implémentation
 #include "adapters/primary/ui/DefaultViewManager.hpp"
-#include "adapters/secondary/hardware/output/display/Ili9341LvglDisplay.hpp"
+#include "adapters/secondary/hardware/display/Ili9341Driver.hpp"
+#include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
+#include "adapters/secondary/hardware/display/LvglDisplayPortAdapter.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "adapters/secondary/storage/ProfileManager.hpp"
 #include "app/services/NavigationConfigService.hpp"
@@ -79,17 +81,36 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     // MIDI Out
     container->registerDependency<MidiOutputPort>(std::make_shared<TeensyUsbMidiOut>());
 
-    // Écran LVGL
-    auto display = std::make_shared<Ili9341LvglDisplay>();
-    if (!display->init()) {
-        return Result<bool, std::string>::error("Échec d'initialisation de l'écran ILI9341_LVGL");
-    }
-
-    // TODO Phase 1: Temporairement désactivé - plus de DisplayPort
-    // container->registerDependency<DisplayPort>(display);
+    // Écran LVGL - Nouvelle architecture modulaire
+    Serial.println(F("Initializing display hardware driver..."));
     
-    // Enregistrer le display hardware directement
-    container->registerDependency<Ili9341LvglDisplay>(display);
+    // 1. Créer et initialiser le driver hardware
+    Ili9341Driver::Config driverConfig = Ili9341Driver::getDefaultConfig();
+    auto driver = std::make_shared<Ili9341Driver>(driverConfig);
+    if (!driver->initialize()) {
+        return Result<bool, std::string>::error("Échec d'initialisation du driver hardware ILI9341");
+    }
+    Serial.println(F("Hardware driver initialized successfully"));
+    
+    // 2. Créer et initialiser le bridge LVGL
+    Serial.println(F("Initializing LVGL bridge..."));
+    Ili9341LvglBridge::LvglConfig lvglConfig = Ili9341LvglBridge::getDefaultLvglConfig();
+    auto bridge = std::make_shared<Ili9341LvglBridge>(driver, lvglConfig);
+    if (!bridge->initialize()) {
+        return Result<bool, std::string>::error("Échec d'initialisation du bridge LVGL");
+    }
+    Serial.println(F("LVGL bridge initialized successfully"));
+    
+    // 3. Créer l'adaptateur DisplayPort qui utilise le bridge LVGL
+    Serial.println(F("Creating DisplayPort adapter..."));
+    auto displayAdapter = std::make_shared<LvglDisplayPortAdapter>(bridge);
+    Serial.println(F("DisplayPort adapter created successfully"));
+    
+    // 4. Enregistrer les composants dans le container
+    container->registerDependency<Ili9341Driver>(driver);
+    container->registerDependency<Ili9341LvglBridge>(bridge);
+    container->registerDependency<DisplayPort>(displayAdapter);
+    Serial.println(F("All display components registered in container"));
 
     // Stockage de profils
     auto profileManager = std::make_shared<ProfileManager>();
@@ -193,23 +214,42 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
 }
 
 void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyContainer> container) {
+    Serial.println(F("=== Configuration des écouteurs MIDI ==="));
+    
     // Récupération des composants nécessaires
     auto midiSystem = container->resolve<MidiSubsystem>();
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
 
-    if (!midiSystem || !optimizedEventBus) {
-        Serial.println(F("Impossible de configurer les écouteurs MIDI"));
+    if (!midiSystem) {
+        Serial.println(F("ERREUR: MidiSubsystem non disponible"));
         return;
     }
+    
+    if (!optimizedEventBus) {
+        Serial.println(F("ERREUR: OptimizedEventBus non disponible"));
+        return;
+    }
+    
+    Serial.println(F("MidiSubsystem et OptimizedEventBus trouvés"));
 
     // Récupérer le MidiMapper du MidiSubsystem
+    Serial.println(F("Récupération du MidiMapper..."));
     MidiMapper& midiMapper = midiSystem->getMidiMapper();
+    Serial.print(F("MidiMapper obtenu à l'adresse: 0x"));
+    Serial.println((uintptr_t)&midiMapper, HEX);
 
     // Enregistrer le MidiMapper comme écouteur de haute priorité
-    optimizedEventBus->subscribeWithPriority(&midiMapper, EventPriority::PRIORITY_HIGH);
-
-    Serial.println(F("MidiMapper enregistré comme écouteur prioritaire d'événements"));
+    Serial.println(F("Enregistrement du MidiMapper dans l'EventBus..."));
+    SubscriptionId subscriptionId = optimizedEventBus->subscribeWithPriority(&midiMapper, EventPriority::PRIORITY_HIGH);
+    
+    if (subscriptionId != 0) {
+        Serial.print(F("MidiMapper enregistré avec succès - ID: "));
+        Serial.println(subscriptionId);
+    } else {
+        Serial.println(F("ERREUR: Échec de l'enregistrement du MidiMapper"));
+    }
 
     // Configurer la propagation des événements haute priorité
     optimizedEventBus->setPropagateHighPriorityEvents(false);
+    Serial.println(F("Configuration des écouteurs MIDI terminée"));
 }
