@@ -1,5 +1,5 @@
 #include "LvglModalView.hpp"
-#include "adapters/secondary/hardware/display/DisplayConfig.hpp"
+#include "config/DisplayConfig.hpp"
 
 LvglModalView::LvglModalView(std::shared_ptr<Ili9341LvglBridge> bridge)
     :  bridge_(bridge),

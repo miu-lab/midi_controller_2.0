@@ -1,6 +1,6 @@
 #include "LvglMenuView.hpp"
 #include "ViewManager.hpp"
-#include "adapters/secondary/hardware/display/DisplayConfig.hpp"
+#include "config/DisplayConfig.hpp"
 
 LvglMenuView::LvglMenuView(std::shared_ptr<Ili9341LvglBridge> bridge)
     : bridge_(bridge), view_manager_(nullptr),

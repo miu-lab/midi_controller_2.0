@@ -12,7 +12,7 @@
 #include <Arduino.h>
 #include <lvgl.h>
 
-#include "DisplayConfig.hpp"
+#include "config/DisplayConfig.hpp"
 
 // Static DMAMEM buffers pour performance optimale - Taille selon orientation configurée
 DMAMEM static lv_color_t lvgl_buffer_1[DisplayConfig::LVGL_BUFFER_SIZE];
@@ -137,8 +137,7 @@ void Ili9341LvglBridge::freeLvglBuffers() {
 
 Ili9341LvglBridge::LvglConfig Ili9341LvglBridge::getDefaultLvglConfig() {
     return {.buffer_lines = DisplayConfig::LVGL_BUFFER_LINES,  ///< Lignes dans buffer LVGL
-            .double_buffering = true,
-            .lvgl_memory_kb = 48};
+            .double_buffering = true};
 }
 
 Ili9341LvglBridge* Ili9341LvglBridge::getInstance(lv_display_t* disp) {

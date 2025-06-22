@@ -1,36 +1,43 @@
 #pragma once
 
+#include "PerformanceConfig.hpp"
+#include "MidiConfig.hpp"
+#include "InputConfig.hpp"
+#include "HardwareConfig.hpp"
+
 /**
- * @brief Valeurs par défaut et constantes de configuration
+ * @brief Agrégation des configurations pour l'ApplicationConfiguration
  *
- * Ce namespace contient toutes les constantes et valeurs par défaut
- * utilisées par ApplicationConfiguration.
+ * Ce namespace fournit un accès unifié aux configurations modulaires
+ * pour maintenir la compatibilité avec ApplicationConfiguration.
  */
 namespace ConfigDefaults {
-// Performance
-constexpr bool PERFORMANCE_MODE = false;
-constexpr unsigned long MAX_UPDATE_TIME_US = 30000;  // 30ms
-constexpr unsigned long MAX_INPUT_TIME_US = 1000;    // 1ms
-constexpr unsigned long MAX_MIDI_TIME_US = 2000;     // 2ms
-constexpr unsigned long MAX_UI_TIME_US = 16000;      // 2ms
 
-// Interface utilisateur
-constexpr int DISPLAY_REFRESH_RATE_HZ = 60;
-constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = 1000 / DISPLAY_REFRESH_RATE_HZ;  // ~16.67ms
+// === PERFORMANCE ===
+constexpr bool PERFORMANCE_MODE = PerformanceConfig::PERFORMANCE_MODE_DEFAULT;
+constexpr unsigned long MAX_UPDATE_TIME_US = PerformanceConfig::MAX_UPDATE_TIME_US;
+constexpr unsigned long MAX_INPUT_TIME_US = PerformanceConfig::MAX_INPUT_TIME_US;
+constexpr unsigned long MAX_MIDI_TIME_US = PerformanceConfig::MAX_MIDI_TIME_US;
+constexpr unsigned long MAX_UI_TIME_US = PerformanceConfig::MAX_UI_TIME_US;
+
+// === INTERFACE UTILISATEUR ===
+constexpr int DISPLAY_REFRESH_RATE_HZ = PerformanceConfig::DISPLAY_REFRESH_RATE_HZ;
+constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS;
 constexpr bool SHOW_DEBUG_INFO = false;
 constexpr bool ENABLE_FULL_UI = true;
 
-// Sensibilité des contrôles
-constexpr float DEFAULT_ENCODER_SENSITIVITY = 1.0f;
-constexpr unsigned long ENCODER_RATE_LIMIT_MS = 20;  // 30ms au lieu de 2ms -> limite à ~33Hz
-constexpr unsigned long DUPLICATE_CHECK_MS = 10;     // 15ms au lieu de 4ms
+// === CONTRÔLES ===
+constexpr float DEFAULT_ENCODER_SENSITIVITY = InputConfig::DEFAULT_ENCODER_SENSITIVITY;
+constexpr unsigned long ENCODER_RATE_LIMIT_MS = PerformanceConfig::ENCODER_RATE_LIMIT_MS;
+constexpr unsigned long DUPLICATE_CHECK_MS = PerformanceConfig::DUPLICATE_CHECK_MS;
 
-// MIDI
-constexpr uint8_t DEFAULT_MIDI_CHANNEL = 0;  // Canal MIDI 1 (0-15)
-constexpr uint8_t CC_VALUE_MIN = 0;
-constexpr uint8_t CC_VALUE_MAX = 127;
+// === MIDI ===
+constexpr uint8_t DEFAULT_MIDI_CHANNEL = MidiConfig::DEFAULT_CHANNEL;
+constexpr uint8_t CC_VALUE_MIN = MidiConfig::CC_VALUE_MIN;
+constexpr uint8_t CC_VALUE_MAX = MidiConfig::CC_VALUE_MAX;
 
-// Système
-constexpr unsigned long SERIAL_BAUD_RATE = 115200;
-constexpr size_t MAX_COMMAND_HISTORY = 10;
+// === SYSTÈME ===
+constexpr unsigned long SERIAL_BAUD_RATE = HardwareConfig::SERIAL_BAUD_RATE;
+constexpr size_t MAX_COMMAND_HISTORY = HardwareConfig::MAX_COMMAND_HISTORY;
+
 }  // namespace ConfigDefaults

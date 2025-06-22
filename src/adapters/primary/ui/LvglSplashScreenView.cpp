@@ -1,5 +1,5 @@
 #include "LvglSplashScreenView.hpp"
-#include "adapters/secondary/hardware/display/DisplayConfig.hpp"
+#include "config/DisplayConfig.hpp"
 #include <Arduino.h>
 
 LvglSplashScreenView::LvglSplashScreenView(std::shared_ptr<Ili9341LvglBridge> bridge,

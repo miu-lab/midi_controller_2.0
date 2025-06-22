@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "DisplayConfig.hpp"
+#include "config/DisplayConfig.hpp"
 
 // Buffers statiques DMAMEM - Taille selon orientation configurée
 DMAMEM static uint16_t main_framebuffer[DisplayConfig::FRAMEBUFFER_SIZE];

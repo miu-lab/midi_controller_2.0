@@ -1,4 +1,5 @@
 #include "DisplayTestSuite.hpp"
+#include "config/DisplayConfig.hpp"
 #include "core/utils/FlashStrings.hpp"
 #include <Arduino.h>
 

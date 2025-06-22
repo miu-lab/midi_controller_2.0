@@ -12,7 +12,6 @@
 class NavigationConfigService;
 class CommandManager;
 class TeensyUsbMidiOut;
-class Ili9341LvglDisplay;
 class ProfileManager;
 class ConfigurationSubsystem;
 class InputController;

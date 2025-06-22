@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "DisplayConfig.hpp"
+#include "config/DisplayConfig.hpp"
 
 /**
  * @brief Driver hardware pur pour écran ILI9341 via ILI9341_T4
