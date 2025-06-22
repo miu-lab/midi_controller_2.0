@@ -12,7 +12,7 @@ constexpr bool PERFORMANCE_MODE = false;
 constexpr unsigned long MAX_UPDATE_TIME_US = 30000;  // 30ms
 constexpr unsigned long MAX_INPUT_TIME_US = 1000;    // 1ms
 constexpr unsigned long MAX_MIDI_TIME_US = 2000;     // 2ms
-constexpr unsigned long MAX_UI_TIME_US = 2000;       // 2ms
+constexpr unsigned long MAX_UI_TIME_US = 16000;      // 2ms
 
 // Interface utilisateur
 constexpr int DISPLAY_REFRESH_RATE_HZ = 60;
