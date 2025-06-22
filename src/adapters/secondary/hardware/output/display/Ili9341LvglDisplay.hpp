@@ -146,6 +146,16 @@ public:
     bool testAllRotations(); 
     bool testEndurance(uint16_t cycles = 1000);
     void runFullHardwareTestSuite();
+    
+    /**
+     * @brief Test direct framebuffer sans LVGL pour diagnostic
+     */
+    bool testDirectFramebuffer();
+    
+    /**
+     * @brief Test LVGL simple pour diagnostiquer le flush callback
+     */
+    bool testSimpleLvgl();
 
 private:
     // Hardware et configuration
@@ -158,20 +168,19 @@ private:
     // Buffers selon modèle ILI9341_t4
     uint16_t* framebuffer_;  // Buffer principal 240x320 (alloué en DMAMEM)
 
-    // Diff buffers pour performance ILI9341_t4 (déplacés en EXTMEM)
+    // Diff buffers pour performance ILI9341_t4
     std::unique_ptr<ILI9341_T4::DiffBuff> diff1_;
     std::unique_ptr<ILI9341_T4::DiffBuff> diff2_;
 
     // LVGL
     lv_display_t* display_;
-    lv_draw_buf_t draw_buf_;
     lv_color_t* lvgl_buf1_;  // Buffer LVGL ligne par ligne (40 lignes)
-    lv_color_t* lvgl_buf2_;  // Double buffer LVGL
+    lv_color_t* lvgl_buf2_;  // Double buffer LVGL pour performance
 
-    // Dimensions écran ILI9341
-    static constexpr int SCREEN_WIDTH = 240;
-    static constexpr int SCREEN_HEIGHT = 320;
-    static constexpr int LVGL_BUFFER_LINES = 40;  // Nombre de lignes dans le buffer LVGL
+    // Dimensions écran ILI9341 (rotation 1 = paysage)
+    static constexpr int SCREEN_WIDTH = 320;   // Largeur en paysage
+    static constexpr int SCREEN_HEIGHT = 240;  // Hauteur en paysage
+    static constexpr int LVGL_BUFFER_LINES = 60;  // Nombre de lignes dans le buffer LVGL
 
     // Performance tracking
     DisplayProfiler profiler_;

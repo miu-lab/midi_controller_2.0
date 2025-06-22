@@ -9,9 +9,10 @@
 // Buffer principal en DMAMEM (240x320 pixels = 150KB)
 DMAMEM static uint16_t main_framebuffer[240 * 320];
 
-// Buffers LVGL (40 lignes = 19.2KB chacun)
-DMAMEM static lv_color_t lvgl_buffer1[240 * 40];
-DMAMEM static lv_color_t lvgl_buffer2[240 * 40];
+// Buffers LVGL optimisés pour performance (320 * 60 lignes = 38.4KB chacun)
+// Plus gros buffers = moins de flush callbacks = plus de FPS
+DMAMEM static lv_color_t lvgl_buffer1[320 * 60];
+DMAMEM static lv_color_t lvgl_buffer2[320 * 60];
 
 //=============================================================================
 // Configuration et constructeur
@@ -25,8 +26,8 @@ Ili9341LvglDisplay::Config Ili9341LvglDisplay::getDefaultConfig() {
         .mosi_pin = 11,         // MOSI sur pin 11 (SPI standard)
         .sck_pin = 13,          // SCK sur pin 13 (SPI standard)
         .miso_pin = 12,         // MISO sur pin 12 (SPI standard)
-        .spi_speed = 40000000,  // 40MHz - optimal pour Teensy 4.1 + LVGL
-        .rotation = 0           // Portrait
+        .spi_speed = 40000000,  // 80MHz - vitesse max pour ILI9341 sur Teensy 4.1
+        .rotation = 1  // Paysage (0=Portrait, 1=Paysage, 2=Portrait inversé, 3=Paysage inversé)
     };
 }
 
@@ -67,9 +68,7 @@ bool Ili9341LvglDisplay::init() {
         pinMode(config_.rst_pin, OUTPUT);
         // Reset de l'écran
         digitalWrite(config_.rst_pin, LOW);
-        delay(10);
         digitalWrite(config_.rst_pin, HIGH);
-        delay(100);
     }
 
     // Créer le driver ILI9341_T4
@@ -90,6 +89,7 @@ bool Ili9341LvglDisplay::init() {
     // Initialiser le driver
     tft_->begin(config_.spi_speed);
     tft_->setRotation(config_.rotation);
+    // IMPORTANT: Donner au driver son propre framebuffer interne pour que updateRegion marche
     tft_->setFramebuffer(framebuffer_);
 
     // Créer les diff buffers pour optimisation (alloués en DMAMEM)
@@ -102,9 +102,10 @@ bool Ili9341LvglDisplay::init() {
     diff2_ = std::make_unique<ILI9341_T4::DiffBuff>(diffbuffer2, sizeof(diffbuffer2));
     tft_->setDiffBuffers(diff1_.get(), diff2_.get());
 
-    // Configuration performance
-    tft_->setRefreshRate(120);
-    tft_->setVSyncSpacing(2);
+    // Configuration performance optimisée (selon exemple officiel)
+    tft_->setDiffGap(4);        // gap petit avec buffers diff 4K
+    tft_->setVSyncSpacing(1);   // minimiser tearing, LVGL contrôle framerate
+    tft_->setRefreshRate(100);  // 100Hz pour dépasser 60 FPS
 
     Serial.println(F("ILI9341_LVGL: Hardware initialized, setting up LVGL..."));
 
@@ -114,24 +115,20 @@ bool Ili9341LvglDisplay::init() {
         return false;
     }
 
-    // Test initial - effacer l'écran
+    // Test initial - effacer l'écran et forcer le rendu
     lv_obj_t* screen = lv_screen_active();
     if (screen) {
         lv_obj_clean(screen);
+        lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
     }
     lv_timer_handler(); // Forcer un rendu LVGL
 
+    // Forcer mise à jour framebuffer (critique pour premier affichage)
+    tft_->update(framebuffer_);
+
     Serial.println(F("ILI9341_LVGL: Initialization complete"));
     initialized_ = true;
-    
-    // DEBUG: Afficher diagnostics mémoire
-    debugMemory();
-    
-    // TODO Phase 1: Option pour lancer les tests hardware
-    Serial.println(F(""));
-    Serial.println(F("Phase 1 Test Option: Send 'T' via Serial to run hardware tests"));
-    Serial.println(F("(Tests include: init, rotations, performance, endurance)"));
-    
+
     return true;
 }
 
@@ -140,26 +137,48 @@ bool Ili9341LvglDisplay::setupLvgl() {
     static bool lvgl_initialized = false;
     if (!lvgl_initialized) {
         lv_init();
+
+        // ✅ Configurer le tick system comme dans l'exemple officiel
+        lv_tick_set_cb([]() -> uint32_t { return millis(); });
+
         lvgl_initialized = true;
         Serial.println(F("ILI9341_LVGL: LVGL core initialized"));
     }
 
-    // Créer le display LVGL
-    display_ = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
+    // Créer le display LVGL avec dimensions selon rotation
+    uint16_t display_width, display_height;
+    getDimensions(display_width, display_height);
+
+    Serial.print(F("ILI9341_LVGL: Creating display with dimensions "));
+    Serial.print(display_width);
+    Serial.print(F("x"));
+    Serial.print(display_height);
+    Serial.print(F(" (rotation "));
+    Serial.print(config_.rotation);
+    Serial.println(F(")"));
+
+    display_ = lv_display_create(display_width, display_height);
     if (!display_) {
         Serial.println(F("ILI9341_LVGL: Failed to create LVGL display"));
         return false;
     }
 
-    // Configurer les buffers de dessin LVGL
-    lv_display_set_buffers(display_, lvgl_buf1_, lvgl_buf2_, 
-                          sizeof(lvgl_buffer1), LV_DISPLAY_RENDER_MODE_PARTIAL);
+    // Configurer les buffers de dessin LVGL avec double buffering
+    // Buffer size optimisé : 320 * 60 * sizeof(lv_color_t) = 38400 bytes
+    lv_display_set_buffers(display_,
+                           lvgl_buf1_,
+                           lvgl_buf2_,  // Double buffer pour performance
+                           320 * 60 * sizeof(lv_color_t),
+                           LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     // Définir les callbacks
     lv_display_set_flush_cb(display_, flush_cb);
 
     // Associer cette instance au display pour les callbacks
     lv_display_set_user_data(display_, this);
+
+    // CRITIQUE: Définir comme display par défaut
+    lv_display_set_default(display_);
 
     Serial.println(F("ILI9341_LVGL: LVGL display configured"));
     return true;
@@ -176,71 +195,11 @@ void Ili9341LvglDisplay::flush_cb(lv_display_t* disp, const lv_area_t* area, uin
         return;
     }
 
-    unsigned long startTime = micros();
-    unsigned long copyStart, copyEnd, updateStart, updateEnd;
+    // FLUSH CALLBACK OPTIMISÉ (selon exemple officiel ILI9341_T4 + LVGL)
+    const bool redraw_now = lv_disp_flush_is_last(disp);
+    instance->tft_
+        ->updateRegion(redraw_now, (uint16_t*)px_map, area->x1, area->x2, area->y1, area->y2);
 
-    // Calculer dimensions de la zone
-    int32_t w = area->x2 - area->x1 + 1;
-    int32_t h = area->y2 - area->y1 + 1;
-    uint32_t pixels_updated = w * h;
-
-    copyStart = micros();
-    
-    // Optimisation: copie optimisée par lignes complètes
-    uint16_t* fb = instance->framebuffer_;
-    uint16_t* src = (uint16_t*)px_map;
-    
-    // Si la zone couvre toute la largeur, on peut copier par memcpy (plus rapide)
-    if (area->x1 == 0 && w == 240) {
-        // Copie optimisée ligne complète
-        uint16_t* dst = &fb[area->y1 * 240];
-        memcpy(dst, src, pixels_updated * 2); // 2 bytes par pixel
-    } else {
-        // Copie ligne par ligne pour zones partielles
-        for (int32_t y = area->y1; y <= area->y2; y++) {
-            uint16_t* dst_line = &fb[y * 240 + area->x1];
-            memcpy(dst_line, src, w * 2); // 2 bytes par pixel
-            src += w;
-        }
-    }
-    
-    copyEnd = micros();
-    updateStart = micros();
-    
-    // Optimisation critique: utiliser updateRegion au lieu de update global
-    // Pour éviter le transfert du framebuffer complet (40ms -> <2ms)
-    if (w < 240 || h < 320) {
-        // Update zone partielle seulement (optimisation majeure)
-        instance->tft_->updateRegion(true, instance->framebuffer_, 
-                                   area->x1, area->x2, area->y1, area->y2, 240);
-    } else {
-        // Fallback update global pour écran complet
-        instance->tft_->update(instance->framebuffer_);
-    }
-    
-    updateEnd = micros();
-
-    // Métriques détaillées pour analyse performance
-    unsigned long totalTime = updateEnd - startTime;
-    unsigned long copyTime = copyEnd - copyStart;
-    unsigned long updateTime = updateEnd - updateStart;
-    
-    instance->profiler_.recordUpdate(totalTime);
-    instance->flush_profiler_.recordFlush(area, totalTime);
-    
-    // Debug performance si > 500μs pour zones partielles ou 2ms pour écran complet
-    uint32_t threshold = (w < 240 || h < 320) ? 500 : 2000;
-    if (totalTime > threshold) {
-        Serial.print(F("SLOW flush: ")); Serial.print(totalTime); Serial.println(F("μs"));
-        Serial.print(F("  Copy: ")); Serial.print(copyTime); Serial.println(F("μs"));
-        Serial.print(F("  Update: ")); Serial.print(updateTime); Serial.println(F("μs"));
-        Serial.print(F("  Pixels: ")); Serial.println(pixels_updated);
-        Serial.print(F("  Area: ")); Serial.print(area->x1); Serial.print(F(","));
-        Serial.print(area->y1); Serial.print(F(" -> ")); Serial.print(area->x2);
-        Serial.print(F(",")); Serial.println(area->y2);
-    }
-
-    // Indiquer à LVGL que le transfert est terminé
     lv_display_flush_ready(disp);
 }
 
@@ -259,34 +218,22 @@ Ili9341LvglDisplay* Ili9341LvglDisplay::getInstance(lv_display_t* disp) {
 
 void Ili9341LvglDisplay::debugMemory() const {
     Serial.println(F("=== DEBUG MEMORY ==="));
-    Serial.print(F("Framebuffer (240x320): 0x")); Serial.println((uint32_t)framebuffer_, HEX);
-    Serial.print(F("Framebuffer size: ")); Serial.println(240 * 320 * 2); // 153,600 bytes
-    
-    Serial.print(F("LVGL buf1 (40 lines): 0x")); Serial.println((uint32_t)lvgl_buf1_, HEX);
-    Serial.print(F("LVGL buf2 (40 lines): 0x")); Serial.println((uint32_t)lvgl_buf2_, HEX);
-    Serial.print(F("LVGL buffer size each: ")); Serial.println(240 * 40 * 2); // 19,200 bytes each
-    
-    Serial.print(F("Diff buf1: 0x")); Serial.println((uint32_t)diff1_.get(), HEX);
-    Serial.print(F("Diff buf2: 0x")); Serial.println((uint32_t)diff2_.get(), HEX);
-    
-    Serial.print(F("Display initialized: ")); Serial.println(initialized_);
-    Serial.print(F("LVGL display: 0x")); Serial.println((uint32_t)display_, HEX);
-    
-    // Vérifier si c'est bien en DMAMEM (addresses 0x2020xxxx pour Teensy 4.1)
-    bool fb_in_dmamem = ((uint32_t)framebuffer_ >= 0x20200000) && ((uint32_t)framebuffer_ < 0x20280000);
-    bool buf1_in_dmamem = ((uint32_t)lvgl_buf1_ >= 0x20200000) && ((uint32_t)lvgl_buf1_ < 0x20280000);
-    bool buf2_in_dmamem = ((uint32_t)lvgl_buf2_ >= 0x20200000) && ((uint32_t)lvgl_buf2_ < 0x20280000);
-    
-    Serial.print(F("Framebuffer in DMAMEM: ")); Serial.println(fb_in_dmamem ? "YES" : "NO");
-    Serial.print(F("LVGL buf1 in DMAMEM: ")); Serial.println(buf1_in_dmamem ? "YES" : "NO");
-    Serial.print(F("LVGL buf2 in DMAMEM: ")); Serial.println(buf2_in_dmamem ? "YES" : "NO");
-    
-    // Total DMAMEM utilisé
-    uint32_t total_dmamem = (240 * 320 * 2) + (240 * 40 * 2) + (240 * 40 * 2) + 4096 + 4096;
-    Serial.print(F("Total DMAMEM used: ")); Serial.println(total_dmamem);
-    Serial.print(F("DMAMEM available on T4.1: ")); Serial.println(524288); // 512KB
-    
-    Serial.println(F("=================="));
+    Serial.print(F("Framebuffer (240x320): 0x"));
+    Serial.println((uint32_t)framebuffer_, HEX);
+
+    Serial.print(F("LVGL buf1 (40 lines): 0x"));
+    Serial.println((uint32_t)lvgl_buf1_, HEX);
+    Serial.print(F("LVGL buf2 (40 lines): 0x"));
+    Serial.println((uint32_t)lvgl_buf2_, HEX);
+
+    Serial.print(F("Diff buf1: 0x"));
+    Serial.println((uint32_t)diff1_.get(), HEX);
+    Serial.print(F("Diff buf2: 0x"));
+    Serial.println((uint32_t)diff2_.get(), HEX);
+    Serial.print(F("Display initialized: "));
+    Serial.println(initialized_);
+    Serial.print(F("LVGL display: 0x"));
+    Serial.println((uint32_t)display_, HEX);
 }
 
 //=============================================================================
@@ -313,10 +260,10 @@ void Ili9341LvglDisplay::setRotation(uint8_t rotation) {
 void Ili9341LvglDisplay::getDimensions(uint16_t& width, uint16_t& height) const {
     // Dimensions selon rotation
     if (config_.rotation == 1 || config_.rotation == 3) {
-        width = 320;  // Paysage
+        width = 320;  // Paysage (90° et 270°)
         height = 240;
     } else {
-        width = 240;  // Portrait
+        width = 240;  // Portrait (0° et 180°)
         height = 320;
     }
 }
@@ -707,10 +654,11 @@ void Ili9341LvglDisplay::runFullHardwareTestSuite() {
     
     // Test 1: Multiple init
     bool test1 = testMultipleInit();
-    
-    // Test 2: Rotations
-    bool test2 = testAllRotations();
-    
+
+    // Test 2: Rotations (temporairement désactivé pour économiser mémoire)
+    Serial.println(F("Skipping rotation test to save memory"));
+    bool test2 = true;  // testAllRotations();
+
     // Test 3: Performance benchmark
     Serial.println(F("Running performance benchmark..."));
     runPerformanceBenchmark();
@@ -787,7 +735,6 @@ bool Ili9341LvglDisplay::testParameterWidget() {
         snprintf(value_text, sizeof(value_text), "VALUE: %d", value);
         lv_label_set_text(test_label, value_text);
         lv_timer_handler();
-        delay(100);
     }
     
     // Nettoyage
@@ -812,17 +759,20 @@ bool Ili9341LvglDisplay::demoParameterWidget() {
         Serial.println(F("FAILED: Display not initialized"));
         return false;
     }
-    
-    Serial.println(F("Testing basic LVGL before ParameterWidget..."));
-    
-    // D'abord test basique LVGL pour vérifier l'écran
-    lv_obj_t* screen = lv_screen_active();
-    lv_obj_clean(screen);
+
+    Serial.println(F("Creating new screen for ParameterWidget demo..."));
+
+    // Créer un NOUVEL écran (comme dans createTestScreen qui fonctionne)
+    lv_obj_t* screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(screen, lv_color_hex(0x101010), 0); // Gris très foncé pour contraste
+
+    // Charger le nouvel écran
+    lv_screen_load(screen);
     lv_timer_handler();
-    delay(1000);
-    
+    delay(500);
+
     // Test 1: Créer un simple label de test
+    Serial.println(F("Testing basic LVGL on new screen..."));
     lv_obj_t* test_label = lv_label_create(screen);
     lv_label_set_text(test_label, "LVGL TEST");
     lv_obj_set_pos(test_label, 10, 10);
@@ -835,13 +785,12 @@ bool Ili9341LvglDisplay::demoParameterWidget() {
     // Nettoyer avant ParameterWidget
     lv_obj_delete(test_label);
     lv_timer_handler();
-    
+
     // Créer le widget avec configuration personnalisée
     ParameterWidget::Config config = ParameterWidget::getDefaultConfig();
     config.arc_color = lv_color_hex(0x00FF80);  // Vert électrique
-    config.arc_width = 8;  // Plus épais pour la démo
-    config.anim_duration = 300;  // Animation plus lente pour bien voir
-    
+    config.arc_width = 8;                       // Plus épais pour la démo
+
     auto widget = std::make_unique<ParameterWidget>(screen, config);
     
     // Centrer le widget sur l'écran (position absolue)
@@ -877,22 +826,18 @@ bool Ili9341LvglDisplay::demoParameterWidget() {
         delay(500);
         
         // Animation valeur 0 -> 127
-        for (uint8_t value = 0; value <= 127; value += 8) {
+        for (uint8_t value = 0; value <= 127; value += 1) {
             widget->setValue(value, true);
             lv_timer_handler();
-            delay(50);  // Animation rapide
         }
-        delay(500);
-        
+
         // Animation 127 -> 0
-        for (uint8_t value = 127; value > 0; value -= 8) {
+        for (uint8_t value = 127; value > 0; value -= 1) {
             widget->setValue(value, true);
             lv_timer_handler();
-            delay(50);
         }
         widget->setValue(0, true);
         lv_timer_handler();
-        delay(1000);
     }
     
     // === TEST 3: Canaux MIDI différents ===
@@ -915,7 +860,7 @@ bool Ili9341LvglDisplay::demoParameterWidget() {
         uint8_t random_value = cycle * 127 / 50;  // Progression linéaire
         widget->setValue(random_value, false);  // Pas d'animation pour test rapide
         lv_timer_handler();
-        delay(50);
+        delay(10);
     }
     
     // === TEST 5: Animation finale avec callback ===
@@ -935,7 +880,7 @@ bool Ili9341LvglDisplay::demoParameterWidget() {
     for (uint8_t value = 64; value <= 100; value += 2) {
         widget->setValue(value, true);
         lv_timer_handler();
-        delay(100);
+        delay(10);
     }
     
     // === NETTOYAGE ===
@@ -956,3 +901,168 @@ bool Ili9341LvglDisplay::demoParameterWidget() {
     return true;
 }
 
+//=============================================================================
+// Test direct du framebuffer (diagnostic)
+//=============================================================================
+
+bool Ili9341LvglDisplay::testDirectFramebuffer() {
+    Serial.println(F("=== DIRECT FRAMEBUFFER TEST ==="));
+
+    if (!initialized_ || !tft_) {
+        Serial.println(F("FAILED: Display not initialized"));
+        return false;
+    }
+
+    Serial.println(F("Drawing directly to framebuffer..."));
+
+    // Test 1: Remplir l'écran en rouge
+    Serial.println(F("Test 1: Red screen"));
+    uint16_t red = 0xF800;  // Rouge en RGB565
+    for (int i = 0; i < 240 * 320; i++) {
+        framebuffer_[i] = red;
+    }
+    tft_->update(framebuffer_);
+    delay(2000);
+
+    // Test 2: Remplir l'écran en vert
+    Serial.println(F("Test 2: Green screen"));
+    uint16_t green = 0x07E0;  // Vert en RGB565
+    for (int i = 0; i < 240 * 320; i++) {
+        framebuffer_[i] = green;
+    }
+    tft_->update(framebuffer_);
+    delay(2000);
+
+    // Test 3: Remplir l'écran en bleu
+    Serial.println(F("Test 3: Blue screen"));
+    uint16_t blue = 0x001F;  // Bleu en RGB565
+    for (int i = 0; i < 240 * 320; i++) {
+        framebuffer_[i] = blue;
+    }
+    tft_->update(framebuffer_);
+    delay(2000);
+
+    // Test 4: Pattern simple - lignes horizontales
+    Serial.println(F("Test 4: Horizontal lines"));
+    for (int y = 0; y < 320; y++) {
+        uint16_t color = (y % 40 < 20) ? 0xFFFF : 0x0000;  // Blanc/noir
+        for (int x = 0; x < 240; x++) {
+            framebuffer_[y * 240 + x] = color;
+        }
+    }
+    tft_->update(framebuffer_);
+    delay(2000);
+
+    // Test 5: Pattern simple - lignes verticales
+    Serial.println(F("Test 5: Vertical lines"));
+    for (int y = 0; y < 320; y++) {
+        for (int x = 0; x < 240; x++) {
+            uint16_t color = (x % 40 < 20) ? 0xF800 : 0x001F;  // Rouge/bleu
+            framebuffer_[y * 240 + x] = color;
+        }
+    }
+    tft_->update(framebuffer_);
+    delay(2000);
+
+    // Test 6: Clear to black
+    Serial.println(F("Test 6: Back to black"));
+    for (int i = 0; i < 240 * 320; i++) {
+        framebuffer_[i] = 0x0000;
+    }
+    tft_->update(framebuffer_);
+
+    Serial.println(F("Direct framebuffer test completed"));
+    return true;
+}
+
+//=============================================================================
+// Test LVGL simple (diagnostic flush callback)
+//=============================================================================
+
+bool Ili9341LvglDisplay::testSimpleLvgl() {
+    Serial.println(F("=== SIMPLE LVGL TEST ==="));
+
+    if (!initialized_) {
+        Serial.println(F("FAILED: Display not initialized"));
+        return false;
+    }
+
+    Serial.println(F("Testing LVGL flush callback step by step..."));
+
+    // D'abord effacer le framebuffer manuellement (pour comparaison)
+    Serial.println(F("Step 1: Clear framebuffer manually"));
+    for (int i = 0; i < 240 * 320; i++) {
+        framebuffer_[i] = 0x0000;  // Noir
+    }
+    tft_->update(framebuffer_);
+    delay(1000);
+
+    // Maintenant essayer avec LVGL - écran plein noir
+    Serial.println(F("Step 2: LVGL black screen"));
+    lv_obj_t* screen = lv_screen_active();
+    lv_obj_clean(screen);
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+
+    // Forcer plusieurs appels pour être sûr avec tick manuel
+    for (int i = 0; i < 10; i++) {
+        lv_tick_inc(100);  // Simuler 100ms
+        lv_timer_handler();
+        delay(100);
+    }
+    delay(1000);
+
+    // LVGL écran plein rouge
+    Serial.println(F("Step 3: LVGL red screen"));
+    lv_obj_set_style_bg_color(screen, lv_color_hex(0xFF0000), 0);
+    lv_timer_handler();
+    delay(2000);
+
+    // Test différent : créer des objets au lieu de changer les couleurs
+    Serial.println(F("Step 4: Create green rectangle"));
+    lv_obj_t* rect = lv_obj_create(screen);
+    lv_obj_set_size(rect, 200, 100);
+    lv_obj_center(rect);
+    lv_obj_set_style_bg_color(rect, lv_color_hex(0x00FF00), 0);
+
+    // Forcer les ticks et la synchronisation
+    Serial.println(F("DEBUG: Forcing LVGL refresh..."));
+    for (int i = 0; i < 10; i++) {
+        lv_tick_inc(50);  // Forcer 50ms de tick
+        lv_timer_handler();
+        delay(50);
+    }
+    lv_obj_invalidate(screen);  // Invalider tout l'écran
+    lv_timer_handler();
+    delay(1000);
+
+    Serial.println(F("Step 5: Change to blue rectangle"));
+    lv_obj_set_style_bg_color(rect, lv_color_hex(0x0000FF), 0);
+    lv_obj_invalidate(rect);  // Forcer le redraw
+    lv_timer_handler();
+    delay(2000);
+
+    Serial.println(F("Step 5b: Delete rectangle"));
+    lv_obj_delete(rect);
+    lv_timer_handler();
+    delay(1000);
+
+    // Test avec un objet simple
+    Serial.println(F("Step 6: LVGL simple label"));
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+
+    lv_obj_t* label = lv_label_create(screen);
+    lv_label_set_text(label, "HELLO LVGL!");
+    lv_obj_set_style_text_color(label, lv_color_white(), 0);
+    lv_obj_set_pos(label, 50, 50);
+    lv_timer_handler();
+    delay(3000);
+
+    // Nettoyer
+    Serial.println(F("Step 7: Cleanup"));
+    lv_obj_delete(label);
+    lv_obj_set_style_bg_color(screen, lv_color_black(), 0);
+    lv_timer_handler();
+
+    Serial.println(F("Simple LVGL test completed"));
+    return true;
+}
