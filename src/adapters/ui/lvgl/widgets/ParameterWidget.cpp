@@ -6,19 +6,15 @@
 //=============================================================================
 
 ParameterWidget::Config ParameterWidget::getDefaultConfig() {
-    return {
-        .width = 240,
-        .height = 120,
-        .arc_size = 80,
-        .arc_width = 6,
-        .arc_color = lv_color_hex(0x0080FF),
-        .arc_bg_color = lv_color_hex(0x404040),
-        .anim_duration = 200,
-        .enable_animations = true,
-        .show_cc_number = true,
-        .show_channel = true,
-        .show_value = true
-    };
+    return {.width = 240,
+            .height = 120,
+            .arc_size = 80,
+            .arc_width = 6,
+            .arc_color = lv_color_hex(0x0080FF),
+            .arc_bg_color = lv_color_hex(0x404040),
+            .show_cc_number = true,
+            .show_channel = true,
+            .show_value = true};
 }
 
 //=============================================================================
@@ -263,36 +259,13 @@ void ParameterWidget::updateLabels() {
 
 void ParameterWidget::updateArcValue(bool animate) {
     if (!arc_) return;
-    
+
     int16_t arc_value = midiToArcValue(current_value_);
-    
-    if (animate && config_.enable_animations) {
-        // Arrêter animation précédente si nécessaire
-        if (is_animating_) {
-            lv_anim_delete(arc_, anim_arc_exec_cb);
-        }
-        
-        // Configurer animation
-        lv_anim_init(&value_anim_);
-        lv_anim_set_var(&value_anim_, arc_);
-        lv_anim_set_values(&value_anim_, lv_arc_get_value(arc_), arc_value);
-        lv_anim_set_duration(&value_anim_, config_.anim_duration);
-        lv_anim_set_exec_cb(&value_anim_, anim_arc_exec_cb);
-        lv_anim_set_ready_cb(&value_anim_, anim_ready_cb);
-        lv_anim_set_user_data(&value_anim_, this);
-        
-        is_animating_ = true;
-        lv_anim_start(&value_anim_);
-        
-        Serial.print(F("ParameterWidget: Starting animation to value "));
-        Serial.println(arc_value);
-    } else {
-        // Mise à jour immédiate
-        lv_arc_set_value(arc_, arc_value);
-        
-        Serial.print(F("ParameterWidget: Immediate arc update to "));
-        Serial.println(arc_value);
-    }
+    // Mise à jour immédiate
+    lv_arc_set_value(arc_, arc_value);
+
+    Serial.print(F("ParameterWidget: Immediate arc update to "));
+    Serial.println(arc_value);
 }
 
 //=============================================================================

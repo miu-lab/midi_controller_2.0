@@ -31,10 +31,6 @@ public:
         lv_color_t arc_color = lv_color_hex(0x0080FF);  ///< Couleur arc actif
         lv_color_t arc_bg_color = lv_color_hex(0x404040); ///< Couleur arc background
         
-        // Animation
-        uint32_t anim_duration = 200;   ///< Durée animation (ms)
-        bool enable_animations = true; ///< Activer animations
-        
         // Style
         bool show_cc_number = true;     ///< Afficher numéro CC
         bool show_channel = true;       ///< Afficher canal MIDI
