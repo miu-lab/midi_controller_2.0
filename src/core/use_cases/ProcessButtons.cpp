@@ -1,7 +1,6 @@
 #include "core/use_cases/ProcessButtons.hpp"
 
-#include "core/domain/events/core/Events.hpp"
-#include "tools/Diagnostics.hpp"
+#include "core/use_cases/ButtonStateProcessor.hpp"
 
 ProcessButtons::ProcessButtons(const std::vector<ButtonPort*>& buttons)
     : buttons_(buttons),
@@ -12,20 +11,10 @@ ProcessButtons::ProcessButtons(const std::vector<ButtonPort*>& buttons)
       useInputController_(false) {}
 
 void ProcessButtons::initStates() {
-    // Capture l'état initial de tous les boutons sans déclencher d'événements
     for (size_t i = 0; i < buttons_.size(); ++i) {
-        ButtonPort* btn = buttons_[i];
-        lastPressed_[i] = btn->isPressed();
+        lastPressed_[i] = buttons_[i]->isPressed();
     }
     initialized_ = true;
-
-    // Diagnostic d'initialisation - utiliser un buffer plus grand pour éviter la troncature
-    char diagEvent[50];  // Augmentation de la taille du buffer
-    snprintf(diagEvent,
-             sizeof(diagEvent),
-             "ProcessButtons: %d boutons initialisés",
-             (int)buttons_.size());
-    DIAG_ON_EVENT(diagEvent);
 }
 
 void ProcessButtons::setOnButtonStateChangedCallback(ButtonStateChangedCallback callback) {
@@ -38,37 +27,17 @@ void ProcessButtons::setInputController(InputController* inputController) {
 }
 
 void ProcessButtons::update() {
-    // Si nous n'avons pas encore initialisé les états, le faire maintenant
     if (!initialized_) {
         initStates();
         return;
     }
 
-    for (size_t i = 0; i < buttons_.size(); ++i) {
-        ButtonPort* btn = buttons_[i];
-        bool pressed = btn->isPressed();
-        if (pressed != lastPressed_[i]) {
-            // Diagnostic pour le changement d'état du bouton
-            char diagEvent[50];
-            snprintf(diagEvent,
-                     sizeof(diagEvent),
-                     "ProcessButtons: Bouton ID=%d %s",
-                     btn->getId(),
-                     pressed ? "pressé" : "relâché");
-            DIAG_ON_EVENT(diagEvent);
-
-            lastPressed_[i] = pressed;
-
-            // Ordre de priorité pour traiter l'événement:
-            // 1. Nouveau callback (onButtonStateChangedCallback_)
-            // 2. Ancien contrôleur d'entrée (inputController_)
-            if (onButtonStateChangedCallback_) {
-                onButtonStateChangedCallback_(btn->getId(), pressed);
-            } else if (useInputController_) {
-                // Utiliser le contrôleur d'entrée
-                inputController_->processButtonPress(btn->getId(), pressed);
-            }
-            // Les EventBus ne sont plus utilisés dans la nouvelle version
+    // Utilise le template pour éviter la duplication de code
+    processButtonChanges(buttons_, lastPressed_, [this](uint8_t id, bool pressed) {
+        if (onButtonStateChangedCallback_) {
+            onButtonStateChangedCallback_(id, pressed);
+        } else if (useInputController_) {
+            inputController_->processButtonPress(id, pressed);
         }
-    }
+    });
 }

@@ -78,7 +78,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("MIDI")
                            .withDescription("Encodeur Enc 4")
                            .withDisplayOrder(4)
-                           .asEncoder(25, 14, 24)  // Changé pin A de 13 vers 25
+                           .asEncoder(14, 5, 24)  // Changé pin A de 13 vers 25
                            .withEncoderButton(41, 30)
                            .withAcceleration(true, 4)
                            .withMidiCC(4, 0, true)
@@ -146,8 +146,8 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
             .inGroup("Navigation")
             .withDescription("Encodeur Navigation")
             .withDisplayOrder(9)
-            .asEncoder(4, 5, 96)  // Changé de 9,10 vers 4,5 - Higher resolution
-            .withEncoderButton(8, 30)
+            .asEncoder(25, 24, 96)  // Changé de 9,10 vers 4,5 - Higher resolution
+            .withEncoderButton(26, 30)
             .withSensitivity(1.5f)
             .withAcceleration(true, 4)
             .withNavigation("ITEM_NAVIGATOR", MappingControlType::ENCODER)  // Encodeur navigue
@@ -174,29 +174,4 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
     }
 
     return config;
-}
-
-// Helpers pour mapper les pins (si besoin dans le futur)
-uint8_t ConfigurationFactory::getEncoderPinA(int encoderNum) {
-    static const uint8_t pins[] = {0, 22, 19, 16, 13, 39, 36, 33, 28};
-    if (encoderNum >= 1 && encoderNum <= 8) {
-        return pins[encoderNum];
-    }
-    return 0;
-}
-
-uint8_t ConfigurationFactory::getEncoderPinB(int encoderNum) {
-    static const uint8_t pins[] = {0, 23, 20, 17, 14, 40, 37, 34, 29};
-    if (encoderNum >= 1 && encoderNum <= 8) {
-        return pins[encoderNum];
-    }
-    return 0;
-}
-
-uint8_t ConfigurationFactory::getEncoderButtonPin(int encoderNum) {
-    static const uint8_t pins[] = {0, 21, 18, 15, 41, 38, 35, 30, 27};
-    if (encoderNum >= 1 && encoderNum <= 8) {
-        return pins[encoderNum];
-    }
-    return 0;
 }
