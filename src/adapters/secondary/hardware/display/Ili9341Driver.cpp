@@ -1,0 +1,184 @@
+#include "Ili9341Driver.hpp"
+
+#include <Arduino.h>
+
+// Buffers statiques DMAMEM (240x320 pixels = 150KB)
+DMAMEM static uint16_t main_framebuffer[240 * 320];
+
+// Buffers de différence statiques DMAMEM pour optimisation (4KB chacun)
+DMAMEM static uint8_t diffbuffer1[8192];
+DMAMEM static uint8_t diffbuffer2[8192];
+
+//=============================================================================
+// Configuration et constructeur
+//=============================================================================
+
+Ili9341Driver::Config Ili9341Driver::getDefaultConfig() {
+    return {
+        .cs_pin = 9,            // CS sur pin 9
+        .dc_pin = 10,           // DC sur pin 10
+        .rst_pin = 6,           // RST sur pin 6
+        .mosi_pin = 11,         // MOSI sur pin 11 (SPI standard)
+        .sck_pin = 13,          // SCK sur pin 13 (SPI standard)
+        .miso_pin = 12,         // MISO sur pin 12 (SPI standard)
+        .spi_speed = 40000000,  // 40MHz - vitesse optimale pour ILI9341 sur Teensy 4.1
+        .rotation = 1           // Paysage (0=Portrait, 1=Paysage, 2=Portrait inversé, 3=Paysage inversé)
+    };
+}
+
+Ili9341Driver::Ili9341Driver(const Config& config)
+    : config_(config),
+      initialized_(false),
+      framebuffer_(main_framebuffer) {
+    Serial.println(F("Ili9341Driver: Constructor called"));
+    Serial.print(F("Ili9341Driver: framebuffer_ = 0x"));
+    Serial.println((unsigned long)framebuffer_, HEX);
+}
+
+//=============================================================================
+// Initialisation hardware
+//=============================================================================
+
+bool Ili9341Driver::initialize() {
+    if (initialized_) {
+        return true;
+    }
+
+    Serial.println(F("ILI9341: Initializing hardware..."));
+
+    // Configuration des pins
+    configurePins();
+
+    // Créer le driver ILI9341_T4
+    tft_ = std::make_unique<ILI9341_T4::ILI9341Driver>(
+        config_.cs_pin,
+        config_.dc_pin,
+        config_.sck_pin,
+        config_.mosi_pin,
+        config_.miso_pin,
+        config_.rst_pin
+    );
+
+    if (!tft_) {
+        Serial.println(F("ILI9341: Failed to create ILI9341Driver"));
+        return false;
+    }
+
+    // Initialiser le driver
+    tft_->begin(config_.spi_speed);
+    tft_->setRotation(config_.rotation);
+    
+    // IMPORTANT: Donner au driver son propre framebuffer interne
+    tft_->setFramebuffer(framebuffer_);
+
+    // Configurer les diff buffers pour optimisation
+    setupDiffBuffers();
+
+    // Configurer les paramètres de performance
+    setupPerformance();
+
+    Serial.println(F("ILI9341: Hardware initialized"));
+    initialized_ = true;
+
+    return true;
+}
+
+void Ili9341Driver::configurePins() {
+    pinMode(config_.cs_pin, OUTPUT);
+    pinMode(config_.dc_pin, OUTPUT);
+    if (config_.rst_pin != 255) {
+        pinMode(config_.rst_pin, OUTPUT);
+        // Reset de l'écran
+        digitalWrite(config_.rst_pin, LOW);
+        digitalWrite(config_.rst_pin, HIGH);
+    }
+}
+
+void Ili9341Driver::setupDiffBuffers() {
+    // Créer les diff buffers pour optimisation (alloués en DMAMEM)
+    diff1_ = std::make_unique<ILI9341_T4::DiffBuff>(diffbuffer1, sizeof(diffbuffer1));
+    diff2_ = std::make_unique<ILI9341_T4::DiffBuff>(diffbuffer2, sizeof(diffbuffer2));
+    tft_->setDiffBuffers(diff1_.get(), diff2_.get());
+}
+
+void Ili9341Driver::setupPerformance() {
+    // Configuration performance optimisée (selon exemple officiel)
+    tft_->setDiffGap(4);        // gap petit avec buffers diff 4K
+    tft_->setVSyncSpacing(2);   // minimiser tearing
+    tft_->setRefreshRate(120);  // 100Hz pour performance élevée
+}
+
+//=============================================================================
+// Méthodes d'affichage
+//=============================================================================
+
+void Ili9341Driver::updateRegion(bool redraw_now, uint16_t* pixels, 
+                                 int x1, int x2, int y1, int y2) {
+    if (!initialized_ || !tft_) {
+        return;
+    }
+
+    tft_->updateRegion(redraw_now, pixels, x1, x2, y1, y2);
+}
+
+void Ili9341Driver::updateFullScreen() {
+    if (!initialized_ || !tft_) {
+        return;
+    }
+
+    tft_->update(framebuffer_);
+}
+
+//=============================================================================
+// Configuration et propriétés
+//=============================================================================
+
+void Ili9341Driver::setRotation(uint8_t rotation) {
+    if (!initialized_ || !tft_) return;
+
+    config_.rotation = rotation;
+    tft_->setRotation(rotation);
+
+    Serial.print(F("ILI9341: Rotation set to "));
+    Serial.println(rotation);
+}
+
+void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
+    // Dimensions selon rotation
+    if (config_.rotation == 1 || config_.rotation == 3) {
+        width = 320;  // Paysage (90° et 270°)
+        height = 240;
+    } else {
+        width = 240;  // Portrait (0° et 180°)
+        height = 320;
+    }
+}
+
+//=============================================================================
+// Debug et diagnostics
+//=============================================================================
+
+void Ili9341Driver::debugMemory() const {
+    Serial.println(F("=== ILI9341 DRIVER DEBUG MEMORY ==="));
+    Serial.print(F("Framebuffer (240x320): 0x"));
+    Serial.println((uint32_t)framebuffer_, HEX);
+
+    Serial.print(F("Diff buf1 (4KB): 0x"));
+    Serial.println((uint32_t)diff1_.get(), HEX);
+    Serial.print(F("Diff buf2 (4KB): 0x"));
+    Serial.println((uint32_t)diff2_.get(), HEX);
+    
+    Serial.print(F("Driver initialized: "));
+    Serial.println(initialized_);
+    Serial.print(F("SPI Speed: "));
+    Serial.println(config_.spi_speed);
+    Serial.print(F("Rotation: "));
+    Serial.println(config_.rotation);
+    
+    uint16_t width, height;
+    getDimensions(width, height);
+    Serial.print(F("Current dimensions: "));
+    Serial.print(width);
+    Serial.print(F("x"));
+    Serial.println(height);
+}
