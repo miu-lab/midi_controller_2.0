@@ -65,10 +65,13 @@ Result<bool, std::string> MidiSubsystem::init() {
     container_->registerDependency<EventEnabledMidiOut>(eventEnabledMidiOut);
 
     // Créer le MidiMapper et MidiInHandler
+    Serial.println(F("MidiSubsystem: Creating MidiMapper..."));
     midiMapper_ = std::make_unique<MidiMapper>(*midiOut_, *commandManager_);
     if (!midiMapper_) {
         return Result<bool, std::string>::error("Failed to create MidiMapper");
     }
+    Serial.print(F("MidiSubsystem: MidiMapper created at address: 0x"));
+    Serial.println((uintptr_t)midiMapper_.get(), HEX);
 
     midiInHandler_ = std::make_unique<MidiInHandler>();
     if (!midiInHandler_) {
