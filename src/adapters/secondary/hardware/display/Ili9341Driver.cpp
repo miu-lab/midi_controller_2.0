@@ -102,9 +102,10 @@ void Ili9341Driver::setupDiffBuffers() {
 
 void Ili9341Driver::setupPerformance() {
     // Configuration performance optimisée (selon exemple officiel)
-    tft_->setDiffGap(8);        // gap petit avec buffers diff 4K
-    tft_->setVSyncSpacing(1);   // minimiser tearing
-    tft_->setRefreshRate(60);  // 100Hz pour performance élevée
+    tft_->setDiffGap(10);      // gap petit avec buffers diff 4K
+    tft_->setVSyncSpacing(2);  // minimiser tearing
+    tft_->setRefreshRate(
+        PerformanceConfig::DISPLAY_REFRESH_RATE_HZ);  // 100Hz pour performance élevée
 }
 
 //=============================================================================

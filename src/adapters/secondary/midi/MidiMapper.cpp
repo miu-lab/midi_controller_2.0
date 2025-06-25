@@ -426,10 +426,6 @@ bool MidiMapper::onEvent(const Event& event) {
     case EventTypes::HighPriorityEncoderChanged: {
         const HighPriorityEncoderChangedEvent& encEvent =
             static_cast<const HighPriorityEncoderChangedEvent&>(event);
-        Serial.print(F("MidiMapper: Received encoder event ID="));
-        Serial.print(encEvent.encoderId);
-        Serial.print(F(" pos="));
-        Serial.println(encEvent.position);
         processEncoderChange(encEvent.encoderId, encEvent.position);
         return true;
     }

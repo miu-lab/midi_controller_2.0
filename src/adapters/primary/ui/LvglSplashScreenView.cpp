@@ -67,14 +67,9 @@ void LvglSplashScreenView::render() {
     if (main_screen_) {
         lv_screen_load(main_screen_);
     }
-    
-    // Forcer le rendu LVGL
-    lv_timer_handler();
-    
-    // Forcer le refresh du bridge
-    if (bridge_) {
-        bridge_->refreshDisplay();
-    }
+
+    // Le refresh est géré centralement par MidiControllerApp
+    // Pas besoin d'appeler refreshDisplay() ici
 }
 
 bool LvglSplashScreenView::handleEvent(uint8_t eventType, int32_t data) {
@@ -121,9 +116,10 @@ void LvglSplashScreenView::setupMainScreen() {
 void LvglSplashScreenView::setupBorder() {
     // Créer la bordure (rectangle non rempli)
     border_rect_ = lv_obj_create(main_screen_);
-    lv_obj_set_size(border_rect_, DisplayConfig::SCREEN_WIDTH - 4, DisplayConfig::SCREEN_HEIGHT - 4);
-    lv_obj_set_pos(border_rect_, 2, 2);
-    
+    // Utiliser des pourcentages natifs LVGL au lieu de calculs manuels
+    lv_obj_set_size(border_rect_, lv_pct(98), lv_pct(98));
+    lv_obj_center(border_rect_);
+
     // Style de la bordure
     lv_obj_set_style_bg_opa(border_rect_, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_color(border_rect_, config_.text_color, 0);
@@ -158,7 +154,8 @@ void LvglSplashScreenView::setupLabels() {
 void LvglSplashScreenView::setupProgressBar() {
     // Créer la barre de progression
     progress_bar_ = lv_bar_create(main_screen_);
-    lv_obj_set_size(progress_bar_, DisplayConfig::SCREEN_WIDTH - 40, 10);
+    // Utiliser des pourcentages natifs LVGL au lieu de calculs manuels
+    lv_obj_set_size(progress_bar_, lv_pct(88), 10);
     lv_obj_align(progress_bar_, LV_ALIGN_BOTTOM_MID, 0, -80);
     
     // Style de la barre

@@ -72,6 +72,14 @@ private:
     lv_display_t* display_;
     lv_color_t* lvgl_buf1_;
     lv_color_t* lvgl_buf2_;
+    
+    // Variables de profiling performance
+    unsigned long flush_call_count_ = 0;
+    unsigned long total_flush_time_ = 0;
+    unsigned long total_flush_calls_ = 0;
+    unsigned long total_flush_time_period_ = 0;
+    unsigned long avg_flush_calls_ = 0;
+    unsigned long avg_flush_time_ = 0;
 
     /**
      * @brief Configure LVGL global (tick, mémoire)

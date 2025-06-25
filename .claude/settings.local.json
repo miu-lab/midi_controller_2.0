@@ -13,7 +13,17 @@
       "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/platformio.exe device monitor --baud 115200)",
       "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio device monitor)",
       "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio.exe run -e MIDI_CONTROLLER_PRODUCTION)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio.exe run --dry-run)",
+      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio.exe check --skip-packages)",
+      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio.exe run -e MIDI_CONTROLLER_DEVELOPMENT)",
+      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/platformio.exe run)",
+      "WebFetch(domain:docs.lvgl.io)",
+      "Bash(ls:*)",
+      "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio run -e MIDI_CONTROLLER_DEVELOPMENT)",
+      "Bash(pio run:*)"
     ],
     "deny": []
   }

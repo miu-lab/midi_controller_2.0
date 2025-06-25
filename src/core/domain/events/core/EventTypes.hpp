@@ -18,6 +18,7 @@ namespace EventTypes {
     constexpr EventType MenuSelection = 1002;
     constexpr EventType DialogShow = 1003;
     constexpr EventType DialogClose = 1004;
+    constexpr EventType UIParameterUpdate = 1005;  // Événements UI batchés
     
     // Types d'événements MIDI - plage 2000-2999
     constexpr EventType MidiNoteOn = 2000;

@@ -21,8 +21,8 @@ static constexpr size_t FRAMEBUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT;  // 768
 static constexpr size_t DIFFBUFFER_SIZE = 4096;  // Buffer pour différences
 
 // === BUFFERS LVGL ===
-static constexpr size_t LVGL_BUFFER_LINES = 60;  // Lignes par buffer
-static constexpr size_t LVGL_BUFFER_SIZE = SCREEN_WIDTH * LVGL_BUFFER_LINES;  // 19200 pixels
+static constexpr size_t LVGL_BUFFER_LINES = 60;                               // Lignes par buffer (réduit pour performance)
+static constexpr size_t LVGL_BUFFER_SIZE = SCREEN_WIDTH * LVGL_BUFFER_LINES;  // 9600 pixels
 
 // === PERFORMANCE AFFICHAGE ===
 static constexpr unsigned long REFRESH_PERIOD_MS = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS;

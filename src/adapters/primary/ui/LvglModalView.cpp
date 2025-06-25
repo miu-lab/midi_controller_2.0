@@ -43,9 +43,7 @@ void LvglModalView::render() {
     
     lv_timer_handler();
     
-    if (bridge_) {
-        bridge_->refreshDisplay();
-    }
+    // Le refresh est géré centralement par MidiControllerApp
 }
 
 bool LvglModalView::handleEvent(uint8_t eventType, int32_t data) {
@@ -73,14 +71,16 @@ void LvglModalView::setupModalScreen() {
     
     // Overlay semi-transparent
     bg_overlay_ = lv_obj_create(modal_screen_);
-    lv_obj_set_size(bg_overlay_, DisplayConfig::SCREEN_WIDTH, DisplayConfig::SCREEN_HEIGHT);
+    // Utiliser des pourcentages natifs LVGL pour couvrir tout l'écran
+    lv_obj_set_size(bg_overlay_, lv_pct(100), lv_pct(100));
     lv_obj_set_style_bg_color(bg_overlay_, lv_color_hex(0x000000), 0);
     lv_obj_set_style_bg_opa(bg_overlay_, LV_OPA_50, 0);
     lv_obj_set_style_border_opa(bg_overlay_, LV_OPA_TRANSP, 0);
     
     // Boîte de message
     message_box_ = lv_obj_create(modal_screen_);
-    lv_obj_set_size(message_box_, DisplayConfig::SCREEN_WIDTH - 40, 80);
+    // Utiliser des pourcentages natifs LVGL au lieu de calculs manuels
+    lv_obj_set_size(message_box_, lv_pct(88), 80);
     lv_obj_center(message_box_);
     lv_obj_set_style_bg_color(message_box_, lv_color_hex(0x333333), 0);
     lv_obj_set_style_bg_opa(message_box_, LV_OPA_COVER, 0);

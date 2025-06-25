@@ -11,7 +11,6 @@ L'application utilise une architecture modulaire basée sur les principes SOLID,
 ### Injection de dépendances
 
 - **DependencyContainer** (`app/di/DependencyContainer.hpp`) : Conteneur central pour l'injection de dépendances, permettant l'enregistrement et la résolution de dépendances typées.
-- **ServiceLocatorAdapter** (`app/di/ServiceLocatorAdapter.hpp`) : Adaptateur assurant la compatibilité avec l'ancien code qui utilise le pattern ServiceLocator.
 
 ### Interfaces abstraites
 

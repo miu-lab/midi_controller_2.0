@@ -44,9 +44,7 @@ void LvglMenuView::render() {
     
     lv_timer_handler();
     
-    if (bridge_) {
-        bridge_->refreshDisplay();
-    }
+    // Le refresh est géré centralement par MidiControllerApp
 }
 
 bool LvglMenuView::handleEvent(uint8_t eventType, int32_t data) {
@@ -83,7 +81,8 @@ void LvglMenuView::setupMainScreen() {
 
 void LvglMenuView::setupMenuList() {
     menu_list_ = lv_list_create(main_screen_);
-    lv_obj_set_size(menu_list_, DisplayConfig::SCREEN_WIDTH - 20, DisplayConfig::SCREEN_HEIGHT - 20);
+    // Utiliser des pourcentages natifs LVGL au lieu de calculs manuels
+    lv_obj_set_size(menu_list_, lv_pct(94), lv_pct(92));
     lv_obj_center(menu_list_);
     
     // Ajouter les éléments du menu
