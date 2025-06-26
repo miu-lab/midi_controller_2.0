@@ -14,33 +14,36 @@
 #include "app/MidiControllerApp.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "config/ApplicationConfiguration.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 ApplicationConfiguration appConfig;
 std::shared_ptr<MidiControllerApp> app;
 std::shared_ptr<DependencyContainer> container;
 
 void setup() {
-    delay(2000);
-    Serial.println(F("Démarrage de l'application MIDI Controller..."));
+    Serial.begin(115200); // Assurer que la série est initialisée
+    while (!Serial && millis() < 5000) { // Attendre jusqu'à 5 secondes pour la connexion série
+        // Attendre la connexion série
+    }
+
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Démarrage de l'application MIDI Controller...");
     container = std::make_shared<DependencyContainer>();
 
-    Serial.println(F("Initialisation du conteneur..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Initialisation du conteneur...");
     auto initResult = InitializationScript::initializeContainer(container, appConfig);
     if (initResult.isError()) {
-        Serial.print(F("ERREUR d'initialisation: "));
-        Serial.println(initResult.error()->c_str());
+        DEBUG_ERROR("ERREUR d'initialisation: %s", initResult.error()->c_str());
         return;
     }
-    Serial.println(F("Conteneur initialisé avec succès"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Conteneur initialisé avec succès");
 
     app = std::make_shared<MidiControllerApp>(container);
     auto appInitResult = app->init();
     if (appInitResult.isError()) {
-        Serial.print(F("ERREUR d'initialisation de l'app: "));
-        Serial.println(appInitResult.error()->c_str());
+        DEBUG_ERROR("ERREUR d'initialisation de l'app: %s", appInitResult.error()->c_str());
         return;
     }
-    Serial.println(F("Démarrage terminé"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Démarrage terminé");
 }
 
 void loop() {

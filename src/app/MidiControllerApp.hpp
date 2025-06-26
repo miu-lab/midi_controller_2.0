@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "core/utils/Result.hpp"
+#include "core/TaskScheduler.hpp"
 
 // Déclarations anticipées
 class DependencyContainer;
@@ -10,9 +11,6 @@ class IConfiguration;
 class IInputSystem;
 class IMidiSystem;
 class IUISystem;
-class EventEnabledMidiOut;
-class Ili9341LvglBridge;
-class EventBatcher;
 
 /**
  * @brief Application principale du contrôleur MIDI
@@ -36,9 +34,7 @@ private:
     std::shared_ptr<IMidiSystem> m_midiSystem;
     std::shared_ptr<IUISystem> m_uiSystem;
     
-    // Bridge LVGL pour le rafraîchissement de l'affichage
-    std::shared_ptr<Ili9341LvglBridge> m_lvglBridge;
+    std::shared_ptr<TaskScheduler> m_scheduler;
     
-    // Event Batcher pour optimiser les événements UI
-    std::unique_ptr<EventBatcher> m_eventBatcher;
+    
 };

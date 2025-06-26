@@ -18,6 +18,7 @@
 #include "core/domain/events/core/OptimizedEventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
+#include "core/TaskScheduler.hpp"
 
 Result<bool, std::string> InitializationScript::initializeContainer(
     std::shared_ptr<DependencyContainer> container, const ApplicationConfiguration& config) {
@@ -31,6 +32,10 @@ Result<bool, std::string> InitializationScript::initializeContainer(
     // Créer et enregistrer l'OptimizedEventBus
     auto optimizedEventBus = std::make_shared<OptimizedEventBus>();
     container->registerDependency<OptimizedEventBus>(optimizedEventBus);
+
+    // Créer et enregistrer le TaskScheduler
+    auto taskScheduler = std::make_shared<TaskScheduler>();
+    container->registerDependency<TaskScheduler>(taskScheduler);
 
     // Étape 2: Adaptateurs matériels
     auto hardwareResult = setupHardwareAdapters(container);
@@ -127,6 +132,12 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
     auto inputController = std::make_shared<InputController>(navConfig, optimizedEventBus);
     container->registerDependency<InputController>(inputController);
 
+    // Récupérer le TaskScheduler
+    auto scheduler = container->resolve<TaskScheduler>();
+    if (!scheduler) {
+        return Result<bool, std::string>::error("Impossible de résoudre TaskScheduler");
+    }
+
     // Définition des sous-systèmes à initialiser dans l'ordre
     std::vector<SubsystemInfo> subsystems = {
         {"Configuration",
@@ -139,25 +150,37 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
          }},
         {"Input",
          std::make_shared<InputSubsystem>(container),
-         [&container, &subsystems]() {
+         [&container, &subsystems, &scheduler]() {
              auto system = std::static_pointer_cast<InputSubsystem>(subsystems[1].instance);
              container->registerDependency<InputSubsystem>(system);
              container->registerDependency<IInputSystem>(system);
-             return system->init();
+             auto initResult = system->init();
+             if (initResult.isSuccess()) {
+                 scheduler->addTask([system]() { system->update(); }, 1, 0, "InputUpdate"); // 1ms pour l'InputSystem
+             }
+             return initResult;
          }},
         {"MIDI",
          std::make_shared<MidiSubsystem>(container),
-         [&container, &subsystems]() {
+         [&container, &subsystems, &scheduler]() {
              auto system = std::static_pointer_cast<MidiSubsystem>(subsystems[2].instance);
              container->registerDependency<MidiSubsystem>(system);
              container->registerDependency<IMidiSystem>(system);
-             return system->init();
+             auto initResult = system->init();
+             if (initResult.isSuccess()) {
+                 scheduler->addTask([system]() { system->update(); }, 1, 0, "MidiUpdate"); // 1ms pour le MidiSubsystem
+             }
+             return initResult;
          }},
-        {"UI", std::make_shared<UISubsystem>(container), [&container, &subsystems]() {
+        {"UI", std::make_shared<UISubsystem>(container), [&container, &subsystems, &scheduler]() {
              auto system = std::static_pointer_cast<UISubsystem>(subsystems[3].instance);
              container->registerDependency<UISubsystem>(system);
              container->registerDependency<IUISystem>(system);
-             return system->init(true);  // true = enable full UI
+             auto initResult = system->init(true);  // true = enable full UI
+             if (initResult.isSuccess()) {
+                 scheduler->addTask([system]() { system->update(); }, 16, 0, "UIUpdate"); // 16ms pour l'UISubsystem (approx 60 FPS)
+             }
+             return initResult;
          }}};
 
     // Initialiser chaque sous-système séquentiellement

@@ -9,6 +9,8 @@
 #include "core/domain/interfaces/IUISystem.hpp"
 #include "core/utils/Result.hpp"
 #include "adapters/primary/ui/ViewManagerEventListener.hpp"
+#include "core/domain/events/EventBatcher.hpp"
+#include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 
 class ViewManager;
 
@@ -64,6 +66,8 @@ private:
     std::shared_ptr<IConfiguration> configuration_;
     std::shared_ptr<ViewManager> viewManager_;
     std::unique_ptr<ViewManagerEventListener> eventListener_;
+    std::unique_ptr<EventBatcher> m_eventBatcher;
+    std::shared_ptr<Ili9341LvglBridge> m_lvglBridge;
 
     bool fullUIEnabled_ = false;
     bool initialized_ = false;

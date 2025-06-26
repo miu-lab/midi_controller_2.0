@@ -12,6 +12,8 @@ namespace PerformanceConfig {
 
 // === REFRESH RATES (utilise PerformanceDefines.h) ===
 constexpr int DISPLAY_REFRESH_RATE_HZ = LVGL_REFRESH_RATE_HZ;
+constexpr int VSYNC_SPACING = 2;
+constexpr int DIFF_GAP = 6;
 constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = LVGL_REFRESH_PERIOD_MS;
 
 // === TIMEOUTS D'EXÉCUTION ===

@@ -1,9 +1,11 @@
 #include "UISubsystem.hpp"
 
 #include "adapters/primary/ui/DefaultViewManager.hpp"
-#include "core/TaskScheduler.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
+#include "config/PerformanceConfig.hpp"
+#include "config/debug/DebugMacros.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
+#include "core/TaskScheduler.hpp"
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {}
@@ -19,6 +21,22 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
         return Result<bool, std::string>::error("Failed to resolve IConfiguration");
+    }
+
+    // Initialiser et démarrer l'EventBatcher
+    EventBatcher::BatchConfig batchConfig;
+    batchConfig.ui_update_interval_ms = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
+                                        PerformanceConfig::VSYNC_SPACING;  // 60 FPS max
+    batchConfig.coalesce_identical_values = true;
+
+    m_eventBatcher = std::make_unique<EventBatcher>(batchConfig);
+    m_eventBatcher->start();
+
+    // Récupérer le bridge LVGL
+    m_lvglBridge = container_->resolve<Ili9341LvglBridge>();
+    if (!m_lvglBridge) {
+        DEBUG_LOG(DEBUG_LEVEL_WARNING,
+                  "AVERTISSEMENT: Bridge LVGL non disponible dans UISubsystem");
     }
 
     // Créer le gestionnaire de vues si l'UI complète est activée
@@ -55,8 +73,24 @@ void UISubsystem::update() {
         return;
     }
 
+    // Traiter les batchs d'événements UI
+    if (m_eventBatcher) {
+        m_eventBatcher->processPendingBatches();
+    }
+
     // Mettre à jour le gestionnaire de vues
     viewManager_->update();
+
+    // Rafraîchir l'affichage LVGL avec limitation de fréquence
+    static unsigned long last_display_refresh = 0;
+    constexpr unsigned long DISPLAY_REFRESH_INTERVAL_MS =
+        PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
+        PerformanceConfig::VSYNC_SPACING;  // 60 FPS max
+
+    if (m_lvglBridge && (millis() - last_display_refresh) >= DISPLAY_REFRESH_INTERVAL_MS) {
+        m_lvglBridge->refreshDisplay();
+        last_display_refresh = millis();
+    }
 }
 
 Result<bool, std::string> UISubsystem::showMessage(const std::string& message) {
