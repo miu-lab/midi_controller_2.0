@@ -19,6 +19,7 @@
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
 #include "core/TaskScheduler.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 Result<bool, std::string> InitializationScript::initializeContainer(
     std::shared_ptr<DependencyContainer> container, const ApplicationConfiguration& config) {
@@ -81,7 +82,7 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     container->registerDependency<MidiOutputPort>(std::make_shared<TeensyUsbMidiOut>());
 
     // Écran LVGL - Nouvelle architecture modulaire
-    Serial.println(F("Initializing display hardware driver..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Initializing display hardware driver...");
     
     // 1. Créer et initialiser le driver hardware
     Ili9341Driver::Config driverConfig = Ili9341Driver::getDefaultConfig();
@@ -89,21 +90,21 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     if (!driver->initialize()) {
         return Result<bool, std::string>::error("Échec d'initialisation du driver hardware ILI9341");
     }
-    Serial.println(F("Hardware driver initialized successfully"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Hardware driver initialized successfully");
     
     // 2. Créer et initialiser le bridge LVGL
-    Serial.println(F("Initializing LVGL bridge..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Initializing LVGL bridge...");
     Ili9341LvglBridge::LvglConfig lvglConfig = Ili9341LvglBridge::getDefaultLvglConfig();
     auto bridge = std::make_shared<Ili9341LvglBridge>(driver, lvglConfig);
     if (!bridge->initialize()) {
         return Result<bool, std::string>::error("Échec d'initialisation du bridge LVGL");
     }
-    Serial.println(F("LVGL bridge initialized successfully"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LVGL bridge initialized successfully");
     
     // 3. Enregistrer les composants dans le container
     container->registerDependency<Ili9341Driver>(driver);
     container->registerDependency<Ili9341LvglBridge>(bridge);
-    Serial.println(F("LVGL display components registered in container"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LVGL display components registered in container");
 
     // Stockage de profils
     auto profileManager = std::make_shared<ProfileManager>();
@@ -124,8 +125,8 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
     // Récupérer l'OptimizedEventBus
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
     if (!optimizedEventBus) {
-        Serial.println(
-            F("AVERTISSEMENT: OptimizedEventBus non disponible, utilisant le mode legacy"));
+        DEBUG_LOG(DEBUG_LEVEL_WARNING,
+            "AVERTISSEMENT: OptimizedEventBus non disponible, utilisant le mode legacy");
     }
 
     // Créer InputController avec l'OptimizedEventBus
@@ -156,7 +157,10 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
              container->registerDependency<IInputSystem>(system);
              auto initResult = system->init();
              if (initResult.isSuccess()) {
-                 scheduler->addTask([system]() { system->update(); }, 1, 0, "InputUpdate"); // 1ms pour l'InputSystem
+                 scheduler->addTask([system]() { system->update(); },
+                                    PerformanceConfig::MAX_INPUT_TIME_US,
+                                    0,
+                                    "InputUpdate");  // 1ms pour l'InputSystem
              }
              return initResult;
          }},
@@ -168,7 +172,10 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
              container->registerDependency<IMidiSystem>(system);
              auto initResult = system->init();
              if (initResult.isSuccess()) {
-                 scheduler->addTask([system]() { system->update(); }, 1, 0, "MidiUpdate"); // 1ms pour le MidiSubsystem
+                 scheduler->addTask([system]() { system->update(); },
+                                    PerformanceConfig::MAX_MIDI_TIME_US,
+                                    1,
+                                    "MidiUpdate");  // 1ms pour le MidiSubsystem
              }
              return initResult;
          }},
@@ -178,7 +185,10 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
              container->registerDependency<IUISystem>(system);
              auto initResult = system->init(true);  // true = enable full UI
              if (initResult.isSuccess()) {
-                 scheduler->addTask([system]() { system->update(); }, 16, 0, "UIUpdate"); // 16ms pour l'UISubsystem (approx 60 FPS)
+                 scheduler->addTask([system]() { system->update(); },
+                                    PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS * 1000,
+                                    1,
+                                    "UIUpdate");  // 16ms pour l'UISubsystem (approx 60 FPS)
              }
              return initResult;
          }}};
@@ -230,51 +240,49 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
     if (optimizedEventBus) {
         optimizedEventBus->subscribe(uiEventListener.get());
-        Serial.println(F("UIControllerEventListener abonné à l'EventBus."));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "UIControllerEventListener abonné à l'EventBus.");
     } else {
-        Serial.println(F("AVERTISSEMENT: OptimizedEventBus non disponible pour UIControllerEventListener."));
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "AVERTISSEMENT: OptimizedEventBus non disponible pour UIControllerEventListener.");
     }
 
     return true;
 }
 
 void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyContainer> container) {
-    Serial.println(F("=== Configuration des écouteurs MIDI ==="));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "=== Configuration des écouteurs MIDI ===");
     
     // Récupération des composants nécessaires
     auto midiSystem = container->resolve<MidiSubsystem>();
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
 
     if (!midiSystem) {
-        Serial.println(F("ERREUR: MidiSubsystem non disponible"));
+        DEBUG_ERROR("ERREUR: MidiSubsystem non disponible");
         return;
     }
     
     if (!optimizedEventBus) {
-        Serial.println(F("ERREUR: OptimizedEventBus non disponible"));
+        DEBUG_ERROR("ERREUR: OptimizedEventBus non disponible");
         return;
     }
     
-    Serial.println(F("MidiSubsystem et OptimizedEventBus trouvés"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem et OptimizedEventBus trouvés");
 
     // Récupérer le MidiMapper du MidiSubsystem
-    Serial.println(F("Récupération du MidiMapper..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Récupération du MidiMapper...");
     MidiMapper& midiMapper = midiSystem->getMidiMapper();
-    Serial.print(F("MidiMapper obtenu à l'adresse: 0x"));
-    Serial.println((uintptr_t)&midiMapper, HEX);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper obtenu à l'adresse: 0x%X", (uintptr_t)&midiMapper);
 
     // Enregistrer le MidiMapper comme écouteur de haute priorité
-    Serial.println(F("Enregistrement du MidiMapper dans l'EventBus..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Enregistrement du MidiMapper dans l'EventBus...");
     SubscriptionId subscriptionId = optimizedEventBus->subscribeWithPriority(&midiMapper, EventPriority::PRIORITY_HIGH);
     
     if (subscriptionId != 0) {
-        Serial.print(F("MidiMapper enregistré avec succès - ID: "));
-        Serial.println(subscriptionId);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper enregistré avec succès - ID: %d", subscriptionId);
     } else {
-        Serial.println(F("ERREUR: Échec de l'enregistrement du MidiMapper"));
+        DEBUG_ERROR("ERREUR: Échec de l'enregistrement du MidiMapper");
     }
 
     // Configurer la propagation des événements haute priorité
     optimizedEventBus->setPropagateHighPriorityEvents(false);
-    Serial.println(F("Configuration des écouteurs MIDI terminée"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Configuration des écouteurs MIDI terminée");
 }
