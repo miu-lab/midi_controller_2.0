@@ -226,27 +226,4 @@ void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinitio
     }
 }
 
-uint8_t MidiSubsystem::extractCCFromInputId(InputId inputId) const {
-    // Extraire le numéro CC depuis l'ID (logique de l'ancien système)
-    // IDs 71-78 -> CCs 1-8, ID 80 -> CC 10
-    if (inputId >= 71 && inputId <= 78) {
-        return static_cast<uint8_t>(inputId - 70);  // 71->1, 72->2, etc.
-    } else if (inputId == 80) {
-        return 10;  // Encodeur optique
-    }
-    // Fallback pour autres IDs
-    return static_cast<uint8_t>(inputId % 128);
-}
 
-bool MidiSubsystem::hasEncoderButton(const ControlDefinition& controlDef) const {
-    // Vérifier si l'encodeur a un bouton (directement depuis ControlDefinition)
-    if (controlDef.hardware.type == InputType::ENCODER) {
-        return controlDef.hardware.encoderButtonPin.has_value();
-    }
-    return false;
-}
-
-InputId MidiSubsystem::getEncoderButtonId(InputId encoderId) const {
-    // Pattern de l'ancien système : ID encodeur + 100
-    return encoderId + 100;
-}

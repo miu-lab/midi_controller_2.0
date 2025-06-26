@@ -17,11 +17,7 @@
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/events/core/OptimizedEventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
-#include "core/domain/interfaces/IInputSystem.hpp"
-#include "core/domain/interfaces/IMidiSystem.hpp"
-#include "core/domain/interfaces/IUISystem.hpp"
-#include "core/ports/output/MidiOutputPort.hpp"
-#include "core/ports/output/ProfileStoragePort.hpp"
+#include "core/listeners/UIControllerEventListener.hpp"
 
 Result<bool, std::string> InitializationScript::initializeContainer(
     std::shared_ptr<DependencyContainer> container, const ApplicationConfiguration& config) {
@@ -201,6 +197,20 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
 
     // Configurer l'interaction entre InputController et UIController
     auto inputController = container->resolve<InputController>();
+
+    // Instancier et abonner UIControllerEventListener
+    auto uiControllerRef = *uiController; // Obtenir une référence
+    auto navServiceRef = *container->resolve<NavigationConfigService>(); // Obtenir une référence
+    auto uiEventListener = std::make_shared<UIControllerEventListener>(uiControllerRef, navServiceRef);
+    container->registerDependency<UIControllerEventListener>(uiEventListener);
+
+    auto optimizedEventBus = container->resolve<OptimizedEventBus>();
+    if (optimizedEventBus) {
+        optimizedEventBus->subscribe(uiEventListener.get());
+        Serial.println(F("UIControllerEventListener abonné à l'EventBus."));
+    } else {
+        Serial.println(F("AVERTISSEMENT: OptimizedEventBus non disponible pour UIControllerEventListener."));
+    }
 
     return true;
 }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
-
 #include <memory>
 
 #include "app/di/DependencyContainer.hpp"
@@ -11,14 +9,10 @@
 // Déclarations anticipées pour réduire les inclusions
 class NavigationConfigService;
 class CommandManager;
-class TeensyUsbMidiOut;
-class ProfileManager;
-class ConfigurationSubsystem;
 class InputController;
 class InputSubsystem;
 class MidiSubsystem;
 class UISubsystem;
-class ViewManager;
 class MenuController;
 class UIController;
 

@@ -56,30 +56,7 @@ public:
      */
     void processButtonPress(ButtonId id, bool pressed);
 
-    /**
-     * @brief Définit le callback pour les encodeurs de navigation
-     * @param callback Fonction à appeler lors de la rotation d'un encodeur de navigation
-     */
-    void setNavigationEncoderCallback(std::function<void(EncoderId, int32_t, int8_t)> callback);
-
-    /**
-     * @brief Définit le callback pour les boutons d'encodeur de navigation
-     * @param callback Fonction à appeler lors de l'appui sur un bouton d'encodeur de navigation
-     */
-    void setNavigationEncoderButtonCallback(std::function<void(EncoderId, bool)> callback);
-
-    /**
-     * @brief Définit le callback pour les boutons de navigation
-     * @param callback Fonction à appeler lors de l'appui sur un bouton de navigation
-     */
-    void setNavigationButtonCallback(std::function<void(ButtonId, bool)> callback);
-
-private:
+    private:
     std::shared_ptr<NavigationConfigService> m_navigationConfig;
     std::shared_ptr<OptimizedEventBus> eventBus_;  // Bus d'événements optimisé
-
-    // Stockage des callbacks de navigation uniquement
-    std::function<void(EncoderId, int32_t, int8_t)> m_navigationEncoderCallback;
-    std::function<void(EncoderId, bool)> m_navigationEncoderButtonCallback;
-    std::function<void(ButtonId, bool)> m_navigationButtonCallback;
 };

@@ -14,7 +14,8 @@ namespace DisplayConfig {
 // === DIMENSIONS ÉCRAN ===
 static constexpr uint16_t SCREEN_WIDTH = 320;
 static constexpr uint16_t SCREEN_HEIGHT = 240;
-static constexpr uint8_t ROTATION = 1;  // 0=Portrait, 1=Paysage, 2=Portrait inversé, 3=Paysage inversé
+static constexpr uint8_t ROTATION =
+    3;  // 0=Portrait, 1=Paysage, 2=Portrait inversé, 3=Paysage inversé
 
 // === BUFFERS HARDWARE ===
 static constexpr size_t FRAMEBUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT;  // 76800 pixels
