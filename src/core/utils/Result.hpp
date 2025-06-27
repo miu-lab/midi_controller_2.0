@@ -1,8 +1,8 @@
 #pragma once
 
 #include <optional>
-#include <string>
 #include <variant>
+#include "Error.hpp" // Inclure notre nouvelle classe Error
 
 /**
  * @file Result.hpp
@@ -16,9 +16,9 @@
  * et sécurisée.
  * 
  * @tparam T Type de la valeur en cas de succès
- * @tparam E Type de l'erreur en cas d'échec (std::string par défaut)
+ * @tparam E Type de l'erreur en cas d'échec (notre struct Error par défaut)
  */
-template<typename T, typename E = std::string>
+template<typename T, typename E = Error>
 class Result {
 public:
   /**

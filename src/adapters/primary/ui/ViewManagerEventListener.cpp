@@ -1,5 +1,7 @@
 #include "ViewManagerEventListener.hpp"
 
+#include "config/debug/DebugMacros.hpp"
+
 ViewManagerEventListener::ViewManagerEventListener(ViewManager& viewManager)
     : m_viewManager(viewManager), m_subscriptionId(0) {
 }
@@ -11,8 +13,9 @@ ViewManagerEventListener::~ViewManagerEventListener() {
 void ViewManagerEventListener::subscribe() {
     if (m_subscriptionId == 0) {
         m_subscriptionId = EventBus::getInstance().subscribe(this);
-        Serial.print(F("ViewManagerEventListener: Subscribed with ID "));
-        Serial.println(m_subscriptionId);
+        DEBUG_LOG(DEBUG_LEVEL_INFO,
+                  "ViewManagerEventListener: Subscribed with ID %d",
+                  m_subscriptionId);
     }
 }
 
@@ -51,14 +54,13 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
         case EventTypes::MidiControlChange: {
             // Traiter les événements CC MIDI
             auto& ccEvent = static_cast<const MidiCCEvent&>(event);
-            
-            Serial.print(F("\nMIDI CC Event: CH"));
-            Serial.print(ccEvent.channel);
-            Serial.print(F(" CC"));
-            Serial.print(ccEvent.controller);
-            Serial.print(F(" = "));
-            Serial.println(ccEvent.value);
-            
+
+            DEBUG_LOG(DEBUG_LEVEL_INFO,
+                      "MIDI CC Event: CH%d CC%d = %d",
+                      ccEvent.channel,
+                      ccEvent.controller,
+                      ccEvent.value);
+
             // Mapper le CC à un nom de paramètre
             String paramName = mapCCToParameterName(ccEvent.controller);
             
@@ -76,7 +78,7 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
         case EventTypes::MidiNoteOn:
         case EventTypes::MidiNoteOff: {
             // Pour les notes, on peut ignorer ou traiter différemment
-            Serial.println(F("MIDI Note event received (ignored for now)"));
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "MIDI Note event received (ignored for now)");
             return true;
         }
         
@@ -104,15 +106,12 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
     switch (event.getType()) {
         case EventTypes::EncoderTurned: {
             // Traiter les événements d'encodeur tourné
-            auto& encoderEvent = static_cast<const EncoderTurnedEvent&>(event);
-            
-            // Si on est déjà en vue ParameterFocus, mettre à jour la valeur
-            // sinon déclencher l'affichage d'un nouveau paramètre
-            Serial.print(F("Encoder "));
-            Serial.print(encoderEvent.id);
-            Serial.print(F(" position: "));
-            Serial.println(encoderEvent.position);
-            
+            const auto& encoderEvent = static_cast<const EncoderTurnedEvent&>(event);
+            DEBUG_LOG(DEBUG_LEVEL_INFO,
+                      "Encoder %d position: %d",
+                      encoderEvent.id,
+                      encoderEvent.position);
+
             // Pour l'instant, on peut simplement logger
             // L'implémentation dépendra de comment vous voulez mapper les encodeurs aux paramètres
             
@@ -121,13 +120,12 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
         
         case EventTypes::EncoderButton: {
             // Traiter les événements de bouton d'encodeur
-            auto& buttonEvent = static_cast<const EncoderButtonEvent&>(event);
-            
-            Serial.print(F("Encoder button "));
-            Serial.print(buttonEvent.id);
-            Serial.print(F(" "));
-            Serial.println(buttonEvent.pressed ? "pressed" : "released");
-            
+            const auto& buttonEvent = static_cast<const EncoderButtonEvent&>(event);
+            DEBUG_LOG(DEBUG_LEVEL_INFO,
+                      "Encoder button %d %s",
+                      buttonEvent.id,
+                      buttonEvent.pressed ? "pressed" : "released");
+
             return true;
         }
         
@@ -142,22 +140,18 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
             } else {
                 id = static_cast<const ButtonReleasedEvent&>(event).id;
             }
-                
-            Serial.print(F("Button "));
-            Serial.print(id);
-            Serial.print(F(" "));
-            Serial.println(pressed ? "pressed" : "released");
-            
+
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "Button %d %s", id, pressed ? "pressed" : "released");
+
             // Déterminer si c'est un bouton de navigation
             if (pressed && isNavigationButton(id)) {
-                Serial.print(F("Navigation button pressed: "));
-                Serial.println(id);
-                
+                DEBUG_LOG(DEBUG_LEVEL_INFO, "Navigation button pressed: %d", id);
+
                 if (id == 51) { // Bouton MENU
-                    Serial.println(F("Showing menu via navigation button"));
+                    DEBUG_LOG(DEBUG_LEVEL_INFO, "Showing menu via navigation button");
                     m_viewManager.showMenu();
                 } else if (id == 52) { // Bouton HOME/VALIDATION
-                    Serial.println(F("Showing home via navigation button"));
+                    DEBUG_LOG(DEBUG_LEVEL_INFO, "Showing home via navigation button");
                     m_viewManager.showHome();
                 }
             }

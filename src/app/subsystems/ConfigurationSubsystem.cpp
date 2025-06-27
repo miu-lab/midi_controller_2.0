@@ -1,18 +1,21 @@
 #include "ConfigurationSubsystem.hpp"
 
 #include <Arduino.h>
+
 #include <algorithm>
 #include <set>
 
 #include "config/ConfigDefaults.hpp"
+#include "config/debug/DebugMacros.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
+#include "core/utils/Error.hpp"
 
 ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
     navService_ = std::make_shared<NavigationConfigService>();
 }
 
-Result<bool, std::string> ConfigurationSubsystem::init() {
+Result<bool> ConfigurationSubsystem::init() {
     // Récupérer la configuration de l'application depuis le conteneur
     config_ = container_->resolve<ApplicationConfiguration>();
     if (!config_) {
@@ -41,10 +44,11 @@ Result<bool, std::string> ConfigurationSubsystem::init() {
                 // Custom deleter qui ne fait rien car on ne possède pas l'objet
             });
         container_->registerDependency<UnifiedConfiguration>(unifiedConfigPtr);
-        Serial.println(F("ConfigurationSubsystem: UnifiedConfiguration enregistrée dans le conteneur"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO,
+                  "ConfigurationSubsystem: UnifiedConfiguration enregistrée dans le conteneur");
     }
 
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 const std::vector<ControlDefinition>& ConfigurationSubsystem::getAllControlDefinitions() const {
@@ -147,30 +151,23 @@ size_t ConfigurationSubsystem::getInputCountByType(InputType type) const {
                         });
 }
 
-Result<bool, std::string> ConfigurationSubsystem::loadUnifiedConfigurations() {
-    Serial.println(F("ConfigurationSubsystem: Loading control definitions"));
-    
+Result<bool> ConfigurationSubsystem::loadUnifiedConfigurations() {
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "ConfigurationSubsystem: Loading control definitions");
+
     if (!config_) {
-        return Result<bool, std::string>::error("ApplicationConfiguration not available");
+        return Result<bool>::error(
+            {ErrorCode::DependencyMissing, "ApplicationConfiguration not available"});
     }
-    
-    if (!validateAllConfigurations()) {
-        return Result<bool, std::string>::error("Some control definitions are invalid");
-    }
-    
-    const auto& unifiedConfig = config_->getUnifiedConfiguration();
-    auto stats = unifiedConfig.getStats();
-    Serial.print(stats.totalControls);
-    Serial.println(F(" control definitions loaded"));
-    
-    Serial.println(F("ConfigurationSubsystem: Using unified configuration system"));
-    
-    Serial.print(F("Stats - Encoders: "));
-    Serial.print(stats.encoders);
-    Serial.print(F(", Buttons: "));
-    Serial.print(stats.buttons);
-    Serial.print(F(", MIDI mappings: "));
-    Serial.println(stats.midiMappings);
-    
-    return Result<bool, std::string>::success(true);
+
+    // Afficher les statistiques de configuration
+    config_->getUnifiedConfiguration().getStats();
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "%d control definitions loaded", stats.totalControls);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "ConfigurationSubsystem: Using unified configuration system");
+    DEBUG_LOG(DEBUG_LEVEL_INFO,
+              "Stats - Encoders: %d, Buttons: %d, MIDI mappings: %d",
+              stats.encoders,
+              stats.buttons,
+              stats.midiMappings);
+
+    return Result<bool>::success(true);
 }

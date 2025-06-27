@@ -36,9 +36,9 @@ public:
      * Cette méthode configure la chaîne de traitement MIDI:
      * TeensyUsbMidiOut -> BufferedMidiOut -> EventEnabledMidiOut
      * 
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> init() override;
+    Result<bool> init() override;
 
     /**
      * @brief Met à jour l'état du sous-système MIDI
@@ -56,18 +56,18 @@ public:
      * @param channel Canal MIDI (0-15)
      * @param note Numéro de note (0-127)
      * @param velocity Vélocité (0-127)
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override;
+    Result<bool> sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override;
 
     /**
      * @brief Envoie un message MIDI Note Off
      *
      * @param channel Canal MIDI (0-15)
      * @param note Numéro de note (0-127)
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> sendNoteOff(uint8_t channel, uint8_t note) override;
+    Result<bool> sendNoteOff(uint8_t channel, uint8_t note) override;
 
     /**
      * @brief Envoie un message MIDI Control Change
@@ -75,9 +75,9 @@ public:
      * @param channel Canal MIDI (0-15)
      * @param controller Numéro de contrôleur (0-127)
      * @param value Valeur (0-127)
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> sendControlChange(uint8_t channel, uint8_t controller,
+    Result<bool> sendControlChange(uint8_t channel, uint8_t controller,
                                                 uint8_t value) override;
 
     /**

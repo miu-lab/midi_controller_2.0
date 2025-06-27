@@ -24,7 +24,7 @@ public:
     /**
      * @brief Initialise le conteneur de dépendances avec tous les composants requis
      */
-    static Result<bool, std::string> initializeContainer(
+    static Result<bool> initializeContainer(
         std::shared_ptr<DependencyContainer> container, const ApplicationConfiguration& config);
 
 private:
@@ -32,17 +32,17 @@ private:
     struct SubsystemInfo {
         const char* name;
         std::shared_ptr<void> instance;
-        std::function<Result<bool, std::string>()> initFn;
+        std::function<Result<bool>()> initFn;
     };
 
     // Étapes d'initialisation ordonnées
     static void registerBaseServices(std::shared_ptr<DependencyContainer> container,
                                      const ApplicationConfiguration& config);
 
-    static Result<bool, std::string> setupHardwareAdapters(
+    static Result<bool> setupHardwareAdapters(
         std::shared_ptr<DependencyContainer> container);
 
-    static Result<bool, std::string> initializeSubsystems(
+    static Result<bool> initializeSubsystems(
         std::shared_ptr<DependencyContainer> container);
 
     static bool setupControllers(std::shared_ptr<DependencyContainer> container);

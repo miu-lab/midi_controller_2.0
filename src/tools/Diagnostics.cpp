@@ -1,5 +1,6 @@
 #include "Diagnostics.hpp"
 #include "config/debug/DebugMacros.hpp"
+#include "core/utils/Error.hpp"
 
 // Initialisation des variables statiques
 TaskScheduler* DiagnosticsManager::_scheduler = nullptr;
@@ -148,6 +149,13 @@ bool DiagnosticsManager::handleCommand(const String& command) {
 #endif
     
     return false;  // Commande non reconnue
+}
+
+void DiagnosticsManager::printError(const Result<bool>& result, const char* prefix) {
+    if (result.isError()) {
+        auto err = result.error().value_or(Errors::Unknown);
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "%s: %s (code: %d)", prefix, err.message, static_cast<int>(err.code));
+    }
 }
 
 void DiagnosticsManager::printSchedulerStats(bool showDetails) {

@@ -21,7 +21,7 @@ public:
     ~MidiControllerApp();
 
     // Méthodes principales
-    Result<bool, std::string> init();
+    Result<bool> init();
     void update();
 
 private:

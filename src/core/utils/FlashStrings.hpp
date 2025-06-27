@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <WString.h>
+#include "config/debug/DebugMacros.hpp"
 
 /**
  * @brief Utilitaire pour la gestion des chaînes de caractères en mémoire Flash
@@ -28,14 +29,7 @@ public:
         
         // Vérifier si la chaîne va être tronquée
         if (srcLen >= bufferSize) {
-            #ifdef DEBUG
-            // En mode debug, afficher un avertissement la première fois
-            static bool warningDisplayed = false;
-            if (!warningDisplayed) {
-                Serial.println(F("AVERTISSEMENT: Troncation de chaîne détectée dans FlashStrings::copy"));
-                warningDisplayed = true; // N'afficher qu'une fois
-            }
-            #endif
+            DEBUG_LOG(DEBUG_LEVEL_WARNING, "AVERTISSEMENT: Troncation de chaîne détectée dans FlashStrings::copy");
         }
         
         // Méthode de copie plus sûre pour éviter les avertissements de troncation

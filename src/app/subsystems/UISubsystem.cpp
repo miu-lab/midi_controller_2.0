@@ -6,13 +6,14 @@
 #include "config/debug/DebugMacros.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/TaskScheduler.hpp"
+#include "core/utils/Error.hpp"
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {}
 
-Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
+Result<bool> UISubsystem::init(bool enableFullUI) {
     if (initialized_) {
-        return Result<bool, std::string>::success(true);
+        return Result<bool>::success(true);
     }
 
     fullUIEnabled_ = enableFullUI;
@@ -20,7 +21,7 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        return Result<bool, std::string>::error("Failed to resolve IConfiguration");
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"});
     }
 
     // Initialiser et démarrer l'EventBatcher
@@ -46,13 +47,13 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
         auto unifiedConfig = container_->resolve<UnifiedConfiguration>();
         
         if (!lvglBridge || !unifiedConfig) {
-            return Result<bool, std::string>::error("Missing LVGL dependencies");
+            return Result<bool>::error({ErrorCode::DependencyMissing, "Missing LVGL dependencies"});
         }
         
         viewManager_ = std::make_shared<DefaultViewManager>(lvglBridge, unifiedConfig);
 
         if (!viewManager_->init()) {
-            return Result<bool, std::string>::error("Failed to initialize ViewManager");
+            return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to initialize ViewManager"});
         }
 
         // Créer l'écouteur d'événements UI et l'abonner aux événements
@@ -65,7 +66,7 @@ Result<bool, std::string> UISubsystem::init(bool enableFullUI) {
     }
 
     initialized_ = true;
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 void UISubsystem::update() {
@@ -93,22 +94,22 @@ void UISubsystem::update() {
     }
 }
 
-Result<bool, std::string> UISubsystem::showMessage(const std::string& message) {
+Result<bool> UISubsystem::showMessage(const std::string& message) {
     if (!initialized_ || !fullUIEnabled_ || !viewManager_) {
-        return Result<bool, std::string>::error("UI not initialized or disabled");
+        return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized or disabled"});
     }
 
     // Utiliser le système modal LVGL
     viewManager_->showModal(message.c_str());
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
-Result<bool, std::string> UISubsystem::clearDisplay() {
+Result<bool> UISubsystem::clearDisplay() {
     if (!initialized_ || !fullUIEnabled_ || !viewManager_) {
-        return Result<bool, std::string>::error("UI not initialized or disabled");
+        return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized or disabled"});
     }
 
     // Cacher le modal et retourner à la vue principale
     viewManager_->hideModal();
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }

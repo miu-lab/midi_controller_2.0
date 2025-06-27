@@ -142,19 +142,19 @@ uint32_t TaskScheduler::executeTask(int taskIndex) {
 
 void TaskScheduler::printDebugStats() {
 #ifdef DEBUG
-    // // Ajout d'un séparateur pour améliorer la lisibilité
-    // DEBUG_SCHEDULER("========== STATISTIQUES SCHEDULER ===========");
+    // Ajout d'un séparateur pour améliorer la lisibilité
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "========== STATISTIQUES SCHEDULER ==========");
 
-    // // Informations de base (toujours disponibles si DEBUG_TASK_SCHEDULER est activé)
-    // DEBUG_SCHEDULER("CPU: %.2f%% | Cycles: %u | Overruns: %u",
-    //               getCpuUsage(), cycleCount, overruns);
+    // Informations de base (toujours disponibles si DEBUG_TASK_SCHEDULER est activé)
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "CPU: %.2f%% | Cycles: %u | Overruns: %u",
+                  getCpuUsage(), cycleCount, overruns);
 
     // Pour le mode verbose, afficher les détails des tâches
     if (DEBUG_TASK_SCHEDULER_LEVEL >= 2) {
-        DEBUG_SCHEDULER_VERBOSE("Détails des tâches actives:");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "Détails des tâches actives:");
         for (size_t i = 0; i < tasks.size(); i++) {
             if (tasks[i].enabled) {
-                DEBUG_SCHEDULER_VERBOSE("  [%u] %s: P%u, %u µs/cycle, interval %u µs", 
+                DEBUG_LOG(DEBUG_LEVEL_INFO, "  [%u] %s: P%u, %u µs/cycle, interval %u µs", 
                     i, tasks[i].name, tasks[i].priority, tasks[i].executionTime, 
                     tasks[i].interval);
             }
@@ -165,19 +165,20 @@ void TaskScheduler::printDebugStats() {
         for (size_t i = 0; i < tasks.size(); i++) {
             if (!tasks[i].enabled) {
                 if (!hasDisabledTasks) {
-                    DEBUG_SCHEDULER_VERBOSE("Tâches désactivées:");
+                    DEBUG_LOG(DEBUG_LEVEL_INFO, "Tâches désactivées:");
                     hasDisabledTasks = true;
                 }
-                DEBUG_SCHEDULER_VERBOSE("  [%u] %s", i, tasks[i].name);
+                DEBUG_LOG(DEBUG_LEVEL_INFO, "  [%u] %s", i, tasks[i].name);
             }
         }
     }
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "============================================");
 #endif
 }
 
 void TaskScheduler::printStats(bool showDetailedStats) {
     // Affiche les statistiques CPU de base sur le port série (fonctionne même en mode non-DEBUG)
-    Serial.println("========== STATISTIQUES SCHEDULER ===========");
+    Serial.println("========== STATISTIQUES SCHEDULER ==========");
     Serial.printf("CPU: %.2f%% | Cycles: %u | Overruns: %u\n", 
                 getCpuUsage(), cycleCount, overruns);
     

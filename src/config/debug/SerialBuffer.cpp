@@ -1,4 +1,5 @@
 #include "SerialBuffer.hpp"
+#include "DebugMacros.hpp"
 
 // Initialisation du pointeur d'instance statique
 SerialBuffer* SerialBuffer::_instance = nullptr;
@@ -19,10 +20,9 @@ void SerialBuffer::println(const String& line) {
         // Si pas encore initialisé, affiche directement sur le port série
         // et s'assure qu'il y a un saut de ligne
         if (line.length() > 80) {
-            Serial.print(line.substring(0, 77));
-            Serial.println("...");
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "%.77s...", line.c_str());
         } else {
-            Serial.println(line);
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "%s", line.c_str());
         }
     }
 #endif
@@ -73,7 +73,7 @@ void SerialBuffer::dumpBuffer() {
     
     for (size_t i = 0; i < count; i++) {
         size_t index = (startIndex + i) % _maxLines;
-        Serial.println(_buffer[index]);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "%s", _buffer[index].c_str());
     }
 #endif
 }

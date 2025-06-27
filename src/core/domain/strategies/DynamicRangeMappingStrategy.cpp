@@ -1,6 +1,7 @@
 #include "core/domain/strategies/DynamicRangeMappingStrategy.hpp"
 
 #include <Arduino.h>
+#include "config/debug/DebugMacros.hpp"
 
 DynamicRangeMappingStrategy::DynamicRangeMappingStrategy(int32_t initialMin, int32_t initialMax,
                                                          uint32_t resetThreshold)
@@ -63,13 +64,5 @@ void DynamicRangeMappingStrategy::updateRange(int32_t physicalValue) const {
         }
     }
 
-#if defined(DEBUG) && defined(DEBUG_MAPPING) && (DEBUG_MAPPING >= 1)
-    // Débogage de la plage
-    Serial.print("RANGE ");
-    Serial.print(minPhysical_);
-    Serial.print(" - ");
-    Serial.print(maxPhysical_);
-    Serial.print(" Value: ");
-    Serial.println(physicalValue);
-#endif
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "RANGE %d - %d Value: %d", minPhysical_, maxPhysical_, physicalValue);
 }

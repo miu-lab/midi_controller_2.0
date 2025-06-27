@@ -24,9 +24,9 @@ public:
 
     /**
      * @brief Initialise le sous-système de configuration
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> init() override;
+    Result<bool> init() override;
 
     const std::vector<ControlDefinition>& getAllControlDefinitions() const override;
     std::vector<ControlDefinition> getControlDefinitionsByType(InputType type) const override;
@@ -49,5 +49,5 @@ private:
     std::shared_ptr<ApplicationConfiguration> config_;
     std::shared_ptr<NavigationConfigService> navService_;
 
-    Result<bool, std::string> loadUnifiedConfigurations();
+    Result<bool> loadUnifiedConfigurations();
 };

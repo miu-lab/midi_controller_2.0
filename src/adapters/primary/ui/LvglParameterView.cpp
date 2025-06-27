@@ -1,6 +1,7 @@
 #include "LvglParameterView.hpp"
 #include "config/DisplayConfig.hpp"
 #include <Arduino.h>
+#include "config/debug/DebugMacros.hpp"
 
 LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge)
     : bridge_(bridge),
@@ -13,11 +14,11 @@ LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge)
       last_channel_(1),
       last_value_(0),
       last_parameter_name_("NO PARAM") {
-    Serial.println(F("LvglParameterView: Constructor (MIDI→UI flow)"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Constructor (MIDI→UI flow)");
 }
 
 LvglParameterView::~LvglParameterView() {
-    Serial.println(F("LvglParameterView: Destructor"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Destructor");
     setActive(false);
     unsubscribeFromEvents();
     cleanupLvglObjects();
@@ -25,16 +26,16 @@ LvglParameterView::~LvglParameterView() {
 
 bool LvglParameterView::init() {
     if (initialized_) {
-        Serial.println(F("LvglParameterView: Already initialized"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Already initialized");
         return true;
     }
     
     if (!bridge_) {
-        Serial.println(F("LvglParameterView: Bridge LVGL non disponible"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "LvglParameterView: Bridge LVGL non disponible");
         return false;
     }
     
-    Serial.println(F("LvglParameterView: Initialisation..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Initialisation...");
     
     // Créer l'écran principal
     setupMainScreen();
@@ -46,7 +47,7 @@ bool LvglParameterView::init() {
     subscribeToEvents();
 
     initialized_ = true;
-    Serial.println(F("LvglParameterView: Initialisé avec succès"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Initialisé avec succès");
     return true;
 }
 
@@ -89,7 +90,7 @@ void LvglParameterView::setActive(bool active) {
             parameter_widget_->setVisible(true);
         }
 
-        Serial.println(F("LvglParameterView: Activé"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Activé");
     } else if (!active && active_) {
         // Désactivation
         active_ = false;
@@ -99,7 +100,7 @@ void LvglParameterView::setActive(bool active) {
             parameter_widget_->setVisible(false);
         }
 
-        Serial.println(F("LvglParameterView: Désactivé"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Désactivé");
     }
 }
 
@@ -111,22 +112,18 @@ void LvglParameterView::setParameter(uint8_t cc_number, uint8_t channel, uint8_t
                                      const String& parameter_name, bool animate) {
     if (parameter_widget_) {
         parameter_widget_->setParameter(cc_number, channel, value, parameter_name, animate);
-        Serial.printf("LvglParameterView: Parameter set - CC%d CH%d Value:%d Name:%s\n",
-                      cc_number,
-                      channel,
-                      value,
-                      parameter_name.c_str());
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Parameter set - CC%d CH%d Value:%d Name:%s", cc_number, channel, value, parameter_name.c_str());
     } else {
-        Serial.println(F("LvglParameterView: WARNING - No parameter widget available"));
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: WARNING - No parameter widget available");
     }
 }
 
 void LvglParameterView::setValue(uint8_t value, bool animate) {
     if (parameter_widget_) {
         parameter_widget_->setValue(value, animate);
-        Serial.printf("LvglParameterView: Value set to %d\n", value);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Value set to %d", value);
     } else {
-        Serial.println(F("LvglParameterView: WARNING - No parameter widget available"));
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: WARNING - No parameter widget available");
     }
 }
 
@@ -157,12 +154,12 @@ void LvglParameterView::setupMainScreen() {
     lv_obj_set_style_bg_opa(main_screen_, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(main_screen_, 0, 0);
 
-    Serial.println(F("LvglParameterView: Écran principal créé"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Écran principal créé");
 }
 
 void LvglParameterView::createParameterWidget() {
     if (!main_screen_) {
-        Serial.println(F("LvglParameterView: Cannot create widget - no main screen"));
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: Cannot create widget - no main screen");
         return;
     }
 
@@ -180,21 +177,21 @@ void LvglParameterView::createParameterWidget() {
                                     last_parameter_name_,
                                     false);
 
-    Serial.println(F("LvglParameterView: ParameterWidget créé (read-only)"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: ParameterWidget créé (read-only)");
 }
 
 void LvglParameterView::cleanupLvglObjects() {
     // Nettoyer le widget en premier
     if (parameter_widget_) {
         parameter_widget_.reset();
-        Serial.println(F("LvglParameterView: ParameterWidget détruit"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: ParameterWidget détruit");
     }
 
     // Nettoyer l'écran principal
     if (main_screen_) {
         lv_obj_delete(main_screen_);
         main_screen_ = nullptr;
-        Serial.println(F("LvglParameterView: Écran principal détruit"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Écran principal détruit");
     }
 }
 
@@ -208,10 +205,9 @@ void LvglParameterView::subscribeToEvents() {
     event_subscription_id_ = eventBus.subscribe(this, 100);  // Haute priorité pour l'UI
 
     if (event_subscription_id_ > 0) {
-        Serial.printf("LvglParameterView: Abonné aux événements UI batchés (ID: %d)\\n",
-                      event_subscription_id_);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Abonné aux événements UI batchés (ID: %d)", event_subscription_id_);
     } else {
-        Serial.println(F("LvglParameterView: ERREUR - Échec abonnement événements"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "LvglParameterView: ERREUR - Échec abonnement événements");
     }
 }
 
@@ -219,11 +215,9 @@ void LvglParameterView::unsubscribeFromEvents() {
     if (event_subscription_id_ > 0) {
         EventBus& eventBus = EventBus::getInstance();
         if (eventBus.unsubscribe(event_subscription_id_)) {
-            Serial.printf("LvglParameterView: Désabonné des événements (ID: %d)\\n",
-                          event_subscription_id_);
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Désabonné des événements (ID: %d)", event_subscription_id_);
         } else {
-            Serial.printf("LvglParameterView: ERREUR - Échec désabonnement (ID: %d)\\n",
-                          event_subscription_id_);
+            DEBUG_LOG(DEBUG_LEVEL_ERROR, "LvglParameterView: ERREUR - Échec désabonnement (ID: %d)", event_subscription_id_);
         }
         event_subscription_id_ = 0;
     }

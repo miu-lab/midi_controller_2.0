@@ -39,16 +39,16 @@ public:
 
     /**
      * @brief Initialise le sous-système d'entrée
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> init() override;
+    Result<bool> init() override;
 
     /**
      * @brief Met à jour l'état des entrées
      */
     void update() override;
 
-    Result<bool, std::string> configureInputs(const std::vector<ControlDefinition>& controlDefinitions) override;
+    Result<bool> configureInputs(const std::vector<ControlDefinition>& controlDefinitions) override;
     std::vector<ControlDefinition> getAllActiveControlDefinitions() const override;
     std::optional<ControlDefinition> getControlDefinitionById(InputId id) const override;
     size_t getActiveInputCountByType(InputType type) const override;
@@ -67,11 +67,11 @@ private:
 
     bool initialized_ = false;
     
-    Result<bool, std::string> loadUnifiedConfigurations();
+    Result<bool> loadUnifiedConfigurations();
     std::vector<EncoderConfig> extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const;
     std::vector<ButtonConfig> extractButtonConfigs(const std::vector<ControlDefinition>& controlDefinitions) const;
-    Result<bool, std::string> createManagers(const std::vector<EncoderConfig>& encoderConfigs,
+    Result<bool> createManagers(const std::vector<EncoderConfig>& encoderConfigs,
                                             const std::vector<ButtonConfig>& buttonConfigs);
-    Result<bool, std::string> initializeProcessors();
-    Result<bool, std::string> connectInputController();
+    Result<bool> initializeProcessors();
+    Result<bool> connectInputController();
 };

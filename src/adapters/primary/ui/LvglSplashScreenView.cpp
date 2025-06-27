@@ -1,6 +1,7 @@
 #include "LvglSplashScreenView.hpp"
 #include "config/DisplayConfig.hpp"
 #include <Arduino.h>
+#include "config/debug/DebugMacros.hpp"
 
 LvglSplashScreenView::LvglSplashScreenView(std::shared_ptr<Ili9341LvglBridge> bridge,
                                          const Config& config)
@@ -21,11 +22,11 @@ bool LvglSplashScreenView::init() {
     }
     
     if (!bridge_) {
-        Serial.println(F("LvglSplashScreenView: Bridge LVGL non disponible"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "LvglSplashScreenView: Bridge LVGL non disponible");
         return false;
     }
     
-    Serial.println(F("LvglSplashScreenView: Initialisation..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglSplashScreenView: Initialisation...");
     
     // Créer l'écran principal
     setupMainScreen();
@@ -40,7 +41,7 @@ bool LvglSplashScreenView::init() {
     setupProgressBar();
     
     initialized_ = true;
-    Serial.println(F("LvglSplashScreenView: Initialisé avec succès"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglSplashScreenView: Initialisé avec succès");
     return true;
 }
 
@@ -86,12 +87,12 @@ void LvglSplashScreenView::setActive(bool active) {
         // Activation
         active_ = true;
         start_time_ = millis();
-        Serial.println(F("LvglSplashScreenView: Activé"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglSplashScreenView: Activé");
     } else if (!active && active_) {
         // Désactivation
         active_ = false;
         start_time_ = 0;
-        Serial.println(F("LvglSplashScreenView: Désactivé"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglSplashScreenView: Désactivé");
     }
 }
 
@@ -110,7 +111,7 @@ void LvglSplashScreenView::setupMainScreen() {
     lv_obj_set_style_bg_color(main_screen_, config_.bg_color, 0);
     lv_obj_set_style_bg_opa(main_screen_, LV_OPA_COVER, 0);
     
-    Serial.println(F("LvglSplashScreenView: Écran principal créé"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglSplashScreenView: Écran principal créé");
 }
 
 void LvglSplashScreenView::setupBorder() {

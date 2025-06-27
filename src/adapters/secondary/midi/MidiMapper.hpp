@@ -2,6 +2,7 @@
 
 #include <array>
 #include <memory>
+#include <set>
 #include <unordered_map>
 
 #include "config/ConfigDefaults.hpp"
@@ -67,6 +68,12 @@ public:
      * @return Configuration MIDI du contrôle, ou une valeur par défaut si non trouvé
      */
     ControlDefinition::MidiConfig getMidiConfig(InputId controlId) const;
+
+    /**
+     * @brief Définit les contrôles qui sont utilisés pour la navigation
+     * @param navControlIds Ensemble des IDs des contrôles de navigation
+     */
+    void setNavigationControls(const std::set<InputId>& navControlIds);
 
     /**
      * @brief Traite un changement d'encodeur
@@ -175,6 +182,7 @@ private:
     CommandManager& commandManager_;
     std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
     std::unordered_map<InputId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
+    std::set<InputId> navigationControls_;
 
     ControlDefinition::MidiConfig defaultConfig_;  // Configuration par défaut retournée si non trouvée
 };

@@ -1,4 +1,5 @@
 #include "UIThemeFactory.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 //=============================================================================
 // Interface publique
@@ -19,7 +20,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createTheme(ThemeType type) {
         case ThemeType::STUDIO:
             return createStudioTheme();
         default:
-            Serial.println(F("UIThemeFactory: Unknown theme type, using default"));
+            DEBUG_LOG(DEBUG_LEVEL_WARNING, "UIThemeFactory: Unknown theme type, using default");
             return createDefaultTheme();
     }
 }
@@ -47,7 +48,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createMidiControllerTheme() {
     auto layout = createLayoutForTheme(theme);
     applyThemeOptimizations(*theme, ThemeType::MIDI_CONTROLLER);
     
-    Serial.println(F("UIThemeFactory: MIDI Controller theme created"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: MIDI Controller theme created");
     
     return {
         .theme = theme,
@@ -84,7 +85,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createPerformanceTheme() {
     auto layout = createLayoutForTheme(theme);
     applyThemeOptimizations(*theme, ThemeType::PERFORMANCE);
     
-    Serial.println(F("UIThemeFactory: Performance theme created"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Performance theme created");
     
     return {
         .theme = theme,
@@ -121,7 +122,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createStudioTheme() {
     auto layout = createLayoutForTheme(theme);
     applyThemeOptimizations(*theme, ThemeType::STUDIO);
     
-    Serial.println(F("UIThemeFactory: Studio theme created"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Studio theme created");
     
     return {
         .theme = theme,
@@ -134,8 +135,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createStudioTheme() {
 void UIThemeFactory::applyThemeToDisplay(const ThemeConfig& config, lv_display_t* display) {
     if (config.theme && display) {
         config.theme->applyToLvglDisplay(display);
-        Serial.printf("UIThemeFactory: Theme '%s' applied to display\n", 
-                      config.name.c_str());
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Theme '%s' applied to display", config.name.c_str());
     }
 }
 
@@ -189,7 +189,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createDefaultTheme() {
     auto theme = std::make_shared<UITheme>(UITheme::createDefaultTheme());
     auto layout = createLayoutForTheme(theme);
     
-    Serial.println(F("UIThemeFactory: Default theme created"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Default theme created");
     
     return {
         .theme = theme,
@@ -203,7 +203,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createDarkTheme() {
     auto theme = std::make_shared<UITheme>(UITheme::createDarkTheme());
     auto layout = createLayoutForTheme(theme);
     
-    Serial.println(F("UIThemeFactory: Dark theme created"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Dark theme created");
     
     return {
         .theme = theme,
@@ -217,7 +217,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createLightTheme() {
     auto theme = std::make_shared<UITheme>(UITheme::createLightTheme());
     auto layout = createLayoutForTheme(theme);
     
-    Serial.println(F("UIThemeFactory: Light theme created"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Light theme created");
     
     return {
         .theme = theme,
@@ -229,7 +229,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createLightTheme() {
 
 std::shared_ptr<UILayout> UIThemeFactory::createLayoutForTheme(std::shared_ptr<UITheme> theme) {
     if (!theme) {
-        Serial.println(F("UIThemeFactory: ERROR - Cannot create layout for null theme"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "UIThemeFactory: ERROR - Cannot create layout for null theme");
         return nullptr;
     }
     
@@ -238,7 +238,7 @@ std::shared_ptr<UILayout> UIThemeFactory::createLayoutForTheme(std::shared_ptr<U
     // Le layout sera configuré par les vues selon leurs besoins spécifiques
     // avec setupGrid(), setupFlex(), etc.
     
-    Serial.println(F("UIThemeFactory: Layout created and configured"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Layout created and configured");
     return layout;
 }
 
@@ -269,5 +269,5 @@ void UIThemeFactory::applyThemeOptimizations(UITheme& theme, ThemeType type) {
             break;
     }
     
-    Serial.printf("UIThemeFactory: Optimizations applied for theme type %d\n", (int)type);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "UIThemeFactory: Optimizations applied for theme type %d", (int)type);
 }

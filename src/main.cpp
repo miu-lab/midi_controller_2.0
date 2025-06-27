@@ -15,6 +15,7 @@
 #include "app/di/DependencyContainer.hpp"
 #include "config/ApplicationConfiguration.hpp"
 #include "config/debug/DebugMacros.hpp"
+#include "core/utils/Error.hpp"
 
 ApplicationConfiguration appConfig;
 std::shared_ptr<MidiControllerApp> app;
@@ -32,7 +33,7 @@ void setup() {
     DEBUG_LOG(DEBUG_LEVEL_INFO, "Initialisation du conteneur...");
     auto initResult = InitializationScript::initializeContainer(container, appConfig);
     if (initResult.isError()) {
-        DEBUG_ERROR("ERREUR d'initialisation: %s", initResult.error()->c_str());
+        DEBUG_ERROR("ERREUR d'initialisation: %s", initResult.error().value_or(Errors::Unknown).message);
         return;
     }
     DEBUG_LOG(DEBUG_LEVEL_INFO, "Conteneur initialisé avec succès");
@@ -40,7 +41,7 @@ void setup() {
     app = std::make_shared<MidiControllerApp>(container);
     auto appInitResult = app->init();
     if (appInitResult.isError()) {
-        DEBUG_ERROR("ERREUR d'initialisation de l'app: %s", appInitResult.error()->c_str());
+        DEBUG_ERROR("ERREUR d'initialisation de l'app: %s", appInitResult.error().value_or(Errors::Unknown).message);
         return;
     }
     DEBUG_LOG(DEBUG_LEVEL_INFO, "Démarrage terminé");

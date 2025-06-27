@@ -61,16 +61,7 @@ void MidiMapper::logDiagnostic(const char* format, ...) const {
 }
 
 bool MidiMapper::isNavigationControl(InputId controlId) const {
-    // Vérification directe des contrôles de navigation connus
-    // (basé sur ConfigurationFactory - évite les dépendances)
-    switch (controlId) {
-        case 79:  // Encodeur de navigation
-        case 51:  // Bouton menu
-        case 52:  // Bouton OK
-            return true;
-        default:
-            return false;
-    }
+    return navigationControls_.count(controlId) > 0;
 }
 
 //=============================================================================
@@ -177,6 +168,10 @@ ControlDefinition::MidiConfig MidiMapper::getMidiConfig(InputId controlId) const
     return defaultConfig_;
 }
 
+void MidiMapper::setNavigationControls(const std::set<InputId>& navControlIds) {
+    navigationControls_ = navControlIds;
+}
+
 //=============================================================================
 // Méthodes de traitement des encodeurs
 //=============================================================================
@@ -280,10 +275,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 
     // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
     if (isNavigationControl(encoderId)) {
-        Serial.print(F("Navigation control detected: "));
-        Serial.print(encoderId);
-        Serial.print(F(" position: "));
-        Serial.println(mappingInfo.lastEncoderPosition);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "Navigation control detected: %d position: %d", encoderId, mappingInfo.lastEncoderPosition);
         // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
         return;
     }
@@ -296,17 +288,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;
     }
 
-#ifndef PERFORMANCE_MODE
-    logDiagnostic("Envoi MIDI: Enc=%d CH=%d CC=%d Val=%d (mode %s)",
-                  encoderId,
-                  midiConfig.channel,
-                  midiConfig.control,
-                  newValue,
-                  midiConfig.isRelative ? "relatif" : "absolu");
-    // Débogage pour voir l'ID de l'encodeur
-    Serial.print(F("MidiMapper: Sending MIDI for encoderId="));
-    Serial.println(encoderId);
-#endif
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper: Sending MIDI for encoderId=%d", encoderId);
 
     // Mettre à jour et envoyer la nouvelle valeur
     mappingInfo.lastMidiValue = static_cast<uint8_t>(newValue);
@@ -328,10 +310,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingControlType type) {
     // Si c'est un contrôle de navigation, ne pas traiter en MIDI mais laisser passer
     if (isNavigationControl(buttonId)) {
-        Serial.print(F("Navigation control detected: "));
-        Serial.print(buttonId);
-        Serial.print(F(" pressed: "));
-        Serial.println(pressed);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "Navigation control detected: %d pressed: %d", buttonId, pressed);
         // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
         return;
     }

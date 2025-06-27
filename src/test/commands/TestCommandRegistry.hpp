@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include "TestCommand.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 /**
  * @brief Registry pour gérer toutes les commandes de test
@@ -38,10 +39,7 @@ public:
     bool executeCommand(char key) {
         for (const auto& cmd : commands_) {
             if (cmd && cmd->matches(key)) {
-                Serial.print(F("Executing command '"));
-                Serial.print(key);
-                Serial.print(F("': "));
-                Serial.println(cmd->getDescription());
+                DEBUG_LOG(DEBUG_LEVEL_INFO, "Executing command '%c': %s", key, cmd->getDescription().c_str());
                 
                 cmd->execute();
                 return true;
@@ -54,20 +52,17 @@ public:
      * @brief Affiche toutes les commandes disponibles
      */
     void printHelp() const {
-        Serial.println(F("=========================================="));
-        Serial.println(F("=== AVAILABLE TEST COMMANDS ==="));
-        Serial.println(F("=========================================="));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "==========================================");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "=== AVAILABLE TEST COMMANDS ===");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "==========================================");
         
         for (const auto& cmd : commands_) {
             if (cmd) {
-                Serial.print(F("  "));
-                Serial.print(cmd->getKey());
-                Serial.print(F(" - "));
-                Serial.println(cmd->getDescription());
+                DEBUG_LOG(DEBUG_LEVEL_INFO, "  %c - %s", cmd->getKey(), cmd->getDescription().c_str());
             }
         }
         
-        Serial.println(F("=========================================="));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "==========================================");
     }
     
     /**

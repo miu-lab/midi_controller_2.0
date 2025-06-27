@@ -3,6 +3,9 @@
 #include <Arduino.h>
 #include <algorithm>
 
+#include "config/debug/DebugMacros.hpp"
+#include "core/utils/Error.hpp"
+
 #include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
 #include "adapters/secondary/hardware/input/encoders/EncoderManager.hpp"
 #include "adapters/secondary/midi/MidiMapper.hpp"
@@ -15,15 +18,15 @@
 InputSubsystem::InputSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {}
 
-Result<bool, std::string> InputSubsystem::init() {
+Result<bool> InputSubsystem::init() {
     if (initialized_) {
-        return Result<bool, std::string>::success(true);
+        return Result<bool>::success(true);
     }
 
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        return Result<bool, std::string>::error("Failed to resolve IConfiguration");
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"});
     }
 
     // Charger les configurations unifiées
@@ -45,7 +48,7 @@ Result<bool, std::string> InputSubsystem::init() {
         }));
 
     initialized_ = true;
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 void InputSubsystem::update() {
@@ -74,12 +77,12 @@ void InputSubsystem::update() {
     }
 }
 
-Result<bool, std::string> InputSubsystem::configureInputs(const std::vector<ControlDefinition>& controlDefinitions) {
+Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!initialized_) {
-        return Result<bool, std::string>::error("InputSubsystem not initialized");
+        return Result<bool>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
     }
 
-    Serial.println(F("InputSubsystem: Configuring inputs with ControlDefinition interface"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Configuring inputs with ControlDefinition interface");
 
     // Extraire les configurations par type
     auto encoderConfigs = extractEncoderConfigs(controlDefinitions);
@@ -97,11 +100,9 @@ Result<bool, std::string> InputSubsystem::configureInputs(const std::vector<Cont
         return processorResult;
     }
 
-    Serial.print(F("InputSubsystem: Successfully configured "));
-    Serial.print(controlDefinitions.size());
-    Serial.println(F(" controls"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Successfully configured %d controls", controlDefinitions.size());
 
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 std::vector<ControlDefinition> InputSubsystem::getAllActiveControlDefinitions() const {
@@ -161,30 +162,26 @@ bool InputSubsystem::validateInputsStatus() const {
     return true;
 }
 
-Result<bool, std::string> InputSubsystem::loadUnifiedConfigurations() {
-    Serial.println(F("InputSubsystem: Loading unified control definitions"));
+Result<bool> InputSubsystem::loadUnifiedConfigurations() {
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Loading unified control definitions");
 
     // Obtenir toutes les définitions de contrôles depuis la nouvelle interface
     const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
     
     if (allControlDefinitions.empty()) {
-        return Result<bool, std::string>::error("No control definitions found");
+        return Result<bool>::error({ErrorCode::ConfigError, "No control definitions found"});
     }
 
     // Valider toutes les définitions
     if (!configuration_->validateAllConfigurations()) {
-        return Result<bool, std::string>::error("Some control definitions are invalid");
+        return Result<bool>::error({ErrorCode::ConfigError, "Some control definitions are invalid"});
     }
 
     // Extraire les configurations par type
     auto encoderConfigs = extractEncoderConfigs(allControlDefinitions);
     auto buttonConfigs = extractButtonConfigs(allControlDefinitions);
 
-    Serial.print(F("InputSubsystem: Found "));
-    Serial.print(encoderConfigs.size());
-    Serial.print(F(" encoders and "));
-    Serial.print(buttonConfigs.size());
-    Serial.println(F(" buttons"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Found %d encoders and %d buttons", encoderConfigs.size(), buttonConfigs.size());
 
     // Créer les managers avec les configurations extraites
     auto managerResult = createManagers(encoderConfigs, buttonConfigs);
@@ -198,8 +195,8 @@ Result<bool, std::string> InputSubsystem::loadUnifiedConfigurations() {
         return processorResult;
     }
 
-    Serial.println(F("InputSubsystem: Unified control definitions loaded successfully"));
-    return Result<bool, std::string>::success(true);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Unified control definitions loaded successfully");
+    return Result<bool>::success(true);
 }
 
 std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
@@ -271,34 +268,34 @@ std::vector<ButtonConfig> InputSubsystem::extractButtonConfigs(const std::vector
     return buttonConfigs;
 }
 
-Result<bool, std::string> InputSubsystem::createManagers(const std::vector<EncoderConfig>& encoderConfigs,
+Result<bool> InputSubsystem::createManagers(const std::vector<EncoderConfig>& encoderConfigs,
                                                         const std::vector<ButtonConfig>& buttonConfigs) {
     // Créer le gestionnaire d'encodeurs
     encoderManager_ = std::make_shared<EncoderManager>(encoderConfigs);
     if (!encoderManager_) {
-        return Result<bool, std::string>::error("Failed to create EncoderManager");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create EncoderManager"});
     }
 
     // Créer le gestionnaire de boutons
     buttonManager_ = std::make_shared<DigitalButtonManager>(buttonConfigs);
     if (!buttonManager_) {
-        return Result<bool, std::string>::error("Failed to create DigitalButtonManager");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create DigitalButtonManager"});
     }
 
-    Serial.println(F("InputSubsystem: Hardware managers created successfully"));
-    return Result<bool, std::string>::success(true);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Hardware managers created successfully");
+    return Result<bool>::success(true);
 }
 
-Result<bool, std::string> InputSubsystem::initializeProcessors() {
+Result<bool> InputSubsystem::initializeProcessors() {
     // Créer les processeurs d'événements
     processEncoders_ = std::make_unique<ProcessEncoders>(encoderManager_->getEncoders());
     if (!processEncoders_) {
-        return Result<bool, std::string>::error("Failed to create ProcessEncoders");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create ProcessEncoders"});
     }
 
     processButtons_ = std::make_unique<ProcessButtons>(buttonManager_->getButtons());
     if (!processButtons_) {
-        return Result<bool, std::string>::error("Failed to create ProcessButtons");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create ProcessButtons"});
     }
 
     // Connecter les processeurs au contrôleur d'entrée si disponible
@@ -307,15 +304,15 @@ Result<bool, std::string> InputSubsystem::initializeProcessors() {
         processButtons_->setInputController(inputController_.get());
     }
 
-    Serial.println(F("InputSubsystem: Event processors initialized successfully"));
-    return Result<bool, std::string>::success(true);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Event processors initialized successfully");
+    return Result<bool>::success(true);
 }
 
-Result<bool, std::string> InputSubsystem::connectInputController() {
+Result<bool> InputSubsystem::connectInputController() {
     // Récupérer InputController depuis le conteneur
     inputController_ = container_->resolve<InputController>();
     if (!inputController_) {
-        return Result<bool, std::string>::error("Failed to resolve InputController");
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve InputController"});
     }
 
     // Connecter les processeurs si ils existent déjà
@@ -327,6 +324,6 @@ Result<bool, std::string> InputSubsystem::connectInputController() {
         processButtons_->setInputController(inputController_.get());
     }
 
-    Serial.println(F("InputSubsystem: InputController connected successfully"));
-    return Result<bool, std::string>::success(true);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: InputController connected successfully");
+    return Result<bool>::success(true);
 }

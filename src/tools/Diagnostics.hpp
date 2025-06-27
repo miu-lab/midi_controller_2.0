@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <string>
 
 #include "config/debug/DebugMacros.hpp"  // Pour avoir accès à PERFORMANCE_MODE
 #include "core/TaskScheduler.hpp"
@@ -69,7 +70,7 @@ public:
      * @param result L'objet Result contenant l'erreur potentielle
      * @param prefix Préfixe à afficher avant le message d'erreur
      */
-    static void printError(const Result<bool, std::string>& result, const char* prefix);
+    static void printError(const Result<bool>& result, const char* prefix);
 
 private:
     static TaskScheduler* _scheduler;
@@ -120,7 +121,7 @@ inline void printDiagnostics(bool showDetails = false) {
 }
 
 // Fonction globale pour afficher les erreurs
-inline void printError(const Result<bool, std::string>& result, const char* prefix) {
+inline void printError(const Result<bool>& result, const char* prefix) {
 #ifndef PERFORMANCE_MODE
     DiagnosticsManager::printError(result, prefix);
 #endif

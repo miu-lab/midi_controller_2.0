@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "config/DisplayConfig.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 // Buffers statiques DMAMEM - Taille selon orientation configurée
 DMAMEM static uint16_t main_framebuffer[DisplayConfig::FRAMEBUFFER_SIZE];
@@ -30,9 +31,8 @@ Ili9341Driver::Ili9341Driver(const Config& config)
     : config_(config),
       initialized_(false),
       framebuffer_(main_framebuffer) {
-    Serial.println(F("Ili9341Driver: Constructor called"));
-    Serial.print(F("Ili9341Driver: framebuffer_ = 0x"));
-    Serial.println((unsigned long)framebuffer_, HEX);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Ili9341Driver: Constructor called");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Ili9341Driver: framebuffer_ = 0x%X", (unsigned long)framebuffer_);
 }
 
 //=============================================================================
@@ -44,7 +44,7 @@ bool Ili9341Driver::initialize() {
         return true;
     }
 
-    Serial.println(F("ILI9341: Initializing hardware..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "ILI9341: Initializing hardware...");
 
     // Configuration des pins
     configurePins();
@@ -60,7 +60,7 @@ bool Ili9341Driver::initialize() {
     );
 
     if (!tft_) {
-        Serial.println(F("ILI9341: Failed to create ILI9341Driver"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "ILI9341: Failed to create ILI9341Driver");
         return false;
     }
 
@@ -76,7 +76,7 @@ bool Ili9341Driver::initialize() {
     // Configurer les paramètres de performance
     setupPerformance();
 
-    Serial.println(F("ILI9341: Hardware initialized"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "ILI9341: Hardware initialized");
     initialized_ = true;
 
     return true;
@@ -139,8 +139,7 @@ void Ili9341Driver::setRotation(uint8_t rotation) {
     config_.rotation = rotation;
     tft_->setRotation(rotation);
 
-    Serial.print(F("ILI9341: Rotation set to "));
-    Serial.println(rotation);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "ILI9341: Rotation set to %d", rotation);
 }
 
 void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
@@ -159,26 +158,15 @@ void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
 //=============================================================================
 
 void Ili9341Driver::debugMemory() const {
-    Serial.println(F("=== ILI9341 DRIVER DEBUG MEMORY ==="));
-    Serial.print(F("Framebuffer (240x320): 0x"));
-    Serial.println((uint32_t)framebuffer_, HEX);
-
-    Serial.print(F("Diff buf1 (4KB): 0x"));
-    Serial.println((uint32_t)diff1_.get(), HEX);
-    Serial.print(F("Diff buf2 (4KB): 0x"));
-    Serial.println((uint32_t)diff2_.get(), HEX);
-    
-    Serial.print(F("Driver initialized: "));
-    Serial.println(initialized_);
-    Serial.print(F("SPI Speed: "));
-    Serial.println(config_.spi_speed);
-    Serial.print(F("Rotation: "));
-    Serial.println(config_.rotation);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "=== ILI9341 DRIVER DEBUG MEMORY ===");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Framebuffer (240x320): 0x%X", (uint32_t)framebuffer_);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Diff buf1 (4KB): 0x%X", (uint32_t)diff1_.get());
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Diff buf2 (4KB): 0x%X", (uint32_t)diff2_.get());
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Driver initialized: %d", initialized_);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "SPI Speed: %d", config_.spi_speed);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Rotation: %d", config_.rotation);
     
     uint16_t width, height;
     getDimensions(width, height);
-    Serial.print(F("Current dimensions: "));
-    Serial.print(width);
-    Serial.print(F("x"));
-    Serial.println(height);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Current dimensions: %dx%d", width, height);
 }

@@ -13,6 +13,7 @@
 #include <lvgl.h>
 
 #include "config/DisplayConfig.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 // Static DMAMEM buffers pour performance optimale - Taille selon orientation configurée
 DMAMEM static lv_color_t lvgl_buffer_1[DisplayConfig::LVGL_BUFFER_SIZE];
@@ -26,7 +27,7 @@ Ili9341LvglBridge::Ili9341LvglBridge(std::shared_ptr<Ili9341Driver> driver,
     : config_(config), driver_(std::move(driver)), initialized_(false),
       display_(nullptr), lvgl_buf1_(nullptr), lvgl_buf2_(nullptr) {
     bridge_instance_ = this;
-    Serial.println(F("Ili9341LvglBridge: Constructor called"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Ili9341LvglBridge: Constructor called");
 }
 
 Ili9341LvglBridge::~Ili9341LvglBridge() {
@@ -35,7 +36,7 @@ Ili9341LvglBridge::~Ili9341LvglBridge() {
     }
     freeLvglBuffers();
     bridge_instance_ = nullptr;
-    Serial.println(F("Ili9341LvglBridge: Destructor called"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Ili9341LvglBridge: Destructor called");
 }
 
 bool Ili9341LvglBridge::initialize() {
@@ -44,33 +45,33 @@ bool Ili9341LvglBridge::initialize() {
     }
     
     if (!driver_) {
-        Serial.println(F("Bridge: No hardware driver"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "Bridge: No hardware driver");
         return false;
     }
     
-    Serial.println(F("Bridge: Initializing LVGL..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Bridge: Initializing LVGL...");
     
     // Setup LVGL core
     if (!setupLvglCore()) {
-        Serial.println(F("Bridge: LVGL core setup failed"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "Bridge: LVGL core setup failed");
         return false;
     }
     
     // Allouer buffers LVGL
     if (!allocateLvglBuffers()) {
-        Serial.println(F("Bridge: Buffer allocation failed"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "Bridge: Buffer allocation failed");
         return false;
     }
     
     // Setup display LVGL
     if (!setupLvglDisplay()) {
-        Serial.println(F("Bridge: Display setup failed"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "Bridge: Display setup failed");
         freeLvglBuffers();
         return false;
     }
     
     initialized_ = true;
-    Serial.println(F("Bridge: LVGL initialized successfully"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Bridge: LVGL initialized successfully");
     return true;
 }
 
@@ -90,7 +91,7 @@ bool Ili9341LvglBridge::setupLvglCore() {
         return millis();
     });
     
-    Serial.println(F("Bridge: LVGL core configured"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Bridge: LVGL core configured");
     return true;
 }
 
@@ -98,7 +99,7 @@ bool Ili9341LvglBridge::setupLvglDisplay() {
     // Créer display LVGL v9 - Dimensions selon configuration centralisée
     display_ = lv_display_create(DisplayConfig::SCREEN_WIDTH, DisplayConfig::SCREEN_HEIGHT);
     if (!display_) {
-        Serial.println(F("Bridge: Failed to create display"));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "Bridge: Failed to create display");
         return false;
     }
     
@@ -115,7 +116,7 @@ bool Ili9341LvglBridge::setupLvglDisplay() {
     // Stocker référence dans user_data pour callback
     lv_display_set_user_data(display_, this);
 
-    Serial.println(F("Bridge: Display configured"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Bridge: Display configured");
     return true;
 }
 
@@ -124,9 +125,7 @@ bool Ili9341LvglBridge::allocateLvglBuffers() {
     lvgl_buf1_ = lvgl_buffer_1;
     lvgl_buf2_ = config_.double_buffering ? lvgl_buffer_2 : nullptr;
     
-    Serial.print(F("Bridge: Allocated buffers - Size: "));
-    Serial.print(DisplayConfig::LVGL_BUFFER_SIZE * sizeof(lv_color_t));
-    Serial.println(F(" bytes"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "Bridge: Allocated buffers - Size: %d bytes", DisplayConfig::LVGL_BUFFER_SIZE * sizeof(lv_color_t));
     return true;
 }
 

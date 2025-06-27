@@ -18,9 +18,9 @@ public:
 
     /**
      * @brief Initialise le système d'entrée
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    virtual Result<bool, std::string> init() = 0;
+    virtual Result<bool> init() = 0;
 
     /**
      * @brief Met à jour l'état du système d'entrée
@@ -34,9 +34,9 @@ public:
     /**
      * @brief Configure toutes les entrées avec les définitions de contrôles fournies
      * @param controlDefinitions Definitions de contrôles unifiées
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    virtual Result<bool, std::string> configureInputs(const std::vector<ControlDefinition>& controlDefinitions) = 0;
+    virtual Result<bool> configureInputs(const std::vector<ControlDefinition>& controlDefinitions) = 0;
     
     /**
      * @brief Obtient toutes les définitions de contrôles actives

@@ -22,7 +22,7 @@ public:
      * @brief Initialise la configuration
      * @return Résultat de l'initialisation
      */
-    virtual Result<bool, std::string> init() = 0;
+    virtual Result<bool> init() = 0;
 
     // === INTERFACE UNIFIÉE ===
     

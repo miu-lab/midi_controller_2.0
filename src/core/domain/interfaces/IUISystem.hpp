@@ -17,9 +17,9 @@ public:
      * @brief Initialise le système d'interface utilisateur
      * 
      * @param enableFullUI Indique si l'interface complète doit être activée
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    virtual Result<bool, std::string> init(bool enableFullUI = false) = 0;
+    virtual Result<bool> init(bool enableFullUI = false) = 0;
     
     /**
      * @brief Met à jour l'état du système d'interface utilisateur
@@ -32,14 +32,14 @@ public:
      * @brief Affiche un message sur l'écran
      * 
      * @param message Le message à afficher
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    virtual Result<bool, std::string> showMessage(const std::string& message) = 0;
+    virtual Result<bool> showMessage(const std::string& message) = 0;
     
     /**
      * @brief Efface l'écran
      * 
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    virtual Result<bool, std::string> clearDisplay() = 0;
+    virtual Result<bool> clearDisplay() = 0;
 };

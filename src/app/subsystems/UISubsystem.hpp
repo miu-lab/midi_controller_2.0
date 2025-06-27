@@ -37,9 +37,9 @@ public:
      * @brief Initialise le sous-système d'interface utilisateur
      *
      * @param enableFullUI Indique si l'interface complète doit être activée
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> init(bool enableFullUI = false);
+    Result<bool> init(bool enableFullUI = false);
 
     /**
      * @brief Met à jour l'état du sous-système d'interface utilisateur
@@ -50,16 +50,16 @@ public:
      * @brief Affiche un message sur l'écran
      *
      * @param message Le message à afficher
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> showMessage(const std::string& message);
+    Result<bool> showMessage(const std::string& message);
 
     /**
      * @brief Efface l'écran
      *
-     * @return Result<bool, std::string> Succès ou message d'erreur
+     * @return Result<bool> Succès ou message d'erreur
      */
-    Result<bool, std::string> clearDisplay();
+    Result<bool> clearDisplay();
 
 private:
     std::shared_ptr<DependencyContainer> container_;

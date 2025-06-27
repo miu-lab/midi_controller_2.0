@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <memory>
 #include "commands/TestCommandRegistry.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 /**
  * @brief Handler principal pour gérer les commandes de test via Serial
@@ -20,12 +21,12 @@ public:
      * @brief Initialise le handler et affiche le message de bienvenue
      */
     void init() {
-        Serial.println(F(""));
-        Serial.println(F("=========================================="));
-        Serial.println(F("=== TEST COMMAND HANDLER INITIALIZED ==="));
-        Serial.println(F("=========================================="));
-        Serial.println(F("Type 'H' or '?' for help"));
-        Serial.println(F(""));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "==========================================");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "=== TEST COMMAND HANDLER INITIALIZED ===");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "==========================================");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "Type 'H' or '?' for help");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "");
         printPrompt();
     }
     
@@ -41,16 +42,13 @@ public:
                 return;
             }
             
-            Serial.print(F("\nCommand received: "));
-            Serial.println(command);
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "\nCommand received: %c", command);
             
             if (!registry_->executeCommand(command)) {
-                Serial.print(F("Unknown command: '"));
-                Serial.print(command);
-                Serial.println(F("'. Type 'H' for help."));
+                DEBUG_LOG(DEBUG_LEVEL_WARNING, "Unknown command: '%c'. Type 'H' for help.", command);
             }
             
-            Serial.println(F(""));
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "");
             printPrompt();
         }
     }

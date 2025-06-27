@@ -1,6 +1,10 @@
 #include "MidiSubsystem.hpp"
 
 #include <Arduino.h>
+#include <set>
+
+#include "config/debug/DebugMacros.hpp"
+#include "core/utils/Error.hpp"
 
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
@@ -12,15 +16,15 @@
 MidiSubsystem::MidiSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {}
 
-Result<bool, std::string> MidiSubsystem::init() {
+Result<bool> MidiSubsystem::init() {
     if (initialized_) {
-        return Result<bool, std::string>::success(true);
+        return Result<bool>::success(true);
     }
 
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        return Result<bool, std::string>::error("Failed to resolve IConfiguration");
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"});
     }
 
     // Récupérer ou créer le gestionnaire de commandes
@@ -29,7 +33,7 @@ Result<bool, std::string> MidiSubsystem::init() {
         commandManager_ = std::make_shared<CommandManager>();
         container_->registerDependency<CommandManager>(commandManager_);
     } else {
-        Serial.println(F("MidiSubsystem: Using existing CommandManager"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Using existing CommandManager");
     }
 
     // Créer l'interface MIDI de base (TeensyUsbMidiOut)
@@ -37,22 +41,22 @@ Result<bool, std::string> MidiSubsystem::init() {
     if (configuration_->isHardwareInitEnabled()) {
         baseMidiOut = std::make_shared<TeensyUsbMidiOut>();
         if (!baseMidiOut) {
-            return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
+            return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create TeensyUsbMidiOut"});
         }
     } else {
-        Serial.println(F("MidiSubsystem: Creating TeensyUsbMidiOut (test mode)"));
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Creating TeensyUsbMidiOut (test mode)");
         baseMidiOut = std::make_shared<TeensyUsbMidiOut>();
         if (!baseMidiOut) {
-            return Result<bool, std::string>::error("Failed to create TeensyUsbMidiOut");
+            return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create TeensyUsbMidiOut"});
         }
     }
 
     // Créer l'EventEnabledMidiOut qui va décorer directement TeensyUsbMidiOut
     auto eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*baseMidiOut);
     if (!eventEnabledMidiOut) {
-        return Result<bool, std::string>::error("Failed to create EventEnabledMidiOut");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create EventEnabledMidiOut"});
     }
-    Serial.println(F("MidiSubsystem: Created EventEnabledMidiOut wrapper"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Created EventEnabledMidiOut wrapper");
 
     // Utiliser EventEnabledMidiOut comme interface MidiOutputPort
     midiOut_ = eventEnabledMidiOut;
@@ -65,19 +69,18 @@ Result<bool, std::string> MidiSubsystem::init() {
     container_->registerDependency<EventEnabledMidiOut>(eventEnabledMidiOut);
 
     // Créer le MidiMapper et MidiInHandler
-    Serial.println(F("MidiSubsystem: Creating MidiMapper..."));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Creating MidiMapper...");
     midiMapper_ = std::make_unique<MidiMapper>(*midiOut_, *commandManager_);
     if (!midiMapper_) {
-        return Result<bool, std::string>::error("Failed to create MidiMapper");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiMapper"});
     }
-    Serial.print(F("MidiSubsystem: MidiMapper created at address: 0x"));
-    Serial.println((uintptr_t)midiMapper_.get(), HEX);
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: MidiMapper created at address: 0x%X", (uintptr_t)midiMapper_.get());
 
     midiInHandler_ = std::make_unique<MidiInHandler>();
     if (!midiInHandler_) {
-        return Result<bool, std::string>::error("Failed to create MidiInHandler");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiInHandler"});
     }
-    Serial.println(F("MidiSubsystem: MidiInHandler created"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: MidiInHandler created");
 
     // Charger les mappings MIDI depuis les ControlDefinition
     loadMidiMappingsFromControlDefinitions();
@@ -89,7 +92,7 @@ Result<bool, std::string> MidiSubsystem::init() {
         }));
 
     initialized_ = true;
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 void MidiSubsystem::update() {
@@ -104,49 +107,49 @@ void MidiSubsystem::update() {
     }
 }
 
-Result<bool, std::string> MidiSubsystem::sendNoteOn(uint8_t channel, uint8_t note,
+Result<bool> MidiSubsystem::sendNoteOn(uint8_t channel, uint8_t note,
                                                     uint8_t velocity) {
     if (!initialized_) {
-        return Result<bool, std::string>::error("MidiSubsystem: Not initialized");
+        return Result<bool>::error({ErrorCode::OperationFailed, "MidiSubsystem: Not initialized"});
     }
 
     if (!midiOut_) {
-        return Result<bool, std::string>::error("MidiSubsystem: No MIDI output available");
+        return Result<bool>::error({ErrorCode::OperationFailed, "MidiSubsystem: No MIDI output available"});
     }
 
     // Conversion des types pour correspondre à la signature attendue
     // Pas d'utilisation d'exceptions en environnement embarqué
     midiOut_->sendNoteOn(MidiChannel(channel), MidiNote(note), velocity);
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
-Result<bool, std::string> MidiSubsystem::sendNoteOff(uint8_t channel, uint8_t note) {
+Result<bool> MidiSubsystem::sendNoteOff(uint8_t channel, uint8_t note) {
     if (!initialized_) {
-        return Result<bool, std::string>::error("MidiSubsystem: Not initialized");
+        return Result<bool>::error({ErrorCode::OperationFailed, "MidiSubsystem: Not initialized"});
     }
 
     if (!midiOut_) {
-        return Result<bool, std::string>::error("MidiSubsystem: No MIDI output available");
+        return Result<bool>::error({ErrorCode::OperationFailed, "MidiSubsystem: No MIDI output available"});
     }
 
     // sendNoteOff attend un troisième paramètre (velocity)
     midiOut_->sendNoteOff(MidiChannel(channel), MidiNote(note), 0);
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
-Result<bool, std::string> MidiSubsystem::sendControlChange(uint8_t channel, uint8_t controller,
+Result<bool> MidiSubsystem::sendControlChange(uint8_t channel, uint8_t controller,
                                                            uint8_t value) {
     if (!initialized_) {
-        return Result<bool, std::string>::error("MidiSubsystem: Not initialized");
+        return Result<bool>::error({ErrorCode::OperationFailed, "MidiSubsystem: Not initialized"});
     }
 
     if (!midiOut_) {
-        return Result<bool, std::string>::error("MidiSubsystem: No MIDI output available");
+        return Result<bool>::error({ErrorCode::OperationFailed, "MidiSubsystem: No MIDI output available"});
     }
 
     // La méthode s'appelle sendCc et non sendControlChange
     midiOut_->sendControlChange(MidiChannel(channel), MidiCC(controller), value);
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 MidiMapper& MidiSubsystem::getMidiMapper() const {
@@ -160,31 +163,39 @@ MidiMapper& MidiSubsystem::getMidiMapper() const {
 
 void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     if (!configuration_) {
-        Serial.println(F("MidiSubsystem: No configuration available"));
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "MidiSubsystem: No configuration available");
         return;
     }
     
     // Obtenir toutes les définitions de contrôles depuis le système unifié
     const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
     
-    Serial.print(F("MidiSubsystem: Processing "));
-    Serial.print(allControlDefinitions.size());
-    Serial.println(F(" control definitions for MIDI mappings"));
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Processing %d control definitions for MIDI mappings", allControlDefinitions.size());
     
     int mappingCount = 0;
+    std::set<InputId> navigationControlIds;
     
     // Utiliser directement les mappings intégrés dans ControlDefinition
     for (const auto& controlDef : allControlDefinitions) {
         if (!controlDef.enabled) continue;
+        
+        // Vérifier si le contrôle est pour la navigation
+        for (const auto& mapping : controlDef.mappings) {
+            if (mapping.role == MappingRole::NAVIGATION) {
+                navigationControlIds.insert(controlDef.id);
+                break; // Un seul mapping de navigation suffit
+            }
+        }
         
         // Configurer les mappings MIDI depuis cette définition de contrôle
         setupMidiMappingFromControlDefinition(controlDef);
         mappingCount++;
     }
     
-    Serial.print(F("MidiSubsystem: Configured "));
-    Serial.print(mappingCount);
-    Serial.println(F(" control definitions with MIDI mappings"));
+    // Configurer les contrôles de navigation dans le mapper
+    midiMapper_->setNavigationControls(navigationControlIds);
+    
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Configured %d control definitions with MIDI mappings", mappingCount);
 }
 
 void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinition& controlDef) const {
@@ -221,9 +232,6 @@ void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinitio
         // Configurer le mapping dans MidiMapper en utilisant la nouvelle méthode
         midiMapper_->setMappingFromControlDefinition(controlDef, std::move(strategy));
         
-        Serial.print(F("MidiSubsystem: Configured MIDI mapping for control ID "));
-        Serial.println(controlDef.id);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Configured MIDI mapping for control ID %d", controlDef.id);
     }
 }
-
-

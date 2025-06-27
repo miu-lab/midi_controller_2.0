@@ -3,6 +3,7 @@
 #include <cstdio>  // Pour snprintf
 
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
+#include "config/debug/DebugMacros.hpp"
 
 SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc,
                                      uint8_t value, uint8_t source)
@@ -13,10 +14,7 @@ SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, u
       source_(source),
       previousValue_(0),  // Sera mis à jour lors de l'exécution
       hasExecuted_(false) {
-#ifndef PERFORMANCE_MODE
-    Serial.print(F("SendMidiCCCommand created with source ID: "));
-    Serial.println(source_);
-#endif
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "SendMidiCCCommand created with source ID: %d", source_);
 }
 
 void SendMidiCCCommand::reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value,

@@ -20,11 +20,12 @@
 #include "core/listeners/UIControllerEventListener.hpp"
 #include "core/TaskScheduler.hpp"
 #include "config/debug/DebugMacros.hpp"
+#include "core/utils/Error.hpp"
 
-Result<bool, std::string> InitializationScript::initializeContainer(
+Result<bool> InitializationScript::initializeContainer(
     std::shared_ptr<DependencyContainer> container, const ApplicationConfiguration& config) {
     if (!container) {
-        return Result<bool, std::string>::error("Conteneur de dépendances invalide");
+        return Result<bool>::error({ErrorCode::InvalidArgument, "Conteneur de dépendances invalide"});
     }
 
     // Étape 1: Services de base
@@ -48,13 +49,13 @@ Result<bool, std::string> InitializationScript::initializeContainer(
 
     // Étape 4: Contrôleurs et interactions
     if (!setupControllers(container)) {
-        return Result<bool, std::string>::error("Échec lors de la configuration des contrôleurs");
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Échec lors de la configuration des contrôleurs"});
     }
 
     // Étape 5: Configuration des écouteurs MIDI prioritaires
     setupMidiEventListeners(container);
 
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 void InitializationScript::registerBaseServices(std::shared_ptr<DependencyContainer> container,
@@ -76,7 +77,7 @@ void InitializationScript::registerBaseServices(std::shared_ptr<DependencyContai
     container->registerDependency<CommandManager>(std::make_shared<CommandManager>());
 }
 
-Result<bool, std::string> InitializationScript::setupHardwareAdapters(
+Result<bool> InitializationScript::setupHardwareAdapters(
     std::shared_ptr<DependencyContainer> container) {
     // MIDI Out
     container->registerDependency<MidiOutputPort>(std::make_shared<TeensyUsbMidiOut>());
@@ -88,7 +89,7 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     Ili9341Driver::Config driverConfig = Ili9341Driver::getDefaultConfig();
     auto driver = std::make_shared<Ili9341Driver>(driverConfig);
     if (!driver->initialize()) {
-        return Result<bool, std::string>::error("Échec d'initialisation du driver hardware ILI9341");
+        return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du driver hardware ILI9341"});
     }
     DEBUG_LOG(DEBUG_LEVEL_INFO, "Hardware driver initialized successfully");
     
@@ -97,7 +98,7 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     Ili9341LvglBridge::LvglConfig lvglConfig = Ili9341LvglBridge::getDefaultLvglConfig();
     auto bridge = std::make_shared<Ili9341LvglBridge>(driver, lvglConfig);
     if (!bridge->initialize()) {
-        return Result<bool, std::string>::error("Échec d'initialisation du bridge LVGL");
+        return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du bridge LVGL"});
     }
     DEBUG_LOG(DEBUG_LEVEL_INFO, "LVGL bridge initialized successfully");
     
@@ -111,15 +112,15 @@ Result<bool, std::string> InitializationScript::setupHardwareAdapters(
     container->registerDependency<ProfileStoragePort>(profileManager);
     container->registerDependency<ProfileManager>(profileManager);
 
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
-Result<bool, std::string> InitializationScript::initializeSubsystems(
+Result<bool> InitializationScript::initializeSubsystems(
     std::shared_ptr<DependencyContainer> container) {
     // Créer le contrôleur d'entrée avant les sous-systèmes
     auto navConfig = container->resolve<NavigationConfigService>();
     if (!navConfig) {
-        return Result<bool, std::string>::error("Impossible de résoudre NavigationConfigService");
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Impossible de résoudre NavigationConfigService"});
     }
 
     // Récupérer l'OptimizedEventBus
@@ -136,22 +137,22 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
     // Récupérer le TaskScheduler
     auto scheduler = container->resolve<TaskScheduler>();
     if (!scheduler) {
-        return Result<bool, std::string>::error("Impossible de résoudre TaskScheduler");
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Impossible de résoudre TaskScheduler"});
     }
 
     // Définition des sous-systèmes à initialiser dans l'ordre
-    std::vector<SubsystemInfo> subsystems = {
-        {"Configuration",
+    std::vector<SubsystemInfo> subsystems;
+    subsystems.push_back({"Configuration",
          std::make_shared<ConfigurationSubsystem>(container),
-         [&container, &subsystems]() {
+         [&]() -> Result<bool> {
              auto system = std::static_pointer_cast<ConfigurationSubsystem>(subsystems[0].instance);
              container->registerDependency<ConfigurationSubsystem>(system);
              container->registerDependency<IConfiguration>(system);
              return system->init();
-         }},
-        {"Input",
+         }});
+    subsystems.push_back({"Input",
          std::make_shared<InputSubsystem>(container),
-         [&container, &subsystems, &scheduler]() {
+         [&]() -> Result<bool> {
              auto system = std::static_pointer_cast<InputSubsystem>(subsystems[1].instance);
              container->registerDependency<InputSubsystem>(system);
              container->registerDependency<IInputSystem>(system);
@@ -163,10 +164,10 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
                                     "InputUpdate");  // 1ms pour l'InputSystem
              }
              return initResult;
-         }},
-        {"MIDI",
+         }});
+    subsystems.push_back({"MIDI",
          std::make_shared<MidiSubsystem>(container),
-         [&container, &subsystems, &scheduler]() {
+         [&]() -> Result<bool> {
              auto system = std::static_pointer_cast<MidiSubsystem>(subsystems[2].instance);
              container->registerDependency<MidiSubsystem>(system);
              container->registerDependency<IMidiSystem>(system);
@@ -178,8 +179,8 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
                                     "MidiUpdate");  // 1ms pour le MidiSubsystem
              }
              return initResult;
-         }},
-        {"UI", std::make_shared<UISubsystem>(container), [&container, &subsystems, &scheduler]() {
+         }});
+    subsystems.push_back({"UI", std::make_shared<UISubsystem>(container), [&]() -> Result<bool> {
              auto system = std::static_pointer_cast<UISubsystem>(subsystems[3].instance);
              container->registerDependency<UISubsystem>(system);
              container->registerDependency<IUISystem>(system);
@@ -191,25 +192,19 @@ Result<bool, std::string> InitializationScript::initializeSubsystems(
                                     "UIUpdate");  // 16ms pour l'UISubsystem (approx 60 FPS)
              }
              return initResult;
-         }}};
+         }});
 
     // Initialiser chaque sous-système séquentiellement
     for (auto& info : subsystems) {
         auto result = info.initFn();
         if (result.isError()) {
-            // Convertir le std::string en const char* pour la concaténation Arduino
-            std::string errorMsg = *(result.error());
-            char msgBuffer[128];
-            snprintf(msgBuffer,
-                     sizeof(msgBuffer),
-                     "Échec d'initialisation du sous-système %s: %s",
-                     info.name,
-                     errorMsg.c_str());
-            return Result<bool, std::string>::error(msgBuffer);
+            auto err = result.error().value_or(Errors::Unknown);
+            DEBUG_LOG(DEBUG_LEVEL_ERROR, "Échec d'initialisation du sous-système %s: %s", info.name, err.message);
+            return Result<bool>::error(err);
         }
     }
 
-    return Result<bool, std::string>::success(true);
+    return Result<bool>::success(true);
 }
 
 bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer> container) {
