@@ -106,11 +106,10 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
     switch (event.getType()) {
         case EventTypes::EncoderTurned: {
             // Traiter les événements d'encodeur tourné
-            const auto& encoderEvent = static_cast<const EncoderTurnedEvent&>(event);
             DEBUG_LOG(DEBUG_LEVEL_INFO,
                       "Encoder %d position: %d",
-                      encoderEvent.id,
-                      encoderEvent.position);
+                      static_cast<const EncoderTurnedEvent&>(event).id,
+                      static_cast<const EncoderTurnedEvent&>(event).position);
 
             // Pour l'instant, on peut simplement logger
             // L'implémentation dépendra de comment vous voulez mapper les encodeurs aux paramètres
@@ -120,11 +119,10 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
         
         case EventTypes::EncoderButton: {
             // Traiter les événements de bouton d'encodeur
-            const auto& buttonEvent = static_cast<const EncoderButtonEvent&>(event);
             DEBUG_LOG(DEBUG_LEVEL_INFO,
                       "Encoder button %d %s",
-                      buttonEvent.id,
-                      buttonEvent.pressed ? "pressed" : "released");
+                      static_cast<const EncoderButtonEvent&>(event).id,
+                      static_cast<const EncoderButtonEvent&>(event).pressed ? "pressed" : "released");
 
             return true;
         }

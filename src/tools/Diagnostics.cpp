@@ -153,8 +153,7 @@ bool DiagnosticsManager::handleCommand(const String& command) {
 
 void DiagnosticsManager::printError(const Result<bool>& result, const char* prefix) {
     if (result.isError()) {
-        auto err = result.error().value_or(Errors::Unknown);
-        DEBUG_LOG(DEBUG_LEVEL_ERROR, "%s: %s (code: %d)", prefix, err.message, static_cast<int>(err.code));
+        DEBUG_LOG(DEBUG_LEVEL_ERROR, "%s: %s (code: %d)", prefix, result.error().value_or(Errors::Unknown).message, static_cast<int>(result.error().value_or(Errors::Unknown).code));
     }
 }
 
