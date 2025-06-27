@@ -159,7 +159,7 @@ Result<bool> InitializationScript::initializeSubsystems(
              auto initResult = system->init();
              if (initResult.isSuccess()) {
                  scheduler->addTask([system]() { system->update(); },
-                                    PerformanceConfig::MAX_INPUT_TIME_US,
+                                    PerformanceConfig::INPUT_TIME_INTERVAL,
                                     0,
                                     "InputUpdate");  // 1ms pour l'InputSystem
              }
@@ -174,7 +174,7 @@ Result<bool> InitializationScript::initializeSubsystems(
              auto initResult = system->init();
              if (initResult.isSuccess()) {
                  scheduler->addTask([system]() { system->update(); },
-                                    PerformanceConfig::MAX_MIDI_TIME_US,
+                                    PerformanceConfig::MIDI_TIME_INTERVAL,
                                     1,
                                     "MidiUpdate");  // 1ms pour le MidiSubsystem
              }

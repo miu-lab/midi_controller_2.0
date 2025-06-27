@@ -16,9 +16,9 @@ namespace ConfigDefaults {
 // === PERFORMANCE ===
 constexpr bool PERFORMANCE_MODE = PerformanceConfig::PERFORMANCE_MODE_DEFAULT;
 constexpr unsigned long MAX_UPDATE_TIME_US = PerformanceConfig::MAX_UPDATE_TIME_US;
-constexpr unsigned long MAX_INPUT_TIME_US = PerformanceConfig::MAX_INPUT_TIME_US;
-constexpr unsigned long MAX_MIDI_TIME_US = PerformanceConfig::MAX_MIDI_TIME_US;
-constexpr unsigned long MAX_UI_TIME_US = PerformanceConfig::MAX_UI_TIME_US;
+constexpr unsigned long MAX_INPUT_TIME_US = PerformanceConfig::INPUT_TIME_INTERVAL;
+constexpr unsigned long MAX_MIDI_TIME_US = PerformanceConfig::MIDI_TIME_INTERVAL;
+constexpr unsigned long MAX_UI_TIME_US = PerformanceConfig::UI_TIME_INTERVAL;
 
 // === INTERFACE UTILISATEUR ===
 constexpr int DISPLAY_REFRESH_RATE_HZ = PerformanceConfig::DISPLAY_REFRESH_RATE_HZ;
