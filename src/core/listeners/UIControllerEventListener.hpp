@@ -3,7 +3,7 @@
 #include "app/services/NavigationConfigService.hpp"
 #include "core/controllers/UIController.hpp"
 #include "core/domain/events/core/EventTypes.hpp"
-#include "core/domain/events/core/Eventbus.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 /**
  * @brief Écouteur d'événements pour le UIController
  *

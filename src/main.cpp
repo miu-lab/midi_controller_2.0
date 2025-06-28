@@ -22,10 +22,6 @@ std::shared_ptr<MidiControllerApp> app;
 std::shared_ptr<DependencyContainer> container;
 
 void setup() {
-    Serial.begin(115200); // Assurer que la série est initialisée
-    while (!Serial && millis() < 5000) { // Attendre jusqu'à 5 secondes pour la connexion série
-        // Attendre la connexion série
-    }
 
     DEBUG_LOG(DEBUG_LEVEL_INFO, "Démarrage de l'application MIDI Controller...");
     container = std::make_shared<DependencyContainer>();

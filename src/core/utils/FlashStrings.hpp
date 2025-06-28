@@ -28,9 +28,7 @@ public:
         size_t srcLen = strlen_P(flashStr);
         
         // Vérifier si la chaîne va être tronquée
-        if (srcLen >= bufferSize) {
-            DEBUG_LOG(DEBUG_LEVEL_WARNING, "AVERTISSEMENT: Troncation de chaîne détectée dans FlashStrings::copy");
-        }
+        // Note: DEBUG_LOG supprimé ici pour éviter les conflits PROGMEM dans les fonctions inline
         
         // Méthode de copie plus sûre pour éviter les avertissements de troncation
         if (srcLen >= bufferSize) {

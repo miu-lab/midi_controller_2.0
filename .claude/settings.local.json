@@ -23,7 +23,10 @@
       "WebFetch(domain:docs.lvgl.io)",
       "Bash(ls:*)",
       "Bash(/mnt/c/Users/simon/.platformio/penv/Scripts/pio run -e MIDI_CONTROLLER_DEVELOPMENT)",
-      "Bash(pio run:*)"
+      "Bash(pio run:*)",
+      "Bash(~/.platformio/penv/bin/pio run -e MIDI_CONTROLLER_DEVELOPMENT)",
+      "Bash(curl:*)",
+      "Bash(sudo cp:*)"
     ],
     "deny": []
   }

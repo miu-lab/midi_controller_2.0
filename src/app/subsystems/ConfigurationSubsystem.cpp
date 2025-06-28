@@ -160,7 +160,7 @@ Result<bool> ConfigurationSubsystem::loadUnifiedConfigurations() {
     }
 
     // Afficher les statistiques de configuration
-    config_->getUnifiedConfiguration().getStats();
+    auto stats = config_->getUnifiedConfiguration().getStats();
     DEBUG_LOG(DEBUG_LEVEL_INFO, "%d control definitions loaded", stats.totalControls);
     DEBUG_LOG(DEBUG_LEVEL_INFO, "ConfigurationSubsystem: Using unified configuration system");
     DEBUG_LOG(DEBUG_LEVEL_INFO,

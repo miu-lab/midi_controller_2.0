@@ -123,5 +123,3 @@ Pour ajouter un nouveau sous-système :
 ## Memories
 
 - Concernant l'intégration LVGL (2024-01-01) : Plan d'action détaillé à élaborer dans `docs/ui/lvgl_integration.md` avec une approche structurée pour l'intégration de la bibliothèque graphique LVGL dans le contrôleur MIDI
-- Toutes les futures commandes pio doivent pointer vers l'exécutable situé dans %USERPROFILE%\.platformio\penv\Scripts. Assurez-vous que c'est bien le cas, même pour les commandes exécutées depuis WSL
-- Il faut utiliser les chemins /mnt pour pointer .platformio/penv/** vu que tu lances pio de l'env hôte depuis WSL, stp garde ça en mémoire stp je vais pas te le redire à chaque nouvelle conversation
