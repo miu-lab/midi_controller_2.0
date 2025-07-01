@@ -22,7 +22,12 @@ std::shared_ptr<MidiControllerApp> app;
 std::shared_ptr<DependencyContainer> container;
 
 void setup() {
+    Serial.begin(115200);                 // pas obligatoire sur Teensy, mais explicite
+    const uint32_t timeout = 5000;        // 5 s max ; ajustez selon vos besoins
+    uint32_t t0 = millis();
+    while (!Serial && millis() - t0 < timeout) {}
 
+    Serial.println("=== Init OK ===");
     DEBUG_LOG(DEBUG_LEVEL_INFO, "Démarrage de l'application MIDI Controller...");
     container = std::make_shared<DependencyContainer>();
 

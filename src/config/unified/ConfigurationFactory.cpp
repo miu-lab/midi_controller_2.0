@@ -78,7 +78,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("MIDI")
                            .withDescription("Encodeur Enc 4")
                            .withDisplayOrder(4)
-                           .asEncoder(14, 5, 24)  // Changé pin A de 13 vers 25
+                           .asEncoder(5, 14, 24)  // Changé pin A de 13 vers 25
                            .withEncoderButton(41, 30)
                            .withAcceleration(true, 4)
                            .withMidiCC(4, 0, true)

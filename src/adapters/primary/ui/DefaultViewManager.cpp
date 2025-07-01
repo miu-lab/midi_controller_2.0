@@ -16,7 +16,7 @@ bool DefaultViewManager::init() {
 
     // Créer toutes les vues LVGL
     splashView_ = std::make_shared<LvglSplashScreenView>(lvglBridge_);
-    parameterView_ = std::make_shared<LvglParameterView>(lvglBridge_);
+    parameterView_ = std::make_shared<LvglParameterView>(lvglBridge_, unifiedConfig_);
     menuView_ = std::make_shared<LvglMenuView>(lvglBridge_);
     modalView_ = std::make_shared<LvglModalView>(lvglBridge_);
     

@@ -229,6 +229,9 @@ std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vect
                     btnConfig.enableLongPress = false;
                     btnConfig.longPressMs = 800;
                     hwConfig.buttonConfig = btnConfig;
+                    
+                    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Created encoder button - encoderId=%d, buttonId=%d, pin=%d", 
+                              controlDef.id, btnConfig.id, btnConfig.gpio);
                 }
                 
                 encoderConfigs.push_back(hwConfig);

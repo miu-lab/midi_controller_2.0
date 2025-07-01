@@ -26,7 +26,8 @@
       "Bash(pio run:*)",
       "Bash(~/.platformio/penv/bin/pio run -e MIDI_CONTROLLER_DEVELOPMENT)",
       "Bash(curl:*)",
-      "Bash(sudo cp:*)"
+      "Bash(sudo cp:*)",
+      "Bash(python3:*)"
     ],
     "deny": []
   }

@@ -3,17 +3,20 @@
 #include <Arduino.h>
 #include "config/debug/DebugMacros.hpp"
 
-LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge)
+// Initialisation du mapping CC vers index de widget
+// CC 1-8 mappent vers widgets 0-7, autres CC non mappés (-1)
+static uint8_t cc_to_widget_mapping[128];
+static bool mapping_initialized = false;
+
+LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge,
+                                     std::shared_ptr<UnifiedConfiguration> config)
     : bridge_(bridge),
-      parameter_widget_(nullptr),
+      config_(config),
+      grid_container_(nullptr),
       main_screen_(nullptr),
       initialized_(false),
       active_(false),
-      event_subscription_id_(0),
-      last_cc_number_(0),
-      last_channel_(1),
-      last_value_(0),
-      last_parameter_name_("NO PARAM") {
+      event_subscription_id_(0) {
     DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Constructor (MIDI→UI flow)");
 }
 
@@ -40,8 +43,17 @@ bool LvglParameterView::init() {
     // Créer l'écran principal
     setupMainScreen();
 
-    // Créer le widget de paramètre
-    createParameterWidget();
+    // Initialiser le mapping CC->Widget depuis la configuration
+    initializeCCMappingFromConfig();
+    
+    // Créer le container grille
+    createGridContainer();
+    
+    // Créer les widgets de paramètres avec configuration
+    createParameterWidgets();
+    
+    // Initialiser les configurations des widgets depuis la configuration
+    initializeWidgetConfigurationsFromConfig();
 
     // S'abonner aux événements MIDI
     subscribeToEvents();
@@ -70,9 +82,11 @@ void LvglParameterView::update() {
         return;
     }
 
-    // Traiter les mises à jour différées du ParameterWidget
-    if (parameter_widget_) {
-        parameter_widget_->processPendingUpdates();
+    // Traiter les mises à jour différées de tous les ParameterWidget
+    for (auto& widget : parameter_widgets_) {
+        if (widget) {
+            widget->processPendingUpdates();
+        }
     }
 }
 
@@ -85,9 +99,11 @@ void LvglParameterView::setActive(bool active) {
         // Activation
         active_ = true;
 
-        // S'assurer que le widget est visible
-        if (parameter_widget_) {
-            parameter_widget_->setVisible(true);
+        // S'assurer que tous les widgets sont visibles
+        for (auto& widget : parameter_widgets_) {
+            if (widget) {
+                widget->setVisible(true);
+            }
         }
 
         DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Activé");
@@ -95,9 +111,11 @@ void LvglParameterView::setActive(bool active) {
         // Désactivation
         active_ = false;
 
-        // Masquer le widget
-        if (parameter_widget_) {
-            parameter_widget_->setVisible(false);
+        // Masquer tous les widgets
+        for (auto& widget : parameter_widgets_) {
+            if (widget) {
+                widget->setVisible(false);
+            }
         }
 
         DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Désactivé");
@@ -110,21 +128,21 @@ void LvglParameterView::setActive(bool active) {
 
 void LvglParameterView::setParameter(uint8_t cc_number, uint8_t channel, uint8_t value,
                                      const String& parameter_name, bool animate) {
-    if (parameter_widget_) {
-        parameter_widget_->setParameter(cc_number, channel, value, parameter_name, animate);
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Parameter set - CC%d CH%d Value:%d Name:%s", cc_number, channel, value, parameter_name.c_str());
+    ParameterWidget* widget = getWidgetForCC(cc_number);
+    if (widget) {
+        int8_t widgetIndex = getWidgetIndexForCC(cc_number);
+        widget->setParameter(cc_number, channel, value, parameter_name, animate);
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Parameter set - Widget%d CC%d CH%d Value:%d Name:%s", 
+                  widgetIndex, cc_number, channel, value, parameter_name.c_str());
     } else {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: WARNING - No parameter widget available");
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: No widget mapped for CC%d - ignoring", cc_number);
     }
 }
 
 void LvglParameterView::setValue(uint8_t value, bool animate) {
-    if (parameter_widget_) {
-        parameter_widget_->setValue(value, animate);
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Value set to %d", value);
-    } else {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: WARNING - No parameter widget available");
-    }
+    // Cette méthode est dépréciée car on ne sait pas quel widget mettre à jour
+    // sans le CC number. Utiliser setParameter() à la place.
+    DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: setValue() deprecated - use setParameter() instead");
 }
 
 //=============================================================================
@@ -157,34 +175,76 @@ void LvglParameterView::setupMainScreen() {
     DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Écran principal créé");
 }
 
-void LvglParameterView::createParameterWidget() {
+void LvglParameterView::createGridContainer() {
     if (!main_screen_) {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: Cannot create widget - no main screen");
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: Cannot create grid container - no main screen");
         return;
     }
 
-    // Créer le widget avec dimensions adaptées à l'écran ILI9341 (320x240)
-    // Le constructeur legacy est utilisé temporairement (read-only par défaut)
-    parameter_widget_ = std::make_unique<ParameterWidget>(main_screen_);
+    // Créer le container principal pour la grille
+    grid_container_ = lv_obj_create(main_screen_);
+    
+    // Configuration du container pour une grille 4x2
+    lv_obj_set_size(grid_container_, 320, 240);  // Taille plein écran ILI9341
+    lv_obj_set_pos(grid_container_, 0, 0);
+    
+    // Style du container
+    lv_obj_set_style_bg_opa(grid_container_, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(grid_container_, 0, 0);
+    lv_obj_set_style_pad_all(grid_container_, 4, 0);
+    lv_obj_set_style_pad_gap(grid_container_, 2, 0);
+    
+    // Configurer le layout en grille 4x2
+    static lv_coord_t col_dsc[] = {80, 80, 80, 80, LV_GRID_TEMPLATE_LAST};
+    static lv_coord_t row_dsc[] = {120, 120, LV_GRID_TEMPLATE_LAST};
+    
+    lv_obj_set_grid_dsc_array(grid_container_, col_dsc, row_dsc);
+    lv_obj_set_layout(grid_container_, LV_LAYOUT_GRID);
+    
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Grid container créé (4x2)");
+}
 
-    // Centrer le widget sur l'écran
-    parameter_widget_->center();
+void LvglParameterView::createParameterWidgets() {
+    if (!grid_container_) {
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: Cannot create widgets - no grid container");
+        return;
+    }
 
-    // Définir un paramètre initial vide
-    parameter_widget_->setParameter(last_cc_number_,
-                                    last_channel_,
-                                    last_value_,
-                                    last_parameter_name_,
-                                    false);
+    // Créer 8 widgets dans la grille 4x2
+    for (uint8_t i = 0; i < 8; i++) {
+        // Créer le widget avec dimensions réduites pour la grille
+        parameter_widgets_[i] = std::make_unique<ParameterWidget>(grid_container_);
+        
+        // Calculer position dans la grille (4 colonnes, 2 lignes)
+        uint8_t col = i % 4;
+        uint8_t row = i / 4;
+        
+        // Positionner dans la grille
+        lv_obj_set_grid_cell(parameter_widgets_[i]->getContainer(), 
+                             LV_GRID_ALIGN_CENTER, col, 1,
+                             LV_GRID_ALIGN_CENTER, row, 1);
+        
+        // Les paramètres initiaux seront définis dans initializeWidgetConfigurations()
+        // après que le mapping soit établi
+    }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: ParameterWidget créé (read-only)");
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: 8 ParameterWidgets créés en grille 4x2");
 }
 
 void LvglParameterView::cleanupLvglObjects() {
-    // Nettoyer le widget en premier
-    if (parameter_widget_) {
-        parameter_widget_.reset();
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: ParameterWidget détruit");
+    // Nettoyer tous les widgets en premier
+    for (auto& widget : parameter_widgets_) {
+        if (widget) {
+            widget.reset();
+        }
+    }
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: 8 ParameterWidgets détruits");
+    
+    // Nettoyer le container grille
+    if (grid_container_) {
+        lv_obj_delete(grid_container_);
+        grid_container_ = nullptr;
+        DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Grid container détruit");
     }
 
     // Nettoyer l'écran principal
@@ -224,21 +284,155 @@ void LvglParameterView::unsubscribeFromEvents() {
 }
 
 bool LvglParameterView::handleUIParameterUpdateEvent(const UIParameterUpdateEvent& event) {
-    // Stocker les dernières valeurs reçues (déjà optimisées par le batcher)
-    last_cc_number_ = event.controller;
-    last_channel_ = event.channel + 1;  // Convertir 0-15 vers 1-16
-    last_value_ = event.value;
-    last_parameter_name_ = event.parameter_name.length() == 0 ? 
-                          ("CC" + String(event.controller)) : event.parameter_name;
+    // Les valeurs sont traitées directement sans stockage global
+    // car chaque widget gère son propre état
 
-    // Mettre à jour l'affichage directement (pas de throttling, déjà fait par le batcher)
-    if (parameter_widget_ && active_ && initialized_) {
-        parameter_widget_->setParameter(last_cc_number_,
-                                        last_channel_,
-                                        last_value_,
-                                        last_parameter_name_,
-                                        true);
+    // Mettre à jour le widget correspondant au CC reçu (pas de throttling, déjà fait par le batcher)
+    if (active_ && initialized_) {
+        ParameterWidget* widget = getWidgetForCC(event.controller);
+        if (widget) {
+            uint8_t channel = event.channel + 1;  // Convertir 0-15 vers 1-16
+            String parameter_name = event.parameter_name.length() == 0 ? 
+                                  ("CC" + String(event.controller)) : event.parameter_name;
+            
+            widget->setParameter(event.controller,
+                               channel,
+                               event.value,
+                               parameter_name,
+                               true);
+        }
     }
 
     return true;  // Événement traité
+}
+
+//=============================================================================
+// Méthodes de gestion du mapping CC->Widget
+//=============================================================================
+
+std::vector<LvglParameterView::MidiControlInfo> LvglParameterView::extractMidiControlsFromConfig() {
+    std::vector<MidiControlInfo> midiControls;
+    
+    if (!config_) {
+        DEBUG_LOG(DEBUG_LEVEL_WARNING, "LvglParameterView: No configuration available - using fallback");
+        // Fallback vers la configuration par défaut
+        for (uint8_t i = 0; i < 8; i++) {
+            MidiControlInfo info;
+            info.cc_number = i + 1;
+            info.channel = 0;  // Canal 0 (MIDI canal 1)
+            info.name = "ENC" + String(i + 1);
+            info.control_id = 71 + i;  // IDs des encodeurs selon ConfigurationFactory
+            midiControls.push_back(info);
+        }
+        return midiControls;
+    }
+    
+    // Obtenir tous les contrôles depuis la configuration
+    auto allControls = config_->getAllControls();
+    
+    for (const auto& control : allControls) {
+        // Chercher les mappings MIDI pour ce contrôle
+        auto midiMappings = control.getMappingsForRole(MappingRole::MIDI);
+        
+        for (const auto& mapping : midiMappings) {
+            if (std::holds_alternative<ControlDefinition::MidiConfig>(mapping.config)) {
+                auto midiConfig = std::get<ControlDefinition::MidiConfig>(mapping.config);
+                
+                // Ajouter tous les contrôles MIDI CC
+                MidiControlInfo info;
+                info.cc_number = midiConfig.control;
+                info.channel = midiConfig.channel; 
+                
+                // Gérer la concaténation des strings correctement
+                if (control.label.length() > 0) {
+                    info.name = control.label.c_str();
+                } else {
+                    info.name = "CC" + String(midiConfig.control);
+                }
+                
+                info.control_id = control.id;
+                midiControls.push_back(info);
+                
+                DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Found MIDI control - CC%d CH%d '%s'", 
+                         midiConfig.control, midiConfig.channel, info.name.c_str());
+            }
+        }
+    }
+    
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Extracted %d MIDI controls from config", midiControls.size());
+    
+    return midiControls;
+}
+
+void LvglParameterView::initializeCCMappingFromConfig() {
+    if (mapping_initialized) {
+        return;
+    }
+    
+    // Initialiser tout le tableau à 255 (pas de mapping)
+    for (int i = 0; i < 128; i++) {
+        cc_to_widget_mapping[i] = 255;
+    }
+    
+    // Extraire les contrôles MIDI depuis la configuration
+    auto midiControls = extractMidiControlsFromConfig();
+    
+    // Mapper les 8 premiers contrôles aux widgets
+    size_t widgetIndex = 0;
+    for (const auto& control : midiControls) {
+        if (widgetIndex >= 8) break;  // Maximum 8 widgets
+        
+        if (control.cc_number < 128) {
+            cc_to_widget_mapping[control.cc_number] = widgetIndex;
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Mapped CC%d to widget %d (%s)", 
+                     control.cc_number, widgetIndex, control.name.c_str());
+            widgetIndex++;
+        }
+    }
+    
+    mapping_initialized = true;
+    DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: CC mapping initialized from config (%d mappings)", widgetIndex);
+}
+
+void LvglParameterView::initializeWidgetConfigurationsFromConfig() {
+    // Extraire les contrôles MIDI depuis la configuration
+    auto midiControls = extractMidiControlsFromConfig();
+    
+    // Configurer chaque widget avec les paramètres réels
+    for (size_t i = 0; i < std::min(midiControls.size(), static_cast<size_t>(8)); i++) {
+        if (parameter_widgets_[i]) {
+            const auto& control = midiControls[i];
+            uint8_t channel = control.channel + 1;  // Convertir 0-based vers 1-based
+            
+            // Valeur initiale à 0 comme demandé
+            parameter_widgets_[i]->setParameter(control.cc_number, channel, 0, control.name, false);
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Widget %d configured - CC%d CH%d '%s'", 
+                     i, control.cc_number, channel, control.name.c_str());
+        }
+    }
+    
+    // Si moins de 8 contrôles configurés, masquer les widgets excédentaires
+    for (size_t i = midiControls.size(); i < 8; i++) {
+        if (parameter_widgets_[i]) {
+            parameter_widgets_[i]->setVisible(false);
+            DEBUG_LOG(DEBUG_LEVEL_INFO, "LvglParameterView: Widget %d hidden (no config)", i);
+        }
+    }
+}
+
+int8_t LvglParameterView::getWidgetIndexForCC(uint8_t cc_number) const {
+    if (cc_number >= 128) {
+        return -1;
+    }
+    
+    uint8_t index = cc_to_widget_mapping[cc_number];
+    return (index == 255) ? -1 : static_cast<int8_t>(index);
+}
+
+ParameterWidget* LvglParameterView::getWidgetForCC(uint8_t cc_number) {
+    int8_t index = getWidgetIndexForCC(cc_number);
+    if (index >= 0 && index < 8 && parameter_widgets_[index]) {
+        return parameter_widgets_[index].get();
+    }
+    return nullptr;
 }

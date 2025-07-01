@@ -21,7 +21,7 @@
 // Vérifie si Serial est disponible (avec un timeout de 0ms)
 inline bool isSerialReady() {
 #ifdef DEBUG
-    return Serial;
+    return Serial;  // Sur Teensy, Serial est toujours disponible après Serial.begin()
 #else
     return false;
 #endif
@@ -38,8 +38,8 @@ inline void formatDebugMessage(const String& msg) {
         formattedMsg = msg;
     }
 
-    // Utilise le tampon série si disponible, sinon affiche directement
-    SerialBuffer::println(formattedMsg);
+    // Affiche directement sur Serial pour éviter la dépendance circulaire
+    Serial.println(formattedMsg);
 #endif
 }
 
