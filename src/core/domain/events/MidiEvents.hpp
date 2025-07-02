@@ -14,13 +14,13 @@ public:
      * @param position Position absolue actuelle
      * @param delta Changement relatif
      */
-    HighPriorityEncoderChangedEvent(uint8_t encoderId, int32_t position, int32_t delta)
+    HighPriorityEncoderChangedEvent(uint16_t encoderId, int32_t position, int32_t delta)
         : Event(EventTypes::HighPriorityEncoderChanged, EventCategory::MIDI),
           encoderId(encoderId), position(position), delta(delta) {}
           
     virtual const char* getEventName() const override { return "HighPriorityEncoderChanged"; }
     
-    uint8_t encoderId;  // Identifiant de l'encodeur
+    uint16_t encoderId;  // Identifiant de l'encodeur
     int32_t position;   // Position absolue
     int32_t delta;      // Changement relatif
 };
@@ -36,13 +36,13 @@ public:
      * @param buttonId Identifiant du bouton
      * @param pressed État du bouton (pressé ou relâché)
      */
-    HighPriorityButtonPressEvent(uint8_t buttonId, bool pressed)
+    HighPriorityButtonPressEvent(uint16_t buttonId, bool pressed)
         : Event(EventTypes::HighPriorityButtonPress, EventCategory::MIDI),
           buttonId(buttonId), pressed(pressed) {}
           
     virtual const char* getEventName() const override { return "HighPriorityButtonPress"; }
     
-    uint8_t buttonId;   // Identifiant du bouton
+    uint16_t buttonId;   // Identifiant du bouton
     bool pressed;       // État du bouton
 };
 

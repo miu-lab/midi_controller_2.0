@@ -34,8 +34,7 @@ void ProcessButtons::update() {
     }
 
     // Utilise le template pour éviter la duplication de code
-    processButtonChanges(buttons_, lastPressed_, [this](uint8_t id, bool pressed) {
-        // DEBUG MSG TO IMPLEMENT
+    processButtonChanges(buttons_, lastPressed_, [this](uint16_t id, bool pressed) {
         if (onButtonStateChangedCallback_) {
             onButtonStateChangedCallback_(id, pressed);
         } else if (useInputController_) {

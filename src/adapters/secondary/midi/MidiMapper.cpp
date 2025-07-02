@@ -98,11 +98,6 @@ void MidiMapper::setMappingFromControlDefinition(const ControlDefinition& contro
 
             // DEBUG MSG TO IMPLEMENT
 
-            logDiagnostic("Mapping ajouté: ID=%d CH=%d CC=%d Type=%d",
-                          controlDef.id,
-                          midiConfig.channel,
-                          midiConfig.control,
-                          static_cast<int>(mappingSpec.appliesTo));
                           
             // Traiter seulement le premier mapping MIDI pour cette version
             break;
@@ -310,24 +305,16 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 //=============================================================================
 
 void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingControlType type) {
-    // DEBUG MSG TO IMPLEMENT
-    
     // Si c'est un contrôle de navigation, ne pas traiter en MIDI mais laisser passer
     if (isNavigationControl(buttonId)) {
-        // DEBUG MSG TO IMPLEMENT
-        // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
         return;
     }
 
     // Créer une clé composite à partir de l'ID et du type
     uint32_t buttonKey = makeCompositeKey(buttonId, type);
-    // DEBUG MSG TO IMPLEMENT
 
     auto it = mappings_.find(buttonKey);
     if (it == mappings_.end()) {
-        const char* typeStr = (type == MappingControlType::BUTTON) ? "encoder button" : "button";
-        logDiagnostic("No mapping found for %s %d (composite key=0x%X)", typeStr, buttonId, buttonKey);
-        // DEBUG MSG TO IMPLEMENT
         return;  // Pas de mapping pour ce bouton
     }
 
@@ -336,14 +323,6 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingContr
 
     // Pour les boutons, on utilise des notes MIDI au lieu de CC
     uint8_t velocity = pressed ? 127 : 0;
-
-    const char* typeStr = (type == MappingControlType::BUTTON) ? "Bouton encodeur" : "Bouton";
-    logDiagnostic("%s MIDI: ID=%d CH=%d Note=%d Vel=%d",
-                  typeStr,
-                  buttonId,
-                  midiConfig.channel,
-                  midiConfig.control,
-                  velocity);
 
     // Utiliser le pool d'objets pour créer la commande
     SendMidiNoteCommand& command = getNextNoteCommand();

@@ -12,12 +12,13 @@
 template<typename Port>
 void processButtonChanges(const std::vector<Port*>& ports, 
                          std::vector<bool>& lastStates,
-                         std::function<void(uint8_t, bool)> callback) {
+                         std::function<void(uint16_t, bool)> callback) {
     for (size_t i = 0; i < ports.size(); ++i) {
         bool pressed = ports[i]->isPressed();
         if (pressed != lastStates[i]) {
             lastStates[i] = pressed;
-            callback(ports[i]->getId(), pressed);
+            uint16_t buttonId = ports[i]->getId();
+            callback(buttonId, pressed);
         }
     }
 }
