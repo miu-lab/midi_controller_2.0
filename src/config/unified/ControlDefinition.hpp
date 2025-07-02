@@ -73,6 +73,7 @@ struct ControlDefinition {
     std::string description = "";   ///< Description détaillée
     bool enabled = true;            ///< Actif/Inactif
     uint8_t displayOrder = 0;       ///< Ordre d'affichage
+    std::optional<uint16_t> parentId;  ///< ID du contrôle parent (hiérarchie)
 
     // === MÉTHODES UTILITAIRES ===
 

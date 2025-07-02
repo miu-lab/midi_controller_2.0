@@ -49,7 +49,7 @@ public:
 
     // === HARDWARE - ENCODEUR ===
 
-    ControlBuilder& asEncoder(uint8_t pinA, uint8_t pinB, uint16_t ppr = 24) {
+    ControlBuilder& asRotaryEncoder(uint8_t pinA, uint8_t pinB, uint16_t ppr = 24) {
         control_.hardware.type = InputType::ENCODER;
 
         control_.hardware.config = ControlDefinition::EncoderConfig();
@@ -58,17 +58,12 @@ public:
         enc.pinB = GpioPin{pinB, PinMode::PULLUP};
         enc.ppr = ppr;
         enc.sensitivity = 1.0f;
-        enc.enableAcceleration = true;
+        enc.enableAcceleration = false;  // Désactivé par défaut
         enc.stepsPerDetent = 4;
 
         return *this;
     }
 
-    ControlBuilder& withEncoderButton(uint8_t pin, uint16_t debounceMs = 30) {
-        control_.hardware.encoderButtonPin = GpioPin{pin, PinMode::PULLUP};
-        control_.hardware.encoderButtonDebounceMs = debounceMs;
-        return *this;
-    }
 
     ControlBuilder& withSensitivity(float sensitivity) {
         if (std::holds_alternative<ControlDefinition::EncoderConfig>(control_.hardware.config)) {
@@ -89,7 +84,7 @@ public:
 
     // === HARDWARE - BOUTON ===
 
-    ControlBuilder& asButton(uint8_t pin, ButtonMode mode = ButtonMode::MOMENTARY) {
+    ControlBuilder& asButton(uint8_t pin, uint16_t debounceMs = 30, ButtonMode mode = ButtonMode::MOMENTARY) {
         control_.hardware.type = InputType::BUTTON;
 
         control_.hardware.config = ControlDefinition::ButtonConfig();
@@ -97,7 +92,7 @@ public:
         btn.pin = GpioPin{pin, PinMode::PULLUP};
         btn.activeLow = true;
         btn.mode = mode;
-        btn.debounceMs = 50;
+        btn.debounceMs = debounceMs;
 
         return *this;
     }
@@ -107,6 +102,13 @@ public:
             auto& btn = std::get<ControlDefinition::ButtonConfig>(control_.hardware.config);
             btn.longPressMs = ms;
         }
+        return *this;
+    }
+
+    // === HIÉRARCHIE ===
+
+    ControlBuilder& asChildOf(uint16_t parentId) {
+        control_.parentId = parentId;
         return *this;
     }
 
@@ -155,20 +157,6 @@ public:
         return *this;
     }
 
-    // === HELPERS POUR ENCODEURS MIDI STANDARDS ===
-
-    /**
-     * @brief Configure un encodeur MIDI complet avec bouton
-     * Applique automatiquement les conventions:
-     * - Encodeur -> CC
-     * - Bouton -> Note (CC + 35)
-     */
-    ControlBuilder& asMidiEncoder(uint8_t cc, uint8_t pinA, uint8_t pinB, uint8_t pinButton) {
-        return asEncoder(pinA, pinB)
-               .withEncoderButton(pinButton)
-               .withMidiCC(cc)
-               .withMidiNote(cc + 35);  // Convention: Note = CC + 35
-    }
 
     // === BUILD ===
 
