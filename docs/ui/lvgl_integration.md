@@ -400,7 +400,6 @@ class ParameterWidget {
 private:
     lv_obj_t* container_;
     lv_obj_t* arc_;           // Encodeur visuel (0-127)
-    lv_obj_t* value_label_;   // Valeur numérique
     lv_obj_t* name_label_;    // Nom paramètre  
     lv_obj_t* cc_label_;      // Numéro CC
     lv_obj_t* channel_label_; // Canal MIDI

@@ -137,12 +137,6 @@ void LvglParameterView::setParameter(uint8_t cc_number, uint8_t channel, uint8_t
     }
 }
 
-void LvglParameterView::setValue(uint8_t value, bool animate) {
-    // Cette méthode est dépréciée car on ne sait pas quel widget mettre à jour
-    // sans le CC number. Utiliser setParameter() à la place.
-    // DEBUG MSG TO IMPLEMENT
-}
-
 //=============================================================================
 // Interface Event Listener
 //=============================================================================
@@ -186,11 +180,11 @@ void LvglParameterView::createGridContainer() {
     lv_obj_set_size(grid_container_, 320, 240);  // Taille plein écran ILI9341
     lv_obj_set_pos(grid_container_, 0, 0);
     
-    // Style du container
+    // // Style du container
     lv_obj_set_style_bg_opa(grid_container_, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(grid_container_, 0, 0);
-    lv_obj_set_style_pad_all(grid_container_, 4, 0);
-    lv_obj_set_style_pad_gap(grid_container_, 2, 0);
+    lv_obj_set_style_pad_all(grid_container_, 0, 0);
+    lv_obj_set_style_pad_gap(grid_container_, 0, 0);
     
     // Configurer le layout en grille 4x2
     static lv_coord_t col_dsc[] = {80, 80, 80, 80, LV_GRID_TEMPLATE_LAST};
@@ -208,10 +202,11 @@ void LvglParameterView::createParameterWidgets() {
         return;
     }
 
-    // Créer 8 widgets dans la grille 4x2
+    // Créer seulement 4 widgets pour économiser la mémoire (grille 4x1)
+    // Économie: ~8KB par rapport aux 8 widgets originaux
     for (uint8_t i = 0; i < 8; i++) {
-        // Créer le widget avec dimensions réduites pour la grille
-        parameter_widgets_[i] = std::make_unique<ParameterWidget>(grid_container_);
+        // Créer le widget avec dimensions adaptées pour la grille (constructeur legacy)
+        parameter_widgets_[i] = std::make_unique<ParameterWidget>(grid_container_, 80, 120, 70);
         
         // Calculer position dans la grille (4 colonnes, 2 lignes)
         uint8_t col = i % 4;

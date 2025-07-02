@@ -109,8 +109,7 @@ void UITheme::createArcStyle(lv_style_t* style) {
 }
 
 void UITheme::applyParameterWidgetStyle(lv_obj_t* container, lv_obj_t* arc,
-                                       lv_obj_t* value_label, lv_obj_t* cc_label,
-                                       lv_obj_t* channel_label, lv_obj_t* name_label) const {
+                                        lv_obj_t* cc_label, lv_obj_t* channel_label, lv_obj_t* name_label) const {
     if (!container || !arc) return;
     
     // Style du container
@@ -126,13 +125,6 @@ void UITheme::applyParameterWidgetStyle(lv_obj_t* container, lv_obj_t* arc,
     lv_obj_set_style_arc_width(arc, dimensions.arc_width, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, colors.midi_cc, LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(arc, LV_OPA_TRANSP, LV_PART_KNOB);
-    
-    // Style des labels
-    if (value_label) {
-        lv_obj_set_style_text_color(value_label, colors.on_surface, 0);
-        lv_obj_set_style_text_font(value_label, fonts.parameter_value, 0);
-        lv_obj_set_style_text_align(value_label, LV_TEXT_ALIGN_CENTER, 0);
-    }
     
     if (cc_label) {
         lv_obj_set_style_text_color(cc_label, colors.text_secondary, 0);

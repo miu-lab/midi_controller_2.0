@@ -31,14 +31,17 @@ public:
      * @param arc_size Taille de l'arc
      */
     ParameterWidget(lv_obj_t* parent, const UITheme& theme, 
-                   uint16_t width = 96, uint16_t height = 84, uint16_t arc_size = 64);
-    
+                   uint16_t width = 80, uint16_t height = 120, uint16_t arc_size = 64);
+
     /**
-     * @brief Constructeur legacy simple (deprecated)
-     * @param parent Widget parent LVGL (null = écran actuel)
+     * @brief Constructeur legacy sans thème (styles hardcodés)
+     * @param parent Widget parent LVGL
+     * @param width Largeur du widget
+     * @param height Hauteur du widget
+     * @param arc_size Taille de l'arc
      */
-    [[deprecated("Use UITheme constructor instead")]]
-    explicit ParameterWidget(lv_obj_t* parent = nullptr);
+    ParameterWidget(lv_obj_t* parent, 
+                   uint16_t width = 80, uint16_t height = 120, uint16_t arc_size = 64);
 
     /**
      * @brief Destructeur
@@ -153,9 +156,8 @@ private:
     // Objets LVGL
     lv_obj_t* container_;       ///< Container principal
     lv_obj_t* arc_;             ///< Arc natif LVGL
-    lv_obj_t* cc_label_;        ///< Label "CC XX"
-    lv_obj_t* channel_label_;   ///< Label "CH XX"
-    lv_obj_t* value_label_;     ///< Label valeur numérique centrale
+    lv_obj_t* cc_label_;        ///< Label "CC XX" (inutilisé)
+    lv_obj_t* channel_label_;   ///< Label "CH XX" (inutilisé)
     lv_obj_t* name_label_;      ///< Label nom paramètre
     
     // Optimisation performance
@@ -170,11 +172,6 @@ private:
     void createLvglObjects();
     
     /**
-     * @brief Configure les styles legacy (hardcodés)
-     */
-    void setupLegacyStyles();
-    
-    /**
      * @brief Met à jour tous les labels
      */
     void updateLabels();
@@ -183,6 +180,11 @@ private:
      * @brief Positionne les labels autour de l'arc
      */
     void positionLabels();
+    
+    /**
+     * @brief Configure les styles hardcodés pour le mode legacy
+     */
+    void setupLegacyStyles();
     
     /**
      * @brief Met à jour la valeur de l'arc

@@ -230,14 +230,13 @@ public:
      * @brief Applique le style complet à un ParameterWidget
      * @param container Container du widget
      * @param arc Arc du widget
-     * @param value_label Label de valeur
      * @param cc_label Label CC
      * @param channel_label Label canal
      * @param name_label Label nom
      */
     void applyParameterWidgetStyle(lv_obj_t* container, lv_obj_t* arc,
-                                  lv_obj_t* value_label, lv_obj_t* cc_label,
-                                  lv_obj_t* channel_label, lv_obj_t* name_label) const;
+                                   lv_obj_t* cc_label,
+                                   lv_obj_t* channel_label, lv_obj_t* name_label) const;
     
     /**
      * @brief Obtient une couleur avec opacité modifiée
