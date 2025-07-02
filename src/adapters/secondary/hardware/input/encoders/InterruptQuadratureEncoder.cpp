@@ -5,12 +5,8 @@
 
 InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig& cfg)
     : id_(cfg.id),
-      encoder_(cfg.pinA.pin, cfg.pinB.pin)  // Utiliser les nouvelles propriétés GpioPin
-      ,
+      encoder_(cfg.pinA.pin, cfg.pinB.pin),
       ppr_(cfg.ppr),
-      hasButton_(cfg.buttonConfig.has_value()),
-      buttonPin_(hasButton_ ? cfg.buttonConfig->gpio.pin : 0),
-      activeLowButton_(hasButton_ ? cfg.buttonConfig->activeLow : false),
       lastPosition_(0),
       physicalPosition_(0),
       absolutePosition_(0) {
@@ -21,14 +17,6 @@ InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig& cfg)
     // Calculer avec un facteur d'échelle pour une meilleure précision
     // Shift de 8 bits pour avoir un facteur d'échelle de 256 (comme une virgule fixe)
     normalizationFactor_ = (REFERENCE_PPR << 8) / ppr_;
-    // Configuration du bouton si présent
-    if (hasButton_) {
-        const auto& buttonCfg = cfg.buttonConfig.value();
-        int pinModeValue = (buttonCfg.gpio.mode == PinMode::PULLUP)     ? INPUT_PULLUP
-                           : (buttonCfg.gpio.mode == PinMode::PULLDOWN) ? INPUT_PULLDOWN
-                                                                        : INPUT;
-        pinMode(buttonPin_, pinModeValue);
-    }
 }
 
 InterruptQuadratureEncoder::~InterruptQuadratureEncoder() {
@@ -92,14 +80,6 @@ int8_t InterruptQuadratureEncoder::readDelta() {
     return result;
 }
 
-bool InterruptQuadratureEncoder::isPressed() const {
-    if (!hasButton_) return false;
-    // Lire l'état du bouton
-    int raw = digitalRead(buttonPin_);
-    bool pressed = activeLowButton_ ? (raw == LOW) : (raw == HIGH);
-
-    return pressed;
-}
 
 EncoderId InterruptQuadratureEncoder::getId() const {
     return id_;

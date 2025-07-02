@@ -8,7 +8,7 @@
 #include "core/ports/input/EncoderPort.hpp"
 
 /**
- * @brief Encodeur quadrature utilisant la bibliothèque Encoder + bouton optionnel + PPR.
+ * @brief Encodeur quadrature pur utilisant la bibliothèque Encoder + PPR.
  *
  * Utilise la bibliothèque Encoder pour une lecture fiable des rotations
  * avec gestion automatique des interruptions et du debounce.
@@ -19,7 +19,6 @@ public:
     ~InterruptQuadratureEncoder() override;
 
     int8_t readDelta() override;
-    bool isPressed() const override;
     EncoderId getId() const override;
     uint16_t getPpr() const override;
 
@@ -32,9 +31,6 @@ private:
     EncoderId id_;
     Encoder encoder_;  // Utilisation de la classe Encoder au lieu de la gestion manuelle
     uint16_t ppr_;     // Pulses Par Revolution
-    bool hasButton_;
-    uint8_t buttonPin_;
-    bool activeLowButton_;
 
     // Variables pour le calcul du delta
     int32_t lastPosition_;

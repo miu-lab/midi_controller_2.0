@@ -42,12 +42,6 @@ public:
      */
     void processEncoderTurn(EncoderId id, int32_t absolutePosition, int8_t relativeChange);
 
-    /**
-     * @brief Traite l'appui sur le bouton d'un encodeur
-     * @param id Identifiant de l'encodeur
-     * @param pressed État du bouton (true = pressé, false = relâché)
-     */
-    void processEncoderButton(EncoderId id, bool pressed);
 
     /**
      * @brief Traite l'appui sur un bouton

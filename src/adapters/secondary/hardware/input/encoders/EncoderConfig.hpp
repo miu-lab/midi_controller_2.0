@@ -2,19 +2,17 @@
 #pragma once
 #include <optional>
 
-#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
 #include "config/InputConfig.hpp"
 #include "core/domain/types.hpp"
 
 /**
- * @brief Configuration générique pour un encodeur quadrature + switch optionnel et PPR.
+ * @brief Configuration générique pour un encodeur quadrature pur (sans bouton intégré).
  */
 struct EncoderConfig {
     EncoderId id;                                    ///< Identifiant unique de l'encodeur
     GpioPin pinA;                                    ///< Broche GPIO du signal A (phase A)
     GpioPin pinB;                                    ///< Broche GPIO du signal B (phase B)
     uint16_t ppr = 24;                               ///< Impulsions par rotation (défaut cohérent)
-    std::optional<ButtonConfig> buttonConfig;        ///< Configuration du bouton intégré (optionnel)
     
     // === NOUVELLES FONCTIONNALITÉS ===
     bool invertDirection = false;                    ///< Inverse le sens de rotation

@@ -25,25 +25,6 @@ public:
     int32_t delta;      // Changement relatif
 };
 
-/**
- * @brief Événement haute priorité pour les boutons d'encodeur (chemin critique MIDI)
- */
-class HighPriorityEncoderButtonEvent : public Event {
-public:
-    /**
-     * @brief Constructeur optimisé pour les performances
-     * @param encoderId Identifiant de l'encodeur
-     * @param pressed État du bouton (pressé ou relâché)
-     */
-    HighPriorityEncoderButtonEvent(uint8_t encoderId, bool pressed)
-        : Event(EventTypes::HighPriorityEncoderButton, EventCategory::MIDI),
-          encoderId(encoderId), pressed(pressed) {}
-          
-    virtual const char* getEventName() const override { return "HighPriorityEncoderButton"; }
-    
-    uint8_t encoderId;  // Identifiant de l'encodeur
-    bool pressed;       // État du bouton
-};
 
 /**
  * @brief Événement haute priorité pour les pressions de bouton (chemin critique MIDI)

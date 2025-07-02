@@ -372,10 +372,6 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingContr
     }
 }
 
-void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
-    // DEBUG MSG TO IMPLEMENT
-    processButtonEvent(encoderId, pressed, MappingControlType::BUTTON);
-}
 
 void MidiMapper::processButtonPress(ButtonId buttonId, bool pressed) {
     processButtonEvent(buttonId, pressed, MappingControlType::BUTTON);
@@ -416,13 +412,6 @@ bool MidiMapper::onEvent(const Event& event) {
         return true;
     }
 
-    case EventTypes::HighPriorityEncoderButton: {
-        const HighPriorityEncoderButtonEvent& buttonEvent =
-            static_cast<const HighPriorityEncoderButtonEvent&>(event);
-        // DEBUG MSG TO IMPLEMENT
-        processEncoderButton(buttonEvent.encoderId, buttonEvent.pressed);
-        return true;
-    }
 
     case EventTypes::HighPriorityButtonPress: {
         const HighPriorityButtonPressEvent& buttonEvent =
@@ -441,7 +430,7 @@ bool MidiMapper::onEvent(const Event& event) {
 
     case EventTypes::EncoderButton: {
         const EncoderButtonEvent& buttonEvent = static_cast<const EncoderButtonEvent&>(event);
-        processEncoderButton(buttonEvent.id, buttonEvent.pressed);
+        processButtonPress(buttonEvent.id, buttonEvent.pressed);
         return true;
     }
 

@@ -7,10 +7,10 @@
 #include "core/ports/input/EncoderPort.hpp"
 
 /**
- * @brief Cas d'utilisation qui traite la lecture des encodeurs physiques
+ * @brief Cas d'utilisation qui traite la lecture des encodeurs physiques purs
  *
- * Cette classe est responsable uniquement de lire l'état des encodeurs physiques
- * et de transmettre les événements bruts (delta/boutons) sans filtrage ni stockage d'état.
+ * Cette classe est responsable uniquement de lire les rotations des encodeurs physiques
+ * et de transmettre les événements de rotation sans filtrage ni stockage d'état.
  * La limitation de taux et le suivi de position sont gérés par les classes en aval (MidiMapper).
  */
 class ProcessEncoders {
@@ -26,10 +26,6 @@ public:
      */
     using EncoderTurnedCallback = std::function<void(uint8_t, int32_t, int8_t)>;
 
-    /**
-     * @brief Types de callbacks pour les boutons d'encodeurs
-     */
-    using EncoderButtonCallback = std::function<void(uint8_t, bool)>;
 
     /**
      * @brief Définit le callback pour la rotation des encodeurs
@@ -37,11 +33,6 @@ public:
      */
     void setOnEncoderTurnedCallback(EncoderTurnedCallback callback);
 
-    /**
-     * @brief Définit le callback pour les boutons d'encodeurs
-     * @param callback Fonction à appeler
-     */
-    void setOnEncoderButtonCallback(EncoderButtonCallback callback);
 
     /**
      * @brief Définit le contrôleur d'entrée à utiliser
@@ -60,9 +51,7 @@ public:
 
 private:
     std::vector<EncoderPort*> encoders_;
-    std::vector<bool> lastPressed_;  // Uniquement pour détecter les changements d'état des boutons
     EncoderTurnedCallback onEncoderTurnedCallback_;
-    EncoderButtonCallback onEncoderButtonCallback_;
     InputController* inputController_;
     bool useInputController_;
 };

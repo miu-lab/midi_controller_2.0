@@ -11,14 +11,8 @@ EncoderManager::EncoderManager(const std::vector<EncoderConfig>& cfgs) {
 }
 
 void EncoderManager::updateAll() {
-    for (auto* e : encoders_) {
-        // Ne PAS appeler readDelta() ici car cela consommerait les deltas
-        // avant que ProcessEncoders::update() ne puisse les traiter
-        // e->readDelta(); // Commenté pour éviter la consommation des deltas
-
-        // On vérifie quand même l'état des boutons d'encodeur
-        (void)e->isPressed();
-    }
+    // Les encodeurs sont maintenant purs (sans boutons intégrés)
+    // Aucune mise à jour nécessaire ici - les deltas sont lus par ProcessEncoders
 }
 
 const std::vector<EncoderPort*>& EncoderManager::getEncoders() const {

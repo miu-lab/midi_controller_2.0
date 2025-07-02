@@ -89,12 +89,6 @@ public:
      */
     void processEncoderChange(EncoderId encoderId, int32_t position);
 
-    /**
-     * @brief Traite un appui sur un bouton d'encodeur
-     * @param encoderId ID de l'encodeur
-     * @param pressed true si le bouton est pressé, false s'il est relâché
-     */
-    void processEncoderButton(EncoderId encoderId, bool pressed);
 
     /**
      * @brief Traite un appui sur un bouton

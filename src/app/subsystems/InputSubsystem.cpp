@@ -218,19 +218,6 @@ std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vect
                 hwConfig.accelerationThreshold = 100;  // Valeur par défaut
                 hwConfig.maxAcceleration = 5.0f;       // Valeur par défaut
                 
-                // Ajouter le bouton si présent
-                if (controlDef.hardware.encoderButtonPin) {
-                    ButtonConfig btnConfig;
-                    btnConfig.id = controlDef.getEncoderButtonId();
-                    btnConfig.gpio = *controlDef.hardware.encoderButtonPin;
-                    btnConfig.activeLow = true;
-                    btnConfig.mode = ButtonMode::MOMENTARY;
-                    btnConfig.debounceMs = controlDef.hardware.encoderButtonDebounceMs.value_or(30);
-                    btnConfig.enableLongPress = false;
-                    btnConfig.longPressMs = 800;
-                    hwConfig.buttonConfig = btnConfig;
-                }
-                
                 encoderConfigs.push_back(hwConfig);
             }
         }

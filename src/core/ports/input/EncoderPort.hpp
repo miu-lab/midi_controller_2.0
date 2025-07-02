@@ -20,11 +20,6 @@ public:
      */
     virtual int8_t readDelta() = 0;
 
-    /**
-     * @brief Vérifie si le bouton de l'encodeur est pressé
-     * @return true si le bouton est pressé, false sinon
-     */
-    virtual bool isPressed() const = 0;
 
     /**
      * @brief Obtient l'identifiant de l'encodeur
