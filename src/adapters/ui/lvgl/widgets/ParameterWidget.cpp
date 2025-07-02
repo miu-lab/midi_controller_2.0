@@ -1,7 +1,7 @@
 #include "ParameterWidget.hpp"
 #include "adapters/ui/lvgl/theme/UITheme.hpp"
 #include "core/utils/FlashStrings.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 
 
 //=============================================================================
@@ -26,14 +26,12 @@ ParameterWidget::ParameterWidget(lv_obj_t* parent, const UITheme& theme,
       value_label_(nullptr),
       name_label_(nullptr) {
     
-    DEBUG_UI("ParameterWidget: Creating widget with UITheme");
 
     createLvglObjects();
     positionLabels();
     updateLabels();
     updateArcValue(false);
 
-    DEBUG_UI("ParameterWidget: Widget with UITheme created successfully");
 }
 
 ParameterWidget::ParameterWidget(lv_obj_t* parent)
@@ -52,19 +50,15 @@ ParameterWidget::ParameterWidget(lv_obj_t* parent)
       channel_label_(nullptr),
       value_label_(nullptr),
       name_label_(nullptr) {
-    DEBUG_UI("ParameterWidget: Creating widget (legacy mode)");
 
     createLvglObjects();
     setupLegacyStyles();
     positionLabels();
     updateLabels();
     updateArcValue(false);
-
-    DEBUG_UI("ParameterWidget: Widget created successfully");
 }
 
 ParameterWidget::~ParameterWidget() {
-    DEBUG_UI("ParameterWidget: Destroying widget");
 
     // LVGL supprime automatiquement les enfants quand on supprime le parent
     if (container_) {
@@ -77,7 +71,6 @@ ParameterWidget::~ParameterWidget() {
         name_label_ = nullptr;
     }
 
-    DEBUG_UI("ParameterWidget: Widget destroyed");
 }
 
 //=============================================================================
@@ -122,7 +115,6 @@ void ParameterWidget::createLvglObjects() {
                                          cc_label_, channel_label_, name_label_);
     }
     
-    DEBUG_UI("ParameterWidget: LVGL objects created");
 }
 
 
@@ -171,8 +163,6 @@ void ParameterWidget::setupLegacyStyles() {
         lv_obj_set_style_text_font(name_label_, font_medium, 0);
         lv_obj_set_style_text_align(name_label_, LV_TEXT_ALIGN_CENTER, 0);
     }
-    
-    DEBUG_UI("ParameterWidget: Legacy styles configured");
 }
 
 void ParameterWidget::positionLabels() {
@@ -206,8 +196,6 @@ void ParameterWidget::positionLabels() {
     lv_obj_set_width(name_label_, lv_pct(100));
     lv_obj_align(name_label_, LV_ALIGN_BOTTOM_MID, 0, -5);
     lv_obj_set_style_text_align(name_label_, LV_TEXT_ALIGN_CENTER, 0);
-
-    DEBUG_UI("ParameterWidget: Labels positioned with native LVGL layout");
 }
 
 //=============================================================================
@@ -223,9 +211,6 @@ void ParameterWidget::setParameter(uint8_t cc_number, uint8_t channel, uint8_t v
     
     updateLabels();
     updateArcValue(animate);
-
-    DEBUG_UI("ParameterWidget: Parameter set - CC%d CH%d Value:%d Name:%s",
-             cc_number_, channel_, current_value_, parameter_name_.c_str());
 }
 
 void ParameterWidget::setValue(uint8_t value, bool animate) {
@@ -242,7 +227,6 @@ void ParameterWidget::setValue(uint8_t value, bool animate) {
             lv_label_set_text(value_label_, value_text);
         }
         
-        DEBUG_UI("ParameterWidget: Value updated to %d", current_value_);
     }
 }
 
@@ -361,7 +345,5 @@ void ParameterWidget::updateArcValue(bool animate) {
     // Invalider seulement la zone de l'arc pour optimiser le redraw
     lv_obj_invalidate(arc_);
 
-    DEBUG_UI("ParameterWidget: Arc value updated to %d (animate: %s)",
-             current_value_, animate ? "true" : "false");
 }
 

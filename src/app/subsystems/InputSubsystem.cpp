@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <algorithm>
 
-#include "config/debug/DebugMacros.hpp"
+
 #include "core/utils/Error.hpp"
 
 #include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
@@ -82,7 +82,7 @@ Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition
         return Result<bool>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Configuring inputs with ControlDefinition interface");
+    // DEBUG MSG TO IMPLEMENT
 
     // Extraire les configurations par type
     auto encoderConfigs = extractEncoderConfigs(controlDefinitions);
@@ -100,7 +100,7 @@ Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition
         return processorResult;
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Successfully configured %d controls", controlDefinitions.size());
+    // DEBUG MSG TO IMPLEMENT
 
     return Result<bool>::success(true);
 }
@@ -163,7 +163,7 @@ bool InputSubsystem::validateInputsStatus() const {
 }
 
 Result<bool> InputSubsystem::loadUnifiedConfigurations() {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Loading unified control definitions");
+    // DEBUG MSG TO IMPLEMENT
 
     // Obtenir toutes les définitions de contrôles depuis la nouvelle interface
     const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
@@ -181,7 +181,7 @@ Result<bool> InputSubsystem::loadUnifiedConfigurations() {
     auto encoderConfigs = extractEncoderConfigs(allControlDefinitions);
     auto buttonConfigs = extractButtonConfigs(allControlDefinitions);
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Found %d encoders and %d buttons", encoderConfigs.size(), buttonConfigs.size());
+    // DEBUG MSG TO IMPLEMENT
 
     // Créer les managers avec les configurations extraites
     auto managerResult = createManagers(encoderConfigs, buttonConfigs);
@@ -195,7 +195,7 @@ Result<bool> InputSubsystem::loadUnifiedConfigurations() {
         return processorResult;
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Unified control definitions loaded successfully");
+    // DEBUG MSG TO IMPLEMENT
     return Result<bool>::success(true);
 }
 
@@ -229,9 +229,6 @@ std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vect
                     btnConfig.enableLongPress = false;
                     btnConfig.longPressMs = 800;
                     hwConfig.buttonConfig = btnConfig;
-                    
-                    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Created encoder button - encoderId=%d, buttonId=%d, pin=%d", 
-                              controlDef.id, btnConfig.id, btnConfig.gpio);
                 }
                 
                 encoderConfigs.push_back(hwConfig);
@@ -285,7 +282,7 @@ Result<bool> InputSubsystem::createManagers(const std::vector<EncoderConfig>& en
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create DigitalButtonManager"});
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Hardware managers created successfully");
+    // DEBUG MSG TO IMPLEMENT
     return Result<bool>::success(true);
 }
 
@@ -307,7 +304,7 @@ Result<bool> InputSubsystem::initializeProcessors() {
         processButtons_->setInputController(inputController_.get());
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: Event processors initialized successfully");
+    // DEBUG MSG TO IMPLEMENT
     return Result<bool>::success(true);
 }
 
@@ -327,6 +324,6 @@ Result<bool> InputSubsystem::connectInputController() {
         processButtons_->setInputController(inputController_.get());
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "InputSubsystem: InputController connected successfully");
+    // DEBUG MSG TO IMPLEMENT
     return Result<bool>::success(true);
 }

@@ -1,6 +1,6 @@
 #include "ViewManagerEventListener.hpp"
 
-#include "config/debug/DebugMacros.hpp"
+
 
 ViewManagerEventListener::ViewManagerEventListener(ViewManager& viewManager)
     : m_viewManager(viewManager), m_subscriptionId(0) {
@@ -13,9 +13,7 @@ ViewManagerEventListener::~ViewManagerEventListener() {
 void ViewManagerEventListener::subscribe() {
     if (m_subscriptionId == 0) {
         m_subscriptionId = EventBus::getInstance().subscribe(this);
-        DEBUG_LOG(DEBUG_LEVEL_INFO,
-                  "ViewManagerEventListener: Subscribed with ID %d",
-                  m_subscriptionId);
+        // DEBUG MSG TO IMPLEMENT
     }
 }
 
@@ -55,11 +53,7 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
             // Traiter les événements CC MIDI
             auto& ccEvent = static_cast<const MidiCCEvent&>(event);
 
-            DEBUG_LOG(DEBUG_LEVEL_INFO,
-                      "MIDI CC Event: CH%d CC%d = %d",
-                      ccEvent.channel,
-                      ccEvent.controller,
-                      ccEvent.value);
+            // DEBUG MSG TO IMPLEMENT
 
             // Mapper le CC à un nom de paramètre
             String paramName = mapCCToParameterName(ccEvent.controller);
@@ -78,7 +72,7 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
         case EventTypes::MidiNoteOn:
         case EventTypes::MidiNoteOff: {
             // Pour les notes, on peut ignorer ou traiter différemment
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "MIDI Note event received (ignored for now)");
+            // DEBUG MSG TO IMPLEMENT
             return true;
         }
         
@@ -105,25 +99,12 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
 bool ViewManagerEventListener::handleInputEvent(const Event& event) {
     switch (event.getType()) {
         case EventTypes::EncoderTurned: {
-            // Traiter les événements d'encodeur tourné
-            DEBUG_LOG(DEBUG_LEVEL_INFO,
-                      "Encoder %d position: %d",
-                      static_cast<const EncoderTurnedEvent&>(event).id,
-                      static_cast<const EncoderTurnedEvent&>(event).position);
-
-            // Pour l'instant, on peut simplement logger
-            // L'implémentation dépendra de comment vous voulez mapper les encodeurs aux paramètres
-            
+            // DEBUG MSG TO IMPLEMENT
             return true;
         }
         
         case EventTypes::EncoderButton: {
-            // Traiter les événements de bouton d'encodeur
-            DEBUG_LOG(DEBUG_LEVEL_INFO,
-                      "Encoder button %d %s",
-                      static_cast<const EncoderButtonEvent&>(event).id,
-                      static_cast<const EncoderButtonEvent&>(event).pressed ? "pressed" : "released");
-
+            // DEBUG MSG TO IMPLEMENT
             return true;
         }
         
@@ -139,17 +120,17 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
                 id = static_cast<const ButtonReleasedEvent&>(event).id;
             }
 
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "Button %d %s", id, pressed ? "pressed" : "released");
+            // DEBUG MSG TO IMPLEMENT
 
             // Déterminer si c'est un bouton de navigation
             if (pressed && isNavigationButton(id)) {
-                DEBUG_LOG(DEBUG_LEVEL_INFO, "Navigation button pressed: %d", id);
+                // DEBUG MSG TO IMPLEMENT
 
                 if (id == 51) { // Bouton MENU
-                    DEBUG_LOG(DEBUG_LEVEL_INFO, "Showing menu via navigation button");
+                    // DEBUG MSG TO IMPLEMENT
                     m_viewManager.showMenu();
                 } else if (id == 52) { // Bouton HOME/VALIDATION
-                    DEBUG_LOG(DEBUG_LEVEL_INFO, "Showing home via navigation button");
+                    // DEBUG MSG TO IMPLEMENT
                     m_viewManager.showHome();
                 }
             }

@@ -167,9 +167,6 @@ void test_my_feature_initialization() {
    pio device monitor
    ```
 
-3. **Analyser les logs**:
-   Utilisez les macros de débogage comme `DEBUG_PRINT` et `DEBUG_ERROR` pour tracer l'exécution.
-
 ## Questions et Assistance
 
 Si vous avez des questions ou besoin d'aide:

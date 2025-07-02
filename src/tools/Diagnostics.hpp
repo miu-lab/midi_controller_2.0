@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <string>
 
-#include "config/debug/DebugMacros.hpp"  // Pour avoir accès à PERFORMANCE_MODE
+  // Pour avoir accès à PERFORMANCE_MODE
 #include "core/TaskScheduler.hpp"
 #include "core/utils/Result.hpp"  // Pour avoir accès à Result
 

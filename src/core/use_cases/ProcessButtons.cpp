@@ -1,7 +1,7 @@
 #include "core/use_cases/ProcessButtons.hpp"
 
 #include "core/use_cases/ButtonStateProcessor.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 
 ProcessButtons::ProcessButtons(const std::vector<ButtonPort*>& buttons)
     : buttons_(buttons),
@@ -35,7 +35,7 @@ void ProcessButtons::update() {
 
     // Utilise le template pour éviter la duplication de code
     processButtonChanges(buttons_, lastPressed_, [this](uint8_t id, bool pressed) {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "ProcessButtons: Button change detected - id=%d, pressed=%d", id, pressed);
+        // DEBUG MSG TO IMPLEMENT
         if (onButtonStateChangedCallback_) {
             onButtonStateChangedCallback_(id, pressed);
         } else if (useInputController_) {

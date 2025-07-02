@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include <WString.h>
-#include "config/debug/DebugMacros.hpp"
+
 
 /**
  * @brief Utilitaire pour la gestion des chaînes de caractères en mémoire Flash
@@ -26,9 +26,6 @@ public:
         
         // Obtenir la longueur de la chaîne source
         size_t srcLen = strlen_P(flashStr);
-        
-        // Vérifier si la chaîne va être tronquée
-        // Note: DEBUG_LOG supprimé ici pour éviter les conflits PROGMEM dans les fonctions inline
         
         // Méthode de copie plus sûre pour éviter les avertissements de troncation
         if (srcLen >= bufferSize) {

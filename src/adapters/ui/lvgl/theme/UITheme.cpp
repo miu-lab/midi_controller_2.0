@@ -1,5 +1,5 @@
 #include "UITheme.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 
 //=============================================================================
 // Application du thème LVGL
@@ -19,7 +19,7 @@ void UITheme::applyToLvglDisplay(lv_display_t* display) {
     
     lv_display_set_theme(display, theme);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Thème LVGL appliqué au display");
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================
@@ -44,7 +44,7 @@ void UITheme::createContainerStyle(lv_style_t* style) {
     lv_style_set_pad_all(style, spacing.medium);
     lv_style_set_radius(style, dimensions.radius_medium);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Style container créé");
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UITheme::createButtonStyle(lv_style_t* style) {
@@ -72,7 +72,7 @@ void UITheme::createButtonStyle(lv_style_t* style) {
     lv_style_set_shadow_color(style, colors.background);
     lv_style_set_shadow_opa(style, LV_OPA_30);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Style bouton créé");
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UITheme::createLabelStyle(lv_style_t* style, const lv_font_t* font) {
@@ -92,7 +92,7 @@ void UITheme::createLabelStyle(lv_style_t* style, const lv_font_t* font) {
     lv_style_set_border_width(style, 0);
     lv_style_set_pad_all(style, 0);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Style label créé");
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UITheme::createArcStyle(lv_style_t* style) {
@@ -105,7 +105,7 @@ void UITheme::createArcStyle(lv_style_t* style) {
     lv_style_set_arc_color(style, colors.midi_inactive);
     lv_style_set_arc_opa(style, LV_OPA_COVER);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Style arc créé");
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UITheme::applyParameterWidgetStyle(lv_obj_t* container, lv_obj_t* arc,
@@ -150,7 +150,7 @@ void UITheme::applyParameterWidgetStyle(lv_obj_t* container, lv_obj_t* arc,
         lv_obj_set_style_text_align(name_label, LV_TEXT_ALIGN_CENTER, 0);
     }
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Styles ParameterWidget appliqués");
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================
@@ -193,7 +193,7 @@ UITheme UITheme::createDefaultTheme() {
     UITheme theme;
     
     // Configuration par défaut déjà dans les structures
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Thème par défaut créé");
+    // DEBUG MSG TO IMPLEMENT
     return theme;
 }
 
@@ -210,7 +210,7 @@ UITheme UITheme::createDarkTheme() {
     theme.colors.on_surface = lv_color_hex(0xE0E0E0);
     theme.colors.text_secondary = lv_color_hex(0xA0A0A0);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Thème sombre créé");
+    // DEBUG MSG TO IMPLEMENT
     return theme;
 }
 
@@ -231,6 +231,6 @@ UITheme UITheme::createLightTheme() {
     theme.colors.primary = lv_color_hex(0x00AA55);
     theme.colors.secondary = lv_color_hex(0x0066CC);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UITheme: Thème clair créé");
+    // DEBUG MSG TO IMPLEMENT
     return theme;
 }

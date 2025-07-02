@@ -7,9 +7,6 @@ TaskScheduler scheduler;
 TaskScheduler::TaskScheduler() 
     : cycleStartTime(0), totalExecutionTime(0), cpuUsage(0),
       overruns(0), cycleCount(0) {
-#ifdef DEBUG
-    DEBUG_SCHEDULER("TaskScheduler initialise - Niveau de debug: %d", DEBUG_TASK_SCHEDULER_LEVEL);
-#endif
 }
 
 int TaskScheduler::addTask(TaskFunction func, uint32_t intervalMicros, uint8_t priority, const char* name) {
@@ -50,9 +47,6 @@ void TaskScheduler::update(uint32_t maxMicros) {
             // Vérifie si on a assez de temps dans le budget
             if (elapsedTime > maxMicros) {
                 overruns++;
-#ifdef DEBUG
-                DEBUG_SCHEDULER_VERBOSE("Budget CPU dépassé, tâche '%s' reportée", task.name);
-#endif
                 break;
             }
             
@@ -70,14 +64,6 @@ void TaskScheduler::update(uint32_t maxMicros) {
         uint32_t usage = (elapsedTime * 10000) / cyclePeriod; // *100 pour pourcentage, *100 pour 2 décimales
         cpuUsage = cpuUsage * 0.95 + usage * 0.05;
     }
-    
-    // Affichage des statistiques de debug (toutes les 10 secondes)
-    // Cycle count est incrémenté environ 1000 fois par seconde, donc 10000 = 10 secondes
-#ifdef DEBUG
-    if (DEBUG_TASK_SCHEDULER_LEVEL >= 1 && cycleCount % 10000 == 0) {
-        printDebugStats();
-    }
-#endif
 }
 
 void TaskScheduler::enableTask(int taskIndex, bool enabled) {
@@ -133,78 +119,13 @@ uint32_t TaskScheduler::executeTask(int taskIndex) {
         task.executionTime = task.executionTime * 0.9 + executionTime * 0.1;
     }
     
-#ifdef DEBUG
-    DEBUG_SCHEDULER_VERBOSE("Tâche '%s' exécutée en %u µs", task.name, executionTime);
-#endif
-    
     return executionTime;
 }
 
 void TaskScheduler::printDebugStats() {
-#ifdef DEBUG
-    // Ajout d'un séparateur pour améliorer la lisibilité
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "========== STATISTIQUES SCHEDULER ==========");
-
-    // Informations de base (toujours disponibles si DEBUG_TASK_SCHEDULER est activé)
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "CPU: %.2f%% | Cycles: %u | Overruns: %u",
-                  getCpuUsage(), cycleCount, overruns);
-
-    // Pour le mode verbose, afficher les détails des tâches
-    if (DEBUG_TASK_SCHEDULER_LEVEL >= 2) {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "Détails des tâches actives:");
-        for (size_t i = 0; i < tasks.size(); i++) {
-            if (tasks[i].enabled) {
-                DEBUG_LOG(DEBUG_LEVEL_INFO, "  [%u] %s: P%u, %u µs/cycle, interval %u µs", 
-                    i, tasks[i].name, tasks[i].priority, tasks[i].executionTime, 
-                    tasks[i].interval);
-            }
-        }
-        
-        // Afficher les tâches désactivées séparément
-        bool hasDisabledTasks = false;
-        for (size_t i = 0; i < tasks.size(); i++) {
-            if (!tasks[i].enabled) {
-                if (!hasDisabledTasks) {
-                    DEBUG_LOG(DEBUG_LEVEL_INFO, "Tâches désactivées:");
-                    hasDisabledTasks = true;
-                }
-                DEBUG_LOG(DEBUG_LEVEL_INFO, "  [%u] %s", i, tasks[i].name);
-            }
-        }
-    }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "============================================");
-#endif
+    return;
 }
 
 void TaskScheduler::printStats(bool showDetailedStats) {
     // Affiche les statistiques CPU de base sur le port série (fonctionne même en mode non-DEBUG)
-    Serial.println("========== STATISTIQUES SCHEDULER ==========");
-    Serial.printf("CPU: %.2f%% | Cycles: %u | Overruns: %u\n", 
-                getCpuUsage(), cycleCount, overruns);
-    
-    // Pour le mode verbose, afficher les détails des tâches
-    if (showDetailedStats || (DEBUG_TASK_SCHEDULER_LEVEL >= 2)) {
-        Serial.println("Détails des tâches actives:");
-        for (size_t i = 0; i < tasks.size(); i++) {
-            if (tasks[i].enabled) {
-                Serial.printf("  [%u] %s: P%u, %u µs/cycle, interval %u µs\n", 
-                    i, tasks[i].name, tasks[i].priority, tasks[i].executionTime, 
-                    tasks[i].interval);
-            }
-        }
-        
-        // Afficher les tâches désactivées séparément
-        bool hasDisabledTasks = false;
-        for (size_t i = 0; i < tasks.size(); i++) {
-            if (!tasks[i].enabled) {
-                if (!hasDisabledTasks) {
-                    Serial.println("Tâches désactivées:");
-                    hasDisabledTasks = true;
-                }
-                Serial.printf("  [%u] %s\n", i, tasks[i].name);
-            }
-        }
-    }
-    
-    Serial.println("============================================");
 }

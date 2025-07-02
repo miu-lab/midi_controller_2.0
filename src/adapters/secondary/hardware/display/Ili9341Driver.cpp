@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "config/DisplayConfig.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 
 // Buffers statiques DMAMEM - Taille selon orientation configurée
 DMAMEM static uint16_t main_framebuffer[DisplayConfig::FRAMEBUFFER_SIZE];
@@ -31,8 +31,8 @@ Ili9341Driver::Ili9341Driver(const Config& config)
     : config_(config),
       initialized_(false),
       framebuffer_(main_framebuffer) {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Ili9341Driver: Constructor called");
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Ili9341Driver: framebuffer_ = 0x%X", (unsigned long)framebuffer_);
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================
@@ -44,7 +44,7 @@ bool Ili9341Driver::initialize() {
         return true;
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "ILI9341: Initializing hardware...");
+    // DEBUG MSG TO IMPLEMENT
 
     // Configuration des pins
     configurePins();
@@ -60,7 +60,7 @@ bool Ili9341Driver::initialize() {
     );
 
     if (!tft_) {
-        DEBUG_LOG(DEBUG_LEVEL_ERROR, "ILI9341: Failed to create ILI9341Driver");
+        // DEBUG MSG TO IMPLEMENT
         return false;
     }
 
@@ -76,7 +76,7 @@ bool Ili9341Driver::initialize() {
     // Configurer les paramètres de performance
     setupPerformance();
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "ILI9341: Hardware initialized");
+    // DEBUG MSG TO IMPLEMENT
     initialized_ = true;
 
     return true;
@@ -139,7 +139,7 @@ void Ili9341Driver::setRotation(uint8_t rotation) {
     config_.rotation = rotation;
     tft_->setRotation(rotation);
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "ILI9341: Rotation set to %d", rotation);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
@@ -158,15 +158,15 @@ void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
 //=============================================================================
 
 void Ili9341Driver::debugMemory() const {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "=== ILI9341 DRIVER DEBUG MEMORY ===");
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Framebuffer (240x320): 0x%X", (uint32_t)framebuffer_);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Diff buf1 (4KB): 0x%X", (uint32_t)diff1_.get());
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Diff buf2 (4KB): 0x%X", (uint32_t)diff2_.get());
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Driver initialized: %d", initialized_);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "SPI Speed: %d", config_.spi_speed);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Rotation: %d", config_.rotation);
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
     
     uint16_t width, height;
     getDimensions(width, height);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Current dimensions: %dx%d", width, height);
+    // DEBUG MSG TO IMPLEMENT
 }

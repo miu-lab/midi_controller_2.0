@@ -1,5 +1,5 @@
 #include "Diagnostics.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 #include "core/utils/Error.hpp"
 
 // Initialisation des variables statiques
@@ -17,7 +17,7 @@ void DiagnosticsManager::init(TaskScheduler& scheduler, uint16_t interval) {
     _eventDiagnosticsEnabled = true;  // Activé par défaut
     
 #ifdef DEBUG
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Module de diagnostics initialisé (mode événementiel)");
+    // DEBUG MSG TO IMPLEMENT
     
     // Affiche les statistiques initiales
     printStats(false);
@@ -35,7 +35,6 @@ void DiagnosticsManager::update() {
     
     // Conversion ms -> s et vérification de l'intervalle
     if (elapsedTime >= (_statsInterval * 1000)) {
-        printSchedulerStats(DEBUG_TASK_SCHEDULER_LEVEL >= 2);
         _lastStatsTime = currentTime;
     }
 #endif
@@ -48,9 +47,9 @@ void DiagnosticsManager::onEvent(const char* eventName, bool showDetails) {
     }
     
     // Affiche un en-tête avec le nom de l'événement
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "===================================================");
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "DIAGNOSTICS - ÉVÉNEMENT: %s", eventName);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "===================================================");
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
+    // DEBUG MSG TO IMPLEMENT
     
     // Affiche les statistiques
     printSchedulerStats(showDetails);
@@ -60,14 +59,13 @@ void DiagnosticsManager::onEvent(const char* eventName, bool showDetails) {
         printMemoryStats();
     }
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "===================================================");
+    // DEBUG MSG TO IMPLEMENT
 #endif
 }
 
 void DiagnosticsManager::printStats(bool showDetails) {
 #ifdef DEBUG
     if (!_scheduler) {
-        DEBUG_ERROR("Diagnostics non initialisé!");
         return;
     }
     
@@ -80,14 +78,14 @@ void DiagnosticsManager::enableRegularStats(bool enable) {
     _regularStatsEnabled = enable;
     
 #ifdef DEBUG
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Statistiques régulières %s", enable ? "activées" : "désactivées");
+    // DEBUG MSG TO IMPLEMENT
 #endif
 }
 
 void DiagnosticsManager::enableEventDiagnostics(bool enable) {
     _eventDiagnosticsEnabled = enable;
 #ifdef DEBUG
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Diagnostics événementiels %s", enable ? "activés" : "désactivés");
+    // DEBUG MSG TO IMPLEMENT
 #endif
 }
 
@@ -96,22 +94,22 @@ void DiagnosticsManager::setStatsInterval(uint16_t seconds) {
     
     _statsInterval = seconds;
 #ifdef DEBUG
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Intervalle d'affichage des statistiques: %us", seconds);
+    // DEBUG MSG TO IMPLEMENT
 #endif
 }
 
 bool DiagnosticsManager::handleCommand(const String& command) {
 #ifdef DEBUG
     if (command == "stats") {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "===== STATISTIQUES =====");
+        // DEBUG MSG TO IMPLEMENT
         printStats(true);
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "=======================");
+        // DEBUG MSG TO IMPLEMENT
         return true;
     }
     else if (command == "stats detailed") {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "===== STATISTIQUES DÉTAILLÉES =====");
+        // DEBUG MSG TO IMPLEMENT
         printStats(true);
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "================================");
+        // DEBUG MSG TO IMPLEMENT
         return true;
     }
     else if (command == "stats off") {
@@ -138,7 +136,7 @@ bool DiagnosticsManager::handleCommand(const String& command) {
         if (interval > 0) {
             setStatsInterval(interval);
         } else {
-            DEBUG_ERROR("Intervalle invalide");
+            // DEBUG MSG TO IMPLEMENT
         }
         return true;
     }
@@ -153,59 +151,15 @@ bool DiagnosticsManager::handleCommand(const String& command) {
 
 void DiagnosticsManager::printError(const Result<bool>& result, const char* prefix) {
     if (result.isError()) {
-        DEBUG_LOG(DEBUG_LEVEL_ERROR, "%s: %s (code: %d)", prefix, result.error().value_or(Errors::Unknown).message, static_cast<int>(result.error().value_or(Errors::Unknown).code));
+        // DEBUG MSG TO IMPLEMENT
     }
 }
 
 void DiagnosticsManager::printSchedulerStats(bool showDetails) {
-#ifdef DEBUG
-    // Affichage des statistiques du scheduler
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "========== STATISTIQUES SCHEDULER ===========");
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "CPU: %.2f%% | Cycles: %u | Overruns: %u", 
-              _scheduler->getCpuUsage(), _scheduler->getCycleCount(), _scheduler->getOverruns());
-    
-    // Détails des tâches si demandé
-    if (showDetails) {
-        // Utilise l'API publique pour récupérer les infos sur les tâches
-        size_t taskCount = _scheduler->getTaskCount();
-        
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "Nombre total de tâches: %d", taskCount);
-        
-        // Nous avons besoin d'accéder aux détails des tâches
-        // Mais comme nous ne voulons pas modifier TaskScheduler, nous ne pouvons
-        // afficher que les informations globales
-        
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "Note: Pour les détails des tâches, utilisez la commande 'stats detailed'");
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "(Nécessite une modification de TaskScheduler pour être implémenté)");
-    }
-    
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "============================================");
-#endif
+    // DEBUG MSG TO IMPLEMENT
+    return;
 }
 
 void DiagnosticsManager::printMemoryStats() {
-#if defined(DEBUG) && (defined(ARDUINO_TEENSY36) || defined(ARDUINO_TEENSY40) || defined(ARDUINO_TEENSY41))
-    // Statistiques de mémoire spécifiques à Teensy
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "========== STATISTIQUES MEMOIRE ============");
-    
-    // Obtenir les informations de mémoire disponible
-    extern unsigned long _heap_start;
-    extern unsigned long _heap_end;
-    extern char *__brkval;
-    
-    int heapSize = (char *)&_heap_end - (char *)&_heap_start;
-    int heapUsed = __brkval ? (char *)__brkval - (char *)&_heap_start : 0;
-    int heapFree = heapSize - heapUsed;
-    
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "RAM Totale: %d octets", heapSize);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "RAM Utilisée: %d octets (%.1f%%)", 
-              heapUsed, (heapUsed * 100.0) / heapSize);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "RAM Libre: %d octets (%.1f%%)", 
-              heapFree, (heapFree * 100.0) / heapSize);
-    
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "============================================");
-#elif defined(DEBUG)
-    // Pour les autres plateformes, utiliser freeMemory() si disponible
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Information mémoire non disponible sur cette plateforme");
-#endif
+    // DEBUG MSG TO IMPLEMENT
 }

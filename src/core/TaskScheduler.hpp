@@ -6,7 +6,7 @@
 #include <functional>
 #include <vector>
 
-#include "config/debug/DebugMacros.hpp"
+
 #include "config/debug/TaskSchedulerConfig.hpp"
 
 /**

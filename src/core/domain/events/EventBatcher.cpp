@@ -1,9 +1,8 @@
 #include "EventBatcher.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 
 EventBatcher::EventBatcher(const BatchConfig& config)
     : config_(config) {
-    DEBUG_EVENT_BUS("EventBatcher: Created with UI interval %lu ms", config_.ui_update_interval_ms);
 }
 
 void EventBatcher::start() {
@@ -14,7 +13,6 @@ void EventBatcher::start() {
     subscription_id_ = eventBus.subscribe(this, 90); // Priorité haute pour traiter avant l'UI
     
     started_ = true;
-    DEBUG_EVENT_BUS("EventBatcher: Started batching system (ID: %d)", subscription_id_);
 }
 
 void EventBatcher::stop() {
@@ -31,7 +29,6 @@ void EventBatcher::stop() {
     flushUIBatch();
     
     started_ = false;
-    DEBUG_EVENT_BUS("EventBatcher: Stopped batching system");
 }
 
 bool EventBatcher::onEvent(const Event& event) {
@@ -65,8 +62,6 @@ void EventBatcher::handleMidiCCEvent(const MidiCCEvent& midi_event) {
         
         pending_parameters_[key] = param;
         
-        DEBUG_EVENT_BUS("EventBatcher: New parameter CC%d CH%d = %d", 
-                       midi_event.controller, midi_event.channel, midi_event.value);
     } else {
         // Paramètre existant - mise à jour
         PendingParameter& param = it->second;
@@ -80,8 +75,6 @@ void EventBatcher::handleMidiCCEvent(const MidiCCEvent& midi_event) {
         param.last_update_ms = now;
         param.needs_ui_update = true;
         
-        DEBUG_EVENT_BUS("EventBatcher: Updated parameter CC%d CH%d = %d", 
-                       midi_event.controller, midi_event.channel, midi_event.value);
     }
 }
 
@@ -119,8 +112,6 @@ void EventBatcher::flushUIBatch() {
             eventBus.publish(ui_event);
             param.needs_ui_update = false;
             
-            DEBUG_EVENT_BUS("EventBatcher: Flushed UI event CC%d CH%d = %d", 
-                           param.controller, param.channel, param.value);
         }
     }
 }

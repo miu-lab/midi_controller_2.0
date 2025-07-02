@@ -2,20 +2,10 @@
 
 #include "config/common/CommonIncludes.hpp"
 #include "core/domain/events/core/Event.hpp"
-#include "config/debug/DebugConfig.hpp"
 #include <vector>
 
 // Identifiant d'abonnement
 using SubscriptionId = uint16_t;
-
-// Assurer que DEBUG_EVENT_BUS est défini même si DebugMacros.hpp n'est pas inclus
-#ifndef DEBUG_EVENT_BUS
-#ifdef DEBUG
-#define DEBUG_EVENT_BUS(format, ...) do { if (Serial) { Serial.printf(format, ##__VA_ARGS__); } } while(0)
-#else
-#define DEBUG_EVENT_BUS(format, ...) do {} while(0)
-#endif
-#endif
 
 // Nombre initial et maximum d'abonnements (configurable)
 #ifndef INITIAL_EVENT_LISTENERS
@@ -102,10 +92,6 @@ public:
         // Trier par priorité pour que les plus prioritaires soient traités en premier
         sortByPriority();
         
-        // Débogage
-        DEBUG_EVENT_BUS("Nouvelle souscription ID=%d - Total: %zu (Capacité: %zu)\n", 
-                       nextId_, subscriptions_.size(), subscriptions_.capacity());
-        
         return nextId_++;  // Retourner l'ID actuel et incrémenter pour le prochain
     }
     
@@ -119,11 +105,6 @@ public:
         if (index >= 0) {
             // Supprimer l'élément à l'index spécifié
             subscriptions_.erase(subscriptions_.begin() + index);
-            
-            // Débogage
-            DEBUG_EVENT_BUS("Désinscription ID=%d - Restants: %zu (Capacité: %zu)\n", 
-                           id, subscriptions_.size(), subscriptions_.capacity());
-            
             return true;
         }
         
@@ -139,10 +120,6 @@ public:
         int index = findSubscriptionIndex(id);
         if (index >= 0) {
             subscriptions_[index].active = false;
-            
-            // Débogage
-            DEBUG_EVENT_BUS("Mise en pause ID=%d\n", id);
-            
             return true;
         }
         
@@ -158,10 +135,6 @@ public:
         int index = findSubscriptionIndex(id);
         if (index >= 0) {
             subscriptions_[index].active = true;
-            
-            // Débogage
-            DEBUG_EVENT_BUS("Reprise ID=%d\n", id);
-            
             return true;
         }
         
@@ -174,10 +147,7 @@ public:
      * @return true si au moins un abonné a traité l'événement, false sinon
      */
     bool publish(Event& event) {
-        // Débogage
-        DEBUG_EVENT_BUS("Publication d'un événement de type %s - Destinataires: %d\n", 
-                      event.getEventName(), subscriptions_.size());
-        
+
         bool handled = false;
         
         // Parcourir tous les abonnements (déjà triés par priorité)
@@ -218,9 +188,6 @@ public:
         
         // Remettre à la capacité initiale
         subscriptions_.reserve(INITIAL_EVENT_LISTENERS);
-        
-        // Débogage
-        DEBUG_EVENT_BUS("Effacement de tous les abonnements\n");
     }
     
     /**

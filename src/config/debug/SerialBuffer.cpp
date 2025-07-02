@@ -20,9 +20,9 @@ void SerialBuffer::println(const String& line) {
         // Si pas encore initialisé, affiche directement sur le port série
         // et s'assure qu'il y a un saut de ligne
         if (line.length() > 80) {
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "%.77s...", line.c_str());
+            // DEBUG MSG TO IMPLEMENT
         } else {
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "%s", line.c_str());
+            // DEBUG MSG TO IMPLEMENT
         }
     }
 #endif
@@ -73,7 +73,7 @@ void SerialBuffer::dumpBuffer() {
     
     for (size_t i = 0; i < count; i++) {
         size_t index = (startIndex + i) % _maxLines;
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "%s", _buffer[index].c_str());
+        // DEBUG MSG TO IMPLEMENT
     }
 #endif
 }

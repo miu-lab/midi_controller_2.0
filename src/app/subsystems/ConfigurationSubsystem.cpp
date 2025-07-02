@@ -6,7 +6,7 @@
 #include <set>
 
 #include "config/ConfigDefaults.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/utils/Error.hpp"
 
@@ -44,8 +44,7 @@ Result<bool> ConfigurationSubsystem::init() {
                 // Custom deleter qui ne fait rien car on ne possède pas l'objet
             });
         container_->registerDependency<UnifiedConfiguration>(unifiedConfigPtr);
-        DEBUG_LOG(DEBUG_LEVEL_INFO,
-                  "ConfigurationSubsystem: UnifiedConfiguration enregistrée dans le conteneur");
+        // DEBUG MSG TO IMPLEMENT
     }
 
     return Result<bool>::success(true);
@@ -152,7 +151,7 @@ size_t ConfigurationSubsystem::getInputCountByType(InputType type) const {
 }
 
 Result<bool> ConfigurationSubsystem::loadUnifiedConfigurations() {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "ConfigurationSubsystem: Loading control definitions");
+    // DEBUG MSG TO IMPLEMENT
 
     if (!config_) {
         return Result<bool>::error(
@@ -161,13 +160,6 @@ Result<bool> ConfigurationSubsystem::loadUnifiedConfigurations() {
 
     // Afficher les statistiques de configuration
     auto stats = config_->getUnifiedConfiguration().getStats();
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "%d control definitions loaded", stats.totalControls);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "ConfigurationSubsystem: Using unified configuration system");
-    DEBUG_LOG(DEBUG_LEVEL_INFO,
-              "Stats - Encoders: %d, Buttons: %d, MIDI mappings: %d",
-              stats.encoders,
-              stats.buttons,
-              stats.midiMappings);
-
+    // DEBUG MSG TO IMPLEMENT
     return Result<bool>::success(true);
 }

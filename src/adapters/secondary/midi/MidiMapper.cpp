@@ -5,7 +5,7 @@
 #include <config/ConfigDefaults.hpp>
 
 #include "config/GlobalSettings.hpp"
-#include "config/debug/DebugMacros.hpp"  // Pour avoir accès à PERFORMANCE_MODE
+  // Pour avoir accès à PERFORMANCE_MODE
 #include "core/domain/events/core/EventTypes.hpp"
 #include "tools/Diagnostics.hpp"
 
@@ -96,8 +96,7 @@ void MidiMapper::setMappingFromControlDefinition(const ControlDefinition& contro
             // Ajouter le nouveau mapping
             mappings_[compositeKey] = std::move(info);
 
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper: Mapping created - ID=%d, Type=%d, CompositeKey=0x%X, Channel=%d, Control=%d",
-                      controlDef.id, mappingSpec.appliesTo, compositeKey, midiConfig.channel, midiConfig.control);
+            // DEBUG MSG TO IMPLEMENT
 
             logDiagnostic("Mapping ajouté: ID=%d CH=%d CC=%d Type=%d",
                           controlDef.id,
@@ -278,7 +277,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 
     // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
     if (isNavigationControl(encoderId)) {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "Navigation control detected: %d position: %d", encoderId, mappingInfo.lastEncoderPosition);
+        // DEBUG MSG TO IMPLEMENT
         // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
         return;
     }
@@ -291,7 +290,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;
     }
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper: Sending MIDI for encoderId=%d", encoderId);
+    // DEBUG MSG TO IMPLEMENT
 
     // Mettre à jour et envoyer la nouvelle valeur
     mappingInfo.lastMidiValue = static_cast<uint8_t>(newValue);
@@ -311,25 +310,24 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 //=============================================================================
 
 void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingControlType type) {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper::processButtonEvent - buttonId=%d, pressed=%d, type=%d", buttonId, pressed, (int)type);
+    // DEBUG MSG TO IMPLEMENT
     
     // Si c'est un contrôle de navigation, ne pas traiter en MIDI mais laisser passer
     if (isNavigationControl(buttonId)) {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "Navigation control detected: %d pressed: %d", buttonId, pressed);
+        // DEBUG MSG TO IMPLEMENT
         // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
         return;
     }
 
     // Créer une clé composite à partir de l'ID et du type
     uint32_t buttonKey = makeCompositeKey(buttonId, type);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper: Looking for mapping with composite key=0x%X (buttonId=%d, type=%d)", 
-              buttonKey, buttonId, (int)type);
+    // DEBUG MSG TO IMPLEMENT
 
     auto it = mappings_.find(buttonKey);
     if (it == mappings_.end()) {
         const char* typeStr = (type == MappingControlType::BUTTON) ? "encoder button" : "button";
         logDiagnostic("No mapping found for %s %d (composite key=0x%X)", typeStr, buttonId, buttonKey);
-        DEBUG_LOG(DEBUG_LEVEL_WARNING, "MidiMapper: No mapping found for %s %d (composite key=0x%X)", typeStr, buttonId, buttonKey);
+        // DEBUG MSG TO IMPLEMENT
         return;  // Pas de mapping pour ce bouton
     }
 
@@ -375,7 +373,7 @@ void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingContr
 }
 
 void MidiMapper::processEncoderButton(EncoderId encoderId, bool pressed) {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper::processEncoderButton - encoderId=%d, pressed=%d", encoderId, pressed);
+    // DEBUG MSG TO IMPLEMENT
     processButtonEvent(encoderId, pressed, MappingControlType::BUTTON);
 }
 
@@ -421,8 +419,7 @@ bool MidiMapper::onEvent(const Event& event) {
     case EventTypes::HighPriorityEncoderButton: {
         const HighPriorityEncoderButtonEvent& buttonEvent =
             static_cast<const HighPriorityEncoderButtonEvent&>(event);
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper: Received HighPriorityEncoderButton event - encoderId=%d, pressed=%d", 
-                  buttonEvent.encoderId, buttonEvent.pressed);
+        // DEBUG MSG TO IMPLEMENT
         processEncoderButton(buttonEvent.encoderId, buttonEvent.pressed);
         return true;
     }
@@ -430,8 +427,7 @@ bool MidiMapper::onEvent(const Event& event) {
     case EventTypes::HighPriorityButtonPress: {
         const HighPriorityButtonPressEvent& buttonEvent =
             static_cast<const HighPriorityButtonPressEvent&>(event);
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper: Received HighPriorityButtonPress event - buttonId=%d, pressed=%d", 
-                  buttonEvent.buttonId, buttonEvent.pressed);
+        // DEBUG MSG TO IMPLEMENT
         processButtonPress(buttonEvent.buttonId, buttonEvent.pressed);
         return true;
     }

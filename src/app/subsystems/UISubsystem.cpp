@@ -3,7 +3,7 @@
 #include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "config/PerformanceConfig.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/TaskScheduler.hpp"
 #include "core/utils/Error.hpp"
@@ -36,8 +36,7 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
     // Récupérer le bridge LVGL
     m_lvglBridge = container_->resolve<Ili9341LvglBridge>();
     if (!m_lvglBridge) {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING,
-                  "AVERTISSEMENT: Bridge LVGL non disponible dans UISubsystem");
+        // DEBUG MSG TO IMPLEMENT
     }
 
     // Créer le gestionnaire de vues si l'UI complète est activée

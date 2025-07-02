@@ -14,7 +14,7 @@
 #include "app/MidiControllerApp.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "config/ApplicationConfiguration.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 #include "core/utils/Error.hpp"
 
 ApplicationConfiguration appConfig;
@@ -28,24 +28,22 @@ void setup() {
     while (!Serial && millis() - t0 < timeout) {}
 
     Serial.println("=== Init OK ===");
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Démarrage de l'application MIDI Controller...");
+    // DEBUG MSG TO IMPLEMENT
     container = std::make_shared<DependencyContainer>();
 
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Initialisation du conteneur...");
+    // DEBUG MSG TO IMPLEMENT
     auto initResult = InitializationScript::initializeContainer(container, appConfig);
     if (initResult.isError()) {
-        DEBUG_ERROR("ERREUR d'initialisation: %s", initResult.error().value_or(Errors::Unknown).message);
+        // DEBUG MSG TO IMPLEMENT
         return;
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Conteneur initialisé avec succès");
 
     app = std::make_shared<MidiControllerApp>(container);
     auto appInitResult = app->init();
     if (appInitResult.isError()) {
-        DEBUG_ERROR("ERREUR d'initialisation de l'app: %s", appInitResult.error().value_or(Errors::Unknown).message);
+        // DEBUG MSG TO IMPLEMENT
         return;
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Démarrage terminé");
 }
 
 void loop() {

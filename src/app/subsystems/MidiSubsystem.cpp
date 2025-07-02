@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <set>
 
-#include "config/debug/DebugMacros.hpp"
+
 #include "core/utils/Error.hpp"
 
 #include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
@@ -33,7 +33,7 @@ Result<bool> MidiSubsystem::init() {
         commandManager_ = std::make_shared<CommandManager>();
         container_->registerDependency<CommandManager>(commandManager_);
     } else {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Using existing CommandManager");
+        // DEBUG MSG TO IMPLEMENT
     }
 
     // Créer l'interface MIDI de base (TeensyUsbMidiOut)
@@ -44,7 +44,7 @@ Result<bool> MidiSubsystem::init() {
             return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create TeensyUsbMidiOut"});
         }
     } else {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Creating TeensyUsbMidiOut (test mode)");
+        // DEBUG MSG TO IMPLEMENT
         baseMidiOut = std::make_shared<TeensyUsbMidiOut>();
         if (!baseMidiOut) {
             return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create TeensyUsbMidiOut"});
@@ -56,7 +56,7 @@ Result<bool> MidiSubsystem::init() {
     if (!eventEnabledMidiOut) {
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create EventEnabledMidiOut"});
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Created EventEnabledMidiOut wrapper");
+    // DEBUG MSG TO IMPLEMENT
 
     // Utiliser EventEnabledMidiOut comme interface MidiOutputPort
     midiOut_ = eventEnabledMidiOut;
@@ -69,18 +69,18 @@ Result<bool> MidiSubsystem::init() {
     container_->registerDependency<EventEnabledMidiOut>(eventEnabledMidiOut);
 
     // Créer le MidiMapper et MidiInHandler
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Creating MidiMapper...");
+    // DEBUG MSG TO IMPLEMENT
     midiMapper_ = std::make_unique<MidiMapper>(*midiOut_, *commandManager_);
     if (!midiMapper_) {
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiMapper"});
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: MidiMapper created at address: 0x%X", (uintptr_t)midiMapper_.get());
+    // DEBUG MSG TO IMPLEMENT
 
     midiInHandler_ = std::make_unique<MidiInHandler>();
     if (!midiInHandler_) {
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiInHandler"});
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: MidiInHandler created");
+    // DEBUG MSG TO IMPLEMENT
 
     // Charger les mappings MIDI depuis les ControlDefinition
     loadMidiMappingsFromControlDefinitions();
@@ -163,14 +163,14 @@ MidiMapper& MidiSubsystem::getMidiMapper() const {
 
 void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     if (!configuration_) {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING, "MidiSubsystem: No configuration available");
+        // DEBUG MSG TO IMPLEMENT
         return;
     }
     
     // Obtenir toutes les définitions de contrôles depuis le système unifié
     const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Processing %d control definitions for MIDI mappings", allControlDefinitions.size());
+    // DEBUG MSG TO IMPLEMENT
     
     int mappingCount = 0;
     std::set<InputId> navigationControlIds;
@@ -195,7 +195,7 @@ void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     // Configurer les contrôles de navigation dans le mapper
     midiMapper_->setNavigationControls(navigationControlIds);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Configured %d control definitions with MIDI mappings", mappingCount);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinition& controlDef) const {
@@ -232,6 +232,6 @@ void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinitio
         // Configurer le mapping dans MidiMapper en utilisant la nouvelle méthode
         midiMapper_->setMappingFromControlDefinition(controlDef, std::move(strategy));
         
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem: Configured MIDI mapping for control ID %d", controlDef.id);
+        // DEBUG MSG TO IMPLEMENT
     }
 }

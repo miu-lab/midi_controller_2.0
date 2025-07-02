@@ -19,7 +19,7 @@
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
 #include "core/TaskScheduler.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 #include "core/utils/Error.hpp"
 
 Result<bool> InitializationScript::initializeContainer(
@@ -83,7 +83,7 @@ Result<bool> InitializationScript::setupHardwareAdapters(
     container->registerDependency<MidiOutputPort>(std::make_shared<TeensyUsbMidiOut>());
 
     // Écran LVGL - Nouvelle architecture modulaire
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Initializing display hardware driver...");
+    // DEBUG MSG TO IMPLEMENT
     
     // 1. Créer et initialiser le driver hardware
     Ili9341Driver::Config driverConfig = Ili9341Driver::getDefaultConfig();
@@ -91,21 +91,21 @@ Result<bool> InitializationScript::setupHardwareAdapters(
     if (!driver->initialize()) {
         return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du driver hardware ILI9341"});
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Hardware driver initialized successfully");
+    // DEBUG MSG TO IMPLEMENT
     
     // 2. Créer et initialiser le bridge LVGL
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Initializing LVGL bridge...");
+    // DEBUG MSG TO IMPLEMENT
     Ili9341LvglBridge::LvglConfig lvglConfig = Ili9341LvglBridge::getDefaultLvglConfig();
     auto bridge = std::make_shared<Ili9341LvglBridge>(driver, lvglConfig);
     if (!bridge->initialize()) {
         return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du bridge LVGL"});
     }
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "LVGL bridge initialized successfully");
+    // DEBUG MSG TO IMPLEMENT
     
     // 3. Enregistrer les composants dans le container
     container->registerDependency<Ili9341Driver>(driver);
     container->registerDependency<Ili9341LvglBridge>(bridge);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "LVGL display components registered in container");
+    // DEBUG MSG TO IMPLEMENT
 
     // Stockage de profils
     auto profileManager = std::make_shared<ProfileManager>();
@@ -126,8 +126,7 @@ Result<bool> InitializationScript::initializeSubsystems(
     // Récupérer l'OptimizedEventBus
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
     if (!optimizedEventBus) {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING,
-            "AVERTISSEMENT: OptimizedEventBus non disponible, utilisant le mode legacy");
+        // DEBUG MSG TO IMPLEMENT
     }
 
     // Créer InputController avec l'OptimizedEventBus
@@ -199,7 +198,7 @@ Result<bool> InitializationScript::initializeSubsystems(
         auto result = info.initFn();
         if (result.isError()) {
             auto err = result.error().value_or(Errors::Unknown);
-            DEBUG_LOG(DEBUG_LEVEL_ERROR, "Échec d'initialisation du sous-système %s: %s", info.name, err.message);
+            // DEBUG MSG TO IMPLEMENT
             return Result<bool>::error(err);
         }
     }
@@ -235,49 +234,36 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
     if (optimizedEventBus) {
         optimizedEventBus->subscribe(uiEventListener.get());
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "UIControllerEventListener abonné à l'EventBus.");
+        // DEBUG MSG TO IMPLEMENT
     } else {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING, "AVERTISSEMENT: OptimizedEventBus non disponible pour UIControllerEventListener.");
+        // DEBUG MSG TO IMPLEMENT
     }
 
     return true;
 }
 
 void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyContainer> container) {
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "=== Configuration des écouteurs MIDI ===");
+    // DEBUG MSG TO IMPLEMENT
     
     // Récupération des composants nécessaires
     auto midiSystem = container->resolve<MidiSubsystem>();
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
 
     if (!midiSystem) {
-        DEBUG_ERROR("ERREUR: MidiSubsystem non disponible");
         return;
     }
     
     if (!optimizedEventBus) {
-        DEBUG_ERROR("ERREUR: OptimizedEventBus non disponible");
         return;
     }
-    
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiSubsystem et OptimizedEventBus trouvés");
-
-    // Récupérer le MidiMapper du MidiSubsystem
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Récupération du MidiMapper...");
     MidiMapper& midiMapper = midiSystem->getMidiMapper();
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper obtenu à l'adresse: 0x%X", (uintptr_t)&midiMapper);
-
-    // Enregistrer le MidiMapper comme écouteur de haute priorité
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Enregistrement du MidiMapper dans l'EventBus...");
     SubscriptionId subscriptionId = optimizedEventBus->subscribeWithPriority(&midiMapper, EventPriority::PRIORITY_HIGH);
     
     if (subscriptionId != 0) {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "MidiMapper enregistré avec succès - ID: %d", subscriptionId);
     } else {
-        DEBUG_ERROR("ERREUR: Échec de l'enregistrement du MidiMapper");
+        // DEBUG MSG TO IMPLEMENT
+        // Échec de l'abonnement, gérer l'erreur
+        return;
     }
-
-    // Configurer la propagation des événements haute priorité
     optimizedEventBus->setPropagateHighPriorityEvents(false);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "Configuration des écouteurs MIDI terminée");
 }

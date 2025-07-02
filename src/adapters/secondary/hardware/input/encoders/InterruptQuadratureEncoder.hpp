@@ -5,7 +5,6 @@
 #include <Encoder.h>  // Ajout de la bibliothèque Encoder
 
 #include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
-#include "config/debug/DebugConfig.hpp"  // Configuration des modes de debug
 #include "core/ports/input/EncoderPort.hpp"
 
 /**

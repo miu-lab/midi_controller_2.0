@@ -1,7 +1,7 @@
 #include "MidiControllerApp.hpp"
 
 #include "app/di/DependencyContainer.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 #include "core/TaskScheduler.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"

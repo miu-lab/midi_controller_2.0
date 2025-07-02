@@ -1,5 +1,5 @@
 #include "UILayout.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 
 //=============================================================================
 // Constructeur
@@ -7,7 +7,7 @@
 
 UILayout::UILayout(const UITheme& theme) : theme_(theme) {
     grid_config_ = createDefaultGrid();
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Layout manager initialized");
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================
@@ -49,7 +49,7 @@ void UILayout::setupGrid(lv_obj_t* container, const GridConfig& config) {
     // Sauvegarder la config pour référence
     grid_config_ = config;
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Native grid configured with fractional units - %dx%d", config.columns, config.rows);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UILayout::placeInGrid(lv_obj_t* widget, const GridPosition& position, 
@@ -57,7 +57,7 @@ void UILayout::placeInGrid(lv_obj_t* widget, const GridPosition& position,
     if (!widget) return;
     
     if (!isValidGridPosition(position)) {
-        DEBUG_LOG(DEBUG_LEVEL_WARNING, "UILayout: Invalid grid position");
+        // DEBUG MSG TO IMPLEMENT
         return;
     }
     
@@ -66,7 +66,7 @@ void UILayout::placeInGrid(lv_obj_t* widget, const GridPosition& position,
                          align, position.column, position.column_span,
                          align, position.row, position.row_span);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Widget placed in native grid at (%d,%d) span (%dx%d)", position.column, position.row, position.column_span, position.row_span);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================
@@ -96,7 +96,7 @@ void UILayout::placeRelative(lv_obj_t* widget, float x_percent, float y_percent,
         lv_obj_set_height(widget, lv_pct(h_pct));
     }
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Widget placed with native percentages at %d%%, %d%%", x_pct, y_pct);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================
@@ -107,21 +107,21 @@ void UILayout::centerHorizontally(lv_obj_t* widget, lv_coord_t offset_y) {
     if (!widget) return;
     
     lv_obj_align(widget, LV_ALIGN_TOP_MID, 0, offset_y);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Widget centered horizontally with offset Y=%d", offset_y);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UILayout::centerVertically(lv_obj_t* widget, lv_coord_t offset_x) {
     if (!widget) return;
     
     lv_obj_align(widget, LV_ALIGN_LEFT_MID, offset_x, 0);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Widget centered vertically with offset X=%d", offset_x);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UILayout::centerCompletely(lv_obj_t* widget, lv_coord_t offset_x, lv_coord_t offset_y) {
     if (!widget) return;
     
     lv_obj_align(widget, LV_ALIGN_CENTER, offset_x, offset_y);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Widget centered completely with offsets (%d,%d)", offset_x, offset_y);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UILayout::alignToWidget(lv_obj_t* widget, lv_obj_t* reference, lv_align_t align, 
@@ -129,7 +129,7 @@ void UILayout::alignToWidget(lv_obj_t* widget, lv_obj_t* reference, lv_align_t a
     if (!widget || !reference) return;
     
     lv_obj_align_to(widget, reference, align, offset_x, offset_y);
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Widget aligned to reference with align=%d offsets=(%d,%d)", align, offset_x, offset_y);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================
@@ -147,7 +147,7 @@ void UILayout::setupFlex(lv_obj_t* container, lv_flex_flow_t flow,
     lv_obj_set_flex_flow(container, flow);
     lv_obj_set_flex_align(container, main_align, cross_align, track_align);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Flex configured - flow=%d, aligns=(%d,%d,%d)", flow, main_align, cross_align, track_align);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UILayout::setFlexGrow(lv_obj_t* widget, uint8_t grow) {
@@ -155,7 +155,7 @@ void UILayout::setFlexGrow(lv_obj_t* widget, uint8_t grow) {
     
     lv_obj_set_flex_grow(widget, grow);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Flex grow set to %d for widget", grow);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 
@@ -263,7 +263,7 @@ void UILayout::setupHorizontalFlex(lv_obj_t* container, lv_coord_t spacing) {
     // Configurer espacement via padding
     lv_obj_set_style_pad_column(container, spacing, 0);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Horizontal flex setup with spacing %d", spacing);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UILayout::setupVerticalFlex(lv_obj_t* container, lv_coord_t spacing) {
@@ -278,7 +278,7 @@ void UILayout::setupVerticalFlex(lv_obj_t* container, lv_coord_t spacing) {
     // Configurer espacement via padding
     lv_obj_set_style_pad_row(container, spacing, 0);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Vertical flex setup with spacing %d", spacing);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 void UILayout::setupParameterGrid(lv_obj_t* container, uint8_t columns, uint8_t rows) {
@@ -298,7 +298,7 @@ void UILayout::setupParameterGrid(lv_obj_t* container, uint8_t columns, uint8_t 
     // Utiliser la grille native LVGL
     setupGrid(container, config);
     
-    DEBUG_LOG(DEBUG_LEVEL_INFO, "UILayout: Parameter grid setup - %dx%d", columns, rows);
+    // DEBUG MSG TO IMPLEMENT
 }
 
 //=============================================================================

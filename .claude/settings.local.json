@@ -27,7 +27,8 @@
       "Bash(~/.platformio/penv/bin/pio run -e MIDI_CONTROLLER_DEVELOPMENT)",
       "Bash(curl:*)",
       "Bash(sudo cp:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }

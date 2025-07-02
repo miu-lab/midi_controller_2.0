@@ -1,7 +1,7 @@
 #include "core/use_cases/ProcessEncoders.hpp"
 
 #include "core/use_cases/ButtonStateProcessor.hpp"
-#include "config/debug/DebugMacros.hpp"
+
 
 ProcessEncoders::ProcessEncoders(const std::vector<EncoderPort*>& encoders)
     : encoders_(encoders),
@@ -41,11 +41,11 @@ void ProcessEncoders::update() {
 
     // Process buttons using shared template logic
     processButtonChanges(encoders_, lastPressed_, [this](uint8_t id, bool pressed) {
-        DEBUG_LOG(DEBUG_LEVEL_INFO, "ProcessEncoders: Encoder button change detected - id=%d, pressed=%d", id, pressed);
+        // DEBUG MSG TO IMPLEMENT
         if (onEncoderButtonCallback_) {
             onEncoderButtonCallback_(id, pressed);
         } else if (useInputController_) {
-            DEBUG_LOG(DEBUG_LEVEL_INFO, "ProcessEncoders: Forwarding to InputController - id=%d, pressed=%d", id, pressed);
+            // DEBUG MSG TO IMPLEMENT
             inputController_->processEncoderButton(id, pressed);
         }
     });
