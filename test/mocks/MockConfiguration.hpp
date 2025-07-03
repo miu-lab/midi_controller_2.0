@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include <map>
+#include <set>
 
 /**
  * @brief Mock pour IConfiguration permettant d'isoler les tests configuration

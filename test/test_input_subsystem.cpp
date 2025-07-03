@@ -285,47 +285,61 @@ private:
 
 // === TESTS GLOBAUX ===
 
-InputSubsystemTest* testInstance = nullptr;
+InputSubsystemTest* inputTestInstance = nullptr;
 
-void setUp(void) {
-    testInstance = new InputSubsystemTest();
-    testInstance->setUp();
+void setUpInput(void) {
+    inputTestInstance = new InputSubsystemTest();
+    inputTestInstance->setUp();
 }
 
-void tearDown(void) {
-    if (testInstance) {
-        testInstance->tearDown();
-        delete testInstance;
-        testInstance = nullptr;
+void tearDownInput(void) {
+    if (inputTestInstance) {
+        inputTestInstance->tearDown();
+        delete inputTestInstance;
+        inputTestInstance = nullptr;
     }
 }
 
 // === FONCTIONS DE TEST ===
 
 void test_input_init_with_missing_configuration() {
-    testInstance->testInitWithMissingConfiguration();
+    setUpInput();
+    inputTestInstance->testInitWithMissingConfiguration();
+    tearDownInput();
 }
 
 void test_input_init_with_empty_configuration() {
-    testInstance->testInitWithEmptyConfiguration();
+    setUpInput();
+    inputTestInstance->testInitWithEmptyConfiguration();
+    tearDownInput();
 }
 
 void test_input_init_with_missing_input_controller() {
-    testInstance->testInitWithMissingInputController();
+    setUpInput();
+    inputTestInstance->testInitWithMissingInputController();
+    tearDownInput();
 }
 
 void test_input_init_with_valid_dependencies() {
-    testInstance->testInitWithValidDependencies();
+    setUpInput();
+    inputTestInstance->testInitWithValidDependencies();
+    tearDownInput();
 }
 
 void test_input_double_initialization() {
-    testInstance->testDoubleInitialization();
+    setUpInput();
+    inputTestInstance->testDoubleInitialization();
+    tearDownInput();
 }
 
 void test_input_validation_after_init() {
-    testInstance->testValidationAfterInit();
+    setUpInput();
+    inputTestInstance->testValidationAfterInit();
+    tearDownInput();
 }
 
 void test_input_init_with_complex_configuration() {
-    testInstance->testInitWithComplexConfiguration();
+    setUpInput();
+    inputTestInstance->testInitWithComplexConfiguration();
+    tearDownInput();
 }

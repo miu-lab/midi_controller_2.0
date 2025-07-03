@@ -8,6 +8,37 @@ extern void test_control_access_after_init();
 extern void test_default_configuration_properties();
 extern void test_navigation_functions();
 
+// Tests InputSubsystem
+extern void test_input_init_with_missing_configuration();
+extern void test_input_init_with_empty_configuration();
+extern void test_input_init_with_missing_input_controller();
+extern void test_input_init_with_valid_dependencies();
+extern void test_input_double_initialization();
+extern void test_input_validation_after_init();
+extern void test_input_init_with_complex_configuration();
+
+// Tests UISubsystem
+extern void test_ui_init_with_missing_configuration();
+extern void test_ui_init_with_simple_ui();
+extern void test_ui_init_with_full_ui_but_missing_dependencies();
+extern void test_ui_init_with_full_ui_and_valid_dependencies();
+extern void test_ui_double_initialization();
+extern void test_ui_show_message_without_initialization();
+extern void test_ui_clear_display_without_initialization();
+extern void test_ui_update_with_simple_ui();
+extern void test_ui_init_with_complex_configuration();
+
+// Tests MidiSubsystem
+extern void test_midi_init_with_missing_configuration();
+extern void test_midi_init_with_valid_configuration();
+extern void test_midi_init_with_existing_command_manager();
+extern void test_midi_double_initialization();
+extern void test_midi_send_note_on_without_initialization();
+extern void test_midi_send_control_change_without_initialization();
+extern void test_midi_update_with_initialized_system();
+extern void test_midi_init_with_complex_configuration();
+extern void test_midi_get_midi_mapper_after_init();
+
 // Fonctions setUp/tearDown par défaut pour Unity
 // Note: les tests spécifiques peuvent redéfinir ces fonctions
 void setUp(void) __attribute__((weak));
@@ -51,6 +82,37 @@ int main() {
     RUN_TEST(test_control_access_after_init);
     RUN_TEST(test_default_configuration_properties);
     RUN_TEST(test_navigation_functions);
+    
+    // Tests InputSubsystem
+    RUN_TEST(test_input_init_with_missing_configuration);
+    RUN_TEST(test_input_init_with_empty_configuration);
+    RUN_TEST(test_input_init_with_missing_input_controller);
+    RUN_TEST(test_input_init_with_valid_dependencies);
+    RUN_TEST(test_input_double_initialization);
+    RUN_TEST(test_input_validation_after_init);
+    RUN_TEST(test_input_init_with_complex_configuration);
+    
+    // Tests UISubsystem
+    RUN_TEST(test_ui_init_with_missing_configuration);
+    RUN_TEST(test_ui_init_with_simple_ui);
+    RUN_TEST(test_ui_init_with_full_ui_but_missing_dependencies);
+    RUN_TEST(test_ui_init_with_full_ui_and_valid_dependencies);
+    RUN_TEST(test_ui_double_initialization);
+    RUN_TEST(test_ui_show_message_without_initialization);
+    RUN_TEST(test_ui_clear_display_without_initialization);
+    RUN_TEST(test_ui_update_with_simple_ui);
+    RUN_TEST(test_ui_init_with_complex_configuration);
+    
+    // Tests MidiSubsystem
+    RUN_TEST(test_midi_init_with_missing_configuration);
+    RUN_TEST(test_midi_init_with_valid_configuration);
+    RUN_TEST(test_midi_init_with_existing_command_manager);
+    RUN_TEST(test_midi_double_initialization);
+    RUN_TEST(test_midi_send_note_on_without_initialization);
+    RUN_TEST(test_midi_send_control_change_without_initialization);
+    RUN_TEST(test_midi_update_with_initialized_system);
+    RUN_TEST(test_midi_init_with_complex_configuration);
+    RUN_TEST(test_midi_get_midi_mapper_after_init);
     
     UNITY_END();
     
