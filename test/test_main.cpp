@@ -39,6 +39,14 @@ extern void test_midi_update_with_initialized_system();
 extern void test_midi_init_with_complex_configuration();
 extern void test_midi_get_midi_mapper_after_init();
 
+// Tests ConfigurationLoader
+extern void test_config_loader_load_with_null_configuration();
+extern void test_config_loader_load_with_valid_configuration();
+extern void test_config_loader_validate_without_loading();
+extern void test_config_loader_validate_after_valid_loading();
+extern void test_config_loader_complete_load_and_validate_sequence();
+extern void test_config_loader_multiple_load_operations();
+
 // Fonctions setUp/tearDown par défaut pour Unity
 // Note: les tests spécifiques peuvent redéfinir ces fonctions
 void setUp(void) __attribute__((weak));
@@ -113,6 +121,14 @@ int main() {
     RUN_TEST(test_midi_update_with_initialized_system);
     RUN_TEST(test_midi_init_with_complex_configuration);
     RUN_TEST(test_midi_get_midi_mapper_after_init);
+    
+    // Tests ConfigurationLoader
+    RUN_TEST(test_config_loader_load_with_null_configuration);
+    RUN_TEST(test_config_loader_load_with_valid_configuration);
+    RUN_TEST(test_config_loader_validate_without_loading);
+    RUN_TEST(test_config_loader_validate_after_valid_loading);
+    RUN_TEST(test_config_loader_complete_load_and_validate_sequence);
+    RUN_TEST(test_config_loader_multiple_load_operations);
     
     UNITY_END();
     

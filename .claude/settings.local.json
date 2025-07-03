@@ -31,7 +31,8 @@
       "Bash(timeout:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(pio test:*)"
+      "Bash(pio test:*)",
+      "Bash(git tag:*)"
     ],
     "deny": []
   }

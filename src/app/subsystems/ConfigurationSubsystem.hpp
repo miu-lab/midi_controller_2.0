@@ -9,6 +9,7 @@
 #include "app/services/NavigationConfigService.hpp"
 #include "config/ApplicationConfiguration.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
+#include "core/configuration/ConfigurationLoader.hpp"
 #include "core/utils/Result.hpp"
 
 /**
@@ -48,6 +49,7 @@ private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<ApplicationConfiguration> config_;
     std::shared_ptr<NavigationConfigService> navService_;
+    std::unique_ptr<IConfigurationLoader> configLoader_;
 
     Result<bool> loadUnifiedConfigurations();
 };

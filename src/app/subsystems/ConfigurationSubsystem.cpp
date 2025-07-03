@@ -8,11 +8,13 @@
 #include "config/ConfigDefaults.hpp"
 
 #include "config/unified/UnifiedConfiguration.hpp"
+#include "core/configuration/ConfigurationLoader.hpp"
 #include "core/utils/Error.hpp"
 
 ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
     navService_ = std::make_shared<NavigationConfigService>();
+    configLoader_ = std::make_unique<ConfigurationLoader>();
 }
 
 Result<bool> ConfigurationSubsystem::init() {
@@ -151,12 +153,6 @@ size_t ConfigurationSubsystem::getInputCountByType(InputType type) const {
 }
 
 Result<bool> ConfigurationSubsystem::loadUnifiedConfigurations() {
-    // TODO DEBUG MSG
-
-    if (!config_) {
-        return Result<bool>::error(
-            {ErrorCode::DependencyMissing, "ApplicationConfiguration not available"});
-    }
-
-    return Result<bool>::success(true);
+    // Delegate to ConfigurationLoader
+    return configLoader_->loadUnifiedConfigurations(config_);
 }
