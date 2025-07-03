@@ -10,12 +10,12 @@
  */
 namespace OptimizedEventBusConfig {
     // Nombre maximum d'écouteurs par niveau de priorité
-    constexpr uint8_t MAX_HIGH_PRIORITY_LISTENERS = 8;
-    constexpr uint8_t MAX_NORMAL_PRIORITY_LISTENERS = 16;
-    constexpr uint8_t MAX_LOW_PRIORITY_LISTENERS = 8;
+    constexpr uint8_t MAX_HIGH_PRIORITY_LISTENERS = 4;
+    constexpr uint8_t MAX_NORMAL_PRIORITY_LISTENERS = 8;
+    constexpr uint8_t MAX_LOW_PRIORITY_LISTENERS = 4;
     
     // Nombres maximum d'événements dans le pool
-    constexpr uint8_t EVENT_POOL_SIZE = 16;
+    constexpr uint8_t EVENT_POOL_SIZE = 8;
 }
 
 /**
