@@ -7,7 +7,6 @@
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/core/EventTypes.hpp"
-#include "core/domain/events/core/OptimizedEventBus.hpp"
 #include "core/domain/types.hpp"
 
 // Forward declaration
@@ -32,7 +31,7 @@ public:
      * @param eventBus Bus d'événements optimisé
      */
     InputController(std::shared_ptr<NavigationConfigService> navigationConfig,
-                    std::shared_ptr<OptimizedEventBus> eventBus = nullptr);
+                    std::shared_ptr<EventBus> eventBus = nullptr);
 
     /**
      * @brief Traite la rotation d'un encodeur
@@ -52,5 +51,5 @@ public:
 
     private:
     std::shared_ptr<NavigationConfigService> m_navigationConfig;
-    std::shared_ptr<OptimizedEventBus> eventBus_;  // Bus d'événements optimisé
+    std::shared_ptr<EventBus> eventBus_;  // Bus d'événements unifié
 };

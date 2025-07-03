@@ -12,6 +12,7 @@
 #include "ViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 
 /**
  * @brief Implémentation simplifiée du gestionnaire de vues
@@ -27,9 +28,11 @@ public:
      * @brief Constructeur
      * @param lvglBridge Bridge LVGL
      * @param unifiedConfig Configuration unifiée
+     * @param eventBus Bus d'événements optimisé
      */
     explicit DefaultViewManager(std::shared_ptr<Ili9341LvglBridge> lvglBridge,
-                                std::shared_ptr<UnifiedConfiguration> unifiedConfig);
+                                std::shared_ptr<UnifiedConfiguration> unifiedConfig,
+                                std::shared_ptr<EventBus> eventBus);
 
     /**
      * @brief Destructeur
@@ -70,6 +73,7 @@ private:
     // Dépendances
     std::shared_ptr<Ili9341LvglBridge> lvglBridge_;
     std::shared_ptr<UnifiedConfiguration> unifiedConfig_;
+    std::shared_ptr<EventBus> eventBus_;
 
     // Les vues principales (100% LVGL)
     std::shared_ptr<LvglSplashScreenView> splashView_;

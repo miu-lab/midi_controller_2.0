@@ -3,9 +3,11 @@
 #include <lvgl.h>
 #include <Arduino.h>
 #include <functional>
+#include <memory>
 
-// Forward declaration pour éviter les inclusions circulaires
+// Forward declarations pour éviter les inclusions circulaires
 class UITheme;
+class ButtonIndicator;
 
 /**
  * @brief Widget LVGL pour affichage de paramètres MIDI basé sur lv_arc natif
@@ -136,6 +138,39 @@ public:
      */
     void processPendingUpdates();
 
+    // === GESTION BUTTON INDICATOR ===
+
+    /**
+     * @brief Ajoute un indicateur de bouton au widget
+     * @param size Taille de l'indicateur LED (par défaut 12px)
+     * @return true si l'indicateur a été créé avec succès
+     */
+    bool addButtonIndicator(lv_coord_t size = 12);
+
+    /**
+     * @brief Supprime l'indicateur de bouton
+     */
+    void removeButtonIndicator();
+
+    /**
+     * @brief Vérifie si le widget a un indicateur de bouton
+     * @return true si l'indicateur existe
+     */
+    bool hasButtonIndicator() const;
+
+    /**
+     * @brief Définit l'état de l'indicateur de bouton
+     * @param pressed true si le bouton est pressé
+     * @param animate Utiliser animation
+     */
+    void setButtonState(bool pressed, bool animate = true);
+
+    /**
+     * @brief Obtient l'indicateur de bouton
+     * @return Pointeur vers l'indicateur ou nullptr si inexistant
+     */
+    ButtonIndicator* getButtonIndicator() const;
+
 
 private:
     // Configuration interne
@@ -159,6 +194,9 @@ private:
     lv_obj_t* cc_label_;        ///< Label "CC XX" (inutilisé)
     lv_obj_t* channel_label_;   ///< Label "CH XX" (inutilisé)
     lv_obj_t* name_label_;      ///< Label nom paramètre
+    
+    // Widget optionnel pour indicateur de bouton
+    std::unique_ptr<ButtonIndicator> button_indicator_;  ///< Indicateur bouton (optionnel)
     
     // Optimisation performance
     bool pending_value_update_ = false;
@@ -191,5 +229,10 @@ private:
      * @param animate Utiliser animation
      */
     void updateArcValue(bool animate);
+    
+    /**
+     * @brief Positionne l'indicateur de bouton dans le widget
+     */
+    void positionButtonIndicator();
     
 };

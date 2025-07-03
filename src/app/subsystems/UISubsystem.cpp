@@ -7,6 +7,7 @@
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/TaskScheduler.hpp"
 #include "core/utils/Error.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {}
@@ -44,12 +45,13 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         // Récupérer les dépendances LVGL
         auto lvglBridge = container_->resolve<Ili9341LvglBridge>();
         auto unifiedConfig = container_->resolve<UnifiedConfiguration>();
+        auto eventBus = container_->resolve<EventBus>();
         
-        if (!lvglBridge || !unifiedConfig) {
+        if (!lvglBridge || !unifiedConfig || !eventBus) {
             return Result<bool>::error({ErrorCode::DependencyMissing, "Missing LVGL dependencies"});
         }
         
-        viewManager_ = std::make_shared<DefaultViewManager>(lvglBridge, unifiedConfig);
+        viewManager_ = std::make_shared<DefaultViewManager>(lvglBridge, unifiedConfig, eventBus);
 
         if (!viewManager_->init()) {
             return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to initialize ViewManager"});

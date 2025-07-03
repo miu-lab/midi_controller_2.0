@@ -8,7 +8,7 @@ EventBatcher::EventBatcher(const BatchConfig& config)
 void EventBatcher::start() {
     if (started_) return;
     
-    // S'abonner aux événements avec l'API actuelle
+    // S'abonner aux événements avec l'API unifiée
     EventBus& eventBus = EventBus::getInstance();
     subscription_id_ = eventBus.subscribe(this, 90); // Priorité haute pour traiter avant l'UI
     

@@ -1,8 +1,9 @@
 #include "DefaultViewManager.hpp"
 
 DefaultViewManager::DefaultViewManager(std::shared_ptr<Ili9341LvglBridge> lvglBridge,
-                                     std::shared_ptr<UnifiedConfiguration> unifiedConfig) 
-    : lvglBridge_(lvglBridge), unifiedConfig_(unifiedConfig) {
+                                     std::shared_ptr<UnifiedConfiguration> unifiedConfig,
+                                     std::shared_ptr<EventBus> eventBus) 
+    : lvglBridge_(lvglBridge), unifiedConfig_(unifiedConfig), eventBus_(eventBus) {
 }
 
 bool DefaultViewManager::init() {
@@ -10,13 +11,13 @@ bool DefaultViewManager::init() {
         return true;
     }
 
-    if (!lvglBridge_ || !unifiedConfig_) {
+    if (!lvglBridge_ || !unifiedConfig_ || !eventBus_) {
         return false;
     }
 
     // Créer toutes les vues LVGL
     splashView_ = std::make_shared<LvglSplashScreenView>(lvglBridge_);
-    parameterView_ = std::make_shared<LvglParameterView>(lvglBridge_, unifiedConfig_);
+    parameterView_ = std::make_shared<LvglParameterView>(lvglBridge_, unifiedConfig_, eventBus_);
     menuView_ = std::make_shared<LvglMenuView>(lvglBridge_);
     modalView_ = std::make_shared<LvglModalView>(lvglBridge_);
     

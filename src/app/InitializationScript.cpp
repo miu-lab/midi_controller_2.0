@@ -15,7 +15,7 @@
 #include "core/controllers/MenuController.hpp"
 #include "core/controllers/UIController.hpp"
 #include "core/domain/commands/CommandManager.hpp"
-#include "core/domain/events/core/OptimizedEventBus.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
 #include "core/TaskScheduler.hpp"
@@ -31,9 +31,10 @@ Result<bool> InitializationScript::initializeContainer(
     // Étape 1: Services de base
     registerBaseServices(container, config);
 
-    // Créer et enregistrer l'OptimizedEventBus
-    auto optimizedEventBus = std::make_shared<OptimizedEventBus>();
-    container->registerDependency<OptimizedEventBus>(optimizedEventBus);
+    // Enregistrer l'EventBus singleton
+    auto& eventBusInstance = EventBus::getInstance();
+    std::shared_ptr<EventBus> eventBus(&eventBusInstance, [](EventBus*){});
+    container->registerDependency<EventBus>(eventBus);
 
     // Créer et enregistrer le TaskScheduler
     auto taskScheduler = std::make_shared<TaskScheduler>();
@@ -123,14 +124,14 @@ Result<bool> InitializationScript::initializeSubsystems(
         return Result<bool>::error({ErrorCode::DependencyMissing, "Impossible de résoudre NavigationConfigService"});
     }
 
-    // Récupérer l'OptimizedEventBus
-    auto optimizedEventBus = container->resolve<OptimizedEventBus>();
-    if (!optimizedEventBus) {
+    // Récupérer l'EventBus
+    auto eventBus = container->resolve<EventBus>();
+    if (!eventBus) {
         // TODO DEBUG MSG
     }
 
-    // Créer InputController avec l'OptimizedEventBus
-    auto inputController = std::make_shared<InputController>(navConfig, optimizedEventBus);
+    // Créer InputController avec l'EventBus
+    auto inputController = std::make_shared<InputController>(navConfig, eventBus);
     container->registerDependency<InputController>(inputController);
 
     // Récupérer le TaskScheduler
@@ -231,9 +232,9 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
     auto uiEventListener = std::make_shared<UIControllerEventListener>(uiControllerRef, navServiceRef);
     container->registerDependency<UIControllerEventListener>(uiEventListener);
 
-    auto optimizedEventBus = container->resolve<OptimizedEventBus>();
-    if (optimizedEventBus) {
-        optimizedEventBus->subscribe(uiEventListener.get());
+    auto eventBus = container->resolve<EventBus>();
+    if (eventBus) {
+        eventBus->subscribe(uiEventListener.get());
         // TODO DEBUG MSG
     } else {
         // TODO DEBUG MSG
@@ -247,17 +248,17 @@ void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyCon
     
     // Récupération des composants nécessaires
     auto midiSystem = container->resolve<MidiSubsystem>();
-    auto optimizedEventBus = container->resolve<OptimizedEventBus>();
+    auto eventBus = container->resolve<EventBus>();
 
     if (!midiSystem) {
         return;
     }
     
-    if (!optimizedEventBus) {
+    if (!eventBus) {
         return;
     }
     MidiMapper& midiMapper = midiSystem->getMidiMapper();
-    SubscriptionId subscriptionId = optimizedEventBus->subscribeWithPriority(&midiMapper, EventPriority::PRIORITY_HIGH);
+    SubscriptionId subscriptionId = eventBus->subscribeHigh(&midiMapper);
     
     if (subscriptionId != 0) {
     } else {
@@ -265,5 +266,5 @@ void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyCon
         // Échec de l'abonnement, gérer l'erreur
         return;
     }
-    optimizedEventBus->setPropagateHighPriorityEvents(false);
+    // Plus besoin de configuration de propagation - tout est géré automatiquement
 }

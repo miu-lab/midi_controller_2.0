@@ -1,5 +1,6 @@
 #include "LvglParameterView.hpp"
 #include "config/DisplayConfig.hpp"
+#include "core/domain/events/MidiEvents.hpp"
 #include <Arduino.h>
 
 
@@ -9,9 +10,11 @@ static uint8_t cc_to_widget_mapping[128];
 static bool mapping_initialized = false;
 
 LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge,
-                                     std::shared_ptr<UnifiedConfiguration> config)
+                                     std::shared_ptr<UnifiedConfiguration> config,
+                                     std::shared_ptr<EventBus> eventBus)
     : bridge_(bridge),
       config_(config),
+      eventBus_(eventBus),
       grid_container_(nullptr),
       main_screen_(nullptr),
       initialized_(false),
@@ -46,6 +49,9 @@ bool LvglParameterView::init() {
     // Initialiser le mapping CC->Widget depuis la configuration
     initializeCCMappingFromConfig();
     
+    // Initialiser le mapping boutons depuis la configuration
+    initializeButtonMappingFromConfig();
+    
     // Créer le container grille
     createGridContainer();
     
@@ -54,11 +60,18 @@ bool LvglParameterView::init() {
     
     // Initialiser les configurations des widgets depuis la configuration
     initializeWidgetConfigurationsFromConfig();
+    
+    // Configurer les indicateurs de boutons
+    setupButtonIndicators();
 
     // S'abonner aux événements MIDI
     subscribeToEvents();
 
     initialized_ = true;
+    
+    // POST-TRAITEMENT : Finaliser le positionnement des LEDs après l'initialisation LVGL
+    finalizeButtonIndicatorPositions();
+    
     // TODO DEBUG MSG
     return true;
 }
@@ -146,6 +159,12 @@ bool LvglParameterView::onEvent(const Event& event) {
     if (event.getType() == UIDisplayEvents::UIParameterUpdate) {
         const UIParameterUpdateEvent& uiEvent = static_cast<const UIParameterUpdateEvent&>(event);
         return handleUIParameterUpdateEvent(uiEvent);
+    }
+    
+    // Gérer les événements de boutons (high priority)
+    if (event.getType() == EventTypes::HighPriorityButtonPress) {
+        handleButtonEvent(event);
+        return false;  // NE PAS marquer comme "handled" pour permettre à d'autres de le traiter
     }
 
     return false;  // Événement non traité
@@ -253,25 +272,17 @@ void LvglParameterView::cleanupLvglObjects() {
 //=============================================================================
 
 void LvglParameterView::subscribeToEvents() {
-    EventBus& eventBus = EventBus::getInstance();
-    // S'abonner aux événements UI batchés au lieu des MIDI bruts
-    event_subscription_id_ = eventBus.subscribe(this, 100);  // Haute priorité pour l'UI
-
-    if (event_subscription_id_ > 0) {
-        // TODO DEBUG MSG
-    } else {
-        // TODO DEBUG MSG
+    if (!eventBus_) {
+        return;
     }
+    
+    // S'abonner avec HAUTE PRIORITÉ pour recevoir les événements HighPriorityButtonPress
+    event_subscription_id_ = eventBus_->subscribeHigh(this);
 }
 
 void LvglParameterView::unsubscribeFromEvents() {
-    if (event_subscription_id_ > 0) {
-        EventBus& eventBus = EventBus::getInstance();
-        if (eventBus.unsubscribe(event_subscription_id_)) {
-            // TODO DEBUG MSG
-        } else {
-            // TODO DEBUG MSG
-        }
+    if (event_subscription_id_ > 0 && eventBus_) {
+        eventBus_->unsubscribe(event_subscription_id_);
         event_subscription_id_ = 0;
     }
 }
@@ -307,7 +318,7 @@ std::vector<LvglParameterView::MidiControlInfo> LvglParameterView::extractMidiCo
     std::vector<MidiControlInfo> midiControls;
     
     if (!config_) {
-        // TODO DEBUG MSG
+        Serial.println("[DEBUG] No config, using fallback MIDI controls");
         // Fallback vers la configuration par défaut
         for (uint8_t i = 0; i < 8; i++) {
             MidiControlInfo info;
@@ -322,36 +333,48 @@ std::vector<LvglParameterView::MidiControlInfo> LvglParameterView::extractMidiCo
     
     // Obtenir tous les contrôles depuis la configuration
     auto allControls = config_->getAllControls();
+    Serial.printf("[DEBUG] Extracting MIDI controls from %d total controls\n", allControls.size());
     
     for (const auto& control : allControls) {
         // Chercher les mappings MIDI pour ce contrôle
         auto midiMappings = control.getMappingsForRole(MappingRole::MIDI);
         
+        if (!midiMappings.empty()) {
+            Serial.printf("[DEBUG] Control %d (%s) has %d MIDI mappings\n", control.id, control.label.c_str(), midiMappings.size());
+        }
+        
         for (const auto& mapping : midiMappings) {
             if (std::holds_alternative<ControlDefinition::MidiConfig>(mapping.config)) {
                 auto midiConfig = std::get<ControlDefinition::MidiConfig>(mapping.config);
                 
-                // Ajouter tous les contrôles MIDI CC
-                MidiControlInfo info;
-                info.cc_number = midiConfig.control;
-                info.channel = midiConfig.channel; 
-                
-                // Gérer la concaténation des strings correctement
-                if (control.label.length() > 0) {
-                    info.name = control.label.c_str();
+                // FILTRE CRITIQUE : Ne prendre que les encodeurs (pas les boutons)
+                if (control.hardware.type == InputType::ENCODER) {
+                    // Ajouter seulement les contrôles MIDI des encodeurs
+                    MidiControlInfo info;
+                    info.cc_number = midiConfig.control;
+                    info.channel = midiConfig.channel; 
+                    
+                    // Gérer la concaténation des strings correctement
+                    if (control.label.length() > 0) {
+                        info.name = control.label.c_str();
+                    } else {
+                        info.name = "CC" + String(midiConfig.control);
+                    }
+                    
+                    info.control_id = control.id;
+                    midiControls.push_back(info);
+                    
+                    Serial.printf("[DEBUG] Added ENCODER MIDI control: ID=%d, CC=%d, CH=%d, Name=%s\n", 
+                                 info.control_id, info.cc_number, info.channel, info.name.c_str());
                 } else {
-                    info.name = "CC" + String(midiConfig.control);
+                    Serial.printf("[DEBUG] Skipped non-encoder MIDI control: ID=%d, Type=%d\n", 
+                                 control.id, static_cast<int>(control.hardware.type));
                 }
-                
-                info.control_id = control.id;
-                midiControls.push_back(info);
-                
-                // TODO DEBUG MSG
             }
         }
     }
     
-    // TODO DEBUG MSG
+    Serial.printf("[DEBUG] Extracted %d MIDI controls total\n", midiControls.size());
     
     return midiControls;
 }
@@ -425,4 +448,175 @@ ParameterWidget* LvglParameterView::getWidgetForCC(uint8_t cc_number) {
         return parameter_widgets_[index].get();
     }
     return nullptr;
+}
+
+//=============================================================================
+// Gestion des boutons
+//=============================================================================
+
+int8_t LvglParameterView::getWidgetIndexForButton(uint16_t button_id) const {
+    auto it = button_to_widget_mapping_.find(button_id);
+    if (it != button_to_widget_mapping_.end()) {
+        return static_cast<int8_t>(it->second);
+    }
+    return -1;
+}
+
+void LvglParameterView::setButtonState(uint16_t button_id, bool pressed, bool animate) {
+    // Trouver le widget parent pour ce bouton
+    ParameterWidget* widget = getWidgetForButton(button_id);
+    if (widget && widget->hasButtonIndicator()) {
+        widget->setButtonState(pressed, animate);
+    }
+}
+
+ParameterWidget* LvglParameterView::getWidgetForButton(uint16_t button_id) {
+    int8_t index = getWidgetIndexForButton(button_id);
+    if (index >= 0 && index < 8 && parameter_widgets_[index]) {
+        return parameter_widgets_[index].get();
+    }
+    return nullptr;
+}
+
+bool LvglParameterView::handleButtonEvent(const Event& event) {
+    // Cast vers HighPriorityButtonPressEvent
+    if (event.getType() == EventTypes::HighPriorityButtonPress) {
+        const auto& buttonEvent = static_cast<const HighPriorityButtonPressEvent&>(event);
+        
+        // Mettre à jour l'état du bouton
+        setButtonState(buttonEvent.buttonId, buttonEvent.pressed, true);
+        
+        return true;  // Événement traité
+    }
+    
+    return false;  // Événement non traité
+}
+
+void LvglParameterView::initializeButtonMappingFromConfig() {
+    // Nettoyer les mappings existants
+    button_to_widget_mapping_.clear();
+    standalone_buttons_.clear();
+    
+    // Extraire les informations sur tous les boutons
+    auto buttonInfos = extractButtonInfoFromConfig();
+    Serial.printf("[DEBUG] Found %d buttons in config\n", buttonInfos.size());
+    
+    // Créer les mappings pour les boutons avec parents (encodeurs)
+    for (const auto& info : buttonInfos) {
+        Serial.printf("[DEBUG] Button ID: %d, Parent: %d, Name: %s\n", info.button_id, info.parent_encoder_id, info.name.c_str());
+        
+        if (info.hasParent()) {
+            // Trouver le widget index de l'encodeur parent
+            uint16_t encoder_id = info.parent_encoder_id;
+            
+            // Chercher l'index du widget qui correspond à cet encodeur
+            // (basé sur le mapping CC->Widget existant)
+            auto midiControls = extractMidiControlsFromConfig();
+            for (size_t i = 0; i < std::min(midiControls.size(), static_cast<size_t>(8)); i++) {
+                if (midiControls[i].control_id == encoder_id) {
+                    button_to_widget_mapping_[info.button_id] = i;
+                    Serial.printf("[DEBUG] Mapped button %d to widget %d (encoder %d)\n", info.button_id, i, encoder_id);
+                    break;
+                }
+            }
+        } else {
+            // Bouton indépendant - l'ajouter à la liste des standalone
+            standalone_buttons_.push_back(info);
+            Serial.printf("[DEBUG] Standalone button: %d\n", info.button_id);
+        }
+    }
+    
+    Serial.printf("[DEBUG] Total button mappings: %d\n", button_to_widget_mapping_.size());
+}
+
+void LvglParameterView::setupButtonIndicators() {
+    // Ajouter des indicateurs aux widgets qui ont des boutons enfants
+    for (const auto& mapping : button_to_widget_mapping_) {
+        uint8_t widget_index = mapping.second;
+        
+        if (widget_index < 8 && parameter_widgets_[widget_index]) {
+            // Ajouter un indicateur de bouton à ce widget
+            parameter_widgets_[widget_index]->addButtonIndicator(12);  // Taille 12px
+        }
+    }
+    
+    // TODO: Créer des widgets séparés pour les boutons indépendants
+    // Pour l'instant, on se concentre sur les boutons d'encodeurs
+}
+
+std::vector<LvglParameterView::ButtonInfo> LvglParameterView::extractButtonInfoFromConfig() {
+    std::vector<ButtonInfo> buttonInfos;
+    
+    if (!config_) {
+        Serial.println("[DEBUG] No config available, using fallback");
+        return buttonInfos;
+    }
+    
+    // Obtenir tous les contrôles depuis la configuration
+    auto allControls = config_->getAllControls();
+    Serial.printf("[DEBUG] Found %d total controls in config\n", allControls.size());
+    
+    for (const auto& control : allControls) {
+        if (control.hardware.type == InputType::BUTTON && control.enabled) {
+            ButtonInfo info;
+            info.button_id = control.id;
+            info.name = control.label.length() > 0 ? String(control.label.c_str()) : ("BTN" + String(control.id));
+            
+            // Déterminer si ce bouton a un parent encodeur
+            if (control.parentId.has_value()) {
+                info.parent_encoder_id = control.parentId.value();
+                Serial.printf("[DEBUG] Found button %d with parent %d\n", info.button_id, info.parent_encoder_id);
+            } else {
+                info.parent_encoder_id = 0;  // Pas de parent
+                Serial.printf("[DEBUG] Found standalone button %d\n", info.button_id);
+            }
+            
+            buttonInfos.push_back(info);
+        }
+        
+        // Vérifier aussi les boutons intégrés aux encodeurs
+        if (control.hardware.type == InputType::ENCODER && control.enabled) {
+            if (control.hardware.encoderButtonPin.has_value()) {
+                ButtonInfo info;
+                info.button_id = control.getEncoderButtonId();  // ID encodeur + 1000
+                info.parent_encoder_id = control.id;  // L'encodeur est le parent
+                info.name = String(control.label.c_str()) + " BTN";
+                
+                Serial.printf("[DEBUG] Found integrated encoder button %d for encoder %d\n", info.button_id, info.parent_encoder_id);
+                buttonInfos.push_back(info);
+            }
+        }
+    }
+    
+    Serial.printf("[DEBUG] Extracted %d button infos from config\n", buttonInfos.size());
+    return buttonInfos;
+}
+
+void LvglParameterView::finalizeButtonIndicatorPositions() {
+    // Ré-appliquer les positions et tailles après que LVGL ait fini l'initialisation
+    for (const auto& mapping : button_to_widget_mapping_) {
+        uint8_t widget_index = mapping.second;
+        
+        if (widget_index < 8 && parameter_widgets_[widget_index]) {
+            ParameterWidget* widget = parameter_widgets_[widget_index].get();
+            if (widget && widget->hasButtonIndicator()) {
+                ButtonIndicator* indicator = widget->getButtonIndicator();
+                if (indicator && indicator->getLedObject()) {
+                    lv_obj_t* led = indicator->getLedObject();
+                    
+                    // Forcer la taille à nouveau
+                    lv_obj_set_size(led, 12, 12);
+                    
+                    // Centrer la LED sur son parent (arc)
+                    lv_obj_center(led);
+                    
+                    // Forcer au premier plan
+                    lv_obj_move_foreground(led);
+                    
+                    // Invalider pour redraw
+                    lv_obj_invalidate(led);
+                }
+            }
+        }
+    }
 }

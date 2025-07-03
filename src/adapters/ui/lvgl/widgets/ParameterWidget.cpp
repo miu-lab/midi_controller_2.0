@@ -1,5 +1,6 @@
 #include "ParameterWidget.hpp"
 #include "adapters/ui/lvgl/theme/UITheme.hpp"
+#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
 #include "core/utils/FlashStrings.hpp"
 
 
@@ -23,7 +24,8 @@ ParameterWidget::ParameterWidget(lv_obj_t* parent, const UITheme& theme,
       arc_(nullptr),
       cc_label_(nullptr),
       channel_label_(nullptr),
-      name_label_(nullptr) {
+      name_label_(nullptr),
+      button_indicator_(nullptr) {
     
 
     createLvglObjects();
@@ -48,7 +50,8 @@ ParameterWidget::ParameterWidget(lv_obj_t* parent,
       arc_(nullptr),
       cc_label_(nullptr),
       channel_label_(nullptr),
-      name_label_(nullptr) {
+      name_label_(nullptr),
+      button_indicator_(nullptr) {
     
     createLvglObjects();
     setupLegacyStyles();
@@ -267,5 +270,77 @@ void ParameterWidget::setupLegacyStyles() {
         lv_obj_set_style_text_font(name_label_, &lv_font_montserrat_10, 0);
         lv_obj_set_style_text_align(name_label_, LV_TEXT_ALIGN_CENTER, 0);
     }
+}
+
+//=============================================================================
+// Gestion ButtonIndicator
+//=============================================================================
+
+bool ParameterWidget::addButtonIndicator(lv_coord_t size) {
+    // Ne pas créer un indicateur s'il existe déjà
+    if (button_indicator_) {
+        return true;
+    }
+    
+    // Vérifier que le container existe
+    if (!container_) {
+        return false;
+    }
+    
+    // CHANGEMENT CRUCIAL : Créer l'indicateur comme enfant de l'ARC au lieu du container
+    if (theme_) {
+        button_indicator_ = std::make_unique<ButtonIndicator>(arc_, *theme_, size);
+    } else {
+        button_indicator_ = std::make_unique<ButtonIndicator>(arc_, size);
+    }
+    
+    // Vérifier que la création a réussi
+    if (!button_indicator_) {
+        return false;
+    }
+    
+    // Positionner l'indicateur
+    positionButtonIndicator();
+    
+    return true;
+}
+
+void ParameterWidget::removeButtonIndicator() {
+    button_indicator_.reset();
+}
+
+bool ParameterWidget::hasButtonIndicator() const {
+    return button_indicator_ != nullptr;
+}
+
+void ParameterWidget::setButtonState(bool pressed, bool animate) {
+    if (button_indicator_) {
+        ButtonIndicator::State state = pressed ? ButtonIndicator::State::PRESSED : ButtonIndicator::State::OFF;
+        button_indicator_->setState(state, animate);
+    }
+}
+
+ButtonIndicator* ParameterWidget::getButtonIndicator() const {
+    return button_indicator_.get();
+}
+
+void ParameterWidget::positionButtonIndicator() {
+    if (!button_indicator_ || !arc_) {
+        return;
+    }
+    
+    lv_obj_t* led_obj = button_indicator_->getLedObject();
+    if (!led_obj) {
+        return;
+    }
+    
+    // S'assurer que l'indicateur est visible
+    button_indicator_->setVisible(true);
+    
+    // Centrer la LED directement sur l'arc (parent)
+    lv_obj_center(led_obj);
+    
+    // Mettre la LED au premier plan
+    lv_obj_move_foreground(led_obj);
 }
 

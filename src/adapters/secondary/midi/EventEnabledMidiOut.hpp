@@ -20,9 +20,6 @@ public:
      * @param basePort Port MIDI de base à décorer
      */
     explicit EventEnabledMidiOut(MidiOutputPort& basePort) : m_basePort(basePort) {
-        char buffer[64];
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_EVENT_ENABLED_MIDI_OUT);
-        Serial.println(buffer);
     }
     
     /**
@@ -39,40 +36,6 @@ public:
      * @param source Identifiant de la source du message (encodeur, bouton, etc.)
      */
     void sendCc(MidiChannel ch, MidiCC cc, uint8_t value, uint8_t source = 0) {
-        // Log de débogage compact
-        char buffer[64];
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_SENDING_CC);
-        Serial.print(F("\n"));
-        Serial.println(buffer);
-        Serial.println();
-        
-        // Utiliser le format compact pour le débogage MIDI
-        char labelBuffer[8];
-        
-        // Source ID
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_FMT);
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_SRC);
-        Serial.printf(buffer, labelBuffer, source);
-        Serial.println();
-        
-        // Channel
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_CH);
-        Serial.printf(buffer, labelBuffer, ch);
-        Serial.println();
-        
-        // CC
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_CC);
-        Serial.printf(buffer, labelBuffer, cc);
-        Serial.println();
-        
-        // Value
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_VAL);
-        Serial.printf(buffer, labelBuffer, value);
-        Serial.println();
-        // Utiliser le séparateur optimisé
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_SEPARATOR);
-        Serial.println(buffer);
-        Serial.println("\n");
 
         // Envoyer le message MIDI via le port de base
         m_basePort.sendControlChange(ch, cc, value);
@@ -100,39 +63,6 @@ public:
      * @param source Identifiant de la source du message
      */
     void sendNoteOn(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
-        // Log de débogage compact
-        char buffer[64];
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_SENDING_CC); // Réutiliser la même chaîne
-        Serial.print(F("\n"));
-        Serial.println(buffer);
-        Serial.println();
-        
-        // Utiliser le format compact pour le débogage MIDI
-        char labelBuffer[8];
-        
-        // Source ID
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_FMT);
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_SRC);
-        Serial.printf(buffer, labelBuffer, source);
-        Serial.println();
-        
-        // Channel
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_CH);
-        Serial.printf(buffer, labelBuffer, ch);
-        Serial.println();
-        
-        // Note
-        Serial.print(F("Note:"));
-        Serial.println(note);
-        
-        // Velocity
-        Serial.print(F("Vel:"));
-        Serial.println(velocity);
-        
-        // Utiliser le séparateur optimisé
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_SEPARATOR);
-        Serial.println(buffer);
-        Serial.println("\n");
 
         // Envoyer le message MIDI via le port de base
         m_basePort.sendNoteOn(ch, note, velocity);
@@ -160,40 +90,7 @@ public:
      * @param source Identifiant de la source du message
      */
     void sendNoteOff(MidiChannel ch, MidiNote note, uint8_t velocity, uint8_t source = 0) {
-        // Log de débogage compact
-        char buffer[64];
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_SENDING_CC); // Réutiliser la même chaîne
-        Serial.print(F("\n"));
-        Serial.println(buffer);
-        Serial.println();
         
-        // Utiliser le format compact pour le débogage MIDI
-        char labelBuffer[8];
-        
-        // Source ID
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_FMT);
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_SRC);
-        Serial.printf(buffer, labelBuffer, source);
-        Serial.println();
-        
-        // Channel
-        FlashStrings::copy(labelBuffer, sizeof(labelBuffer), DBG_CH);
-        Serial.printf(buffer, labelBuffer, ch);
-        Serial.println();
-        
-        // Note
-        Serial.print(F("Note:"));
-        Serial.println(note);
-        
-        // Velocity
-        Serial.print(F("Vel:"));
-        Serial.println(velocity);
-        
-        // Utiliser le séparateur optimisé
-        FlashStrings::copy(buffer, sizeof(buffer), DBG_SEPARATOR);
-        Serial.println(buffer);
-        Serial.println("\n");
-
         // Envoyer le message MIDI via le port de base
         m_basePort.sendNoteOff(ch, note, velocity);
 

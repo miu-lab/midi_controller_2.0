@@ -1,20 +1,13 @@
 #pragma once
 
-#include "config/common/CommonIncludes.hpp"
 #include "core/domain/events/core/Event.hpp"
+#include "core/domain/events/core/EventTypes.hpp"
 #include <vector>
+#include <atomic>
+#include <algorithm>
 
 // Identifiant d'abonnement
 using SubscriptionId = uint16_t;
-
-// Nombre initial et maximum d'abonnements (configurable)
-#ifndef INITIAL_EVENT_LISTENERS
-#define INITIAL_EVENT_LISTENERS 8
-#endif
-
-#ifndef MAX_EVENT_LISTENERS
-#define MAX_EVENT_LISTENERS 24
-#endif
 
 /**
  * @brief Classe de base pour les écouteurs d'événements
@@ -32,18 +25,17 @@ public:
 };
 
 /**
- * @brief Structure compacte pour stocker les informations d'abonnement
- * Optimisée pour l'utilisation de la mémoire
+ * @brief Niveau de priorité pour les écouteurs d'événements
  */
-struct Subscription {
-    EventListener* listener;  // Pointeur vers l'écouteur
-    SubscriptionId id;        // ID d'abonnement
-    uint8_t priority;         // Priorité (0-255)
-    bool active;              // État actif/inactif
+enum class EventPriority : uint8_t {
+    PRIORITY_HIGH = 0,    // Haute priorité (chemin critique MIDI)
+    PRIORITY_NORMAL = 1,  // Priorité normale
+    PRIORITY_LOW = 2      // Basse priorité
 };
 
 /**
- * @brief Bus d'événements optimisé pour l'embarqué avec allocation dynamique
+ * @brief Bus d'événements unifié - Architecture simplifiée
+ * Combine EventBus et OptimizedEventBus en une seule classe moderne
  */
 class EventBus {
 public:
@@ -59,40 +51,63 @@ public:
     /**
      * @brief Destructeur
      */
-    ~EventBus() {
-        // Le vecteur subscriptions_ sera automatiquement libéré
+    ~EventBus() = default;
+    
+    /**
+     * @brief S'abonne au bus d'événements avec priorité
+     * @param listener Écouteur d'événements
+     * @param priority Niveau de priorité
+     * @return Identifiant d'abonnement, 0 si échec
+     */
+    SubscriptionId subscribe(EventListener* listener, EventPriority priority = EventPriority::PRIORITY_NORMAL) {
+        if (!listener) {
+            return 0;
+        }
+        
+        Subscription sub;
+        sub.listener = listener;
+        sub.id = nextId_++;
+        sub.priority = priority;
+        sub.active = true;
+        
+        subscriptions_.push_back(sub);
+        
+        // Trier par priorité pour optimiser la publication
+        sortByPriority();
+        
+        return sub.id;
     }
     
     /**
-     * @brief S'abonne au bus d'événements
+     * @brief API de compatibilité avec l'ancien EventBus
      * @param listener Écouteur d'événements
-     * @param priority Priorité (0-255, plus élevé = plus prioritaire)
-     * @return Identifiant d'abonnement, 0 si échec
+     * @param priority Priorité numérique (0-255)
+     * @return Identifiant d'abonnement
      */
-    SubscriptionId subscribe(EventListener* listener, uint8_t priority = 0) {
-        if (!listener) {
-            return 0;  // Listener invalide
+    SubscriptionId subscribe(EventListener* listener, uint8_t priority) {
+        EventPriority eventPriority = EventPriority::PRIORITY_NORMAL;
+        if (priority >= 200) {
+            eventPriority = EventPriority::PRIORITY_HIGH;
+        } else if (priority < 50) {
+            eventPriority = EventPriority::PRIORITY_LOW;
         }
         
-        // Vérifier si on a atteint la limite maximale
-        if (subscriptions_.size() >= MAX_EVENT_LISTENERS) {
-            return 0;  // Trop d'abonnements
-        }
-        
-        // Créer un nouvel abonnement
-        Subscription newSubscription;
-        newSubscription.listener = listener;
-        newSubscription.priority = priority;
-        newSubscription.id = nextId_;
-        newSubscription.active = true;
-        
-        // Ajouter l'abonnement au vecteur
-        subscriptions_.push_back(newSubscription);
-        
-        // Trier par priorité pour que les plus prioritaires soient traités en premier
-        sortByPriority();
-        
-        return nextId_++;  // Retourner l'ID actuel et incrémenter pour le prochain
+        return subscribe(listener, eventPriority);
+    }
+    
+    /**
+     * @brief Méthodes utilitaires pour un usage simplifié
+     */
+    SubscriptionId subscribeHigh(EventListener* listener) {
+        return subscribe(listener, EventPriority::PRIORITY_HIGH);
+    }
+    
+    SubscriptionId subscribeNormal(EventListener* listener) {
+        return subscribe(listener, EventPriority::PRIORITY_NORMAL);
+    }
+    
+    SubscriptionId subscribeLow(EventListener* listener) {
+        return subscribe(listener, EventPriority::PRIORITY_LOW);
     }
     
     /**
@@ -101,14 +116,15 @@ public:
      * @return true si désabonnement réussi, false sinon
      */
     bool unsubscribe(SubscriptionId id) {
-        int index = findSubscriptionIndex(id);
-        if (index >= 0) {
-            // Supprimer l'élément à l'index spécifié
-            subscriptions_.erase(subscriptions_.begin() + index);
+        auto it = std::find_if(subscriptions_.begin(), subscriptions_.end(),
+                              [id](const Subscription& sub) { return sub.id == id; });
+        
+        if (it != subscriptions_.end()) {
+            subscriptions_.erase(it);
             return true;
         }
         
-        return false;  // ID non trouvé
+        return false;
     }
     
     /**
@@ -117,13 +133,7 @@ public:
      * @return true si mise en pause réussie, false sinon
      */
     bool pause(SubscriptionId id) {
-        int index = findSubscriptionIndex(id);
-        if (index >= 0) {
-            subscriptions_[index].active = false;
-            return true;
-        }
-        
-        return false;  // ID non trouvé
+        return setSubscriptionActive(id, false);
     }
     
     /**
@@ -132,13 +142,7 @@ public:
      * @return true si reprise réussie, false sinon
      */
     bool resume(SubscriptionId id) {
-        int index = findSubscriptionIndex(id);
-        if (index >= 0) {
-            subscriptions_[index].active = true;
-            return true;
-        }
-        
-        return false;  // ID non trouvé
+        return setSubscriptionActive(id, true);
     }
     
     /**
@@ -147,11 +151,10 @@ public:
      * @return true si au moins un abonné a traité l'événement, false sinon
      */
     bool publish(Event& event) {
-
         bool handled = false;
         
-        // Parcourir tous les abonnements (déjà triés par priorité)
-        for (const auto& subscription : subscriptions_) {
+        // Traiter tous les abonnements (déjà triés par priorité)
+        for (auto& subscription : subscriptions_) {
             if (subscription.active && subscription.listener) {
                 if (subscription.listener->onEvent(event)) {
                     handled = true;
@@ -165,13 +168,20 @@ public:
             }
         }
         
+        // Incrémenter les compteurs de performance pour les événements haute priorité
+        if (event.getType() >= EventTypes::HighPriorityEncoderChanged && 
+            event.getType() <= EventTypes::HighPriorityButtonPress) {
+            uint8_t index = event.getType() - EventTypes::HighPriorityEncoderChanged;
+            if (index < eventCounters_.size()) {
+                eventCounters_[index].fetch_add(1, std::memory_order_relaxed);
+            }
+        }
+        
         return handled;
     }
     
     /**
-     * @brief Publie un événement à tous les abonnés actifs
-     * @param event Événement à publier
-     * @return true si au moins un abonné a traité l'événement, false sinon
+     * @brief Surcharge pour pointeur
      */
     bool publish(Event* event) {
         if (event) {
@@ -185,9 +195,6 @@ public:
      */
     void clear() {
         subscriptions_.clear();
-        
-        // Remettre à la capacité initiale
-        subscriptions_.reserve(INITIAL_EVENT_LISTENERS);
     }
     
     /**
@@ -196,7 +203,8 @@ public:
      * @return true si l'abonnement existe, false sinon
      */
     bool exists(SubscriptionId id) const {
-        return findSubscriptionIndex(id) >= 0;
+        return std::any_of(subscriptions_.begin(), subscriptions_.end(),
+                          [id](const Subscription& sub) { return sub.id == id; });
     }
     
     /**
@@ -205,8 +213,10 @@ public:
      * @return true si l'abonnement est actif, false sinon
      */
     bool isActive(SubscriptionId id) const {
-        int index = findSubscriptionIndex(id);
-        return (index >= 0) ? subscriptions_[index].active : false;
+        auto it = std::find_if(subscriptions_.begin(), subscriptions_.end(),
+                              [id](const Subscription& sub) { return sub.id == id; });
+        
+        return (it != subscriptions_.end()) ? it->active : false;
     }
     
     /**
@@ -218,48 +228,92 @@ public:
     }
     
     /**
-     * @brief Obtient la capacité actuelle du tableau
-     * @return Capacité du tableau
+     * @brief Obtient la capacité actuelle du vecteur
+     * @return Capacité du vecteur
      */
     int getCapacity() const {
         return subscriptions_.capacity();
     }
+    
+    /**
+     * @brief Obtient les statistiques de traitement d'événements
+     * @param eventType Type d'événement haute priorité
+     * @return Nombre d'événements traités de ce type
+     */
+    uint32_t getEventProcessingCount(EventType eventType) const {
+        if (eventType >= EventTypes::HighPriorityEncoderChanged && 
+            eventType <= EventTypes::HighPriorityButtonPress) {
+            uint8_t index = eventType - EventTypes::HighPriorityEncoderChanged;
+            if (index < eventCounters_.size()) {
+                return eventCounters_[index].load(std::memory_order_relaxed);
+            }
+        }
+        return 0;
+    }
+    
+    /**
+     * @brief Réinitialise les compteurs de traitement d'événements
+     */
+    void resetEventProcessingCounters() {
+        for (auto& counter : eventCounters_) {
+            counter.store(0, std::memory_order_relaxed);
+        }
+    }
 
 private:
     /**
-     * @brief Recherche l'index d'un abonnement par son ID
-     * @param id Identifiant d'abonnement à rechercher
-     * @return Index de l'abonnement, ou -1 si non trouvé
+     * @brief Structure compacte pour stocker les informations d'abonnement
      */
-    int findSubscriptionIndex(SubscriptionId id) const {
-        // Pour de petits tableaux, une recherche linéaire est souvent plus efficace
-        for (size_t i = 0; i < subscriptions_.size(); i++) {
-            if (subscriptions_[i].id == id) {
-                return static_cast<int>(i);
-            }
-        }
-        return -1; // Non trouvé
-    }
-    
-    /**
-     * @brief Trie les abonnements par priorité
-     */
-    void sortByPriority() {
-        std::sort(subscriptions_.begin(), subscriptions_.end(), [](const Subscription& a, const Subscription& b) {
-            return a.priority > b.priority; // Plus grande priorité en premier
-        });
-    }
+    struct Subscription {
+        EventListener* listener;
+        SubscriptionId id;
+        EventPriority priority;
+        bool active;
+    };
     
     // Constructeur privé (singleton)
     EventBus() : nextId_(1) {
-        // Initialiser avec la capacité de départ
-        subscriptions_.reserve(INITIAL_EVENT_LISTENERS);
+        // Réserver de l'espace pour éviter les réallocations fréquentes
+        subscriptions_.reserve(24);
+        
+        // Initialiser les compteurs
+        for (auto& counter : eventCounters_) {
+            counter.store(0, std::memory_order_relaxed);
+        }
     }
     
     // Empêcher la copie
     EventBus(const EventBus&) = delete;
     EventBus& operator=(const EventBus&) = delete;
     
-    std::vector<Subscription> subscriptions_;  // Vecteur des abonnements
-    SubscriptionId nextId_;       // Prochain ID d'abonnement
+    /**
+     * @brief Trie les abonnements par priorité
+     */
+    void sortByPriority() {
+        std::sort(subscriptions_.begin(), subscriptions_.end(),
+                 [](const Subscription& a, const Subscription& b) {
+                     return static_cast<uint8_t>(a.priority) < static_cast<uint8_t>(b.priority);
+                 });
+    }
+    
+    /**
+     * @brief Active/désactive un abonnement
+     */
+    bool setSubscriptionActive(SubscriptionId id, bool active) {
+        auto it = std::find_if(subscriptions_.begin(), subscriptions_.end(),
+                              [id](const Subscription& sub) { return sub.id == id; });
+        
+        if (it != subscriptions_.end()) {
+            it->active = active;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    std::vector<Subscription> subscriptions_;
+    SubscriptionId nextId_;
+    
+    // Compteurs atomiques pour le suivi des événements traités (diagnostics)
+    std::array<std::atomic<uint32_t>, 3> eventCounters_; // Un compteur par type d'événement haute priorité
 };

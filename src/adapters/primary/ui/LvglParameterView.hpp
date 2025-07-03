@@ -2,12 +2,14 @@
 
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
+#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/UIEvent.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
 #include <memory>
 #include <array>
+#include <map>
 #include <lvgl.h>
 
 /**
@@ -25,9 +27,11 @@ public:
      * @brief Constructeur
      * @param bridge Bridge LVGL vers hardware
      * @param config Configuration unifiée pour accéder aux mappings MIDI
+     * @param eventBus Bus d'événements optimisé pour recevoir les événements boutons
      */
     explicit LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge,
-                              std::shared_ptr<UnifiedConfiguration> config);
+                              std::shared_ptr<UnifiedConfiguration> config,
+                              std::shared_ptr<EventBus> eventBus);
 
     /**
      * @brief Destructeur
@@ -74,6 +78,30 @@ public:
      */
     ParameterWidget* getWidgetForCC(uint8_t cc_number);
 
+    // === GESTION DES BOUTONS ===
+    
+    /**
+     * @brief Obtient l'index du widget pour un bouton donné (bouton enfant d'encodeur)
+     * @param button_id ID du bouton
+     * @return Index du widget parent (0-7) ou -1 si non mappé
+     */
+    int8_t getWidgetIndexForButton(uint16_t button_id) const;
+    
+    /**
+     * @brief Met à jour l'état d'un bouton associé à un encodeur
+     * @param button_id ID du bouton
+     * @param pressed État du bouton
+     * @param animate Utiliser animation
+     */
+    void setButtonState(uint16_t button_id, bool pressed, bool animate = true);
+    
+    /**
+     * @brief Obtient le widget parent pour un bouton donné
+     * @param button_id ID du bouton
+     * @return Pointeur vers le widget parent ou nullptr si non mappé
+     */
+    ParameterWidget* getWidgetForButton(uint16_t button_id);
+
     // === INTERFACE EVENT LISTENER ===
     
     /**
@@ -86,6 +114,7 @@ public:
 private:
     std::shared_ptr<Ili9341LvglBridge> bridge_;
     std::shared_ptr<UnifiedConfiguration> config_;
+    std::shared_ptr<EventBus> eventBus_;
     
     // Container grille et widgets
     lv_obj_t* grid_container_;
@@ -103,6 +132,20 @@ private:
     
     // Configuration des widgets (CC 1-8 mappés aux widgets 0-7)
     // Le mapping est géré dans le .cpp avec un tableau statique
+    
+    // Mapping des boutons vers les widgets parents (pour boutons d'encodeurs)
+    std::map<uint16_t, uint8_t> button_to_widget_mapping_;  // button_id -> widget_index
+    
+    // Structure pour les infos des boutons (déplacée ici pour être accessible)
+    struct ButtonInfo {
+        uint16_t button_id;
+        uint16_t parent_encoder_id;  // 0 si bouton indépendant
+        String name;
+        bool hasParent() const { return parent_encoder_id != 0; }
+    };
+    
+    // Liste des boutons indépendants (qui n'ont pas de parent encodeur)
+    std::vector<ButtonInfo> standalone_buttons_;
     
     // Méthodes privées
     void setupMainScreen();
@@ -127,4 +170,11 @@ private:
     void subscribeToEvents();
     void unsubscribeFromEvents();
     bool handleUIParameterUpdateEvent(const UIParameterUpdateEvent& event);
+    bool handleButtonEvent(const Event& event);
+    
+    // Gestion des boutons
+    void initializeButtonMappingFromConfig();
+    void setupButtonIndicators();
+    void finalizeButtonIndicatorPositions();
+    std::vector<ButtonInfo> extractButtonInfoFromConfig();
 };
