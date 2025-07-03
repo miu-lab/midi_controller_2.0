@@ -1,13 +1,24 @@
 #include <Arduino.h>
 #include <unity.h>
 
-// Fonctions setUp/tearDown requises par Unity
+// Déclarations des tests
+extern void test_init_with_missing_application_configuration();
+extern void test_init_with_existing_application_configuration();
+extern void test_control_access_after_init();
+extern void test_default_configuration_properties();
+extern void test_navigation_functions();
+
+// Fonctions setUp/tearDown par défaut pour Unity
+// Note: les tests spécifiques peuvent redéfinir ces fonctions
+void setUp(void) __attribute__((weak));
+void tearDown(void) __attribute__((weak));
+
 void setUp(void) {
-    // Configuration avant chaque test
+    // Configuration par défaut avant chaque test
 }
 
 void tearDown(void) {
-    // Nettoyage après chaque test
+    // Nettoyage par défaut après chaque test
 }
 
 // Test dummy pour vérifier que le framework Unity fonctionne
@@ -33,6 +44,13 @@ int main() {
     // Tests basiques pour valider le framework
     RUN_TEST(test_unity_framework);
     RUN_TEST(test_basic_compilation);
+    
+    // Tests ConfigurationSubsystem
+    RUN_TEST(test_init_with_missing_application_configuration);
+    RUN_TEST(test_init_with_existing_application_configuration);
+    RUN_TEST(test_control_access_after_init);
+    RUN_TEST(test_default_configuration_properties);
+    RUN_TEST(test_navigation_functions);
     
     UNITY_END();
     
