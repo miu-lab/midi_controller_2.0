@@ -2,20 +2,15 @@
 
 #include <Arduino.h>
 
-#include <algorithm>
-#include <set>
-
 #include "config/ConfigDefaults.hpp"
-
-#include "config/unified/UnifiedConfiguration.hpp"
 #include "core/configuration/ConfigurationLoader.hpp"
 #include "core/configuration/ConfigurationService.hpp"
-#include "core/utils/Error.hpp"
 
 ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
     navService_ = std::make_shared<NavigationConfigService>();
     configLoader_ = std::make_unique<ConfigurationLoader>();
+    configRegistry_ = std::make_unique<ConfigurationRegistry>(container);
     // configService_ will be initialized after config_ is set
 }
 
@@ -37,21 +32,18 @@ Result<bool> ConfigurationSubsystem::init() {
     // Initialiser le service de configuration avec la config chargée
     configService_ = std::make_unique<ConfigurationService>(config_);
 
-    // Enregistrer ce sous-système comme implémentation de IConfiguration
-    container_->registerImplementation<IConfiguration, ConfigurationSubsystem>(
-        std::shared_ptr<ConfigurationSubsystem>(this, [](ConfigurationSubsystem*) {
+    // Utiliser ConfigurationRegistry pour enregistrer les dépendances
+    if (configRegistry_) {
+        auto thisPtr = std::shared_ptr<ConfigurationSubsystem>(this, [](ConfigurationSubsystem*) {
             // Ne rien faire lors de la destruction (le conteneur ne possède pas cet objet)
-        }));
-
-    // Enregistrer UnifiedConfiguration pour l'accès direct
-    if (config_) {
-        auto unifiedConfigPtr = std::shared_ptr<UnifiedConfiguration>(
-            const_cast<UnifiedConfiguration*>(&config_->getUnifiedConfiguration()),
-            [](UnifiedConfiguration*) {
-                // Custom deleter qui ne fait rien car on ne possède pas l'objet
-            });
-        container_->registerDependency<UnifiedConfiguration>(unifiedConfigPtr);
-        // TODO DEBUG MSG
+        });
+        
+        configRegistry_->registerConfigurationSubsystem(
+            std::static_pointer_cast<void>(thisPtr));
+        
+        if (config_) {
+            configRegistry_->registerUnifiedConfiguration(config_);
+        }
     }
 
     return Result<bool>::success(true);

@@ -60,6 +60,14 @@ extern void test_config_service_validate_all_configurations_valid();
 extern void test_config_service_validate_all_configurations_empty();
 extern void test_config_service_set_application_configuration();
 
+// Tests ConfigurationRegistry
+extern void test_config_registry_register_subsystem_valid();
+extern void test_config_registry_register_subsystem_null();
+extern void test_config_registry_register_unified_config_valid();
+extern void test_config_registry_register_unified_config_null();
+extern void test_config_registry_with_null_container();
+extern void test_config_registry_multiple_registrations();
+
 // Fonctions setUp/tearDown par défaut pour Unity
 // Note: les tests spécifiques peuvent redéfinir ces fonctions
 void setUp(void) __attribute__((weak));
@@ -155,6 +163,14 @@ int main() {
     RUN_TEST(test_config_service_validate_all_configurations_valid);
     RUN_TEST(test_config_service_validate_all_configurations_empty);
     RUN_TEST(test_config_service_set_application_configuration);
+    
+    // Tests ConfigurationRegistry
+    RUN_TEST(test_config_registry_register_subsystem_valid);
+    RUN_TEST(test_config_registry_register_subsystem_null);
+    RUN_TEST(test_config_registry_register_unified_config_valid);
+    RUN_TEST(test_config_registry_register_unified_config_null);
+    RUN_TEST(test_config_registry_with_null_container);
+    RUN_TEST(test_config_registry_multiple_registrations);
     
     UNITY_END();
     
