@@ -47,6 +47,19 @@ extern void test_config_loader_validate_after_valid_loading();
 extern void test_config_loader_complete_load_and_validate_sequence();
 extern void test_config_loader_multiple_load_operations();
 
+// Tests ConfigurationService
+extern void test_config_service_get_all_control_definitions_minimal();
+extern void test_config_service_get_by_type_encoders();
+extern void test_config_service_get_by_type_buttons();
+extern void test_config_service_get_by_id_existing();
+extern void test_config_service_get_by_id_non_existing();
+extern void test_config_service_get_by_group();
+extern void test_config_service_get_available_groups();
+extern void test_config_service_get_input_count_by_type();
+extern void test_config_service_validate_all_configurations_valid();
+extern void test_config_service_validate_all_configurations_empty();
+extern void test_config_service_set_application_configuration();
+
 // Fonctions setUp/tearDown par défaut pour Unity
 // Note: les tests spécifiques peuvent redéfinir ces fonctions
 void setUp(void) __attribute__((weak));
@@ -129,6 +142,19 @@ int main() {
     RUN_TEST(test_config_loader_validate_after_valid_loading);
     RUN_TEST(test_config_loader_complete_load_and_validate_sequence);
     RUN_TEST(test_config_loader_multiple_load_operations);
+    
+    // Tests ConfigurationService
+    RUN_TEST(test_config_service_get_all_control_definitions_minimal);
+    RUN_TEST(test_config_service_get_by_type_encoders);
+    RUN_TEST(test_config_service_get_by_type_buttons);
+    RUN_TEST(test_config_service_get_by_id_existing);
+    RUN_TEST(test_config_service_get_by_id_non_existing);
+    RUN_TEST(test_config_service_get_by_group);
+    RUN_TEST(test_config_service_get_available_groups);
+    RUN_TEST(test_config_service_get_input_count_by_type);
+    RUN_TEST(test_config_service_validate_all_configurations_valid);
+    RUN_TEST(test_config_service_validate_all_configurations_empty);
+    RUN_TEST(test_config_service_set_application_configuration);
     
     UNITY_END();
     

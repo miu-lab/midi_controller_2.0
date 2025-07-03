@@ -10,6 +10,7 @@
 #include "config/ApplicationConfiguration.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/configuration/ConfigurationLoader.hpp"
+#include "core/configuration/ConfigurationService.hpp"
 #include "core/utils/Result.hpp"
 
 /**
@@ -50,6 +51,7 @@ private:
     std::shared_ptr<ApplicationConfiguration> config_;
     std::shared_ptr<NavigationConfigService> navService_;
     std::unique_ptr<IConfigurationLoader> configLoader_;
+    std::unique_ptr<IConfigurationService> configService_;
 
     Result<bool> loadUnifiedConfigurations();
 };

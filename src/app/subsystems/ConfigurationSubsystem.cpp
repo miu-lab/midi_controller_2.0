@@ -9,12 +9,14 @@
 
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/configuration/ConfigurationLoader.hpp"
+#include "core/configuration/ConfigurationService.hpp"
 #include "core/utils/Error.hpp"
 
 ConfigurationSubsystem::ConfigurationSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
     navService_ = std::make_shared<NavigationConfigService>();
     configLoader_ = std::make_unique<ConfigurationLoader>();
+    // configService_ will be initialized after config_ is set
 }
 
 Result<bool> ConfigurationSubsystem::init() {
@@ -31,6 +33,9 @@ Result<bool> ConfigurationSubsystem::init() {
     if (unifiedResult.isError()) {
         return unifiedResult;
     }
+
+    // Initialiser le service de configuration avec la config chargée
+    configService_ = std::make_unique<ConfigurationService>(config_);
 
     // Enregistrer ce sous-système comme implémentation de IConfiguration
     container_->registerImplementation<IConfiguration, ConfigurationSubsystem>(
@@ -53,9 +58,8 @@ Result<bool> ConfigurationSubsystem::init() {
 }
 
 const std::vector<ControlDefinition>& ConfigurationSubsystem::getAllControlDefinitions() const {
-    if (config_) {
-        const auto& unifiedConfig = config_->getUnifiedConfiguration();
-        return unifiedConfig.getAllControls();
+    if (configService_) {
+        return configService_->getAllControlDefinitions();
     }
     
     static std::vector<ControlDefinition> emptyControls;
@@ -63,44 +67,27 @@ const std::vector<ControlDefinition>& ConfigurationSubsystem::getAllControlDefin
 }
 
 std::vector<ControlDefinition> ConfigurationSubsystem::getControlDefinitionsByType(InputType type) const {
-    const auto& allControls = getAllControlDefinitions();
-    std::vector<ControlDefinition> filtered;
-    
-    for (const auto& control : allControls) {
-        if (control.hardware.type == type) {
-            filtered.push_back(control);
-        }
+    if (configService_) {
+        return configService_->getControlDefinitionsByType(type);
     }
     
-    return filtered;
+    return std::vector<ControlDefinition>();
 }
 
 std::optional<ControlDefinition> ConfigurationSubsystem::getControlDefinitionById(InputId id) const {
-    const auto& allControls = getAllControlDefinitions();
-    
-    auto it = std::find_if(allControls.begin(), allControls.end(),
-        [id](const ControlDefinition& control) {
-            return control.id == id;
-        });
-    
-    if (it != allControls.end()) {
-        return *it;
+    if (configService_) {
+        return configService_->getControlDefinitionById(id);
     }
     
     return std::nullopt;
 }
 
 std::vector<ControlDefinition> ConfigurationSubsystem::getControlDefinitionsByGroup(const std::string& group) const {
-    const auto& allControls = getAllControlDefinitions();
-    std::vector<ControlDefinition> filtered;
-    
-    for (const auto& control : allControls) {
-        if (control.group == group) {
-            filtered.push_back(control);
-        }
+    if (configService_) {
+        return configService_->getControlDefinitionsByGroup(group);
     }
     
-    return filtered;
+    return std::vector<ControlDefinition>();
 }
 
 // === MÉTHODES DE NAVIGATION ===
@@ -126,30 +113,27 @@ bool ConfigurationSubsystem::isHardwareInitEnabled() const {
 }
 
 bool ConfigurationSubsystem::validateAllConfigurations() const {
-    if (config_) {
-        const auto& unifiedConfig = config_->getUnifiedConfiguration();
-        return unifiedConfig.validate();
+    if (configService_) {
+        return configService_->validateAllConfigurations();
     }
+    
     return false;
 }
 
 std::vector<std::string> ConfigurationSubsystem::getAvailableGroups() const {
-    const auto& allControls = getAllControlDefinitions();
-    std::set<std::string> uniqueGroups;
-    
-    for (const auto& control : allControls) {
-        uniqueGroups.insert(control.group);
+    if (configService_) {
+        return configService_->getAvailableGroups();
     }
     
-    return std::vector<std::string>(uniqueGroups.begin(), uniqueGroups.end());
+    return std::vector<std::string>();
 }
 
 size_t ConfigurationSubsystem::getInputCountByType(InputType type) const {
-    const auto& allControls = getAllControlDefinitions();
-    return std::count_if(allControls.begin(), allControls.end(), 
-                        [type](const ControlDefinition& control) {
-                            return control.hardware.type == type;
-                        });
+    if (configService_) {
+        return configService_->getInputCountByType(type);
+    }
+    
+    return 0;
 }
 
 Result<bool> ConfigurationSubsystem::loadUnifiedConfigurations() {
