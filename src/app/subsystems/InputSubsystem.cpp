@@ -82,7 +82,7 @@ Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition
         return Result<bool>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Extraire les configurations par type
     auto encoderConfigs = extractEncoderConfigs(controlDefinitions);
@@ -100,7 +100,7 @@ Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition
         return processorResult;
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     return Result<bool>::success(true);
 }
@@ -163,7 +163,7 @@ bool InputSubsystem::validateInputsStatus() const {
 }
 
 Result<bool> InputSubsystem::loadUnifiedConfigurations() {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Obtenir toutes les définitions de contrôles depuis la nouvelle interface
     const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
@@ -181,7 +181,7 @@ Result<bool> InputSubsystem::loadUnifiedConfigurations() {
     auto encoderConfigs = extractEncoderConfigs(allControlDefinitions);
     auto buttonConfigs = extractButtonConfigs(allControlDefinitions);
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Créer les managers avec les configurations extraites
     auto managerResult = createManagers(encoderConfigs, buttonConfigs);
@@ -195,7 +195,7 @@ Result<bool> InputSubsystem::loadUnifiedConfigurations() {
         return processorResult;
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return Result<bool>::success(true);
 }
 
@@ -269,7 +269,7 @@ Result<bool> InputSubsystem::createManagers(const std::vector<EncoderConfig>& en
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create DigitalButtonManager"});
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return Result<bool>::success(true);
 }
 
@@ -291,7 +291,7 @@ Result<bool> InputSubsystem::initializeProcessors() {
         processButtons_->setInputController(inputController_.get());
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return Result<bool>::success(true);
 }
 
@@ -311,6 +311,6 @@ Result<bool> InputSubsystem::connectInputController() {
         processButtons_->setInputController(inputController_.get());
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return Result<bool>::success(true);
 }

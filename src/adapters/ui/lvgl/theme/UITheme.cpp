@@ -19,7 +19,7 @@ void UITheme::applyToLvglDisplay(lv_display_t* display) {
     
     lv_display_set_theme(display, theme);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 //=============================================================================
@@ -44,7 +44,7 @@ void UITheme::createContainerStyle(lv_style_t* style) {
     lv_style_set_pad_all(style, spacing.medium);
     lv_style_set_radius(style, dimensions.radius_medium);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UITheme::createButtonStyle(lv_style_t* style) {
@@ -72,7 +72,7 @@ void UITheme::createButtonStyle(lv_style_t* style) {
     lv_style_set_shadow_color(style, colors.background);
     lv_style_set_shadow_opa(style, LV_OPA_30);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UITheme::createLabelStyle(lv_style_t* style, const lv_font_t* font) {
@@ -92,7 +92,7 @@ void UITheme::createLabelStyle(lv_style_t* style, const lv_font_t* font) {
     lv_style_set_border_width(style, 0);
     lv_style_set_pad_all(style, 0);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UITheme::createArcStyle(lv_style_t* style) {
@@ -105,7 +105,7 @@ void UITheme::createArcStyle(lv_style_t* style) {
     lv_style_set_arc_color(style, colors.midi_inactive);
     lv_style_set_arc_opa(style, LV_OPA_COVER);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UITheme::applyParameterWidgetStyle(lv_obj_t* container, lv_obj_t* arc,
@@ -142,7 +142,7 @@ void UITheme::applyParameterWidgetStyle(lv_obj_t* container, lv_obj_t* arc,
         lv_obj_set_style_text_align(name_label, LV_TEXT_ALIGN_CENTER, 0);
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 //=============================================================================
@@ -185,7 +185,7 @@ UITheme UITheme::createDefaultTheme() {
     UITheme theme;
     
     // Configuration par défaut déjà dans les structures
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return theme;
 }
 
@@ -202,7 +202,7 @@ UITheme UITheme::createDarkTheme() {
     theme.colors.on_surface = lv_color_hex(0xE0E0E0);
     theme.colors.text_secondary = lv_color_hex(0xA0A0A0);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return theme;
 }
 
@@ -223,6 +223,6 @@ UITheme UITheme::createLightTheme() {
     theme.colors.primary = lv_color_hex(0x00AA55);
     theme.colors.secondary = lv_color_hex(0x0066CC);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return theme;
 }

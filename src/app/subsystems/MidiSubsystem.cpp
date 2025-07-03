@@ -33,7 +33,7 @@ Result<bool> MidiSubsystem::init() {
         commandManager_ = std::make_shared<CommandManager>();
         container_->registerDependency<CommandManager>(commandManager_);
     } else {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 
     // Créer l'interface MIDI de base (TeensyUsbMidiOut)
@@ -44,7 +44,7 @@ Result<bool> MidiSubsystem::init() {
             return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create TeensyUsbMidiOut"});
         }
     } else {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         baseMidiOut = std::make_shared<TeensyUsbMidiOut>();
         if (!baseMidiOut) {
             return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create TeensyUsbMidiOut"});
@@ -56,7 +56,7 @@ Result<bool> MidiSubsystem::init() {
     if (!eventEnabledMidiOut) {
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create EventEnabledMidiOut"});
     }
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Utiliser EventEnabledMidiOut comme interface MidiOutputPort
     midiOut_ = eventEnabledMidiOut;
@@ -69,18 +69,18 @@ Result<bool> MidiSubsystem::init() {
     container_->registerDependency<EventEnabledMidiOut>(eventEnabledMidiOut);
 
     // Créer le MidiMapper et MidiInHandler
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     midiMapper_ = std::make_unique<MidiMapper>(*midiOut_, *commandManager_);
     if (!midiMapper_) {
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiMapper"});
     }
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     midiInHandler_ = std::make_unique<MidiInHandler>();
     if (!midiInHandler_) {
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiInHandler"});
     }
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Charger les mappings MIDI depuis les ControlDefinition
     loadMidiMappingsFromControlDefinitions();
@@ -163,14 +163,14 @@ MidiMapper& MidiSubsystem::getMidiMapper() const {
 
 void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     if (!configuration_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return;
     }
     
     // Obtenir toutes les définitions de contrôles depuis le système unifié
     const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     int mappingCount = 0;
     std::set<InputId> navigationControlIds;
@@ -195,7 +195,7 @@ void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     // Configurer les contrôles de navigation dans le mapper
     midiMapper_->setNavigationControls(navigationControlIds);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinition& controlDef) const {
@@ -232,6 +232,6 @@ void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinitio
         // Configurer le mapping dans MidiMapper en utilisant la nouvelle méthode
         midiMapper_->setMappingFromControlDefinition(controlDef, std::move(strategy));
         
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }

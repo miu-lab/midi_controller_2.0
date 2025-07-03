@@ -17,11 +17,11 @@ LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge,
       initialized_(false),
       active_(false),
       event_subscription_id_(0) {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 LvglParameterView::~LvglParameterView() {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     setActive(false);
     unsubscribeFromEvents();
     cleanupLvglObjects();
@@ -29,16 +29,16 @@ LvglParameterView::~LvglParameterView() {
 
 bool LvglParameterView::init() {
     if (initialized_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return true;
     }
     
     if (!bridge_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return false;
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // Créer l'écran principal
     setupMainScreen();
@@ -59,7 +59,7 @@ bool LvglParameterView::init() {
     subscribeToEvents();
 
     initialized_ = true;
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return true;
 }
 
@@ -106,7 +106,7 @@ void LvglParameterView::setActive(bool active) {
             }
         }
 
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     } else if (!active && active_) {
         // Désactivation
         active_ = false;
@@ -118,7 +118,7 @@ void LvglParameterView::setActive(bool active) {
             }
         }
 
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
@@ -131,9 +131,9 @@ void LvglParameterView::setParameter(uint8_t cc_number, uint8_t channel, uint8_t
     ParameterWidget* widget = getWidgetForCC(cc_number);
     if (widget) {
         widget->setParameter(cc_number, channel, value, parameter_name, animate);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     } else {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
@@ -164,12 +164,12 @@ void LvglParameterView::setupMainScreen() {
     lv_obj_set_style_bg_opa(main_screen_, LV_OPA_COVER, 0);
     lv_obj_set_style_pad_all(main_screen_, 0, 0);
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void LvglParameterView::createGridContainer() {
     if (!main_screen_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return;
     }
 
@@ -193,12 +193,12 @@ void LvglParameterView::createGridContainer() {
     lv_obj_set_grid_dsc_array(grid_container_, col_dsc, row_dsc);
     lv_obj_set_layout(grid_container_, LV_LAYOUT_GRID);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void LvglParameterView::createParameterWidgets() {
     if (!grid_container_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return;
     }
 
@@ -221,7 +221,7 @@ void LvglParameterView::createParameterWidgets() {
         // après que le mapping soit établi
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void LvglParameterView::cleanupLvglObjects() {
@@ -231,20 +231,20 @@ void LvglParameterView::cleanupLvglObjects() {
             widget.reset();
         }
     }
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // Nettoyer le container grille
     if (grid_container_) {
         lv_obj_delete(grid_container_);
         grid_container_ = nullptr;
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 
     // Nettoyer l'écran principal
     if (main_screen_) {
         lv_obj_delete(main_screen_);
         main_screen_ = nullptr;
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
@@ -258,9 +258,9 @@ void LvglParameterView::subscribeToEvents() {
     event_subscription_id_ = eventBus.subscribe(this, 100);  // Haute priorité pour l'UI
 
     if (event_subscription_id_ > 0) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     } else {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
@@ -268,9 +268,9 @@ void LvglParameterView::unsubscribeFromEvents() {
     if (event_subscription_id_ > 0) {
         EventBus& eventBus = EventBus::getInstance();
         if (eventBus.unsubscribe(event_subscription_id_)) {
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
         } else {
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
         }
         event_subscription_id_ = 0;
     }
@@ -307,7 +307,7 @@ std::vector<LvglParameterView::MidiControlInfo> LvglParameterView::extractMidiCo
     std::vector<MidiControlInfo> midiControls;
     
     if (!config_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         // Fallback vers la configuration par défaut
         for (uint8_t i = 0; i < 8; i++) {
             MidiControlInfo info;
@@ -346,12 +346,12 @@ std::vector<LvglParameterView::MidiControlInfo> LvglParameterView::extractMidiCo
                 info.control_id = control.id;
                 midiControls.push_back(info);
                 
-                // DEBUG MSG TO IMPLEMENT
+                // TODO DEBUG MSG
             }
         }
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     return midiControls;
 }
@@ -376,13 +376,13 @@ void LvglParameterView::initializeCCMappingFromConfig() {
         
         if (control.cc_number < 128) {
             cc_to_widget_mapping[control.cc_number] = widgetIndex;
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
             widgetIndex++;
         }
     }
     
     mapping_initialized = true;
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void LvglParameterView::initializeWidgetConfigurationsFromConfig() {
@@ -397,7 +397,7 @@ void LvglParameterView::initializeWidgetConfigurationsFromConfig() {
             
             // Valeur initiale à 0 comme demandé
             parameter_widgets_[i]->setParameter(control.cc_number, channel, 0, control.name, false);
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
         }
     }
     
@@ -405,7 +405,7 @@ void LvglParameterView::initializeWidgetConfigurationsFromConfig() {
     for (size_t i = midiControls.size(); i < 8; i++) {
         if (parameter_widgets_[i]) {
             parameter_widgets_[i]->setVisible(false);
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
         }
     }
 }

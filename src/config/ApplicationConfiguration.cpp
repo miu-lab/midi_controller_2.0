@@ -12,13 +12,13 @@ ApplicationConfiguration::ApplicationConfiguration() {
     unifiedConfig_ = ConfigurationFactory::createDefaultConfiguration();
     if (!unifiedConfig_) {
         // En cas d'échec critique, impossible de continuer
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return;
     }
 
     // Affichage des statistiques (Serial peut ne pas être initialisé ici)
-    // // DEBUG MSG TO IMPLEMENT
-    // // DEBUG MSG TO IMPLEMENT
+    // // TODO DEBUG MSG
+    // // TODO DEBUG MSG
     // Initialisation des paramètres de performance
     performanceSettings = {ConfigDefaults::PERFORMANCE_MODE,
                            ConfigDefaults::MAX_UPDATE_TIME_US,
@@ -200,6 +200,6 @@ const UnifiedConfiguration& ApplicationConfiguration::getUnifiedConfiguration() 
 }
 
 void ApplicationConfiguration::enableUnifiedSystem() {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     notifyChange("configurationSystem");
 }

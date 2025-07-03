@@ -18,13 +18,13 @@ void InputController::processEncoderTurn(EncoderId id, int32_t absolutePosition,
 
 
 void InputController::processButtonPress(ButtonId id, bool pressed) {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     // Publier l'événement sur le bus d'événements
     if (eventBus_) {
         HighPriorityButtonPressEvent event(id, pressed);
         eventBus_->publishHighPriority(event);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     } else {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }

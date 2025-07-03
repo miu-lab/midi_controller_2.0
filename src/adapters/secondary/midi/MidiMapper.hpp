@@ -109,7 +109,7 @@ private:
     //=============================================================================
 
     // Taille du pool d'objets pour les commandes MIDI
-    static constexpr size_t COMMAND_POOL_SIZE = 16;
+    static constexpr size_t COMMAND_POOL_SIZE = 4;
 
     // Constantes de timing
     static constexpr unsigned long ENCODER_RATE_LIMIT_MS =

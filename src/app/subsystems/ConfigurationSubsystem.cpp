@@ -44,7 +44,7 @@ Result<bool> ConfigurationSubsystem::init() {
                 // Custom deleter qui ne fait rien car on ne possède pas l'objet
             });
         container_->registerDependency<UnifiedConfiguration>(unifiedConfigPtr);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 
     return Result<bool>::success(true);
@@ -151,15 +151,12 @@ size_t ConfigurationSubsystem::getInputCountByType(InputType type) const {
 }
 
 Result<bool> ConfigurationSubsystem::loadUnifiedConfigurations() {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     if (!config_) {
         return Result<bool>::error(
             {ErrorCode::DependencyMissing, "ApplicationConfiguration not available"});
     }
 
-    // Afficher les statistiques de configuration
-    auto stats = config_->getUnifiedConfiguration().getStats();
-    // DEBUG MSG TO IMPLEMENT
     return Result<bool>::success(true);
 }

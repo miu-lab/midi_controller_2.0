@@ -20,9 +20,9 @@ void SerialBuffer::println(const String& line) {
         // Si pas encore initialisé, affiche directement sur le port série
         // et s'assure qu'il y a un saut de ligne
         if (line.length() > 80) {
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG TO IMPLEMENT
         } else {
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG TO IMPLEMENT
         }
     }
 #endif
@@ -67,15 +67,7 @@ void SerialBuffer::addLine(const String& line) {
 
 // Affichage de tout le contenu du tampon
 void SerialBuffer::dumpBuffer() {
-#ifdef DEBUG
-    size_t startIndex = _isFull ? _currentIndex : 0;
-    size_t count = _isFull ? _maxLines : _currentIndex;
-    
-    for (size_t i = 0; i < count; i++) {
-        size_t index = (startIndex + i) % _maxLines;
-        // DEBUG MSG TO IMPLEMENT
-    }
-#endif
+    // TODO  : Affiche le contenu du tampon sur le port série
 }
 
 // Effacement du tampon

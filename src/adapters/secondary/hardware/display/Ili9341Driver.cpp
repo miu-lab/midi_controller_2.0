@@ -31,8 +31,8 @@ Ili9341Driver::Ili9341Driver(const Config& config)
     : config_(config),
       initialized_(false),
       framebuffer_(main_framebuffer) {
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
 }
 
 //=============================================================================
@@ -44,7 +44,7 @@ bool Ili9341Driver::initialize() {
         return true;
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Configuration des pins
     configurePins();
@@ -60,7 +60,7 @@ bool Ili9341Driver::initialize() {
     );
 
     if (!tft_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return false;
     }
 
@@ -76,7 +76,7 @@ bool Ili9341Driver::initialize() {
     // Configurer les paramètres de performance
     setupPerformance();
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     initialized_ = true;
 
     return true;
@@ -139,7 +139,7 @@ void Ili9341Driver::setRotation(uint8_t rotation) {
     config_.rotation = rotation;
     tft_->setRotation(rotation);
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
@@ -158,15 +158,15 @@ void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
 //=============================================================================
 
 void Ili9341Driver::debugMemory() const {
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
     
     uint16_t width, height;
     getDimensions(width, height);
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }

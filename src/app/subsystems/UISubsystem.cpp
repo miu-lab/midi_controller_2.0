@@ -36,7 +36,7 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
     // Récupérer le bridge LVGL
     m_lvglBridge = container_->resolve<Ili9341LvglBridge>();
     if (!m_lvglBridge) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 
     // Créer le gestionnaire de vues si l'UI complète est activée

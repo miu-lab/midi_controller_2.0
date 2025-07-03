@@ -22,11 +22,11 @@ bool LvglSplashScreenView::init() {
     }
     
     if (!bridge_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return false;
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // Créer l'écran principal
     setupMainScreen();
@@ -41,7 +41,7 @@ bool LvglSplashScreenView::init() {
     setupProgressBar();
     
     initialized_ = true;
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return true;
 }
 
@@ -87,12 +87,12 @@ void LvglSplashScreenView::setActive(bool active) {
         // Activation
         active_ = true;
         start_time_ = millis();
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     } else if (!active && active_) {
         // Désactivation
         active_ = false;
         start_time_ = 0;
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
@@ -111,7 +111,7 @@ void LvglSplashScreenView::setupMainScreen() {
     lv_obj_set_style_bg_color(main_screen_, config_.bg_color, 0);
     lv_obj_set_style_bg_opa(main_screen_, LV_OPA_COVER, 0);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void LvglSplashScreenView::setupBorder() {

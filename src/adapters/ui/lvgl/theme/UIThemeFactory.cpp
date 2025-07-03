@@ -20,7 +20,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createTheme(ThemeType type) {
         case ThemeType::STUDIO:
             return createStudioTheme();
         default:
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
             return createDefaultTheme();
     }
 }
@@ -48,7 +48,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createMidiControllerTheme() {
     auto layout = createLayoutForTheme(theme);
     applyThemeOptimizations(*theme, ThemeType::MIDI_CONTROLLER);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     return {
         .theme = theme,
@@ -85,7 +85,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createPerformanceTheme() {
     auto layout = createLayoutForTheme(theme);
     applyThemeOptimizations(*theme, ThemeType::PERFORMANCE);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     return {
         .theme = theme,
@@ -122,7 +122,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createStudioTheme() {
     auto layout = createLayoutForTheme(theme);
     applyThemeOptimizations(*theme, ThemeType::STUDIO);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     return {
         .theme = theme,
@@ -135,7 +135,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createStudioTheme() {
 void UIThemeFactory::applyThemeToDisplay(const ThemeConfig& config, lv_display_t* display) {
     if (config.theme && display) {
         config.theme->applyToLvglDisplay(display);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
@@ -189,7 +189,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createDefaultTheme() {
     auto theme = std::make_shared<UITheme>(UITheme::createDefaultTheme());
     auto layout = createLayoutForTheme(theme);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     return {
         .theme = theme,
@@ -203,7 +203,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createDarkTheme() {
     auto theme = std::make_shared<UITheme>(UITheme::createDarkTheme());
     auto layout = createLayoutForTheme(theme);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     return {
         .theme = theme,
@@ -217,7 +217,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createLightTheme() {
     auto theme = std::make_shared<UITheme>(UITheme::createLightTheme());
     auto layout = createLayoutForTheme(theme);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     return {
         .theme = theme,
@@ -229,7 +229,7 @@ UIThemeFactory::ThemeConfig UIThemeFactory::createLightTheme() {
 
 std::shared_ptr<UILayout> UIThemeFactory::createLayoutForTheme(std::shared_ptr<UITheme> theme) {
     if (!theme) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return nullptr;
     }
     
@@ -238,7 +238,7 @@ std::shared_ptr<UILayout> UIThemeFactory::createLayoutForTheme(std::shared_ptr<U
     // Le layout sera configuré par les vues selon leurs besoins spécifiques
     // avec setupGrid(), setupFlex(), etc.
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return layout;
 }
 
@@ -269,5 +269,5 @@ void UIThemeFactory::applyThemeOptimizations(UITheme& theme, ThemeType type) {
             break;
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }

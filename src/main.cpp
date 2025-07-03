@@ -28,20 +28,20 @@ void setup() {
     while (!Serial && millis() - t0 < timeout) {}
 
     Serial.println("=== Init OK ===");
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     container = std::make_shared<DependencyContainer>();
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     auto initResult = InitializationScript::initializeContainer(container, appConfig);
     if (initResult.isError()) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return;
     }
 
     app = std::make_shared<MidiControllerApp>(container);
     auto appInitResult = app->init();
     if (appInitResult.isError()) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return;
     }
 }

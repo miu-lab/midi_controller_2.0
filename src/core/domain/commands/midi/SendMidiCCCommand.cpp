@@ -14,7 +14,7 @@ SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, u
       source_(source),
       previousValue_(0),  // Sera mis à jour lors de l'exécution
       hasExecuted_(false) {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void SendMidiCCCommand::reset(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc, uint8_t value,

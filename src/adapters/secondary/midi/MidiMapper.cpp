@@ -96,7 +96,7 @@ void MidiMapper::setMappingFromControlDefinition(const ControlDefinition& contro
             // Ajouter le nouveau mapping
             mappings_[compositeKey] = std::move(info);
 
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
 
                           
             // Traiter seulement le premier mapping MIDI pour cette version
@@ -272,7 +272,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 
     // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
     if (isNavigationControl(encoderId)) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
         return;
     }
@@ -285,7 +285,7 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;
     }
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Mettre à jour et envoyer la nouvelle valeur
     mappingInfo.lastMidiValue = static_cast<uint8_t>(newValue);
@@ -395,7 +395,7 @@ bool MidiMapper::onEvent(const Event& event) {
     case EventTypes::HighPriorityButtonPress: {
         const HighPriorityButtonPressEvent& buttonEvent =
             static_cast<const HighPriorityButtonPressEvent&>(event);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         processButtonPress(buttonEvent.buttonId, buttonEvent.pressed);
         return true;
     }

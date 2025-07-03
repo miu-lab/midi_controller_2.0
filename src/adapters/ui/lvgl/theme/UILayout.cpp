@@ -7,7 +7,7 @@
 
 UILayout::UILayout(const UITheme& theme) : theme_(theme) {
     grid_config_ = createDefaultGrid();
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 //=============================================================================
@@ -49,7 +49,7 @@ void UILayout::setupGrid(lv_obj_t* container, const GridConfig& config) {
     // Sauvegarder la config pour référence
     grid_config_ = config;
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UILayout::placeInGrid(lv_obj_t* widget, const GridPosition& position, 
@@ -57,7 +57,7 @@ void UILayout::placeInGrid(lv_obj_t* widget, const GridPosition& position,
     if (!widget) return;
     
     if (!isValidGridPosition(position)) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return;
     }
     
@@ -66,7 +66,7 @@ void UILayout::placeInGrid(lv_obj_t* widget, const GridPosition& position,
                          align, position.column, position.column_span,
                          align, position.row, position.row_span);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 //=============================================================================
@@ -96,7 +96,7 @@ void UILayout::placeRelative(lv_obj_t* widget, float x_percent, float y_percent,
         lv_obj_set_height(widget, lv_pct(h_pct));
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 //=============================================================================
@@ -107,21 +107,21 @@ void UILayout::centerHorizontally(lv_obj_t* widget, lv_coord_t offset_y) {
     if (!widget) return;
     
     lv_obj_align(widget, LV_ALIGN_TOP_MID, 0, offset_y);
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UILayout::centerVertically(lv_obj_t* widget, lv_coord_t offset_x) {
     if (!widget) return;
     
     lv_obj_align(widget, LV_ALIGN_LEFT_MID, offset_x, 0);
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UILayout::centerCompletely(lv_obj_t* widget, lv_coord_t offset_x, lv_coord_t offset_y) {
     if (!widget) return;
     
     lv_obj_align(widget, LV_ALIGN_CENTER, offset_x, offset_y);
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UILayout::alignToWidget(lv_obj_t* widget, lv_obj_t* reference, lv_align_t align, 
@@ -129,7 +129,7 @@ void UILayout::alignToWidget(lv_obj_t* widget, lv_obj_t* reference, lv_align_t a
     if (!widget || !reference) return;
     
     lv_obj_align_to(widget, reference, align, offset_x, offset_y);
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 //=============================================================================
@@ -147,7 +147,7 @@ void UILayout::setupFlex(lv_obj_t* container, lv_flex_flow_t flow,
     lv_obj_set_flex_flow(container, flow);
     lv_obj_set_flex_align(container, main_align, cross_align, track_align);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UILayout::setFlexGrow(lv_obj_t* widget, uint8_t grow) {
@@ -155,7 +155,7 @@ void UILayout::setFlexGrow(lv_obj_t* widget, uint8_t grow) {
     
     lv_obj_set_flex_grow(widget, grow);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 
@@ -263,7 +263,7 @@ void UILayout::setupHorizontalFlex(lv_obj_t* container, lv_coord_t spacing) {
     // Configurer espacement via padding
     lv_obj_set_style_pad_column(container, spacing, 0);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UILayout::setupVerticalFlex(lv_obj_t* container, lv_coord_t spacing) {
@@ -278,7 +278,7 @@ void UILayout::setupVerticalFlex(lv_obj_t* container, lv_coord_t spacing) {
     // Configurer espacement via padding
     lv_obj_set_style_pad_row(container, spacing, 0);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 void UILayout::setupParameterGrid(lv_obj_t* container, uint8_t columns, uint8_t rows) {
@@ -298,7 +298,7 @@ void UILayout::setupParameterGrid(lv_obj_t* container, uint8_t columns, uint8_t 
     // Utiliser la grille native LVGL
     setupGrid(container, config);
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 //=============================================================================

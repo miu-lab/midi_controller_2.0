@@ -83,7 +83,7 @@ Result<bool> InitializationScript::setupHardwareAdapters(
     container->registerDependency<MidiOutputPort>(std::make_shared<TeensyUsbMidiOut>());
 
     // Écran LVGL - Nouvelle architecture modulaire
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // 1. Créer et initialiser le driver hardware
     Ili9341Driver::Config driverConfig = Ili9341Driver::getDefaultConfig();
@@ -91,21 +91,21 @@ Result<bool> InitializationScript::setupHardwareAdapters(
     if (!driver->initialize()) {
         return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du driver hardware ILI9341"});
     }
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // 2. Créer et initialiser le bridge LVGL
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     Ili9341LvglBridge::LvglConfig lvglConfig = Ili9341LvglBridge::getDefaultLvglConfig();
     auto bridge = std::make_shared<Ili9341LvglBridge>(driver, lvglConfig);
     if (!bridge->initialize()) {
         return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du bridge LVGL"});
     }
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // 3. Enregistrer les composants dans le container
     container->registerDependency<Ili9341Driver>(driver);
     container->registerDependency<Ili9341LvglBridge>(bridge);
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 
     // Stockage de profils
     auto profileManager = std::make_shared<ProfileManager>();
@@ -126,7 +126,7 @@ Result<bool> InitializationScript::initializeSubsystems(
     // Récupérer l'OptimizedEventBus
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
     if (!optimizedEventBus) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 
     // Créer InputController avec l'OptimizedEventBus
@@ -198,7 +198,7 @@ Result<bool> InitializationScript::initializeSubsystems(
         auto result = info.initFn();
         if (result.isError()) {
             auto err = result.error().value_or(Errors::Unknown);
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
             return Result<bool>::error(err);
         }
     }
@@ -234,16 +234,16 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
     auto optimizedEventBus = container->resolve<OptimizedEventBus>();
     if (optimizedEventBus) {
         optimizedEventBus->subscribe(uiEventListener.get());
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     } else {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 
     return true;
 }
 
 void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyContainer> container) {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // Récupération des composants nécessaires
     auto midiSystem = container->resolve<MidiSubsystem>();
@@ -261,7 +261,7 @@ void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyCon
     
     if (subscriptionId != 0) {
     } else {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         // Échec de l'abonnement, gérer l'erreur
         return;
     }

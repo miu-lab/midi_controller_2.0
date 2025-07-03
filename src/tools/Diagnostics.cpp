@@ -17,7 +17,7 @@ void DiagnosticsManager::init(TaskScheduler& scheduler, uint16_t interval) {
     _eventDiagnosticsEnabled = true;  // Activé par défaut
     
 #ifdef DEBUG
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // Affiche les statistiques initiales
     printStats(false);
@@ -47,9 +47,9 @@ void DiagnosticsManager::onEvent(const char* eventName, bool showDetails) {
     }
     
     // Affiche un en-tête avec le nom de l'événement
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
+    // TODO DEBUG MSG
     
     // Affiche les statistiques
     printSchedulerStats(showDetails);
@@ -59,7 +59,7 @@ void DiagnosticsManager::onEvent(const char* eventName, bool showDetails) {
         printMemoryStats();
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 #endif
 }
 
@@ -78,14 +78,14 @@ void DiagnosticsManager::enableRegularStats(bool enable) {
     _regularStatsEnabled = enable;
     
 #ifdef DEBUG
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 #endif
 }
 
 void DiagnosticsManager::enableEventDiagnostics(bool enable) {
     _eventDiagnosticsEnabled = enable;
 #ifdef DEBUG
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 #endif
 }
 
@@ -94,22 +94,22 @@ void DiagnosticsManager::setStatsInterval(uint16_t seconds) {
     
     _statsInterval = seconds;
 #ifdef DEBUG
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 #endif
 }
 
 bool DiagnosticsManager::handleCommand(const String& command) {
 #ifdef DEBUG
     if (command == "stats") {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         printStats(true);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return true;
     }
     else if (command == "stats detailed") {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         printStats(true);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return true;
     }
     else if (command == "stats off") {
@@ -136,7 +136,7 @@ bool DiagnosticsManager::handleCommand(const String& command) {
         if (interval > 0) {
             setStatsInterval(interval);
         } else {
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
         }
         return true;
     }
@@ -151,15 +151,15 @@ bool DiagnosticsManager::handleCommand(const String& command) {
 
 void DiagnosticsManager::printError(const Result<bool>& result, const char* prefix) {
     if (result.isError()) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
 void DiagnosticsManager::printSchedulerStats(bool showDetails) {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return;
 }
 
 void DiagnosticsManager::printMemoryStats() {
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }

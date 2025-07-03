@@ -13,7 +13,7 @@ ViewManagerEventListener::~ViewManagerEventListener() {
 void ViewManagerEventListener::subscribe() {
     if (m_subscriptionId == 0) {
         m_subscriptionId = EventBus::getInstance().subscribe(this);
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
     }
 }
 
@@ -53,7 +53,7 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
             // Traiter les événements CC MIDI
             auto& ccEvent = static_cast<const MidiCCEvent&>(event);
 
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
 
             // Mapper le CC à un nom de paramètre
             String paramName = mapCCToParameterName(ccEvent.controller);
@@ -72,7 +72,7 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
         case EventTypes::MidiNoteOn:
         case EventTypes::MidiNoteOff: {
             // Pour les notes, on peut ignorer ou traiter différemment
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
             return true;
         }
         
@@ -99,12 +99,12 @@ bool ViewManagerEventListener::handleMidiEvent(const Event& event) {
 bool ViewManagerEventListener::handleInputEvent(const Event& event) {
     switch (event.getType()) {
         case EventTypes::EncoderTurned: {
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
             return true;
         }
         
         case EventTypes::EncoderButton: {
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
             return true;
         }
         
@@ -120,17 +120,17 @@ bool ViewManagerEventListener::handleInputEvent(const Event& event) {
                 id = static_cast<const ButtonReleasedEvent&>(event).id;
             }
 
-            // DEBUG MSG TO IMPLEMENT
+            // TODO DEBUG MSG
 
             // Déterminer si c'est un bouton de navigation
             if (pressed && isNavigationButton(id)) {
-                // DEBUG MSG TO IMPLEMENT
+                // TODO DEBUG MSG
 
                 if (id == 51) { // Bouton MENU
-                    // DEBUG MSG TO IMPLEMENT
+                    // TODO DEBUG MSG
                     m_viewManager.showMenu();
                 } else if (id == 52) { // Bouton HOME/VALIDATION
-                    // DEBUG MSG TO IMPLEMENT
+                    // TODO DEBUG MSG
                     m_viewManager.showHome();
                 }
             }

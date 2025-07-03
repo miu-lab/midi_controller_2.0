@@ -27,7 +27,7 @@ Ili9341LvglBridge::Ili9341LvglBridge(std::shared_ptr<Ili9341Driver> driver,
     : config_(config), driver_(std::move(driver)), initialized_(false),
       display_(nullptr), lvgl_buf1_(nullptr), lvgl_buf2_(nullptr) {
     bridge_instance_ = this;
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 Ili9341LvglBridge::~Ili9341LvglBridge() {
@@ -36,7 +36,7 @@ Ili9341LvglBridge::~Ili9341LvglBridge() {
     }
     freeLvglBuffers();
     bridge_instance_ = nullptr;
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
 }
 
 bool Ili9341LvglBridge::initialize() {
@@ -45,33 +45,33 @@ bool Ili9341LvglBridge::initialize() {
     }
     
     if (!driver_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return false;
     }
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     
     // Setup LVGL core
     if (!setupLvglCore()) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return false;
     }
     
     // Allouer buffers LVGL
     if (!allocateLvglBuffers()) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return false;
     }
     
     // Setup display LVGL
     if (!setupLvglDisplay()) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         freeLvglBuffers();
         return false;
     }
     
     initialized_ = true;
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return true;
 }
 
@@ -91,7 +91,7 @@ bool Ili9341LvglBridge::setupLvglCore() {
         return millis();
     });
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return true;
 }
 
@@ -99,7 +99,7 @@ bool Ili9341LvglBridge::setupLvglDisplay() {
     // Créer display LVGL v9 - Dimensions selon configuration centralisée
     display_ = lv_display_create(DisplayConfig::SCREEN_WIDTH, DisplayConfig::SCREEN_HEIGHT);
     if (!display_) {
-        // DEBUG MSG TO IMPLEMENT
+        // TODO DEBUG MSG
         return false;
     }
     
@@ -116,7 +116,7 @@ bool Ili9341LvglBridge::setupLvglDisplay() {
     // Stocker référence dans user_data pour callback
     lv_display_set_user_data(display_, this);
 
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return true;
 }
 
@@ -125,7 +125,7 @@ bool Ili9341LvglBridge::allocateLvglBuffers() {
     lvgl_buf1_ = lvgl_buffer_1;
     lvgl_buf2_ = config_.double_buffering ? lvgl_buffer_2 : nullptr;
     
-    // DEBUG MSG TO IMPLEMENT
+    // TODO DEBUG MSG
     return true;
 }
 
