@@ -28,7 +28,10 @@
       "Bash(curl:*)",
       "Bash(sudo cp:*)",
       "Bash(python3:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(pio test:*)"
     ],
     "deny": []
   }
