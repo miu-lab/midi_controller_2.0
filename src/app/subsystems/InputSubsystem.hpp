@@ -4,25 +4,21 @@
 #include <vector>
 #include <optional>
 
-#include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
-#include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"
-#include "core/use_cases/ProcessButtons.hpp"
-#include "core/use_cases/ProcessEncoders.hpp"
+#include "core/input/InputManager.hpp"
+#include "core/factories/ControllerFactory.hpp"
 #include "core/utils/Result.hpp"
 
-class EncoderManager;
-class DigitalButtonManager;
 class InputController;
 
 /**
  * @brief Sous-système de gestion des entrées
  *
- * Cette classe implémente l'interface IInputSystem et gère toutes
- * les entrées utilisateur (encodeurs, boutons).
- * Interface unifiée basée sur ControlDefinition.
+ * Cette classe implémente l'interface IInputSystem et délègue
+ * la gestion des entrées à InputManager et ControllerFactory.
+ * Respecte le principe de responsabilité unique.
  */
 class InputSubsystem : public IInputSystem {
 public:
@@ -57,21 +53,24 @@ public:
 private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<IConfiguration> configuration_;
-    std::shared_ptr<EncoderManager> encoderManager_;
-    std::shared_ptr<DigitalButtonManager> buttonManager_;
+    
+    // Composants délégués
+    std::unique_ptr<InputManager> inputManager_;
+    std::unique_ptr<ControllerFactory> controllerFactory_;
     std::shared_ptr<InputController> inputController_;
-
-    // Processeurs d'événements
-    std::unique_ptr<ProcessEncoders> processEncoders_;
-    std::unique_ptr<ProcessButtons> processButtons_;
 
     bool initialized_ = false;
     
-    Result<bool> loadUnifiedConfigurations();
-    std::vector<EncoderConfig> extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const;
-    std::vector<ButtonConfig> extractButtonConfigs(const std::vector<ControlDefinition>& controlDefinitions) const;
-    Result<bool> createManagers(const std::vector<EncoderConfig>& encoderConfigs,
-                                            const std::vector<ButtonConfig>& buttonConfigs);
-    Result<bool> initializeProcessors();
-    Result<bool> connectInputController();
+    /**
+     * @brief Initialise les composants délégués
+     * @return Result<bool> Succès ou erreur
+     */
+    Result<bool> initializeDelegatedComponents();
+
+    /**
+     * @brief Configure les entrées via InputManager
+     * @param controlDefinitions Définitions des contrôles
+     * @return Result<bool> Succès ou erreur
+     */
+    Result<bool> setupInputManager(const std::vector<ControlDefinition>& controlDefinitions);
 };

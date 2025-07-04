@@ -78,6 +78,75 @@ extern void test_display_manager_set_refresh_interval();
 extern void test_display_manager_get_refresh_interval_default();
 extern void test_display_manager_update_with_null_bridge();
 
+// Tests EventManager
+extern void test_event_manager_constructor_default_config();
+extern void test_event_manager_initialize();
+extern void test_event_manager_start();
+extern void test_event_manager_stop();
+extern void test_event_manager_subscribe();
+extern void test_event_manager_publish_event();
+extern void test_event_manager_update();
+extern void test_event_manager_get_event_bus();
+extern void test_event_manager_without_batching();
+extern void test_event_manager_unsubscribe();
+
+// Tests EventRouter  
+extern void test_event_router_register_handler();
+extern void test_event_router_unregister_handler();
+extern void test_event_router_start_stop();
+extern void test_event_router_on_event();
+
+// Tests ViewFactory
+extern void test_view_factory_constructor_valid_container();
+extern void test_view_factory_constructor_null_container();
+extern void test_view_factory_validate_dependencies_all_present();
+extern void test_view_factory_validate_dependencies_missing();
+extern void test_view_factory_validate_dependencies_null_container();
+extern void test_view_factory_create_default_view_manager_success();
+extern void test_view_factory_create_default_view_manager_missing_dependencies();
+extern void test_view_factory_create_view_manager_with_full_ui();
+extern void test_view_factory_create_view_manager_without_full_ui();
+
+// Tests UISystemCore
+extern void test_ui_system_core_constructor_default_config();
+extern void test_ui_system_core_constructor_custom_config();
+extern void test_ui_system_core_initialize_success();
+extern void test_ui_system_core_initialize_missing_view_manager();
+extern void test_ui_system_core_initialize_without_full_ui();
+extern void test_ui_system_core_double_initialization();
+extern void test_ui_system_core_show_message_success();
+extern void test_ui_system_core_show_message_not_operational();
+extern void test_ui_system_core_clear_display_success();
+extern void test_ui_system_core_clear_display_not_operational();
+extern void test_ui_system_core_is_operational();
+
+// Tests InputManager
+extern void test_input_manager_constructor_default_config();
+extern void test_input_manager_constructor_custom_config();
+extern void test_input_manager_initialize_success();
+extern void test_input_manager_initialize_without_input_controller();
+extern void test_input_manager_initialize_empty_definitions();
+extern void test_input_manager_double_initialization();
+extern void test_input_manager_reconfigure_success();
+extern void test_input_manager_reconfigure_not_initialized();
+extern void test_input_manager_is_operational();
+extern void test_input_manager_configuration_encoders_only();
+extern void test_input_manager_configuration_buttons_only();
+
+// Tests ControllerFactory
+extern void test_controller_factory_constructor_valid_container();
+extern void test_controller_factory_constructor_null_container();
+extern void test_controller_factory_constructor_custom_config();
+extern void test_controller_factory_create_input_controller_success();
+extern void test_controller_factory_create_input_controller_no_container();
+extern void test_controller_factory_create_input_controller_missing_navigation_config();
+extern void test_controller_factory_validate_dependencies_success();
+extern void test_controller_factory_validate_dependencies_no_container();
+extern void test_controller_factory_validate_dependencies_missing_navigation_config();
+extern void test_controller_factory_is_operational();
+extern void test_controller_factory_configuration_without_validation();
+extern void test_controller_factory_configuration_without_auto_register();
+
 // Fonctions setUp/tearDown par défaut pour Unity
 // Note: les tests spécifiques peuvent redéfinir ces fonctions
 void setUp(void) __attribute__((weak));
@@ -191,6 +260,75 @@ int main() {
     RUN_TEST(test_display_manager_set_refresh_interval);
     RUN_TEST(test_display_manager_get_refresh_interval_default);
     RUN_TEST(test_display_manager_update_with_null_bridge);
+    
+    // Tests EventManager
+    RUN_TEST(test_event_manager_constructor_default_config);
+    RUN_TEST(test_event_manager_initialize);
+    RUN_TEST(test_event_manager_start);
+    RUN_TEST(test_event_manager_stop);
+    RUN_TEST(test_event_manager_subscribe);
+    RUN_TEST(test_event_manager_publish_event);
+    RUN_TEST(test_event_manager_update);
+    RUN_TEST(test_event_manager_get_event_bus);
+    RUN_TEST(test_event_manager_without_batching);
+    RUN_TEST(test_event_manager_unsubscribe);
+    
+    // Tests EventRouter
+    RUN_TEST(test_event_router_register_handler);
+    RUN_TEST(test_event_router_unregister_handler);
+    RUN_TEST(test_event_router_start_stop);
+    RUN_TEST(test_event_router_on_event);
+    
+    // Tests ViewFactory
+    RUN_TEST(test_view_factory_constructor_valid_container);
+    RUN_TEST(test_view_factory_constructor_null_container);
+    RUN_TEST(test_view_factory_validate_dependencies_all_present);
+    RUN_TEST(test_view_factory_validate_dependencies_missing);
+    RUN_TEST(test_view_factory_validate_dependencies_null_container);
+    RUN_TEST(test_view_factory_create_default_view_manager_success);
+    RUN_TEST(test_view_factory_create_default_view_manager_missing_dependencies);
+    RUN_TEST(test_view_factory_create_view_manager_with_full_ui);
+    RUN_TEST(test_view_factory_create_view_manager_without_full_ui);
+    
+    // Tests UISystemCore
+    RUN_TEST(test_ui_system_core_constructor_default_config);
+    RUN_TEST(test_ui_system_core_constructor_custom_config);
+    RUN_TEST(test_ui_system_core_initialize_success);
+    RUN_TEST(test_ui_system_core_initialize_missing_view_manager);
+    RUN_TEST(test_ui_system_core_initialize_without_full_ui);
+    RUN_TEST(test_ui_system_core_double_initialization);
+    RUN_TEST(test_ui_system_core_show_message_success);
+    RUN_TEST(test_ui_system_core_show_message_not_operational);
+    RUN_TEST(test_ui_system_core_clear_display_success);
+    RUN_TEST(test_ui_system_core_clear_display_not_operational);
+    RUN_TEST(test_ui_system_core_is_operational);
+    
+    // Tests InputManager
+    RUN_TEST(test_input_manager_constructor_default_config);
+    RUN_TEST(test_input_manager_constructor_custom_config);
+    RUN_TEST(test_input_manager_initialize_success);
+    RUN_TEST(test_input_manager_initialize_without_input_controller);
+    RUN_TEST(test_input_manager_initialize_empty_definitions);
+    RUN_TEST(test_input_manager_double_initialization);
+    RUN_TEST(test_input_manager_reconfigure_success);
+    RUN_TEST(test_input_manager_reconfigure_not_initialized);
+    RUN_TEST(test_input_manager_is_operational);
+    RUN_TEST(test_input_manager_configuration_encoders_only);
+    RUN_TEST(test_input_manager_configuration_buttons_only);
+    
+    // Tests ControllerFactory
+    RUN_TEST(test_controller_factory_constructor_valid_container);
+    RUN_TEST(test_controller_factory_constructor_null_container);
+    RUN_TEST(test_controller_factory_constructor_custom_config);
+    RUN_TEST(test_controller_factory_create_input_controller_success);
+    RUN_TEST(test_controller_factory_create_input_controller_no_container);
+    RUN_TEST(test_controller_factory_create_input_controller_missing_navigation_config);
+    RUN_TEST(test_controller_factory_validate_dependencies_success);
+    RUN_TEST(test_controller_factory_validate_dependencies_no_container);
+    RUN_TEST(test_controller_factory_validate_dependencies_missing_navigation_config);
+    RUN_TEST(test_controller_factory_is_operational);
+    RUN_TEST(test_controller_factory_configuration_without_validation);
+    RUN_TEST(test_controller_factory_configuration_without_auto_register);
     
     UNITY_END();
     

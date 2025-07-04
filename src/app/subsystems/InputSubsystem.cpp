@@ -1,22 +1,22 @@
 #include "InputSubsystem.hpp"
 
-#include <Arduino.h>
 #include <algorithm>
 
-
 #include "core/utils/Error.hpp"
-
-#include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
-#include "adapters/secondary/hardware/input/encoders/EncoderManager.hpp"
-#include "adapters/secondary/midi/MidiMapper.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
-#include "core/domain/interfaces/IMidiSystem.hpp"
-#include "core/use_cases/ProcessButtons.hpp"
-#include "core/use_cases/ProcessEncoders.hpp"
 
 InputSubsystem::InputSubsystem(std::shared_ptr<DependencyContainer> container)
-    : container_(container), initialized_(false) {}
+    : container_(container), initialized_(false) {
+    // Créer les composants délégués
+    if (container_) {
+        InputManager::ManagerConfig managerConfig;
+        inputManager_ = std::make_unique<InputManager>(managerConfig);
+        
+        ControllerFactory::FactoryConfig factoryConfig;
+        controllerFactory_ = std::make_unique<ControllerFactory>(container_, factoryConfig);
+    }
+}
 
 Result<bool> InputSubsystem::init() {
     if (initialized_) {
@@ -26,19 +26,20 @@ Result<bool> InputSubsystem::init() {
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"});
+        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"));
     }
 
-    // Charger les configurations unifiées
-    auto loadResult = loadUnifiedConfigurations();
-    if (loadResult.isError()) {
-        return loadResult;
+    // Initialiser les composants délégués
+    auto delegateResult = initializeDelegatedComponents();
+    if (!delegateResult.isSuccess()) {
+        return delegateResult;
     }
 
-    // Connecter le contrôleur d'entrée
-    auto controllerResult = connectInputController();
-    if (controllerResult.isError()) {
-        return controllerResult;
+    // Configurer avec les définitions de contrôles
+    auto controlDefinitions = configuration_->getAllControlDefinitions();
+    auto setupResult = setupInputManager(controlDefinitions);
+    if (!setupResult.isSuccess()) {
+        return setupResult;
     }
 
     // Enregistrer ce sous-système comme implémentation de IInputSystem
@@ -52,57 +53,21 @@ Result<bool> InputSubsystem::init() {
 }
 
 void InputSubsystem::update() {
-    if (!initialized_) {
+    if (!initialized_ || !inputManager_) {
         return;
     }
 
-    // Mettre à jour l'état des encodeurs
-    if (encoderManager_) {
-        encoderManager_->updateAll();
-    }
-
-    // Mettre à jour l'état des boutons
-    if (buttonManager_) {
-        buttonManager_->updateAll();
-    }
-
-    // Traiter les événements d'encodeurs
-    if (processEncoders_) {
-        processEncoders_->update();
-    }
-
-    // Traiter les événements de boutons
-    if (processButtons_) {
-        processButtons_->update();
-    }
+    // Déléguer la mise à jour à InputManager
+    inputManager_->update();
 }
 
 Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition>& controlDefinitions) {
-    if (!initialized_) {
-        return Result<bool>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
+    if (!initialized_ || !inputManager_) {
+        return Result<bool>::error(Error(ErrorCode::OperationFailed, "InputSubsystem not initialized"));
     }
 
-    // TODO DEBUG MSG
-
-    // Extraire les configurations par type
-    auto encoderConfigs = extractEncoderConfigs(controlDefinitions);
-    auto buttonConfigs = extractButtonConfigs(controlDefinitions);
-
-    // Recréer les managers avec les nouvelles configurations
-    auto managerResult = createManagers(encoderConfigs, buttonConfigs);
-    if (managerResult.isError()) {
-        return managerResult;
-    }
-
-    // Réinitialiser les processeurs
-    auto processorResult = initializeProcessors();
-    if (processorResult.isError()) {
-        return processorResult;
-    }
-
-    // TODO DEBUG MSG
-
-    return Result<bool>::success(true);
+    // Déléguer la reconfiguration à InputManager
+    return inputManager_->reconfigure(controlDefinitions);
 }
 
 std::vector<ControlDefinition> InputSubsystem::getAllActiveControlDefinitions() const {
@@ -144,17 +109,12 @@ bool InputSubsystem::validateInputsStatus() const {
         return false;
     }
     
-    // Vérifier que les managers sont créés
-    if (!encoderManager_ || !buttonManager_) {
+    // Vérifier que InputManager est opérationnel
+    if (!inputManager_ || !inputManager_->isOperational()) {
         return false;
     }
     
-    // Vérifier que les processeurs sont créés
-    if (!processEncoders_ || !processButtons_) {
-        return false;
-    }
-    
-    // Vérifier que le contrôleur est connecté
+    // Vérifier que le contrôleur est créé
     if (!inputController_) {
         return false;
     }
@@ -162,155 +122,40 @@ bool InputSubsystem::validateInputsStatus() const {
     return true;
 }
 
-Result<bool> InputSubsystem::loadUnifiedConfigurations() {
-    // TODO DEBUG MSG
-
-    // Obtenir toutes les définitions de contrôles depuis la nouvelle interface
-    const auto& allControlDefinitions = configuration_->getAllControlDefinitions();
-    
-    if (allControlDefinitions.empty()) {
-        return Result<bool>::error({ErrorCode::ConfigError, "No control definitions found"});
+Result<bool> InputSubsystem::initializeDelegatedComponents() {
+    if (!controllerFactory_) {
+        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "ControllerFactory not available"));
     }
 
-    // Valider toutes les définitions
+    // Créer InputController via ControllerFactory
+    auto controllerResult = controllerFactory_->createInputController();
+    if (!controllerResult.isSuccess()) {
+        return Result<bool>::error(controllerResult.error().value());
+    }
+
+    inputController_ = controllerResult.value().value();
+    return Result<bool>::success(true);
+}
+
+Result<bool> InputSubsystem::setupInputManager(const std::vector<ControlDefinition>& controlDefinitions) {
+    if (!inputManager_ || !inputController_) {
+        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "InputManager or InputController not available"));
+    }
+
+    // Valider les configurations
+    if (controlDefinitions.empty()) {
+        return Result<bool>::error(Error(ErrorCode::ConfigError, "No control definitions found"));
+    }
+
     if (!configuration_->validateAllConfigurations()) {
-        return Result<bool>::error({ErrorCode::ConfigError, "Some control definitions are invalid"});
+        return Result<bool>::error(Error(ErrorCode::ConfigError, "Some control definitions are invalid"));
     }
 
-    // Extraire les configurations par type
-    auto encoderConfigs = extractEncoderConfigs(allControlDefinitions);
-    auto buttonConfigs = extractButtonConfigs(allControlDefinitions);
-
-    // TODO DEBUG MSG
-
-    // Créer les managers avec les configurations extraites
-    auto managerResult = createManagers(encoderConfigs, buttonConfigs);
-    if (managerResult.isError()) {
-        return managerResult;
+    // Initialiser InputManager avec les définitions et le contrôleur
+    auto initResult = inputManager_->initialize(controlDefinitions, inputController_);
+    if (!initResult.isSuccess()) {
+        return initResult;
     }
 
-    // Initialiser les processeurs
-    auto processorResult = initializeProcessors();
-    if (processorResult.isError()) {
-        return processorResult;
-    }
-
-    // TODO DEBUG MSG
-    return Result<bool>::success(true);
-}
-
-std::vector<EncoderConfig> InputSubsystem::extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
-    std::vector<EncoderConfig> encoderConfigs;
-    
-    for (const auto& controlDef : controlDefinitions) {
-        if (controlDef.hardware.type == InputType::ENCODER && controlDef.enabled) {
-            // Extraire la configuration d'encodeur depuis ControlDefinition
-            if (auto encConfig = std::get_if<ControlDefinition::EncoderConfig>(&controlDef.hardware.config)) {
-                EncoderConfig hwConfig;
-                hwConfig.id = controlDef.id;
-                hwConfig.pinA = encConfig->pinA;
-                hwConfig.pinB = encConfig->pinB;
-                hwConfig.ppr = encConfig->ppr;
-                hwConfig.sensitivity = encConfig->sensitivity;
-                hwConfig.enableAcceleration = encConfig->enableAcceleration;
-                hwConfig.stepsPerDetent = encConfig->stepsPerDetent;
-                hwConfig.invertDirection = false;      // Valeur par défaut
-                hwConfig.accelerationThreshold = 100;  // Valeur par défaut
-                hwConfig.maxAcceleration = 5.0f;       // Valeur par défaut
-                
-                encoderConfigs.push_back(hwConfig);
-            }
-        }
-    }
-    
-    return encoderConfigs;
-}
-
-std::vector<ButtonConfig> InputSubsystem::extractButtonConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
-    std::vector<ButtonConfig> buttonConfigs;
-    
-    for (const auto& controlDef : controlDefinitions) {
-        if (controlDef.hardware.type == InputType::BUTTON && controlDef.enabled) {
-            // Extraire la configuration de bouton depuis ControlDefinition
-            if (auto btnConfig = std::get_if<ControlDefinition::ButtonConfig>(&controlDef.hardware.config)) {
-                ButtonConfig hwConfig;
-                hwConfig.id = controlDef.id;
-                hwConfig.gpio = btnConfig->pin;
-                hwConfig.activeLow = btnConfig->activeLow;
-                hwConfig.mode = btnConfig->mode;
-                hwConfig.debounceMs = btnConfig->debounceMs;
-                if (btnConfig->longPressMs.has_value()) {
-                    hwConfig.longPressMs = *btnConfig->longPressMs;
-                    hwConfig.enableLongPress = true;
-                } else {
-                    hwConfig.longPressMs = 800;  // Valeur par défaut
-                    hwConfig.enableLongPress = false;
-                }
-                
-                buttonConfigs.push_back(hwConfig);
-            }
-        }
-    }
-    
-    return buttonConfigs;
-}
-
-Result<bool> InputSubsystem::createManagers(const std::vector<EncoderConfig>& encoderConfigs,
-                                                        const std::vector<ButtonConfig>& buttonConfigs) {
-    // Créer le gestionnaire d'encodeurs
-    encoderManager_ = std::make_shared<EncoderManager>(encoderConfigs);
-    if (!encoderManager_) {
-        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create EncoderManager"});
-    }
-
-    // Créer le gestionnaire de boutons
-    buttonManager_ = std::make_shared<DigitalButtonManager>(buttonConfigs);
-    if (!buttonManager_) {
-        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create DigitalButtonManager"});
-    }
-
-    // TODO DEBUG MSG
-    return Result<bool>::success(true);
-}
-
-Result<bool> InputSubsystem::initializeProcessors() {
-    // Créer les processeurs d'événements
-    processEncoders_ = std::make_unique<ProcessEncoders>(encoderManager_->getEncoders());
-    if (!processEncoders_) {
-        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create ProcessEncoders"});
-    }
-
-    processButtons_ = std::make_unique<ProcessButtons>(buttonManager_->getButtons());
-    if (!processButtons_) {
-        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create ProcessButtons"});
-    }
-
-    // Connecter les processeurs au contrôleur d'entrée si disponible
-    if (inputController_) {
-        processEncoders_->setInputController(inputController_.get());
-        processButtons_->setInputController(inputController_.get());
-    }
-
-    // TODO DEBUG MSG
-    return Result<bool>::success(true);
-}
-
-Result<bool> InputSubsystem::connectInputController() {
-    // Récupérer InputController depuis le conteneur
-    inputController_ = container_->resolve<InputController>();
-    if (!inputController_) {
-        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve InputController"});
-    }
-
-    // Connecter les processeurs si ils existent déjà
-    if (processEncoders_) {
-        processEncoders_->setInputController(inputController_.get());
-    }
-    
-    if (processButtons_) {
-        processButtons_->setInputController(inputController_.get());
-    }
-
-    // TODO DEBUG MSG
     return Result<bool>::success(true);
 }

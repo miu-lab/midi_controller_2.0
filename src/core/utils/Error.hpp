@@ -11,6 +11,7 @@ enum class ErrorCode : uint8_t {
     InitializationFailed,
     HardwareError,
     ConfigError,
+    ConfigurationError,
     NotImplemented,
     OperationFailed
 };

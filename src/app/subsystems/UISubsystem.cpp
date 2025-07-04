@@ -10,7 +10,16 @@
 #include "core/domain/events/core/EventBus.hpp"
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
-    : container_(container) {}
+    : container_(container) {
+    // Créer la ViewFactory et UISystemCore
+    if (container_) {
+        viewFactory_ = std::make_unique<ViewFactory>(container_);
+        
+        UISystemCore::CoreConfig coreConfig;
+        coreConfig.enableFullUI = false; // Sera activé lors de l'initialisation
+        uiCore_ = std::make_unique<UISystemCore>(coreConfig);
+    }
+}
 
 Result<bool> UISubsystem::init(bool enableFullUI) {
     if (initialized_) {
@@ -25,50 +34,64 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"});
     }
 
-    // Initialiser et démarrer l'EventBatcher
-    EventBatcher::BatchConfig batchConfig;
-    batchConfig.ui_update_interval_ms = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
-                                        PerformanceConfig::VSYNC_SPACING;  // 60 FPS max
-    batchConfig.coalesce_identical_values = true;
-
-    m_eventBatcher = std::make_unique<EventBatcher>(batchConfig);
-    m_eventBatcher->start();
-
     // Récupérer le bridge LVGL
     m_lvglBridge = container_->resolve<Ili9341LvglBridge>();
     if (!m_lvglBridge) {
         // TODO DEBUG MSG
     }
 
-    // Créer le gestionnaire d'affichage
-    if (m_lvglBridge) {
-        displayManager_ = std::make_unique<DisplayManager>(m_lvglBridge);
-    }
-
-    // Créer le gestionnaire de vues si l'UI complète est activée
+    // Initialiser UISystemCore si l'UI complète est activée
     if (fullUIEnabled_) {
-        // Récupérer les dépendances LVGL
-        auto lvglBridge = container_->resolve<Ili9341LvglBridge>();
-        auto unifiedConfig = container_->resolve<UnifiedConfiguration>();
-        auto eventBus = container_->resolve<EventBus>();
-        
-        if (!lvglBridge || !unifiedConfig || !eventBus) {
-            return Result<bool>::error({ErrorCode::DependencyMissing, "Missing LVGL dependencies"});
-        }
-        
-        viewManager_ = std::make_shared<DefaultViewManager>(lvglBridge, unifiedConfig, eventBus);
-
-        if (!viewManager_->init()) {
-            return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to initialize ViewManager"});
+        if (!viewFactory_ || !uiCore_) {
+            return Result<bool>::error(Error(ErrorCode::DependencyMissing, "ViewFactory or UISystemCore not available"));
         }
 
-        // Créer l'écouteur d'événements UI et l'abonner aux événements
-        eventListener_ = std::make_unique<ViewManagerEventListener>(*viewManager_);
-        eventListener_->subscribe();
+        // Mettre à jour la configuration du core pour activer Full UI
+        UISystemCore::CoreConfig coreConfig;
+        coreConfig.enableFullUI = true;
+        coreConfig.enableEventProcessing = true;
+        coreConfig.enableDisplayRefresh = true;
+        uiCore_ = std::make_unique<UISystemCore>(coreConfig);
 
-        // Enregistrer le ViewManager dans le conteneur
-        container_->registerImplementation<ViewManager, DefaultViewManager>(
-            std::static_pointer_cast<DefaultViewManager>(viewManager_));
+        // Créer les composants via ViewFactory
+        auto viewManagerResult = viewFactory_->createViewManager();
+        if (!viewManagerResult.isSuccess()) {
+            return Result<bool>::error(viewManagerResult.error().value());
+        }
+
+        // Créer EventBatcher
+        EventBatcher::BatchConfig batchConfig;
+        batchConfig.ui_update_interval_ms = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
+                                            PerformanceConfig::VSYNC_SPACING;
+        batchConfig.coalesce_identical_values = true;
+        auto eventBatcher = std::make_unique<EventBatcher>(batchConfig);
+        eventBatcher->start();
+
+        // Créer DisplayManager
+        std::unique_ptr<DisplayManager> displayManager = nullptr;
+        if (m_lvglBridge) {
+            displayManager = std::make_unique<DisplayManager>(m_lvglBridge);
+        }
+
+        // Initialiser UISystemCore avec tous les composants
+        auto initResult = uiCore_->initialize(
+            viewManagerResult.value().value(),
+            std::move(displayManager),
+            std::move(eventBatcher)
+        );
+        
+        if (!initResult.isSuccess()) {
+            return Result<bool>::error(initResult.error().value());
+        }
+
+        // Configurer l'écouteur d'événements
+        if (uiCore_->getViewManager()) {
+            auto eventListener = std::make_unique<ViewManagerEventListener>(*uiCore_->getViewManager());
+            auto listenerResult = uiCore_->configureEventListener(std::move(eventListener));
+            if (!listenerResult.isSuccess()) {
+                return Result<bool>::error(listenerResult.error().value());
+            }
+        }
     }
 
     initialized_ = true;
@@ -76,40 +99,30 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
 }
 
 void UISubsystem::update() {
-    if (!initialized_ || !fullUIEnabled_ || !viewManager_) {
+    if (!initialized_) {
         return;
     }
 
-    // Traiter les batchs d'événements UI
-    if (m_eventBatcher) {
-        m_eventBatcher->processPendingBatches();
-    }
-
-    // Mettre à jour le gestionnaire de vues
-    viewManager_->update();
-
-    // Utiliser le DisplayManager pour rafraîchir l'affichage
-    if (displayManager_) {
-        displayManager_->update();
+    // Déléguer la mise à jour à UISystemCore
+    if (uiCore_) {
+        uiCore_->update();
     }
 }
 
 Result<bool> UISubsystem::showMessage(const std::string& message) {
-    if (!initialized_ || !fullUIEnabled_ || !viewManager_) {
-        return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized or disabled"});
+    if (!initialized_ || !uiCore_) {
+        return Result<bool>::error(Error(ErrorCode::OperationFailed, "UI not initialized"));
     }
 
-    // Utiliser le système modal LVGL
-    viewManager_->showModal(message.c_str());
-    return Result<bool>::success(true);
+    // Déléguer à UISystemCore
+    return uiCore_->showMessage(message);
 }
 
 Result<bool> UISubsystem::clearDisplay() {
-    if (!initialized_ || !fullUIEnabled_ || !viewManager_) {
-        return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized or disabled"});
+    if (!initialized_ || !uiCore_) {
+        return Result<bool>::error(Error(ErrorCode::OperationFailed, "UI not initialized"));
     }
 
-    // Cacher le modal et retourner à la vue principale
-    viewManager_->hideModal();
-    return Result<bool>::success(true);
+    // Déléguer à UISystemCore
+    return uiCore_->clearDisplay();
 }
