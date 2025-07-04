@@ -151,7 +151,7 @@ public:
         
         // Assert
         TEST_ASSERT_TRUE(result.isSuccess());
-        TEST_ASSERT_NOT_NULL(result.getValue().get());
+        TEST_ASSERT_NOT_NULL(result.value().value().get());
     }
 
     /**
@@ -168,7 +168,7 @@ public:
         
         // Assert
         TEST_ASSERT_FALSE(result.isSuccess());
-        TEST_ASSERT_EQUAL(ErrorCode::DependencyMissing, result.getError().code);
+        TEST_ASSERT_EQUAL(ErrorCode::DependencyMissing, result.error().value().code);
     }
 
     /**
@@ -186,7 +186,7 @@ public:
         // Assert
         // Note: Ce test peut échouer à l'initialisation du ViewManager car nous utilisons des mocks
         // mais il devrait au moins passer la validation des dépendances
-        TEST_ASSERT_TRUE(result.isSuccess() || result.getError().code == ErrorCode::InitializationFailed);
+        TEST_ASSERT_TRUE(result.isSuccess() || result.error().value().code == ErrorCode::InitializationFailed);
     }
 
     /**
@@ -202,7 +202,7 @@ public:
         
         // Assert
         TEST_ASSERT_FALSE(result.isSuccess());
-        TEST_ASSERT_EQUAL(ErrorCode::ConfigurationError, result.getError().code);
+        TEST_ASSERT_EQUAL(ErrorCode::ConfigurationError, result.error().value().code);
     }
 
 private:

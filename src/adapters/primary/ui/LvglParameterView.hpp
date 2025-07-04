@@ -3,6 +3,10 @@
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
 #include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
+#include "adapters/primary/ui/parameter/MidiConfigurationParser.hpp"
+#include "adapters/primary/ui/parameter/WidgetMappingManager.hpp"
+#include "adapters/primary/ui/parameter/ParameterEventHandler.hpp"
+#include "adapters/primary/ui/parameter/LvglSceneManager.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/UIEvent.hpp"
@@ -116,13 +120,6 @@ private:
     std::shared_ptr<UnifiedConfiguration> config_;
     std::shared_ptr<EventBus> eventBus_;
     
-    // Container grille et widgets
-    lv_obj_t* grid_container_;
-    std::array<std::unique_ptr<ParameterWidget>, 8> parameter_widgets_;
-    
-    // Objets LVGL
-    lv_obj_t* main_screen_;
-    
     // État
     bool initialized_;
     bool active_;
@@ -130,51 +127,30 @@ private:
     // Event handling
     SubscriptionId event_subscription_id_;
     
-    // Configuration des widgets (CC 1-8 mappés aux widgets 0-7)
-    // Le mapping est géré dans le .cpp avec un tableau statique
+    // Parser pour extraction configuration MIDI (Phase 5.2 refactoring)
+    std::unique_ptr<MidiConfigurationParser> configParser_;
     
-    // Mapping des boutons vers les widgets parents (pour boutons d'encodeurs)
-    std::map<uint16_t, uint8_t> button_to_widget_mapping_;  // button_id -> widget_index
+    // Gestionnaire de mappings CC→Widget et Button→Widget (Phase 5.3 refactoring)
+    std::unique_ptr<WidgetMappingManager> mappingManager_;
     
-    // Structure pour les infos des boutons (déplacée ici pour être accessible)
-    struct ButtonInfo {
-        uint16_t button_id;
-        uint16_t parent_encoder_id;  // 0 si bouton indépendant
-        String name;
-        bool hasParent() const { return parent_encoder_id != 0; }
-    };
+    // Gestionnaire d'événements pour MIDI et boutons (Phase 5.4 refactoring)
+    std::unique_ptr<ParameterEventHandler> eventHandler_;
     
-    // Liste des boutons indépendants (qui n'ont pas de parent encodeur)
-    std::vector<ButtonInfo> standalone_buttons_;
+    // Gestionnaire de scène LVGL pour les objets et widgets (Phase 5.5 refactoring)
+    std::unique_ptr<LvglSceneManager> sceneManager_;
     
-    // Méthodes privées
-    void setupMainScreen();
-    void createGridContainer();
-    void createParameterWidgets();
-    void cleanupLvglObjects();
+    // Méthodes privées - Création du gestionnaire de scène LVGL (Phase 5.5 refactoring)
+    void createSceneManager();
     
-    // Gestion du mapping CC->Widget depuis la configuration
-    void initializeCCMappingFromConfig();
-    void initializeWidgetConfigurationsFromConfig();
+    // Gestion du mapping CC->Widget depuis la configuration (Phase 5.3 refactoring)
+    void initializeMappingsFromConfig();
     
-    // Structure pour les infos extraites de la config
-    struct MidiControlInfo {
-        uint8_t cc_number;
-        uint8_t channel;
-        String name;
-        InputId control_id;
-    };
-    std::vector<MidiControlInfo> extractMidiControlsFromConfig();
+    // Création du gestionnaire d'événements (Phase 5.4 refactoring)
+    void createEventHandler();
     
     // Event handling
     void subscribeToEvents();
     void unsubscribeFromEvents();
     bool handleUIParameterUpdateEvent(const UIParameterUpdateEvent& event);
     bool handleButtonEvent(const Event& event);
-    
-    // Gestion des boutons
-    void initializeButtonMappingFromConfig();
-    void setupButtonIndicators();
-    void finalizeButtonIndicatorPositions();
-    std::vector<ButtonInfo> extractButtonInfoFromConfig();
 };
