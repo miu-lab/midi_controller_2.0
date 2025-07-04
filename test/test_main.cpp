@@ -68,6 +68,16 @@ extern void test_config_registry_register_unified_config_null();
 extern void test_config_registry_with_null_container();
 extern void test_config_registry_multiple_registrations();
 
+// Tests DisplayManager
+extern void test_display_manager_constructor_valid_bridge();
+extern void test_display_manager_constructor_null_bridge();
+extern void test_display_manager_update_first_call();
+extern void test_display_manager_update_fast_calls();
+extern void test_display_manager_force_refresh();
+extern void test_display_manager_set_refresh_interval();
+extern void test_display_manager_get_refresh_interval_default();
+extern void test_display_manager_update_with_null_bridge();
+
 // Fonctions setUp/tearDown par défaut pour Unity
 // Note: les tests spécifiques peuvent redéfinir ces fonctions
 void setUp(void) __attribute__((weak));
@@ -171,6 +181,16 @@ int main() {
     RUN_TEST(test_config_registry_register_unified_config_null);
     RUN_TEST(test_config_registry_with_null_container);
     RUN_TEST(test_config_registry_multiple_registrations);
+    
+    // Tests DisplayManager
+    RUN_TEST(test_display_manager_constructor_valid_bridge);
+    RUN_TEST(test_display_manager_constructor_null_bridge);
+    RUN_TEST(test_display_manager_update_first_call);
+    RUN_TEST(test_display_manager_update_fast_calls);
+    RUN_TEST(test_display_manager_force_refresh);
+    RUN_TEST(test_display_manager_set_refresh_interval);
+    RUN_TEST(test_display_manager_get_refresh_interval_default);
+    RUN_TEST(test_display_manager_update_with_null_bridge);
     
     UNITY_END();
     

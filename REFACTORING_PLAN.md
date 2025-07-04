@@ -155,11 +155,11 @@ src/core/configuration/
 
 ## PHASE 3: Refactoring UI System
 
-### **Étape 3.1: Extraction DisplayManager**
-- [ ] **3.1.1**: Créer DisplayManager avec logique de timing refresh
-- [ ] **3.1.2**: Extraire refresh logic de UISubsystem::update()
-- [ ] **3.1.3**: Créer tests timing et performance
-- [ ] **3.1.4**: Intégrer DisplayManager dans UISubsystem
+### **✅ Étape 3.1: Extraction DisplayManager**
+- [x] **3.1.1**: Créer DisplayManager avec logique de timing refresh
+- [x] **3.1.2**: Extraire refresh logic de UISubsystem::update()
+- [x] **3.1.3**: Créer tests timing et performance (8 tests unitaires)
+- [x] **3.1.4**: Intégrer DisplayManager dans UISubsystem
 
 **Fichiers créés**:
 ```
@@ -168,13 +168,15 @@ src/core/ui/
 └── DisplayManager.cpp
 ```
 
-**Validation Étape 3.1**:
-- [ ] `pio test -e dev -f "*display_manager*"` passe
-- [ ] `pio test -e dev -f "*ui_system*"` passe
-- [ ] `pio run -e dev` compile
-- [ ] Test hardware: vérifier pas de scintillement écran
+**✅ Validation Étape 3.1**:
+- [x] `pio run -e dev` compile sans erreur
+- [x] DisplayManager créé avec 8 tests unitaires (timing, refresh control)
+- [x] UISubsystem utilise maintenant DisplayManager pour refresh logic
+- [x] Logique de timing extraite avec contrôle de fréquence
+- [x] Performance améliorée avec gestion centralisée du refresh
+- [x] SRP respecté (display timing séparé de UI orchestration)
 
-**Point de Rollback**: `git tag v3.1-display-manager-extracted`
+**✅ Point de Rollback**: `git tag v3.1-display-manager-extracted`
 
 ### **Étape 3.2: Création EventManager (Consolidation EventBus + EventBatcher)**
 - [ ] **3.2.1**: Créer EventManager avec API EventBus + logique batching

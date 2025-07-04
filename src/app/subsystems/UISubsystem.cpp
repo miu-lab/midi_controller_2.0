@@ -40,6 +40,11 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         // TODO DEBUG MSG
     }
 
+    // Créer le gestionnaire d'affichage
+    if (m_lvglBridge) {
+        displayManager_ = std::make_unique<DisplayManager>(m_lvglBridge);
+    }
+
     // Créer le gestionnaire de vues si l'UI complète est activée
     if (fullUIEnabled_) {
         // Récupérer les dépendances LVGL
@@ -83,15 +88,9 @@ void UISubsystem::update() {
     // Mettre à jour le gestionnaire de vues
     viewManager_->update();
 
-    // Rafraîchir l'affichage LVGL avec limitation de fréquence
-    static unsigned long last_display_refresh = 0;
-    constexpr unsigned long DISPLAY_REFRESH_INTERVAL_MS =
-        PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
-        PerformanceConfig::VSYNC_SPACING;  // 60 FPS max
-
-    if (m_lvglBridge && (millis() - last_display_refresh) >= DISPLAY_REFRESH_INTERVAL_MS) {
-        m_lvglBridge->refreshDisplay();
-        last_display_refresh = millis();
+    // Utiliser le DisplayManager pour rafraîchir l'affichage
+    if (displayManager_) {
+        displayManager_->update();
     }
 }
 
