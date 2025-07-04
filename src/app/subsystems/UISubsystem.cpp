@@ -53,8 +53,13 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         coreConfig.enableDisplayRefresh = true;
         uiCore_ = std::make_unique<UISystemCore>(coreConfig);
 
-        // Créer les composants via ViewFactory
-        auto viewManagerResult = viewFactory_->createViewManager();
+        // Créer les composants via ViewFactory avec Full UI activé
+        ViewFactory::ViewManagerConfig viewManagerConfig;
+        viewManagerConfig.enableFullUI = true;
+        viewManagerConfig.enableEventListener = true;
+        viewManagerConfig.registerInContainer = true;
+        
+        auto viewManagerResult = viewFactory_->createViewManager(viewManagerConfig);
         if (!viewManagerResult.isSuccess()) {
             return Result<bool>::error(viewManagerResult.error().value());
         }

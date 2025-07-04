@@ -41,12 +41,14 @@ Ili9341Driver::Ili9341Driver(const Config& config)
 
 bool Ili9341Driver::initialize() {
     if (initialized_) {
+        Serial.println("Ili9341Driver already initialized");
         return true;
     }
 
-    // TODO DEBUG MSG
+    Serial.println("Ili9341Driver: Starting initialization...");
 
     // Configuration des pins
+    Serial.println("Ili9341Driver: Configuring pins...");
     configurePins();
 
     // Créer le driver ILI9341_T4
@@ -60,23 +62,26 @@ bool Ili9341Driver::initialize() {
     );
 
     if (!tft_) {
-        // TODO DEBUG MSG
+        Serial.println("ERROR: Ili9341Driver - Failed to create ILI9341_T4 driver");
         return false;
     }
 
     // Initialiser le driver
+    Serial.println("Ili9341Driver: Initializing TFT driver...");
     tft_->begin(config_.spi_speed);
     tft_->setRotation(config_.rotation);
     // IMPORTANT: Donner au driver son propre framebuffer interne
     tft_->setFramebuffer(framebuffer_);
 
     // Configurer les diff buffers pour optimisation
+    Serial.println("Ili9341Driver: Setting up diff buffers...");
     setupDiffBuffers();
 
     // Configurer les paramètres de performance
+    Serial.println("Ili9341Driver: Configuring performance settings...");
     setupPerformance();
 
-    // TODO DEBUG MSG
+    Serial.println("Ili9341Driver: Initialization completed successfully");
     initialized_ = true;
 
     return true;

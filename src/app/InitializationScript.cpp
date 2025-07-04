@@ -1,5 +1,7 @@
 #include "InitializationScript.hpp"
 
+#include <Arduino.h>
+
 // Inclusions nécessaires pour l'implémentation
 #include "adapters/primary/ui/DefaultViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341Driver.hpp"
@@ -29,9 +31,11 @@ Result<bool> InitializationScript::initializeContainer(
     }
 
     // Étape 1: Services de base
+    Serial.println("Registering base services...");
     registerBaseServices(container, config);
 
     // Enregistrer l'EventBus singleton
+    Serial.println("Setting up EventBus...");
     auto& eventBusInstance = EventBus::getInstance();
     std::shared_ptr<EventBus> eventBus(&eventBusInstance, [](EventBus*){});
     container->registerDependency<EventBus>(eventBus);
@@ -41,12 +45,22 @@ Result<bool> InitializationScript::initializeContainer(
     container->registerDependency<TaskScheduler>(taskScheduler);
 
     // Étape 2: Adaptateurs matériels
+    Serial.println("Setting up hardware adapters...");
     auto hardwareResult = setupHardwareAdapters(container);
-    if (hardwareResult.isError()) return hardwareResult;
+    if (hardwareResult.isError()) {
+        Serial.print("Hardware setup failed: ");
+        Serial.println(hardwareResult.error().value().message);
+        return hardwareResult;
+    }
 
     // Étape 3: Sous-systèmes
+    Serial.println("Initializing subsystems...");
     auto subsystemResult = initializeSubsystems(container);
-    if (subsystemResult.isError()) return subsystemResult;
+    if (subsystemResult.isError()) {
+        Serial.print("Subsystem init failed: ");
+        Serial.println(subsystemResult.error().value().message);
+        return subsystemResult;
+    }
 
     // Étape 4: Contrôleurs et interactions
     if (!setupControllers(container)) {

@@ -41,37 +41,41 @@ Ili9341LvglBridge::~Ili9341LvglBridge() {
 
 bool Ili9341LvglBridge::initialize() {
     if (initialized_) {
+        Serial.println("LvglBridge already initialized");
         return true;
     }
     
     if (!driver_) {
-        // TODO DEBUG MSG
+        Serial.println("ERROR: LvglBridge - Driver is null");
         return false;
     }
     
-    // TODO DEBUG MSG
+    Serial.println("LvglBridge: Starting initialization...");
     
     // Setup LVGL core
+    Serial.println("LvglBridge: Setting up LVGL core...");
     if (!setupLvglCore()) {
-        // TODO DEBUG MSG
+        Serial.println("ERROR: LvglBridge - setupLvglCore failed");
         return false;
     }
     
     // Allouer buffers LVGL
+    Serial.println("LvglBridge: Allocating LVGL buffers...");
     if (!allocateLvglBuffers()) {
-        // TODO DEBUG MSG
+        Serial.println("ERROR: LvglBridge - allocateLvglBuffers failed");
         return false;
     }
     
     // Setup display LVGL
+    Serial.println("LvglBridge: Setting up LVGL display...");
     if (!setupLvglDisplay()) {
-        // TODO DEBUG MSG
+        Serial.println("ERROR: LvglBridge - setupLvglDisplay failed");
         freeLvglBuffers();
         return false;
     }
     
     initialized_ = true;
-    // TODO DEBUG MSG
+    Serial.println("LvglBridge: Initialization completed successfully");
     return true;
 }
 

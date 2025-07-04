@@ -28,22 +28,29 @@ void setup() {
     while (!Serial && millis() - t0 < timeout) {}
 
     Serial.println("=== Init OK ===");
-    // TODO DEBUG MSG
+    Serial.println("Creating DependencyContainer...");
     container = std::make_shared<DependencyContainer>();
 
-    // TODO DEBUG MSG
+    Serial.println("Initializing container...");
     auto initResult = InitializationScript::initializeContainer(container, appConfig);
     if (initResult.isError()) {
-        // TODO DEBUG MSG
+        Serial.print("ERREUR InitializationScript: ");
+        Serial.println(static_cast<int>(initResult.error().value().code));
+        Serial.println(initResult.error().value().message);
         return;
     }
 
+    Serial.println("Creating MidiControllerApp...");
     app = std::make_shared<MidiControllerApp>(container);
     auto appInitResult = app->init();
     if (appInitResult.isError()) {
-        // TODO DEBUG MSG
+        Serial.print("ERREUR MidiControllerApp init: ");
+        Serial.println(static_cast<int>(appInitResult.error().value().code));
+        Serial.println(appInitResult.error().value().message);
         return;
     }
+    
+    Serial.println("=== Initialization Complete ===");
 }
 
 void loop() {
