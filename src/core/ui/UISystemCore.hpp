@@ -7,7 +7,7 @@
 // Forward declarations
 class ViewManager;
 class DisplayManager;
-class EventBatcher;
+class EventManager;
 class ViewManagerEventListener;
 
 /**
@@ -47,13 +47,13 @@ public:
      * @brief Initialise le noyau UI avec les composants nécessaires
      * @param viewManager Gestionnaire de vues
      * @param displayManager Gestionnaire d'affichage
-     * @param eventBatcher Processeur d'événements batchés
+     * @param eventManager Gestionnaire d'événements unifié
      * @return Result indiquant le succès ou l'erreur
      */
     Result<bool> initialize(
         std::shared_ptr<ViewManager> viewManager,
         std::unique_ptr<DisplayManager> displayManager,
-        std::unique_ptr<EventBatcher> eventBatcher);
+        std::unique_ptr<EventManager> eventManager);
 
     /**
      * @brief Met à jour tous les composants UI dans le bon ordre
@@ -105,7 +105,7 @@ private:
     // Composants UI centralisés
     std::shared_ptr<ViewManager> viewManager_;
     std::unique_ptr<DisplayManager> displayManager_;
-    std::unique_ptr<EventBatcher> eventBatcher_;
+    std::unique_ptr<EventManager> eventManager_;
     std::unique_ptr<ViewManagerEventListener> eventListener_;
 
     /**
@@ -115,9 +115,9 @@ private:
     bool validateComponents() const;
 
     /**
-     * @brief Traite les événements UI en batch
+     * @brief Traite les événements UI via EventManager
      */
-    void processEventBatches();
+    void processEvents();
 
     /**
      * @brief Met à jour le gestionnaire de vues

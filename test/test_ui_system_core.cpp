@@ -52,18 +52,18 @@ private:
 };
 
 /**
- * @brief Mock EventBatcher pour les tests
+ * @brief Mock EventManager pour les tests
  */
-class MockEventBatcherForCore {
+class MockEventManagerForCore {
 public:
-    MockEventBatcherForCore() : processCalled_(false) {}
+    MockEventManagerForCore() : updateCalled_(false) {}
     
-    void processPendingBatches() { processCalled_ = true; }
-    bool processCalled() const { return processCalled_; }
-    void reset() { processCalled_ = false; }
+    void update() { updateCalled_ = true; }
+    bool updateCalled() const { return updateCalled_; }
+    void reset() { updateCalled_ = false; }
 
 private:
-    bool processCalled_;
+    bool updateCalled_;
 };
 
 /**
@@ -82,14 +82,14 @@ public:
         // Créer les mocks
         mockViewManager_ = std::make_shared<MockViewManagerForCore>();
         mockDisplayManager_ = std::make_unique<MockDisplayManagerForCore>();
-        mockEventBatcher_ = std::make_unique<MockEventBatcherForCore>();
+        mockEventManager_ = std::make_unique<MockEventManagerForCore>();
     }
 
     void tearDown() {
         uiCore_.reset();
         mockViewManager_.reset();
         mockDisplayManager_.reset();
-        mockEventBatcher_.reset();
+        mockEventManager_.reset();
     }
 
     /**
@@ -129,10 +129,10 @@ public:
         // Arrange - utiliser des pointeurs factices pour éviter la déréférence
         auto viewManager = std::shared_ptr<ViewManager>(reinterpret_cast<ViewManager*>(0x1000), [](ViewManager*) {});
         auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventBatcher = std::unique_ptr<EventBatcher>(reinterpret_cast<EventBatcher*>(0x3000), [](EventBatcher*) {});
+        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
         
         // Act
-        auto result = uiCore_->initialize(std::move(viewManager), std::move(displayManager), std::move(eventBatcher));
+        auto result = uiCore_->initialize(std::move(viewManager), std::move(displayManager), std::move(eventManager));
         
         // Assert
         TEST_ASSERT_TRUE(result.isSuccess());
@@ -146,10 +146,10 @@ public:
     void testInitializeMissingViewManager() {
         // Arrange
         auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventBatcher = std::unique_ptr<EventBatcher>(reinterpret_cast<EventBatcher*>(0x3000), [](EventBatcher*) {});
+        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
         
         // Act
-        auto result = uiCore_->initialize(nullptr, std::move(displayManager), std::move(eventBatcher));
+        auto result = uiCore_->initialize(nullptr, std::move(displayManager), std::move(eventManager));
         
         // Assert
         TEST_ASSERT_FALSE(result.isSuccess());
@@ -182,9 +182,9 @@ public:
         // Arrange
         auto viewManager = std::shared_ptr<ViewManager>(reinterpret_cast<ViewManager*>(0x1000), [](ViewManager*) {});
         auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventBatcher = std::unique_ptr<EventBatcher>(reinterpret_cast<EventBatcher*>(0x3000), [](EventBatcher*) {});
+        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
         
-        uiCore_->initialize(viewManager, std::move(displayManager), std::move(eventBatcher));
+        uiCore_->initialize(viewManager, std::move(displayManager), std::move(eventManager));
         
         // Act - deuxième initialisation
         auto result = uiCore_->initialize(viewManager, nullptr, nullptr);
@@ -274,14 +274,14 @@ private:
     std::unique_ptr<UISystemCore> uiCore_;
     std::shared_ptr<MockViewManagerForCore> mockViewManager_;
     std::unique_ptr<MockDisplayManagerForCore> mockDisplayManager_;
-    std::unique_ptr<MockEventBatcherForCore> mockEventBatcher_;
+    std::unique_ptr<MockEventManagerForCore> mockEventManager_;
 
     void initializeWithMocks() {
         auto viewManager = std::shared_ptr<ViewManager>(reinterpret_cast<ViewManager*>(0x1000), [](ViewManager*) {});
         auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventBatcher = std::unique_ptr<EventBatcher>(reinterpret_cast<EventBatcher*>(0x3000), [](EventBatcher*) {});
+        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
         
-        uiCore_->initialize(std::move(viewManager), std::move(displayManager), std::move(eventBatcher));
+        uiCore_->initialize(std::move(viewManager), std::move(displayManager), std::move(eventManager));
     }
 };
 

@@ -3,7 +3,7 @@
 #include "adapters/primary/ui/ViewManager.hpp"
 #include "adapters/primary/ui/ViewManagerEventListener.hpp"
 #include "core/ui/DisplayManager.hpp"
-#include "core/domain/events/EventBatcher.hpp"
+#include "core/events/EventManager.hpp"
 #include "core/utils/Error.hpp"
 
 UISystemCore::UISystemCore(const CoreConfig& config)
@@ -14,7 +14,7 @@ UISystemCore::UISystemCore(const CoreConfig& config)
 Result<bool> UISystemCore::initialize(
     std::shared_ptr<ViewManager> viewManager,
     std::unique_ptr<DisplayManager> displayManager,
-    std::unique_ptr<EventBatcher> eventBatcher) {
+    std::unique_ptr<EventManager> eventManager) {
     
     if (initialized_) {
         return Result<bool>::success(true);
@@ -23,7 +23,7 @@ Result<bool> UISystemCore::initialize(
     // Stocker les composants
     viewManager_ = viewManager;
     displayManager_ = std::move(displayManager);
-    eventBatcher_ = std::move(eventBatcher);
+    eventManager_ = std::move(eventManager);
 
     // Valider les composants selon la configuration
     if (!validateComponents()) {
@@ -42,7 +42,7 @@ void UISystemCore::update() {
     }
 
     // Mettre à jour dans le bon ordre pour optimiser les performances
-    processEventBatches();
+    processEvents();
     updateViewManager();
     refreshDisplay();
 }
@@ -125,17 +125,17 @@ bool UISystemCore::validateComponents() const {
         return false;
     }
 
-    // EventBatcher est requis si le traitement d'événements est activé
-    if (config_.enableEventProcessing && config_.enableFullUI && !eventBatcher_) {
+    // EventManager est requis si le traitement d'événements est activé
+    if (config_.enableEventProcessing && config_.enableFullUI && !eventManager_) {
         return false;
     }
 
     return true;
 }
 
-void UISystemCore::processEventBatches() {
-    if (config_.enableEventProcessing && eventBatcher_) {
-        eventBatcher_->processPendingBatches();
+void UISystemCore::processEvents() {
+    if (config_.enableEventProcessing && eventManager_) {
+        eventManager_->update();
     }
 }
 

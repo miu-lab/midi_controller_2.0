@@ -59,13 +59,15 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
             return Result<bool>::error(viewManagerResult.error().value());
         }
 
-        // Créer EventBatcher
-        EventBatcher::BatchConfig batchConfig;
-        batchConfig.ui_update_interval_ms = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
-                                            PerformanceConfig::VSYNC_SPACING;
-        batchConfig.coalesce_identical_values = true;
-        auto eventBatcher = std::make_unique<EventBatcher>(batchConfig);
-        eventBatcher->start();
+        // Créer EventManager (remplace EventBatcher)
+        EventManager::Config managerConfig;
+        managerConfig.uiUpdateIntervalMs = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
+                                          PerformanceConfig::VSYNC_SPACING;
+        managerConfig.coalesceIdenticalValues = true;
+        managerConfig.enableBatching = true;
+        auto eventManager = std::make_unique<EventManager>(managerConfig);
+        eventManager->initialize();
+        eventManager->start();
 
         // Créer DisplayManager
         std::unique_ptr<DisplayManager> displayManager = nullptr;
@@ -77,7 +79,7 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         auto initResult = uiCore_->initialize(
             viewManagerResult.value().value(),
             std::move(displayManager),
-            std::move(eventBatcher)
+            std::move(eventManager)
         );
         
         if (!initResult.isSuccess()) {

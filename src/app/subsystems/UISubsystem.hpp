@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <memory>
 #include <string>
 
@@ -9,7 +8,7 @@
 #include "core/domain/interfaces/IUISystem.hpp"
 #include "core/utils/Result.hpp"
 #include "adapters/primary/ui/ViewManagerEventListener.hpp"
-#include "core/domain/events/EventBatcher.hpp"
+#include "core/events/EventManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "core/ui/DisplayManager.hpp"
 #include "core/ui/ViewFactory.hpp"
