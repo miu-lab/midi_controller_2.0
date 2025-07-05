@@ -177,7 +177,7 @@ Result<bool> InitializationScript::initializeSubsystems(
                  scheduler->addTask([system]() { system->update(); },
                                     PerformanceConfig::INPUT_TIME_INTERVAL,
                                     0,
-                                    "InputUpdate");  // 1ms pour l'InputSystem
+                                    "InputUpdate");
              }
              return initResult;
          }});
@@ -192,7 +192,7 @@ Result<bool> InitializationScript::initializeSubsystems(
                  scheduler->addTask([system]() { system->update(); },
                                     PerformanceConfig::MIDI_TIME_INTERVAL,
                                     1,
-                                    "MidiUpdate");  // 1ms pour le MidiSubsystem
+                                    "MidiUpdate");
              }
              return initResult;
          }});
@@ -205,7 +205,7 @@ Result<bool> InitializationScript::initializeSubsystems(
                  scheduler->addTask([system]() { system->update(); },
                                     PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS * 1000,
                                     1,
-                                    "UIUpdate");  // 16ms pour l'UISubsystem (approx 60 FPS)
+                                    "UIUpdate");
              }
              return initResult;
          }});
