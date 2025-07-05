@@ -9,7 +9,7 @@
  * Simule un stockage persistant pour les contrôles (en RAM).
  * Peut être remplacé par EEPROM/Flash plus tard.
  */
-class SettingsStore {
+class ControlDefinitionStore {
 public:
     void saveControlDefinition(const ControlDefinition& controlDef);
     std::optional<ControlDefinition> loadControlDefinition(InputId id) const;

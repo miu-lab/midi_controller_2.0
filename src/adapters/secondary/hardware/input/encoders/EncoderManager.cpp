@@ -3,7 +3,7 @@
 
 EncoderManager::EncoderManager(const std::vector<EncoderConfig>& cfgs) {
     for (auto& cfg : cfgs) {
-        ownedEncoders_.push_back(std::make_unique<InterruptQuadratureEncoder>(cfg));
+        ownedEncoders_.push_back(std::make_unique<QuadratureEncoder>(cfg));
     }
     for (auto& up : ownedEncoders_) {
         encoders_.push_back(up.get());

@@ -2,8 +2,7 @@
 
 #include <cstdio>  // Pour snprintf
 
-#include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
-
+#include "adapters/secondary/midi/MidiOutputEventAdapter.hpp"
 
 SendMidiCCCommand::SendMidiCCCommand(MidiOutputPort& midiOut, uint8_t channel, uint8_t cc,
                                      uint8_t value, uint8_t source)

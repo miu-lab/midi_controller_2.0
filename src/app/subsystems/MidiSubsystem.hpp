@@ -34,8 +34,8 @@ public:
      * @brief Initialise le sous-système MIDI
      *
      * Cette méthode configure la chaîne de traitement MIDI:
-     * TeensyUsbMidiOut -> BufferedMidiOut -> EventEnabledMidiOut
-     * 
+     * TeensyUsbMidiOut -> BufferedMidiOut -> MidiOutputEventAdapter
+     *
      * @return Result<bool> Succès ou message d'erreur
      */
     Result<bool> init() override;

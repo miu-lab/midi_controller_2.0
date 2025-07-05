@@ -1,12 +1,14 @@
 #pragma once
 
-#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
-#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
-#include "WidgetMappingManager.hpp"
-#include <memory>
+#include <lvgl.h>
+
 #include <array>
 #include <functional>
-#include <lvgl.h>
+#include <memory>
+
+#include "ParameterWidgetMappingManager.hpp"
+#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
+#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
 
 /**
  * @brief Gestionnaire de scène LVGL pour les widgets de paramètres
@@ -21,7 +23,7 @@
  * Respecte le principe de responsabilité unique en se concentrant uniquement
  * sur la gestion des objets LVGL et leur hiérarchie.
  */
-class LvglSceneManager {
+class ParameterSceneManager {
 public:
     /**
      * @brief Configuration pour le gestionnaire de scène
@@ -64,13 +66,14 @@ public:
      * @param config Configuration de la scène
      * @param mappingManager Gestionnaire de mappings pour les boutons (optionnel)
      */
-    explicit LvglSceneManager(const SceneConfig& config,
-                             std::shared_ptr<WidgetMappingManager> mappingManager = nullptr);
+    explicit ParameterSceneManager(
+        const SceneConfig& config,
+        std::shared_ptr<ParameterWidgetMappingManager> mappingManager = nullptr);
 
     /**
      * @brief Destructeur - nettoie automatiquement les objets LVGL
      */
-    ~LvglSceneManager();
+    ~ParameterSceneManager();
 
     /**
      * @brief Initialise la scène LVGL complète
@@ -108,7 +111,7 @@ public:
      * @brief Met à jour le gestionnaire de mappings
      * @param mappingManager Nouveau gestionnaire de mappings
      */
-    void updateMappingManager(std::shared_ptr<WidgetMappingManager> mappingManager);
+    void updateMappingManager(std::shared_ptr<ParameterWidgetMappingManager> mappingManager);
 
     // === ACCESSEURS ===
 
@@ -156,7 +159,7 @@ public:
 
 private:
     SceneConfig config_;
-    std::shared_ptr<WidgetMappingManager> mappingManager_;
+    std::shared_ptr<ParameterWidgetMappingManager> mappingManager_;
     bool initialized_;
     
     // Objets LVGL

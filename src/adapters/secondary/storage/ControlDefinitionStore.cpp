@@ -1,12 +1,12 @@
-#include "adapters/secondary/storage/SettingsStore.hpp"
-
 #include <optional>
 
-void SettingsStore::saveControlDefinition(const ControlDefinition& controlDef) {
+#include "adapters/secondary/storage/ControlDefinitionStore.hpp"
+
+void ControlDefinitionStore::saveControlDefinition(const ControlDefinition& controlDef) {
     storage_[controlDef.id] = controlDef;
 }
 
-std::optional<ControlDefinition> SettingsStore::loadControlDefinition(InputId id) const {
+std::optional<ControlDefinition> ControlDefinitionStore::loadControlDefinition(InputId id) const {
     auto it = storage_.find(id);
     if (it != storage_.end()) {
         return it->second;
@@ -14,7 +14,7 @@ std::optional<ControlDefinition> SettingsStore::loadControlDefinition(InputId id
     return std::nullopt;
 }
 
-std::vector<ControlDefinition> SettingsStore::loadAllControlDefinitions() const {
+std::vector<ControlDefinition> ControlDefinitionStore::loadAllControlDefinitions() const {
     std::vector<ControlDefinition> result;
     result.reserve(storage_.size());
     
@@ -25,6 +25,6 @@ std::vector<ControlDefinition> SettingsStore::loadAllControlDefinitions() const 
     return result;
 }
 
-void SettingsStore::clearAll() {
+void ControlDefinitionStore::clearAll() {
     storage_.clear();
 }

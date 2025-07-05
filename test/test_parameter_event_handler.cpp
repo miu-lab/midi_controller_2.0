@@ -65,8 +65,8 @@ private:
 class TestParameterEventHandler {
 public:
     static MockParameterWidget* mockWidgets[8];
-    static std::shared_ptr<WidgetMappingManager> mockMappingManager;
-    
+    static std::shared_ptr<ParameterWidgetMappingManager> mockMappingManager;
+
     static void setUp() {
         // Créer les mock widgets
         for (int i = 0; i < 8; i++) {
@@ -74,12 +74,12 @@ public:
         }
         
         // Créer un mapping manager configuré
-        mockMappingManager = std::make_shared<WidgetMappingManager>();
-        
+        mockMappingManager = std::make_shared<ParameterWidgetMappingManager>();
+
         // Configuration de test avec CC1-3 mappés aux widgets 0-2
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
         for (int i = 0; i < 3; i++) {
-            MidiConfigurationParser::MidiControlInfo info;
+            ConfigurationMidiExtractor::MidiControlInfo info;
             info.cc_number = i + 1;  // CC1, CC2, CC3
             info.channel = 0;
             info.name = "ENC" + String(i + 1);
@@ -88,8 +88,8 @@ public:
         }
         
         // Bouton test mappé au widget 0
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        MidiConfigurationParser::ButtonInfo buttonInfo;
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+        ConfigurationMidiExtractor::ButtonInfo buttonInfo;
         buttonInfo.button_id = 1071;
         buttonInfo.parent_encoder_id = 71;  // Parent de CC1
         buttonInfo.name = "ENC1 BTN";
@@ -359,7 +359,7 @@ public:
 
 // Définitions statiques
 MockParameterWidget* TestParameterEventHandler::mockWidgets[8] = {nullptr};
-std::shared_ptr<WidgetMappingManager> TestParameterEventHandler::mockMappingManager;
+std::shared_ptr<ParameterWidgetMappingManager> TestParameterEventHandler::mockMappingManager;
 
 void test_parameter_event_handler_constructor_default() {
     TestParameterEventHandler::setUp();

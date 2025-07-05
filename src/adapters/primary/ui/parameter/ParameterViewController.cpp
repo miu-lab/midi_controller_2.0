@@ -236,23 +236,23 @@ bool ParameterViewController::isInitialized() const {
 //=============================================================================
 
 bool ParameterViewController::initializeConfigParser() {
-    MidiConfigurationParser::ParserConfig parserConfig;
+    ConfigurationMidiExtractor::ParserConfig parserConfig;
     parserConfig.enableLogging = config_.enableLogging;
-    
-    configParser_ = std::make_unique<MidiConfigurationParser>(parserConfig);
-    
+
+    configParser_ = std::make_unique<ConfigurationMidiExtractor>(parserConfig);
+
     logDebug("Config parser initialized");
     return configParser_ != nullptr;
 }
 
 bool ParameterViewController::initializeMappingManager() {
-    WidgetMappingManager::MappingConfig mappingConfig;
+    ParameterWidgetMappingManager::MappingConfig mappingConfig;
     mappingConfig.maxWidgets = config_.maxWidgets;
     mappingConfig.enableLogging = config_.enableLogging;
     mappingConfig.enableButtonMapping = true;
-    
-    mappingManager_ = std::make_unique<WidgetMappingManager>(mappingConfig);
-    
+
+    mappingManager_ = std::make_unique<ParameterWidgetMappingManager>(mappingConfig);
+
     logDebug("Mapping manager initialized");
     return mappingManager_ != nullptr;
 }
@@ -280,7 +280,7 @@ bool ParameterViewController::initializeSceneManager() {
     }
     
     // Configuration du gestionnaire de scène
-    LvglSceneManager::SceneConfig sceneConfig;
+    ParameterSceneManager::SceneConfig sceneConfig;
     sceneConfig.maxWidgets = config_.maxWidgets;
     sceneConfig.screenWidth = config_.screenWidth;
     sceneConfig.screenHeight = config_.screenHeight;
@@ -294,15 +294,15 @@ bool ParameterViewController::initializeSceneManager() {
     sceneConfig.enableLogging = config_.enableLogging;
     
     // Créer le gestionnaire avec les mappings partagés
-    sceneManager_ = std::make_unique<LvglSceneManager>(
+    sceneManager_ = std::make_unique<ParameterSceneManager>(
         sceneConfig,
-        std::shared_ptr<WidgetMappingManager>(mappingManager_.get(), [](WidgetMappingManager*){})
-    );
-    
+        std::shared_ptr<ParameterWidgetMappingManager>(mappingManager_.get(),
+                                                       [](ParameterWidgetMappingManager*) {}));
+
     // Fonction d'accès à la configuration des widgets
-    auto widgetConfigAccessor = [this](uint8_t index) -> LvglSceneManager::WidgetConfig* {
-        static std::array<LvglSceneManager::WidgetConfig, 8> configs;
-        
+    auto widgetConfigAccessor = [this](uint8_t index) -> ParameterSceneManager::WidgetConfig* {
+        static std::array<ParameterSceneManager::WidgetConfig, 8> configs;
+
         if (!configParser_ || !unifiedConfig_) {
             return nullptr;
         }
@@ -330,7 +330,7 @@ bool ParameterViewController::initializeSceneManager() {
         
         return nullptr;
     };
-    
+
     // Initialiser la scène LVGL
     bool success = sceneManager_->initializeScene(widgetConfigAccessor);
     if (success) {
@@ -365,9 +365,9 @@ bool ParameterViewController::initializeEventHandler() {
     eventHandler_ = std::make_unique<ParameterEventHandler>(
         eventConfig,
         widgetAccessor,
-        std::shared_ptr<WidgetMappingManager>(mappingManager_.get(), [](WidgetMappingManager*){})
-    );
-    
+        std::shared_ptr<ParameterWidgetMappingManager>(mappingManager_.get(),
+                                                       [](ParameterWidgetMappingManager*) {}));
+
     logDebug("Event handler initialized");
     return eventHandler_ != nullptr;
 }

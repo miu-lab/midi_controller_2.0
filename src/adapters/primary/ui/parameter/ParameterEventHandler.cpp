@@ -3,15 +3,14 @@
 #include "core/domain/events/UIEvent.hpp"
 #include <Arduino.h>
 
-ParameterEventHandler::ParameterEventHandler(const EventConfig& config,
-                                           WidgetAccessor widgetAccessor,
-                                           std::shared_ptr<WidgetMappingManager> mappingManager)
-    : config_(config)
-    , widgetAccessor_(widgetAccessor)
-    , mappingManager_(mappingManager)
-    , active_(true)
-    , stats_{0, 0, 0, 0} {
-    
+ParameterEventHandler::ParameterEventHandler(
+    const EventConfig& config, WidgetAccessor widgetAccessor,
+    std::shared_ptr<ParameterWidgetMappingManager> mappingManager)
+    : config_(config),
+      widgetAccessor_(widgetAccessor),
+      mappingManager_(mappingManager),
+      active_(true),
+      stats_{0, 0, 0, 0} {
     logInfo("ParameterEventHandler initialized");
 }
 

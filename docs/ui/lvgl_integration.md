@@ -355,7 +355,7 @@ pio run -e MIDI_CONTROLLER_DEVELOPMENT
 - **Impact** : Stabilité mémoire restaurée, plus de freezes
 
 **2. Crashes Encodeurs Rapides - RÉSOLU** :  
-- **Problème** : Variables statiques globales + race conditions dans `InterruptQuadratureEncoder`
+- **Problème** : Variables statiques globales + race conditions dans `QuadratureEncoder`
 - **Solution** : Variables d'instance, filtrage temporel amélioré, protection débordement
 - **Impact** : Stabilité lors de mouvements rapides d'encodeur
 

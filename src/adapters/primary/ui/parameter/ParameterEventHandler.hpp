@@ -1,13 +1,14 @@
 #pragma once
 
-#include "core/domain/events/core/EventBus.hpp"
-#include "core/domain/events/UIEvent.hpp"
-#include "core/domain/events/MidiEvents.hpp"
-#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
-#include "WidgetMappingManager.hpp"
-#include <memory>
 #include <array>
 #include <functional>
+#include <memory>
+
+#include "ParameterWidgetMappingManager.hpp"
+#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
+#include "core/domain/events/MidiEvents.hpp"
+#include "core/domain/events/UIEvent.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 
 /**
  * @brief Gestionnaire d'événements pour les paramètres MIDI et boutons
@@ -44,9 +45,8 @@ public:
      * @param widgetAccessor Fonction pour accéder aux widgets
      * @param mappingManager Gestionnaire de mappings pour résoudre CC→Widget et Button→Widget
      */
-    explicit ParameterEventHandler(const EventConfig& config,
-                                  WidgetAccessor widgetAccessor,
-                                  std::shared_ptr<WidgetMappingManager> mappingManager);
+    explicit ParameterEventHandler(const EventConfig& config, WidgetAccessor widgetAccessor,
+                                   std::shared_ptr<ParameterWidgetMappingManager> mappingManager);
 
     /**
      * @brief Destructeur par défaut
@@ -97,7 +97,7 @@ public:
 private:
     EventConfig config_;
     WidgetAccessor widgetAccessor_;
-    std::shared_ptr<WidgetMappingManager> mappingManager_;
+    std::shared_ptr<ParameterWidgetMappingManager> mappingManager_;
     bool active_;
     
     // Statistiques

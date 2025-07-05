@@ -1,6 +1,7 @@
 #include <unity.h>
+
+#include "adapters/primary/ui/parameter/ConfigurationMidiExtractor.hpp"
 #include "adapters/primary/ui/parameter/ParameterViewController.hpp"
-#include "adapters/primary/ui/parameter/MidiConfigurationParser.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/UIEvent.hpp"
 #include "core/domain/events/core/EventTypes.hpp"

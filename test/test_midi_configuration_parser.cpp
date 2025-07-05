@@ -1,32 +1,33 @@
 #include <unity.h>
-#include "adapters/primary/ui/parameter/MidiConfigurationParser.hpp"
-#include "config/unified/UnifiedConfiguration.hpp"
-#include "config/unified/ConfigurationFactory.hpp"
 
-class TestMidiConfigurationParser {
+#include "adapters/primary/ui/parameter/ConfigurationMidiExtractor.hpp"
+#include "config/unified/ConfigurationFactory.hpp"
+#include "config/unified/UnifiedConfiguration.hpp"
+
+class TestConfigurationMidiExtractor {
 public:
     static void test_constructor_with_default_config() {
-        MidiConfigurationParser::ParserConfig config;
-        MidiConfigurationParser parser(config);
-        
+        ConfigurationMidiExtractor::ParserConfig config;
+        ConfigurationMidiExtractor parser(config);
+
         TEST_ASSERT_TRUE(true); // Constructor successful
     }
 
     static void test_constructor_with_custom_config() {
-        MidiConfigurationParser::ParserConfig config;
+        ConfigurationMidiExtractor::ParserConfig config;
         config.enableLogging = true;
         config.maxCCNumber = 100;
-        
-        MidiConfigurationParser parser(config);
-        
+
+        ConfigurationMidiExtractor parser(config);
+
         TEST_ASSERT_TRUE(true); // Constructor successful
     }
 
     static void test_extract_midi_controls_empty_config() {
         // Créer une configuration vide
         UnifiedConfiguration config;
-        MidiConfigurationParser parser;
-        
+        ConfigurationMidiExtractor parser;
+
         auto result = parser.extractMidiControls(config);
         
         TEST_ASSERT_EQUAL(0, result.size());
@@ -35,17 +36,17 @@ public:
     static void test_extract_button_info_empty_config() {
         // Créer une configuration vide
         UnifiedConfiguration config;
-        MidiConfigurationParser parser;
-        
+        ConfigurationMidiExtractor parser;
+
         auto result = parser.extractButtonInfo(config);
         
         TEST_ASSERT_EQUAL(0, result.size());
     }
 
     static void test_validate_midi_control_info_valid() {
-        MidiConfigurationParser parser;
-        
-        MidiConfigurationParser::MidiControlInfo info;
+        ConfigurationMidiExtractor parser;
+
+        ConfigurationMidiExtractor::MidiControlInfo info;
         info.cc_number = 64;
         info.channel = 5;
         info.name = "Test Control";
@@ -55,11 +56,11 @@ public:
     }
 
     static void test_validate_midi_control_info_invalid_cc() {
-        MidiConfigurationParser::ParserConfig config;
+        ConfigurationMidiExtractor::ParserConfig config;
         config.maxCCNumber = 100;
-        MidiConfigurationParser parser(config);
-        
-        MidiConfigurationParser::MidiControlInfo info;
+        ConfigurationMidiExtractor parser(config);
+
+        ConfigurationMidiExtractor::MidiControlInfo info;
         info.cc_number = 150; // > maxCCNumber
         info.channel = 5;
         info.name = "Test Control";
@@ -69,9 +70,9 @@ public:
     }
 
     static void test_validate_midi_control_info_invalid_channel() {
-        MidiConfigurationParser parser;
-        
-        MidiConfigurationParser::MidiControlInfo info;
+        ConfigurationMidiExtractor parser;
+
+        ConfigurationMidiExtractor::MidiControlInfo info;
         info.cc_number = 64;
         info.channel = 20; // > 15
         info.name = "Test Control";
@@ -81,9 +82,9 @@ public:
     }
 
     static void test_validate_midi_control_info_empty_name() {
-        MidiConfigurationParser parser;
-        
-        MidiConfigurationParser::MidiControlInfo info;
+        ConfigurationMidiExtractor parser;
+
+        ConfigurationMidiExtractor::MidiControlInfo info;
         info.cc_number = 64;
         info.channel = 5;
         info.name = ""; // Empty name
@@ -93,9 +94,9 @@ public:
     }
 
     static void test_validate_button_info_valid() {
-        MidiConfigurationParser parser;
-        
-        MidiConfigurationParser::ButtonInfo info;
+        ConfigurationMidiExtractor parser;
+
+        ConfigurationMidiExtractor::ButtonInfo info;
         info.button_id = 81;
         info.parent_encoder_id = 71;
         info.name = "Test Button";
@@ -104,9 +105,9 @@ public:
     }
 
     static void test_validate_button_info_invalid_id() {
-        MidiConfigurationParser parser;
-        
-        MidiConfigurationParser::ButtonInfo info;
+        ConfigurationMidiExtractor parser;
+
+        ConfigurationMidiExtractor::ButtonInfo info;
         info.button_id = 0; // Invalid ID
         info.parent_encoder_id = 71;
         info.name = "Test Button";
@@ -115,9 +116,9 @@ public:
     }
 
     static void test_validate_button_info_empty_name() {
-        MidiConfigurationParser parser;
-        
-        MidiConfigurationParser::ButtonInfo info;
+        ConfigurationMidiExtractor parser;
+
+        ConfigurationMidiExtractor::ButtonInfo info;
         info.button_id = 81;
         info.parent_encoder_id = 71;
         info.name = ""; // Empty name
@@ -128,8 +129,8 @@ public:
     static void test_extract_with_factory_config() {
         // Utiliser ConfigurationFactory pour créer une config avec des encodeurs
         auto config = ConfigurationFactory::createDefaultConfiguration();
-        MidiConfigurationParser parser;
-        
+        ConfigurationMidiExtractor parser;
+
         auto midiResult = parser.extractMidiControls(config);
         auto buttonResult = parser.extractButtonInfo(config);
         
@@ -141,49 +142,49 @@ public:
 };
 
 void test_midi_configuration_parser_constructor_default() {
-    TestMidiConfigurationParser::test_constructor_with_default_config();
+    TestConfigurationMidiExtractor::test_constructor_with_default_config();
 }
 
 void test_midi_configuration_parser_constructor_custom() {
-    TestMidiConfigurationParser::test_constructor_with_custom_config();
+    TestConfigurationMidiExtractor::test_constructor_with_custom_config();
 }
 
 void test_midi_configuration_parser_extract_empty() {
-    TestMidiConfigurationParser::test_extract_midi_controls_empty_config();
+    TestConfigurationMidiExtractor::test_extract_midi_controls_empty_config();
 }
 
 void test_midi_configuration_parser_extract_button_empty() {
-    TestMidiConfigurationParser::test_extract_button_info_empty_config();
+    TestConfigurationMidiExtractor::test_extract_button_info_empty_config();
 }
 
 void test_midi_configuration_parser_validate_midi_valid() {
-    TestMidiConfigurationParser::test_validate_midi_control_info_valid();
+    TestConfigurationMidiExtractor::test_validate_midi_control_info_valid();
 }
 
 void test_midi_configuration_parser_validate_midi_invalid_cc() {
-    TestMidiConfigurationParser::test_validate_midi_control_info_invalid_cc();
+    TestConfigurationMidiExtractor::test_validate_midi_control_info_invalid_cc();
 }
 
 void test_midi_configuration_parser_validate_midi_invalid_channel() {
-    TestMidiConfigurationParser::test_validate_midi_control_info_invalid_channel();
+    TestConfigurationMidiExtractor::test_validate_midi_control_info_invalid_channel();
 }
 
 void test_midi_configuration_parser_validate_midi_empty_name() {
-    TestMidiConfigurationParser::test_validate_midi_control_info_empty_name();
+    TestConfigurationMidiExtractor::test_validate_midi_control_info_empty_name();
 }
 
 void test_midi_configuration_parser_validate_button_valid() {
-    TestMidiConfigurationParser::test_validate_button_info_valid();
+    TestConfigurationMidiExtractor::test_validate_button_info_valid();
 }
 
 void test_midi_configuration_parser_validate_button_invalid_id() {
-    TestMidiConfigurationParser::test_validate_button_info_invalid_id();
+    TestConfigurationMidiExtractor::test_validate_button_info_invalid_id();
 }
 
 void test_midi_configuration_parser_validate_button_empty_name() {
-    TestMidiConfigurationParser::test_validate_button_info_empty_name();
+    TestConfigurationMidiExtractor::test_validate_button_info_empty_name();
 }
 
 void test_midi_configuration_parser_factory_config() {
-    TestMidiConfigurationParser::test_extract_with_factory_config();
+    TestConfigurationMidiExtractor::test_extract_with_factory_config();
 }

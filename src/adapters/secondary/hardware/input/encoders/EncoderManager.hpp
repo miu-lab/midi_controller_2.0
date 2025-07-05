@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
-#include "adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.hpp"
+#include "adapters/secondary/hardware/input/encoders/QuadratureEncoder.hpp"
 #include "core/ports/input/EncoderPort.hpp"
 
 /**

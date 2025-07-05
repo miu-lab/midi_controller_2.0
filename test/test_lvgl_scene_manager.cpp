@@ -1,7 +1,8 @@
 #include <unity.h>
-#include "adapters/primary/ui/parameter/LvglSceneManager.hpp"
-#include "adapters/primary/ui/parameter/WidgetMappingManager.hpp"
-#include "adapters/primary/ui/parameter/MidiConfigurationParser.hpp"
+
+#include "adapters/primary/ui/parameter/ConfigurationMidiExtractor.hpp"
+#include "adapters/primary/ui/parameter/ParameterSceneManager.hpp"
+#include "adapters/primary/ui/parameter/ParameterWidgetMappingManager.hpp"
 
 // Mock pour LVGL (car pas disponible dans l'environnement de test)
 extern "C" {
@@ -35,18 +36,18 @@ extern "C" {
     int lv_color_hex(int color) { return color; }
 }
 
-class TestLvglSceneManager {
+class TestParameterSceneManager {
 public:
-    static std::shared_ptr<WidgetMappingManager> mockMappingManager;
-    
+    static std::shared_ptr<ParameterWidgetMappingManager> mockMappingManager;
+
     static void setUp() {
         // Créer un mapping manager configuré pour les tests
-        mockMappingManager = std::make_shared<WidgetMappingManager>();
-        
+        mockMappingManager = std::make_shared<ParameterWidgetMappingManager>();
+
         // Configuration de test avec CC1-3 mappés aux widgets 0-2
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
         for (int i = 0; i < 3; i++) {
-            MidiConfigurationParser::MidiControlInfo info;
+            ConfigurationMidiExtractor::MidiControlInfo info;
             info.cc_number = i + 1;  // CC1, CC2, CC3
             info.channel = 0;
             info.name = "ENC" + String(i + 1);
@@ -55,8 +56,8 @@ public:
         }
         
         // Bouton test mappé au widget 0
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        MidiConfigurationParser::ButtonInfo buttonInfo;
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+        ConfigurationMidiExtractor::ButtonInfo buttonInfo;
         buttonInfo.button_id = 1071;
         buttonInfo.parent_encoder_id = 71;  // Parent de CC1
         buttonInfo.name = "ENC1 BTN";
@@ -70,9 +71,9 @@ public:
     }
 
     static void test_constructor_default_config() {
-        LvglSceneManager::SceneConfig config;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager::SceneConfig config;
+        ParameterSceneManager manager(config);
+
         TEST_ASSERT_FALSE(manager.isInitialized());
         TEST_ASSERT_NULL(manager.getMainScreen());
         TEST_ASSERT_NULL(manager.getGridContainer());
@@ -84,23 +85,23 @@ public:
     }
 
     static void test_constructor_custom_config() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.maxWidgets = 4;
         config.screenWidth = 480;
         config.screenHeight = 320;
         config.enableLogging = true;
-        
-        LvglSceneManager manager(config, mockMappingManager);
-        
+
+        ParameterSceneManager manager(config, mockMappingManager);
+
         TEST_ASSERT_FALSE(manager.isInitialized());
         TEST_ASSERT_EQUAL(0, manager.getWidgetCount());
     }
 
     static void test_initialize_scene_success() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;  // Éviter le spam dans les tests
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         bool result = manager.initializeScene();
         
         TEST_ASSERT_TRUE(result);
@@ -116,13 +117,13 @@ public:
     }
 
     static void test_initialize_scene_with_widget_config() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         // Créer un accesseur de configuration pour les widgets
-        auto widgetConfigAccessor = [](uint8_t index) -> LvglSceneManager::WidgetConfig* {
-            static LvglSceneManager::WidgetConfig configs[8];
+        auto widgetConfigAccessor = [](uint8_t index) -> ParameterSceneManager::WidgetConfig* {
+            static ParameterSceneManager::WidgetConfig configs[8];
             if (index < 3) {
                 configs[index].cc_number = index + 10;  // CC10, CC11, CC12
                 configs[index].channel = 1;
@@ -133,7 +134,7 @@ public:
             }
             return nullptr;  // Pas de config pour les autres widgets
         };
-        
+
         bool result = manager.initializeScene(widgetConfigAccessor);
         
         TEST_ASSERT_TRUE(result);
@@ -147,10 +148,10 @@ public:
     }
 
     static void test_initialize_scene_twice() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         bool result1 = manager.initializeScene();
         bool result2 = manager.initializeScene();  // Deuxième appel
         
@@ -160,10 +161,10 @@ public:
     }
 
     static void test_cleanup() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         manager.initializeScene();
         TEST_ASSERT_TRUE(manager.isInitialized());
         
@@ -178,10 +179,10 @@ public:
     }
 
     static void test_widgets_visibility() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         manager.initializeScene();
         
         // Tester la visibilité des widgets
@@ -193,10 +194,10 @@ public:
     }
 
     static void test_get_widget_valid_index() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         manager.initializeScene();
         
         for (uint8_t i = 0; i < 8; i++) {
@@ -206,10 +207,10 @@ public:
     }
 
     static void test_get_widget_invalid_index() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         manager.initializeScene();
         
         ParameterWidget* widget = manager.getWidget(10);  // Index invalide
@@ -217,18 +218,18 @@ public:
     }
 
     static void test_get_widget_before_init() {
-        LvglSceneManager::SceneConfig config;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager::SceneConfig config;
+        ParameterSceneManager manager(config);
+
         ParameterWidget* widget = manager.getWidget(0);
         TEST_ASSERT_NULL(widget);
     }
 
     static void test_finalize_positioning() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config, mockMappingManager);
-        
+        ParameterSceneManager manager(config, mockMappingManager);
+
         manager.initializeScene();
         manager.finalizePositioning();
         
@@ -237,24 +238,24 @@ public:
     }
 
     static void test_update_mapping_manager() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         manager.initializeScene();
         
         // Mettre à jour le mapping manager
-        auto newMappingManager = std::make_shared<WidgetMappingManager>();
+        auto newMappingManager = std::make_shared<ParameterWidgetMappingManager>();
         manager.updateMappingManager(newMappingManager);
         
         TEST_ASSERT_TRUE(manager.isInitialized());
     }
 
     static void test_stats_functionality() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
-        LvglSceneManager manager(config, mockMappingManager);
-        
+        ParameterSceneManager manager(config, mockMappingManager);
+
         // Stats avant initialisation
         auto statsBefore = manager.getStats();
         TEST_ASSERT_FALSE(statsBefore.sceneInitialized);
@@ -271,11 +272,11 @@ public:
     }
 
     static void test_custom_widget_count() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.maxWidgets = 4;  // Seulement 4 widgets
         config.enableLogging = false;
-        LvglSceneManager manager(config);
-        
+        ParameterSceneManager manager(config);
+
         manager.initializeScene();
         
         TEST_ASSERT_EQUAL(4, manager.getWidgetCount());
@@ -292,11 +293,11 @@ public:
     }
 
     static void test_destructor_cleanup() {
-        LvglSceneManager::SceneConfig config;
+        ParameterSceneManager::SceneConfig config;
         config.enableLogging = false;
         
         {
-            LvglSceneManager manager(config);
+            ParameterSceneManager manager(config);
             manager.initializeScene();
             TEST_ASSERT_TRUE(manager.isInitialized());
             // Le destructeur sera appelé à la fin de ce scope
@@ -308,94 +309,94 @@ public:
 };
 
 // Définitions statiques
-std::shared_ptr<WidgetMappingManager> TestLvglSceneManager::mockMappingManager;
+std::shared_ptr<ParameterWidgetMappingManager> TestParameterSceneManager::mockMappingManager;
 
 void test_lvgl_scene_manager_constructor_default() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_constructor_default_config();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_constructor_default_config();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_constructor_custom() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_constructor_custom_config();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_constructor_custom_config();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_initialize_success() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_initialize_scene_success();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_initialize_scene_success();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_initialize_with_config() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_initialize_scene_with_widget_config();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_initialize_scene_with_widget_config();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_initialize_twice() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_initialize_scene_twice();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_initialize_scene_twice();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_cleanup() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_cleanup();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_cleanup();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_widgets_visibility() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_widgets_visibility();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_widgets_visibility();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_get_widget_valid() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_get_widget_valid_index();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_get_widget_valid_index();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_get_widget_invalid() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_get_widget_invalid_index();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_get_widget_invalid_index();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_get_widget_before_init() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_get_widget_before_init();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_get_widget_before_init();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_finalize_positioning() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_finalize_positioning();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_finalize_positioning();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_update_mapping() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_update_mapping_manager();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_update_mapping_manager();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_stats() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_stats_functionality();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_stats_functionality();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_custom_widget_count() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_custom_widget_count();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_custom_widget_count();
+    TestParameterSceneManager::tearDown();
 }
 
 void test_lvgl_scene_manager_destructor() {
-    TestLvglSceneManager::setUp();
-    TestLvglSceneManager::test_destructor_cleanup();
-    TestLvglSceneManager::tearDown();
+    TestParameterSceneManager::setUp();
+    TestParameterSceneManager::test_destructor_cleanup();
+    TestParameterSceneManager::tearDown();
 }

@@ -1,17 +1,16 @@
 #include "MidiSubsystem.hpp"
 
 #include <Arduino.h>
+
 #include <set>
 
-
-#include "core/utils/Error.hpp"
-
-#include "adapters/secondary/midi/EventEnabledMidiOut.hpp"
+#include "adapters/secondary/midi/MidiOutputEventAdapter.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/strategies/AbsoluteMappingStrategy.hpp"
 #include "core/domain/strategies/MidiMappingFactory.hpp"
 #include "core/domain/strategies/RelativeMappingStrategy.hpp"
+#include "core/utils/Error.hpp"
 
 MidiSubsystem::MidiSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {}
@@ -51,22 +50,23 @@ Result<bool> MidiSubsystem::init() {
         }
     }
 
-    // Créer l'EventEnabledMidiOut qui va décorer directement TeensyUsbMidiOut
-    auto eventEnabledMidiOut = std::make_shared<EventEnabledMidiOut>(*baseMidiOut);
-    if (!eventEnabledMidiOut) {
-        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create EventEnabledMidiOut"});
+    // Créer l'MidiOutputEventAdapter qui va décorer directement TeensyUsbMidiOut
+    auto midiOutputEventAdapter = std::make_shared<MidiOutputEventAdapter>(*baseMidiOut);
+    if (!midiOutputEventAdapter) {
+        return Result<bool>::error(
+            {ErrorCode::InitializationFailed, "Failed to create MidiOutputEventAdapter"});
     }
     // TODO DEBUG MSG
 
-    // Utiliser EventEnabledMidiOut comme interface MidiOutputPort
-    midiOut_ = eventEnabledMidiOut;
+    // Utiliser MidiOutputEventAdapter comme interface MidiOutputPort
+    midiOut_ = midiOutputEventAdapter;
 
     // Enregistrer l'implémentation que nous venons de créer
     container_->registerImplementation<MidiOutputPort, MidiOutputPort>(midiOut_);
 
     // Enregistrer également les objets intermédiaires pour éviter qu'ils soient détruits
     container_->registerDependency<TeensyUsbMidiOut>(baseMidiOut);
-    container_->registerDependency<EventEnabledMidiOut>(eventEnabledMidiOut);
+    container_->registerDependency<MidiOutputEventAdapter>(midiOutputEventAdapter);
 
     // Créer le MidiMapper et MidiInHandler
     // TODO DEBUG MSG

@@ -1,4 +1,4 @@
-// adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.hpp
+// adapters/secondary/hardware/input/encoders/QuadratureEncoder.hpp
 #pragma once
 
 #include <Arduino.h>
@@ -13,10 +13,10 @@
  * Utilise la bibliothèque Encoder pour une lecture fiable des rotations
  * avec gestion automatique des interruptions et du debounce.
  */
-class InterruptQuadratureEncoder : public EncoderPort {
+class QuadratureEncoder : public EncoderPort {
 public:
-    explicit InterruptQuadratureEncoder(const EncoderConfig& cfg);
-    ~InterruptQuadratureEncoder() override;
+    explicit QuadratureEncoder(const EncoderConfig& cfg);
+    ~QuadratureEncoder() override;
 
     int8_t readDelta() override;
     EncoderId getId() const override;

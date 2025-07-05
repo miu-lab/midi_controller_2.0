@@ -1,20 +1,22 @@
 #pragma once
 
-#include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
-#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
-#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
-#include "adapters/primary/ui/parameter/MidiConfigurationParser.hpp"
-#include "adapters/primary/ui/parameter/WidgetMappingManager.hpp"
-#include "adapters/primary/ui/parameter/ParameterEventHandler.hpp"
-#include "adapters/primary/ui/parameter/LvglSceneManager.hpp"
-#include "core/domain/events/core/EventBus.hpp"
-#include "core/domain/events/MidiEvents.hpp"
-#include "core/domain/events/UIEvent.hpp"
-#include "config/unified/UnifiedConfiguration.hpp"
-#include <memory>
+#include <lvgl.h>
+
 #include <array>
 #include <map>
-#include <lvgl.h>
+#include <memory>
+
+#include "adapters/primary/ui/parameter/ConfigurationMidiExtractor.hpp"
+#include "adapters/primary/ui/parameter/ParameterEventHandler.hpp"
+#include "adapters/primary/ui/parameter/ParameterSceneManager.hpp"
+#include "adapters/primary/ui/parameter/ParameterWidgetMappingManager.hpp"
+#include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
+#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
+#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
+#include "config/unified/UnifiedConfiguration.hpp"
+#include "core/domain/events/MidiEvents.hpp"
+#include "core/domain/events/UIEvent.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 
 /**
  * @brief Vue LVGL pour affichage de paramètres MIDI avec grille de 8 ParameterWidget
@@ -128,17 +130,17 @@ private:
     SubscriptionId event_subscription_id_;
     
     // Parser pour extraction configuration MIDI (Phase 5.2 refactoring)
-    std::unique_ptr<MidiConfigurationParser> configParser_;
-    
+    std::unique_ptr<ConfigurationMidiExtractor> configParser_;
+
     // Gestionnaire de mappings CC→Widget et Button→Widget (Phase 5.3 refactoring)
-    std::unique_ptr<WidgetMappingManager> mappingManager_;
-    
+    std::unique_ptr<ParameterWidgetMappingManager> mappingManager_;
+
     // Gestionnaire d'événements pour MIDI et boutons (Phase 5.4 refactoring)
     std::unique_ptr<ParameterEventHandler> eventHandler_;
     
     // Gestionnaire de scène LVGL pour les objets et widgets (Phase 5.5 refactoring)
-    std::unique_ptr<LvglSceneManager> sceneManager_;
-    
+    std::unique_ptr<ParameterSceneManager> sceneManager_;
+
     // Méthodes privées - Création du gestionnaire de scène LVGL (Phase 5.5 refactoring)
     void createSceneManager();
     

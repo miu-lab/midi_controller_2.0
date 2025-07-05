@@ -1,9 +1,9 @@
-// adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.cpp
-#include "adapters/secondary/hardware/input/encoders/InterruptQuadratureEncoder.hpp"
-
+// adapters/secondary/hardware/input/encoders/QuadratureEncoder.cpp
 #include <Arduino.h>
 
-InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig& cfg)
+#include "adapters/secondary/hardware/input/encoders/QuadratureEncoder.hpp"
+
+QuadratureEncoder::QuadratureEncoder(const EncoderConfig& cfg)
     : id_(cfg.id),
       encoder_(cfg.pinA.pin, cfg.pinB.pin),
       ppr_(cfg.ppr),
@@ -19,11 +19,11 @@ InterruptQuadratureEncoder::InterruptQuadratureEncoder(const EncoderConfig& cfg)
     normalizationFactor_ = (REFERENCE_PPR << 8) / ppr_;
 }
 
-InterruptQuadratureEncoder::~InterruptQuadratureEncoder() {
+QuadratureEncoder::~QuadratureEncoder() {
     // La bibliothèque Encoder gère le nettoyage des interruptions
 }
 
-int8_t InterruptQuadratureEncoder::readDelta() {
+int8_t QuadratureEncoder::readDelta() {
     // Variables statiques pour le filtrage temporel
     static uint32_t lastChangeTime = 0;
     static const uint32_t MIN_CHANGE_INTERVAL_MS = 1;  // 5ms minimum entre changements
@@ -80,24 +80,23 @@ int8_t InterruptQuadratureEncoder::readDelta() {
     return result;
 }
 
-
-EncoderId InterruptQuadratureEncoder::getId() const {
+EncoderId QuadratureEncoder::getId() const {
     return id_;
 }
 
-uint16_t InterruptQuadratureEncoder::getPpr() const {
+uint16_t QuadratureEncoder::getPpr() const {
     return ppr_;
 }
 
-int32_t InterruptQuadratureEncoder::getAbsolutePosition() const {
+int32_t QuadratureEncoder::getAbsolutePosition() const {
     return absolutePosition_;
 }
 
-int32_t InterruptQuadratureEncoder::getPhysicalPosition() const {
+int32_t QuadratureEncoder::getPhysicalPosition() const {
     return physicalPosition_;
 }
 
-void InterruptQuadratureEncoder::resetPosition() {
+void QuadratureEncoder::resetPosition() {
     // Réinitialiser la position physique et la position absolue à zéro
     physicalPosition_ = 0;
     absolutePosition_ = 0;

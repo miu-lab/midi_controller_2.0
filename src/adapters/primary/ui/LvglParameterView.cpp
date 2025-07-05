@@ -3,8 +3,8 @@
 #include "core/domain/events/MidiEvents.hpp"
 #include <Arduino.h>
 
-
-// Note: Mapping CC→Widget et Button→Widget maintenant géré par WidgetMappingManager (Phase 5.3)
+// Note: Mapping CC→Widget et Button→Widget maintenant géré par ParameterWidgetMappingManager
+// (Phase 5.3)
 
 LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge,
                                      std::shared_ptr<UnifiedConfiguration> config,
@@ -16,18 +16,19 @@ LvglParameterView::LvglParameterView(std::shared_ptr<Ili9341LvglBridge> bridge,
       active_(false),
       event_subscription_id_(0) {
     // Créer le parser de configuration MIDI (Phase 5.2 refactoring)
-    MidiConfigurationParser::ParserConfig parserConfig;
+    ConfigurationMidiExtractor::ParserConfig parserConfig;
     parserConfig.enableLogging = false; // Peut être activé pour debug
-    configParser_ = std::make_unique<MidiConfigurationParser>(parserConfig);
-    
+    configParser_ = std::make_unique<ConfigurationMidiExtractor>(parserConfig);
+
     // Créer le gestionnaire de mappings (Phase 5.3 refactoring)
-    WidgetMappingManager::MappingConfig mappingConfig;
+    ParameterWidgetMappingManager::MappingConfig mappingConfig;
     mappingConfig.maxWidgets = 8;        // 8 widgets dans la grille 4x2
     mappingConfig.enableLogging = false; // Peut être activé pour debug
     mappingConfig.enableButtonMapping = true;
-    mappingManager_ = std::make_unique<WidgetMappingManager>(mappingConfig);
-    
-    // Le ParameterEventHandler et LvglSceneManager seront créés après l'initialisation des mappings
+    mappingManager_ = std::make_unique<ParameterWidgetMappingManager>(mappingConfig);
+
+    // Le ParameterEventHandler et ParameterSceneManager seront créés après l'initialisation des
+    // mappings
     eventHandler_ = nullptr;
     sceneManager_ = nullptr;
 }
@@ -36,7 +37,8 @@ LvglParameterView::~LvglParameterView() {
     // TODO DEBUG MSG
     setActive(false);
     unsubscribeFromEvents();
-    // Le nettoyage des objets LVGL est maintenant géré par LvglSceneManager (Phase 5.5 refactoring)
+    // Le nettoyage des objets LVGL est maintenant géré par ParameterSceneManager (Phase 5.5
+    // refactoring)
 }
 
 bool LvglParameterView::init() {
@@ -250,7 +252,8 @@ void LvglParameterView::initializeMappingsFromConfig() {
     mappingManager_->initializeMappings(midiControls, buttonInfos);
 }
 
-// NOTE: initializeWidgetConfigurationsFromConfig() supprimée - maintenant gérée par LvglSceneManager (Phase 5.5)
+// NOTE: initializeWidgetConfigurationsFromConfig() supprimée - maintenant gérée par
+// ParameterSceneManager (Phase 5.5)
 
 int8_t LvglParameterView::getWidgetIndexForCC(uint8_t cc_number) const {
     // Déléguer au gestionnaire de mappings (Phase 5.3)
@@ -310,9 +313,8 @@ bool LvglParameterView::handleButtonEvent(const Event& event) {
     return false;  // Événement non traité
 }
 
-
-// NOTE: setupButtonIndicators() et finalizeButtonIndicatorPositions() supprimées - 
-// maintenant gérées par LvglSceneManager (Phase 5.5)
+// NOTE: setupButtonIndicators() et finalizeButtonIndicatorPositions() supprimées -
+// maintenant gérées par ParameterSceneManager (Phase 5.5)
 
 //=============================================================================
 // Création du gestionnaire de scène LVGL (Phase 5.5 refactoring)
@@ -324,7 +326,7 @@ void LvglParameterView::createSceneManager() {
     }
     
     // Configuration du gestionnaire de scène
-    LvglSceneManager::SceneConfig sceneConfig;
+    ParameterSceneManager::SceneConfig sceneConfig;
     sceneConfig.maxWidgets = 8;           // 8 widgets dans la grille 4x2
     sceneConfig.screenWidth = 320;        // ILI9341 320x240
     sceneConfig.screenHeight = 240;
@@ -338,15 +340,15 @@ void LvglParameterView::createSceneManager() {
     sceneConfig.enableLogging = false;    // Peut être activé pour debug
     
     // Créer le gestionnaire de scène avec les mappings partagés
-    sceneManager_ = std::make_unique<LvglSceneManager>(
+    sceneManager_ = std::make_unique<ParameterSceneManager>(
         sceneConfig,
-        std::shared_ptr<WidgetMappingManager>(mappingManager_.get(), [](WidgetMappingManager*){})
-    );
-    
+        std::shared_ptr<ParameterWidgetMappingManager>(mappingManager_.get(),
+                                                       [](ParameterWidgetMappingManager*) {}));
+
     // Fonction d'accès à la configuration des widgets
-    auto widgetConfigAccessor = [this](uint8_t index) -> LvglSceneManager::WidgetConfig* {
-        static std::array<LvglSceneManager::WidgetConfig, 8> configs;
-        
+    auto widgetConfigAccessor = [this](uint8_t index) -> ParameterSceneManager::WidgetConfig* {
+        static std::array<ParameterSceneManager::WidgetConfig, 8> configs;
+
         if (!configParser_ || !config_) {
             return nullptr;
         }
@@ -374,7 +376,7 @@ void LvglParameterView::createSceneManager() {
         
         return nullptr;
     };
-    
+
     // Initialiser la scène LVGL
     bool success = sceneManager_->initializeScene(widgetConfigAccessor);
     if (success) {
@@ -411,6 +413,6 @@ void LvglParameterView::createEventHandler() {
     eventHandler_ = std::make_unique<ParameterEventHandler>(
         eventConfig,
         widgetAccessor,
-        std::shared_ptr<WidgetMappingManager>(mappingManager_.get(), [](WidgetMappingManager*){})
-    );
+        std::shared_ptr<ParameterWidgetMappingManager>(mappingManager_.get(),
+                                                       [](ParameterWidgetMappingManager*) {}));
 }

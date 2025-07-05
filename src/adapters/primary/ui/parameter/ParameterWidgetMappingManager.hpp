@@ -1,9 +1,10 @@
 #pragma once
 
-#include "MidiConfigurationParser.hpp"
 #include <array>
-#include <map>
 #include <cstdint>
+#include <map>
+
+#include "ConfigurationMidiExtractor.hpp"
 
 /**
  * @brief Gestionnaire de mappings entre contrôles MIDI et widgets de paramètres
@@ -12,7 +13,7 @@
  * et button ID → index de widget pour simplifier LvglParameterView.
  * Respecte le principe de responsabilité unique.
  */
-class WidgetMappingManager {
+class ParameterWidgetMappingManager {
 public:
     /**
      * @brief Configuration pour le gestionnaire de mappings
@@ -29,20 +30,21 @@ public:
      * @brief Constructeur avec configuration
      * @param config Configuration du gestionnaire
      */
-    explicit WidgetMappingManager(const MappingConfig& config = MappingConfig());
+    explicit ParameterWidgetMappingManager(const MappingConfig& config = MappingConfig());
 
     /**
      * @brief Destructeur par défaut
      */
-    ~WidgetMappingManager() = default;
+    ~ParameterWidgetMappingManager() = default;
 
     /**
      * @brief Initialise les mappings depuis la configuration MIDI
-     * @param midiControls Liste des contrôles MIDI extraits par MidiConfigurationParser
-     * @param buttonInfos Liste des boutons extraits par MidiConfigurationParser
+     * @param midiControls Liste des contrôles MIDI extraits par ConfigurationMidiExtractor
+     * @param buttonInfos Liste des boutons extraits par ConfigurationMidiExtractor
      */
-    void initializeMappings(const std::vector<MidiConfigurationParser::MidiControlInfo>& midiControls,
-                           const std::vector<MidiConfigurationParser::ButtonInfo>& buttonInfos);
+    void initializeMappings(
+        const std::vector<ConfigurationMidiExtractor::MidiControlInfo>& midiControls,
+        const std::vector<ConfigurationMidiExtractor::ButtonInfo>& buttonInfos);
 
     /**
      * @brief Obtient l'index du widget pour un CC donné
@@ -68,7 +70,7 @@ public:
      * @brief Obtient la liste des boutons indépendants (sans parent encodeur)
      * @return Vector des boutons standalone
      */
-    const std::vector<MidiConfigurationParser::ButtonInfo>& getStandaloneButtons() const;
+    const std::vector<ConfigurationMidiExtractor::ButtonInfo>& getStandaloneButtons() const;
 
     /**
      * @brief Vérifie si les mappings sont initialisés
@@ -103,21 +105,23 @@ private:
     std::map<uint16_t, uint8_t> button_to_widget_mapping_;
     
     // Boutons indépendants (sans parent encodeur)
-    std::vector<MidiConfigurationParser::ButtonInfo> standalone_buttons_;
+    std::vector<ConfigurationMidiExtractor::ButtonInfo> standalone_buttons_;
 
     /**
      * @brief Initialise le mapping CC → widget
      * @param midiControls Liste des contrôles MIDI
      */
-    void initializeCCMapping(const std::vector<MidiConfigurationParser::MidiControlInfo>& midiControls);
+    void initializeCCMapping(
+        const std::vector<ConfigurationMidiExtractor::MidiControlInfo>& midiControls);
 
     /**
      * @brief Initialise le mapping boutons → widgets
      * @param midiControls Liste des contrôles MIDI (pour trouver les parents)
      * @param buttonInfos Liste des boutons
      */
-    void initializeButtonMapping(const std::vector<MidiConfigurationParser::MidiControlInfo>& midiControls,
-                                const std::vector<MidiConfigurationParser::ButtonInfo>& buttonInfos);
+    void initializeButtonMapping(
+        const std::vector<ConfigurationMidiExtractor::MidiControlInfo>& midiControls,
+        const std::vector<ConfigurationMidiExtractor::ButtonInfo>& buttonInfos);
 
     /**
      * @brief Log une information si le logging est activé

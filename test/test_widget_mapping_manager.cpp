@@ -1,33 +1,34 @@
 #include <unity.h>
-#include "adapters/primary/ui/parameter/WidgetMappingManager.hpp"
 
-class TestWidgetMappingManager {
+#include "adapters/primary/ui/parameter/ParameterWidgetMappingManager.hpp"
+
+class TestParameterWidgetMappingManager {
 public:
     static void test_constructor_default_config() {
-        WidgetMappingManager manager;
-        
+        ParameterWidgetMappingManager manager;
+
         TEST_ASSERT_FALSE(manager.isInitialized());
         TEST_ASSERT_EQUAL(-1, manager.getWidgetIndexForCC(1));
         TEST_ASSERT_EQUAL(-1, manager.getWidgetIndexForButton(81));
     }
 
     static void test_constructor_custom_config() {
-        WidgetMappingManager::MappingConfig config;
+        ParameterWidgetMappingManager::MappingConfig config;
         config.maxWidgets = 4;
         config.enableLogging = true;
         config.enableButtonMapping = false;
-        
-        WidgetMappingManager manager(config);
-        
+
+        ParameterWidgetMappingManager manager(config);
+
         TEST_ASSERT_FALSE(manager.isInitialized());
     }
 
     static void test_initialize_empty_controls() {
-        WidgetMappingManager manager;
-        
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        
+        ParameterWidgetMappingManager manager;
+
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+
         manager.initializeMappings(midiControls, buttonInfos);
         
         TEST_ASSERT_TRUE(manager.isInitialized());
@@ -39,21 +40,21 @@ public:
     }
 
     static void test_initialize_midi_controls() {
-        WidgetMappingManager manager;
-        
+        ParameterWidgetMappingManager manager;
+
         // Créer des contrôles MIDI test
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
         for (int i = 0; i < 3; i++) {
-            MidiConfigurationParser::MidiControlInfo info;
+            ConfigurationMidiExtractor::MidiControlInfo info;
             info.cc_number = i + 1;  // CC1, CC2, CC3
             info.channel = 0;
             info.name = "ENC" + String(i + 1);
             info.control_id = 71 + i;
             midiControls.push_back(info);
         }
-        
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        
+
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+
         manager.initializeMappings(midiControls, buttonInfos);
         
         TEST_ASSERT_TRUE(manager.isInitialized());
@@ -70,11 +71,11 @@ public:
     }
 
     static void test_initialize_button_mapping() {
-        WidgetMappingManager manager;
-        
+        ParameterWidgetMappingManager manager;
+
         // Créer des contrôles MIDI test
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
-        MidiConfigurationParser::MidiControlInfo midiInfo;
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
+        ConfigurationMidiExtractor::MidiControlInfo midiInfo;
         midiInfo.cc_number = 1;
         midiInfo.channel = 0;
         midiInfo.name = "ENC1";
@@ -82,17 +83,17 @@ public:
         midiControls.push_back(midiInfo);
         
         // Créer des boutons test
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+
         // Bouton enfant d'encodeur
-        MidiConfigurationParser::ButtonInfo buttonInfo1;
+        ConfigurationMidiExtractor::ButtonInfo buttonInfo1;
         buttonInfo1.button_id = 1071;  // Bouton de l'encodeur 71
         buttonInfo1.parent_encoder_id = 71;
         buttonInfo1.name = "ENC1 BTN";
         buttonInfos.push_back(buttonInfo1);
         
         // Bouton standalone
-        MidiConfigurationParser::ButtonInfo buttonInfo2;
+        ConfigurationMidiExtractor::ButtonInfo buttonInfo2;
         buttonInfo2.button_id = 81;
         buttonInfo2.parent_encoder_id = 0;  // Pas de parent
         buttonInfo2.name = "BTN1";
@@ -120,23 +121,23 @@ public:
     }
 
     static void test_max_widgets_limit() {
-        WidgetMappingManager::MappingConfig config;
+        ParameterWidgetMappingManager::MappingConfig config;
         config.maxWidgets = 2;  // Limiter à 2 widgets
-        WidgetMappingManager manager(config);
-        
+        ParameterWidgetMappingManager manager(config);
+
         // Créer 4 contrôles MIDI
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
         for (int i = 0; i < 4; i++) {
-            MidiConfigurationParser::MidiControlInfo info;
+            ConfigurationMidiExtractor::MidiControlInfo info;
             info.cc_number = i + 1;
             info.channel = 0;
             info.name = "ENC" + String(i + 1);
             info.control_id = 71 + i;
             midiControls.push_back(info);
         }
-        
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        
+
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+
         manager.initializeMappings(midiControls, buttonInfos);
         
         // Seuls les 2 premiers doivent être mappés
@@ -150,19 +151,19 @@ public:
     }
 
     static void test_reset_functionality() {
-        WidgetMappingManager manager;
-        
+        ParameterWidgetMappingManager manager;
+
         // Initialiser avec des données
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
-        MidiConfigurationParser::MidiControlInfo info;
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
+        ConfigurationMidiExtractor::MidiControlInfo info;
         info.cc_number = 1;
         info.channel = 0;
         info.name = "ENC1";
         info.control_id = 71;
         midiControls.push_back(info);
-        
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        
+
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+
         manager.initializeMappings(midiControls, buttonInfos);
         TEST_ASSERT_TRUE(manager.isInitialized());
         TEST_ASSERT_EQUAL(0, manager.getWidgetIndexForCC(1));
@@ -178,18 +179,18 @@ public:
     }
 
     static void test_button_mapping_disabled() {
-        WidgetMappingManager::MappingConfig config;
+        ParameterWidgetMappingManager::MappingConfig config;
         config.enableButtonMapping = false;
-        WidgetMappingManager manager(config);
-        
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
-        MidiConfigurationParser::MidiControlInfo midiInfo;
+        ParameterWidgetMappingManager manager(config);
+
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
+        ConfigurationMidiExtractor::MidiControlInfo midiInfo;
         midiInfo.cc_number = 1;
         midiInfo.control_id = 71;
         midiControls.push_back(midiInfo);
-        
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        MidiConfigurationParser::ButtonInfo buttonInfo;
+
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+        ConfigurationMidiExtractor::ButtonInfo buttonInfo;
         buttonInfo.button_id = 1071;
         buttonInfo.parent_encoder_id = 71;
         buttonInfos.push_back(buttonInfo);
@@ -206,21 +207,21 @@ public:
     }
 
     static void test_invalid_cc_numbers() {
-        WidgetMappingManager manager;
-        
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
-        MidiConfigurationParser::MidiControlInfo info1;
+        ParameterWidgetMappingManager manager;
+
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
+        ConfigurationMidiExtractor::MidiControlInfo info1;
         info1.cc_number = 150;  // Invalid (> 127)
         info1.control_id = 71;
         midiControls.push_back(info1);
-        
-        MidiConfigurationParser::MidiControlInfo info2;
+
+        ConfigurationMidiExtractor::MidiControlInfo info2;
         info2.cc_number = 64;   // Valid
         info2.control_id = 72;
         midiControls.push_back(info2);
-        
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        
+
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+
         manager.initializeMappings(midiControls, buttonInfos);
         
         // Seul le CC valide doit être mappé
@@ -232,13 +233,13 @@ public:
     }
 
     static void test_button_without_parent_encoder() {
-        WidgetMappingManager manager;
-        
-        std::vector<MidiConfigurationParser::MidiControlInfo> midiControls;
+        ParameterWidgetMappingManager manager;
+
+        std::vector<ConfigurationMidiExtractor::MidiControlInfo> midiControls;
         // Pas d'encodeur avec ID 99
-        
-        std::vector<MidiConfigurationParser::ButtonInfo> buttonInfos;
-        MidiConfigurationParser::ButtonInfo buttonInfo;
+
+        std::vector<ConfigurationMidiExtractor::ButtonInfo> buttonInfos;
+        ConfigurationMidiExtractor::ButtonInfo buttonInfo;
         buttonInfo.button_id = 1099;
         buttonInfo.parent_encoder_id = 99;  // Parent inexistant
         buttonInfo.name = "Orphan Button";
@@ -254,8 +255,8 @@ public:
     }
 
     static void test_boundary_conditions() {
-        WidgetMappingManager manager;
-        
+        ParameterWidgetMappingManager manager;
+
         // Test CC boundary
         TEST_ASSERT_EQUAL(-1, manager.getWidgetIndexForCC(128));  // Out of range
         TEST_ASSERT_EQUAL(-1, manager.getWidgetIndexForCC(255));  // Out of range
@@ -266,45 +267,45 @@ public:
 };
 
 void test_widget_mapping_manager_constructor_default() {
-    TestWidgetMappingManager::test_constructor_default_config();
+    TestParameterWidgetMappingManager::test_constructor_default_config();
 }
 
 void test_widget_mapping_manager_constructor_custom() {
-    TestWidgetMappingManager::test_constructor_custom_config();
+    TestParameterWidgetMappingManager::test_constructor_custom_config();
 }
 
 void test_widget_mapping_manager_initialize_empty() {
-    TestWidgetMappingManager::test_initialize_empty_controls();
+    TestParameterWidgetMappingManager::test_initialize_empty_controls();
 }
 
 void test_widget_mapping_manager_initialize_midi() {
-    TestWidgetMappingManager::test_initialize_midi_controls();
+    TestParameterWidgetMappingManager::test_initialize_midi_controls();
 }
 
 void test_widget_mapping_manager_initialize_buttons() {
-    TestWidgetMappingManager::test_initialize_button_mapping();
+    TestParameterWidgetMappingManager::test_initialize_button_mapping();
 }
 
 void test_widget_mapping_manager_max_widgets() {
-    TestWidgetMappingManager::test_max_widgets_limit();
+    TestParameterWidgetMappingManager::test_max_widgets_limit();
 }
 
 void test_widget_mapping_manager_reset() {
-    TestWidgetMappingManager::test_reset_functionality();
+    TestParameterWidgetMappingManager::test_reset_functionality();
 }
 
 void test_widget_mapping_manager_buttons_disabled() {
-    TestWidgetMappingManager::test_button_mapping_disabled();
+    TestParameterWidgetMappingManager::test_button_mapping_disabled();
 }
 
 void test_widget_mapping_manager_invalid_cc() {
-    TestWidgetMappingManager::test_invalid_cc_numbers();
+    TestParameterWidgetMappingManager::test_invalid_cc_numbers();
 }
 
 void test_widget_mapping_manager_orphan_button() {
-    TestWidgetMappingManager::test_button_without_parent_encoder();
+    TestParameterWidgetMappingManager::test_button_without_parent_encoder();
 }
 
 void test_widget_mapping_manager_boundaries() {
-    TestWidgetMappingManager::test_boundary_conditions();
+    TestParameterWidgetMappingManager::test_boundary_conditions();
 }

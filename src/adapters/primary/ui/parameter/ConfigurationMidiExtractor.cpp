@@ -1,11 +1,12 @@
-#include "MidiConfigurationParser.hpp"
 #include <Arduino.h>
 
-MidiConfigurationParser::MidiConfigurationParser(const ParserConfig& config)
-    : config_(config) {
-}
+#include "ConfigurationMidiExtractor.hpp"
 
-std::vector<MidiConfigurationParser::MidiControlInfo> MidiConfigurationParser::extractMidiControls(const UnifiedConfiguration& configuration) const {
+ConfigurationMidiExtractor::ConfigurationMidiExtractor(const ParserConfig& config)
+    : config_(config) {}
+
+std::vector<ConfigurationMidiExtractor::MidiControlInfo>
+ConfigurationMidiExtractor::extractMidiControls(const UnifiedConfiguration& configuration) const {
     std::vector<MidiControlInfo> midiControls;
     
     logInfo("Starting MIDI control extraction");
@@ -48,7 +49,8 @@ std::vector<MidiConfigurationParser::MidiControlInfo> MidiConfigurationParser::e
     return midiControls;
 }
 
-std::vector<MidiConfigurationParser::ButtonInfo> MidiConfigurationParser::extractButtonInfo(const UnifiedConfiguration& configuration) const {
+std::vector<ConfigurationMidiExtractor::ButtonInfo> ConfigurationMidiExtractor::extractButtonInfo(
+    const UnifiedConfiguration& configuration) const {
     std::vector<ButtonInfo> buttonInfos;
     
     logInfo("Starting button extraction");
@@ -93,7 +95,7 @@ std::vector<MidiConfigurationParser::ButtonInfo> MidiConfigurationParser::extrac
     return buttonInfos;
 }
 
-bool MidiConfigurationParser::validateMidiControlInfo(const MidiControlInfo& info) const {
+bool ConfigurationMidiExtractor::validateMidiControlInfo(const MidiControlInfo& info) const {
     // Valider le numéro CC
     if (info.cc_number > config_.maxCCNumber) {
         logError("Invalid CC number: " + String(info.cc_number) + " > " + String(config_.maxCCNumber));
@@ -115,7 +117,7 @@ bool MidiConfigurationParser::validateMidiControlInfo(const MidiControlInfo& inf
     return true;
 }
 
-bool MidiConfigurationParser::validateButtonInfo(const ButtonInfo& info) const {
+bool ConfigurationMidiExtractor::validateButtonInfo(const ButtonInfo& info) const {
     // Valider l'ID du bouton
     if (info.button_id == 0) {
         logError("Invalid button ID: 0");
@@ -131,7 +133,8 @@ bool MidiConfigurationParser::validateButtonInfo(const ButtonInfo& info) const {
     return true;
 }
 
-std::optional<MidiConfigurationParser::MidiControlInfo> MidiConfigurationParser::extractFromEncoder(const ControlDefinition& controlDef) const {
+std::optional<ConfigurationMidiExtractor::MidiControlInfo>
+ConfigurationMidiExtractor::extractFromEncoder(const ControlDefinition& controlDef) const {
     // Vérifier que c'est bien un encodeur
     if (controlDef.hardware.type != InputType::ENCODER || !controlDef.enabled) {
         return std::nullopt;
@@ -163,7 +166,8 @@ std::optional<MidiConfigurationParser::MidiControlInfo> MidiConfigurationParser:
     return std::nullopt;
 }
 
-std::optional<MidiConfigurationParser::MidiControlInfo> MidiConfigurationParser::extractFromButton(const ControlDefinition& controlDef) const {
+std::optional<ConfigurationMidiExtractor::MidiControlInfo>
+ConfigurationMidiExtractor::extractFromButton(const ControlDefinition& controlDef) const {
     // Vérifier que c'est bien un bouton
     if (controlDef.hardware.type != InputType::BUTTON || !controlDef.enabled) {
         return std::nullopt;
@@ -195,7 +199,8 @@ std::optional<MidiConfigurationParser::MidiControlInfo> MidiConfigurationParser:
     return std::nullopt;
 }
 
-std::optional<MidiConfigurationParser::ButtonInfo> MidiConfigurationParser::extractButtonFromControl(const ControlDefinition& controlDef) const {
+std::optional<ConfigurationMidiExtractor::ButtonInfo>
+ConfigurationMidiExtractor::extractButtonFromControl(const ControlDefinition& controlDef) const {
     // Vérifier que c'est bien un bouton
     if (controlDef.hardware.type != InputType::BUTTON || !controlDef.enabled) {
         return std::nullopt;
@@ -215,14 +220,14 @@ std::optional<MidiConfigurationParser::ButtonInfo> MidiConfigurationParser::extr
     return info;
 }
 
-void MidiConfigurationParser::logInfo(const String& message) const {
+void ConfigurationMidiExtractor::logInfo(const String& message) const {
     if (config_.enableLogging) {
-        Serial.println("[MidiConfigurationParser] " + message);
+        Serial.println("[ConfigurationMidiExtractor] " + message);
     }
 }
 
-void MidiConfigurationParser::logError(const String& message) const {
+void ConfigurationMidiExtractor::logError(const String& message) const {
     if (config_.enableLogging) {
-        Serial.println("[MidiConfigurationParser ERROR] " + message);
+        Serial.println("[ConfigurationMidiExtractor ERROR] " + message);
     }
 }

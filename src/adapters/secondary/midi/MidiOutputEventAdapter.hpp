@@ -13,15 +13,14 @@
  * Cette classe décore un MidiOutputPort pour ajouter l'émission d'événements
  * à chaque fois qu'un message MIDI est envoyé.
  */
-class EventEnabledMidiOut : public MidiOutputPort {
+class MidiOutputEventAdapter : public MidiOutputPort {
 public:
     /**
      * @brief Constructeur
      * @param basePort Port MIDI de base à décorer
      */
-    explicit EventEnabledMidiOut(MidiOutputPort& basePort) : m_basePort(basePort) {
-    }
-    
+    explicit MidiOutputEventAdapter(MidiOutputPort& basePort) : m_basePort(basePort) {}
+
     /**
      * @brief Vérifie si le port MIDI supporte les événements
      * @return Toujours true pour cette classe

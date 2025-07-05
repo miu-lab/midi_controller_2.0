@@ -12,7 +12,7 @@
  * et des informations de boutons depuis UnifiedConfiguration.
  * Respecte le principe de responsabilité unique.
  */
-class MidiConfigurationParser {
+class ConfigurationMidiExtractor {
 public:
     /**
      * @brief Structure pour les informations de contrôle MIDI extraites
@@ -57,12 +57,12 @@ public:
      * @brief Constructeur avec configuration
      * @param config Configuration du parser
      */
-    explicit MidiConfigurationParser(const ParserConfig& config = ParserConfig());
+    explicit ConfigurationMidiExtractor(const ParserConfig& config = ParserConfig());
 
     /**
      * @brief Destructeur par défaut
      */
-    ~MidiConfigurationParser() = default;
+    ~ConfigurationMidiExtractor() = default;
 
     /**
      * @brief Extrait les contrôles MIDI depuis la configuration

@@ -1,24 +1,25 @@
-#include "LvglSceneManager.hpp"
 #include <Arduino.h>
 
-LvglSceneManager::LvglSceneManager(const SceneConfig& config,
-                                 std::shared_ptr<WidgetMappingManager> mappingManager)
-    : config_(config)
-    , mappingManager_(mappingManager)
-    , initialized_(false)
-    , main_screen_(nullptr)
-    , grid_container_(nullptr)
-    , stats_{0, 0, false, 0} {
-    
-    logInfo("LvglSceneManager initialized with " + String(config_.maxWidgets) + " max widgets");
+#include "ParameterSceneManager.hpp"
+
+ParameterSceneManager::ParameterSceneManager(
+    const SceneConfig& config, std::shared_ptr<ParameterWidgetMappingManager> mappingManager)
+    : config_(config),
+      mappingManager_(mappingManager),
+      initialized_(false),
+      main_screen_(nullptr),
+      grid_container_(nullptr),
+      stats_{0, 0, false, 0} {
+    logInfo("ParameterSceneManager initialized with " + String(config_.maxWidgets) +
+            " max widgets");
 }
 
-LvglSceneManager::~LvglSceneManager() {
+ParameterSceneManager::~ParameterSceneManager() {
     cleanup();
-    logInfo("LvglSceneManager destroyed");
+    logInfo("ParameterSceneManager destroyed");
 }
 
-bool LvglSceneManager::initializeScene(WidgetConfigAccessor widgetConfigAccessor) {
+bool ParameterSceneManager::initializeScene(WidgetConfigAccessor widgetConfigAccessor) {
     if (initialized_) {
         logDebug("Scene already initialized");
         return true;
@@ -56,7 +57,7 @@ bool LvglSceneManager::initializeScene(WidgetConfigAccessor widgetConfigAccessor
     return true;
 }
 
-void LvglSceneManager::cleanup() {
+void ParameterSceneManager::cleanup() {
     if (!initialized_ && !main_screen_ && !grid_container_) {
         return; // Déjà nettoyé
     }
@@ -74,11 +75,11 @@ void LvglSceneManager::cleanup() {
     logDebug("LVGL scene cleanup completed");
 }
 
-bool LvglSceneManager::isInitialized() const {
+bool ParameterSceneManager::isInitialized() const {
     return initialized_;
 }
 
-void LvglSceneManager::setWidgetsVisible(bool visible) {
+void ParameterSceneManager::setWidgetsVisible(bool visible) {
     for (auto& widget : parameter_widgets_) {
         if (widget) {
             widget->setVisible(visible);
@@ -88,12 +89,13 @@ void LvglSceneManager::setWidgetsVisible(bool visible) {
     logDebug("Set all widgets visible: " + String(visible ? "true" : "false"));
 }
 
-void LvglSceneManager::finalizePositioning() {
+void ParameterSceneManager::finalizePositioning() {
     finalizeButtonIndicatorPositions();
     logDebug("Finalized positioning for all elements");
 }
 
-void LvglSceneManager::updateMappingManager(std::shared_ptr<WidgetMappingManager> mappingManager) {
+void ParameterSceneManager::updateMappingManager(
+    std::shared_ptr<ParameterWidgetMappingManager> mappingManager) {
     mappingManager_ = mappingManager;
     
     // Reconfigurer les indicateurs de boutons si nécessaire
@@ -109,26 +111,26 @@ void LvglSceneManager::updateMappingManager(std::shared_ptr<WidgetMappingManager
 // Accesseurs
 //=============================================================================
 
-lv_obj_t* LvglSceneManager::getMainScreen() const {
+lv_obj_t* ParameterSceneManager::getMainScreen() const {
     return main_screen_;
 }
 
-lv_obj_t* LvglSceneManager::getGridContainer() const {
+lv_obj_t* ParameterSceneManager::getGridContainer() const {
     return grid_container_;
 }
 
-ParameterWidget* LvglSceneManager::getWidget(uint8_t index) const {
+ParameterWidget* ParameterSceneManager::getWidget(uint8_t index) const {
     if (index < config_.maxWidgets && parameter_widgets_[index]) {
         return parameter_widgets_[index].get();
     }
     return nullptr;
 }
 
-const std::array<std::unique_ptr<ParameterWidget>, 8>& LvglSceneManager::getWidgets() const {
+const std::array<std::unique_ptr<ParameterWidget>, 8>& ParameterSceneManager::getWidgets() const {
     return parameter_widgets_;
 }
 
-uint8_t LvglSceneManager::getWidgetCount() const {
+uint8_t ParameterSceneManager::getWidgetCount() const {
     uint8_t count = 0;
     for (const auto& widget : parameter_widgets_) {
         if (widget) {
@@ -138,7 +140,7 @@ uint8_t LvglSceneManager::getWidgetCount() const {
     return count;
 }
 
-LvglSceneManager::SceneStats LvglSceneManager::getStats() const {
+ParameterSceneManager::SceneStats ParameterSceneManager::getStats() const {
     updateStats();
     return stats_;
 }
@@ -147,7 +149,7 @@ LvglSceneManager::SceneStats LvglSceneManager::getStats() const {
 // Méthodes privées de création
 //=============================================================================
 
-bool LvglSceneManager::createMainScreen() {
+bool ParameterSceneManager::createMainScreen() {
     logDebug("Creating main screen...");
     
     // Créer l'écran principal
@@ -166,7 +168,7 @@ bool LvglSceneManager::createMainScreen() {
     return true;
 }
 
-bool LvglSceneManager::createGridContainer() {
+bool ParameterSceneManager::createGridContainer() {
     if (!main_screen_) {
         logError("Main screen not available for grid container creation");
         return false;
@@ -216,7 +218,7 @@ bool LvglSceneManager::createGridContainer() {
     return true;
 }
 
-bool LvglSceneManager::createParameterWidgets(WidgetConfigAccessor widgetConfigAccessor) {
+bool ParameterSceneManager::createParameterWidgets(WidgetConfigAccessor widgetConfigAccessor) {
     if (!grid_container_) {
         logError("Grid container not available for widget creation");
         return false;
@@ -271,7 +273,7 @@ bool LvglSceneManager::createParameterWidgets(WidgetConfigAccessor widgetConfigA
     return true;
 }
 
-void LvglSceneManager::setupButtonIndicators() {
+void ParameterSceneManager::setupButtonIndicators() {
     if (!mappingManager_) {
         logDebug("No mapping manager available for button indicators");
         return;
@@ -296,7 +298,7 @@ void LvglSceneManager::setupButtonIndicators() {
     logDebug("Created " + String(indicatorsCreated) + " button indicators");
 }
 
-void LvglSceneManager::finalizeButtonIndicatorPositions() {
+void ParameterSceneManager::finalizeButtonIndicatorPositions() {
     if (!mappingManager_) {
         return;
     }
@@ -342,7 +344,7 @@ void LvglSceneManager::finalizeButtonIndicatorPositions() {
 // Méthodes privées de nettoyage
 //=============================================================================
 
-void LvglSceneManager::cleanupParameterWidgets() {
+void ParameterSceneManager::cleanupParameterWidgets() {
     logDebug("Cleaning up parameter widgets...");
     
     // Nettoyer tous les widgets en premier
@@ -355,7 +357,7 @@ void LvglSceneManager::cleanupParameterWidgets() {
     logDebug("Parameter widgets cleaned up");
 }
 
-void LvglSceneManager::cleanupGridContainer() {
+void ParameterSceneManager::cleanupGridContainer() {
     if (grid_container_) {
         logDebug("Cleaning up grid container...");
         lv_obj_delete(grid_container_);
@@ -364,7 +366,7 @@ void LvglSceneManager::cleanupGridContainer() {
     }
 }
 
-void LvglSceneManager::cleanupMainScreen() {
+void ParameterSceneManager::cleanupMainScreen() {
     if (main_screen_) {
         logDebug("Cleaning up main screen...");
         lv_obj_delete(main_screen_);
@@ -377,7 +379,7 @@ void LvglSceneManager::cleanupMainScreen() {
 // Utilitaires
 //=============================================================================
 
-void LvglSceneManager::updateStats() const {
+void ParameterSceneManager::updateStats() const {
     stats_.widgetsCreated = getWidgetCount();
     stats_.sceneInitialized = initialized_;
     
@@ -390,28 +392,27 @@ void LvglSceneManager::updateStats() const {
     }
     
     // Estimation grossière de l'utilisation mémoire
-    stats_.memoryUsageEstimate = 
-        sizeof(LvglSceneManager) +
-        (stats_.widgetsCreated * sizeof(ParameterWidget)) +
-        (stats_.buttonIndicatorsCreated * sizeof(ButtonIndicator)) +
-        (main_screen_ ? 200 : 0) +  // Estimation pour objets LVGL
-        (grid_container_ ? 150 : 0);
+    stats_.memoryUsageEstimate = sizeof(ParameterSceneManager) +
+                                 (stats_.widgetsCreated * sizeof(ParameterWidget)) +
+                                 (stats_.buttonIndicatorsCreated * sizeof(ButtonIndicator)) +
+                                 (main_screen_ ? 200 : 0) +  // Estimation pour objets LVGL
+                                 (grid_container_ ? 150 : 0);
 }
 
-void LvglSceneManager::logInfo(const String& message) const {
+void ParameterSceneManager::logInfo(const String& message) const {
     if (config_.enableLogging) {
-        Serial.println("[LvglSceneManager] " + message);
+        Serial.println("[ParameterSceneManager] " + message);
     }
 }
 
-void LvglSceneManager::logDebug(const String& message) const {
+void ParameterSceneManager::logDebug(const String& message) const {
     if (config_.enableLogging) {
-        Serial.println("[LvglSceneManager DEBUG] " + message);
+        Serial.println("[ParameterSceneManager DEBUG] " + message);
     }
 }
 
-void LvglSceneManager::logError(const String& message) const {
+void ParameterSceneManager::logError(const String& message) const {
     if (config_.enableLogging) {
-        Serial.println("[LvglSceneManager ERROR] " + message);
+        Serial.println("[ParameterSceneManager ERROR] " + message);
     }
 }

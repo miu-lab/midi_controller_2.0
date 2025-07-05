@@ -100,9 +100,9 @@ FLASH_STRING(MSG_ACTIVATING_VIEW, "LastControlView: Activating view after contro
 // ============================================================================
 // Messages de débogage
 // ============================================================================
-FLASH_STRING(DBG_EVENT_ENABLED_MIDI_OUT, "EventEnabledMidiOut created");
+FLASH_STRING(DBG_EVENT_ENABLED_MIDI_OUT, "MidiOutputEventAdapter created");
 // Simplification des longs séparateurs
-FLASH_STRING(DBG_SENDING_CC, "--- EventEnabledMidiOut: Sending CC ---");
+FLASH_STRING(DBG_SENDING_CC, "--- MidiOutputEventAdapter: Sending CC ---");
 FLASH_STRING(DBG_SEPARATOR, "-----------------------------------");
 // Format compacte pour les étiquettes de débogage
 FLASH_STRING(DBG_FMT, "%s:%d");

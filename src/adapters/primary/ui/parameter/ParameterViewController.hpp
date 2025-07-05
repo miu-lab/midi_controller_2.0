@@ -1,25 +1,26 @@
 #pragma once
 
-#include "MidiConfigurationParser.hpp"
-#include "WidgetMappingManager.hpp"
+#include <memory>
+
+#include "ConfigurationMidiExtractor.hpp"
 #include "ParameterEventHandler.hpp"
-#include "LvglSceneManager.hpp"
+#include "ParameterSceneManager.hpp"
+#include "ParameterWidgetMappingManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
-#include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/UIEvent.hpp"
-#include <memory>
+#include "core/domain/events/core/EventBus.hpp"
 
 /**
  * @brief Contrôleur principal pour orchestrer tous les composants de la vue des paramètres
- * 
+ *
  * Ce contrôleur centralise la coordination entre:
- * - MidiConfigurationParser : parsing de la configuration
- * - WidgetMappingManager : gestion des mappings CC→Widget et Button→Widget
+ * - ConfigurationMidiExtractor : parsing de la configuration
+ * - ParameterWidgetMappingManager : gestion des mappings CC→Widget et Button→Widget
  * - ParameterEventHandler : gestion des événements MIDI et boutons
- * - LvglSceneManager : gestion de la scène et des objets LVGL
- * 
+ * - ParameterSceneManager : gestion de la scène et des objets LVGL
+ *
  * Il implémente le pattern Controller pour respecter la séparation des responsabilités
  * et permettre à LvglParameterView de devenir un simple wrapper.
  */
@@ -161,11 +162,11 @@ private:
     SubscriptionId event_subscription_id_;
     
     // Composants orchestrés (Phase 5.2-5.5)
-    std::unique_ptr<MidiConfigurationParser> configParser_;
-    std::unique_ptr<WidgetMappingManager> mappingManager_;
+    std::unique_ptr<ConfigurationMidiExtractor> configParser_;
+    std::unique_ptr<ParameterWidgetMappingManager> mappingManager_;
     std::unique_ptr<ParameterEventHandler> eventHandler_;
-    std::unique_ptr<LvglSceneManager> sceneManager_;
-    
+    std::unique_ptr<ParameterSceneManager> sceneManager_;
+
     // Méthodes privées d'initialisation
     bool initializeConfigParser();
     bool initializeMappingManager();
