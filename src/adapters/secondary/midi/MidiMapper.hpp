@@ -17,7 +17,6 @@
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
-#include "core/domain/interfaces/INavigationService.hpp"
 
 /**
  * @brief Mapper qui gère la transformation des événements en commandes MIDI
@@ -34,8 +33,7 @@ public:
      * @param commandManager Gestionnaire de commandes
      * @param navigationService Service de navigation pour filtrer les contrôles (optionnel)
      */
-    MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager, 
-               std::shared_ptr<INavigationService> navigationService = nullptr);
+    MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager);
 
     /**
      * @brief Traite les événements reçus du bus d'événements
@@ -72,21 +70,6 @@ public:
      */
     ControlDefinition::MidiConfig getMidiConfig(InputId controlId) const;
 
-    /**
-     * @brief Définit les contrôles qui sont utilisés pour la navigation
-     * @param navControlIds Ensemble des IDs des contrôles de navigation
-     * 
-     * LEGACY: Maintenu pour compatibilité, mais préférer l'injection via constructeur
-     */
-    void setNavigationControls(const std::set<InputId>& navControlIds);
-
-    /**
-     * @brief Obtient les IDs des contrôles de navigation configurés
-     * @return Ensemble des IDs des contrôles de navigation
-     * 
-     * REFACTOR: Maintenu pour compatibilité avec l'ancien code
-     */
-    const std::set<InputId>& getNavigationControlIds() const;
 
     /**
      * @brief Traite un changement d'encodeur
@@ -158,8 +141,6 @@ private:
     // Fonction de log diagnostique conditionnelle
     void logDiagnostic(const char* format, ...) const;
 
-    // Vérifie si un contrôle est dédié à la navigation
-    bool isNavigationControl(InputId controlId) const;
 
     // Vérifie si l'encodeur doit être traité en fonction de la limitation de taux
     bool shouldProcessEncoder(EncoderId encoderId, int32_t position);
@@ -187,10 +168,8 @@ private:
 
     MidiOutputPort& midiOut_;
     CommandManager& commandManager_;
-    std::shared_ptr<INavigationService> navigationService_;  // REFACTOR: Service de navigation injecté
     std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
     std::unordered_map<InputId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
-    std::set<InputId> navigationControls_;  // LEGACY: Maintenu pour compatibilité
 
     ControlDefinition::MidiConfig defaultConfig_;  // Configuration par défaut retournée si non trouvée
 };

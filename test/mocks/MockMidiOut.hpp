@@ -5,6 +5,9 @@
 #include <vector>
 #include <cstdint>
 
+// Mock millis() function for tests
+unsigned long millis() { return 1000; }
+
 /**
  * @brief Mock pour MidiOutputPort permettant d'isoler les tests MIDI
  * 
@@ -25,69 +28,52 @@ public:
     MockMidiOut() : call_count_(0) {}
 
     // Interface MidiOutputPort
-    Result<bool> sendNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) override {
-        if (should_fail_) {
-            return Result<bool>::error({ErrorCode::OperationFailed, "Mock MIDI failure"});
-        }
-        
+    void sendNoteOn(MidiChannel channel, MidiNote note, uint8_t velocity) override {
         CapturedMessage msg;
         msg.type = CapturedMessage::NOTE_ON;
         msg.channel = channel;
         msg.data1 = note;
         msg.data2 = velocity;
-        msg.timestamp = millis();
+        msg.timestamp = ::millis();
         
         captured_messages_.push_back(msg);
         call_count_++;
-        
-        return Result<bool>::success(true);
     }
 
-    Result<bool> sendNoteOff(uint8_t channel, uint8_t note) override {
-        if (should_fail_) {
-            return Result<bool>::error({ErrorCode::OperationFailed, "Mock MIDI failure"});
-        }
-        
+    void sendNoteOff(MidiChannel channel, MidiNote note, uint8_t velocity) override {
         CapturedMessage msg;
         msg.type = CapturedMessage::NOTE_OFF;
         msg.channel = channel;
         msg.data1 = note;
-        msg.data2 = 0;
-        msg.timestamp = millis();
+        msg.data2 = velocity;
+        msg.timestamp = ::millis();
         
         captured_messages_.push_back(msg);
         call_count_++;
-        
-        return Result<bool>::success(true);
     }
 
-    Result<bool> sendControlChange(uint8_t channel, uint8_t controller, uint8_t value) override {
-        if (should_fail_) {
-            return Result<bool>::error({ErrorCode::OperationFailed, "Mock MIDI failure"});
-        }
-        
+    void sendControlChange(MidiChannel channel, uint8_t controller, uint8_t value) override {
         CapturedMessage msg;
         msg.type = CapturedMessage::CONTROL_CHANGE;
         msg.channel = channel;
         msg.data1 = controller;
         msg.data2 = value;
-        msg.timestamp = millis();
+        msg.timestamp = ::millis();
         
         captured_messages_.push_back(msg);
         call_count_++;
-        
-        return Result<bool>::success(true);
     }
+
+    // Méthodes de test
+    void sendProgramChange(MidiChannel ch, uint8_t program) override {}
+    void sendPitchBend(MidiChannel ch, uint16_t value) override {}
+    void sendChannelPressure(MidiChannel ch, uint8_t pressure) override {}
+    void sendSysEx(const uint8_t* data, uint16_t length) override {}
 
     // Méthodes de test
     void reset() {
         captured_messages_.clear();
         call_count_ = 0;
-        should_fail_ = false;
-    }
-
-    void setShouldFail(bool fail) {
-        should_fail_ = fail;
     }
 
     size_t getCallCount() const {
@@ -120,5 +106,4 @@ public:
 private:
     std::vector<CapturedMessage> captured_messages_;
     size_t call_count_;
-    bool should_fail_ = false;
 };

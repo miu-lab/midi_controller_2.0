@@ -4,37 +4,7 @@
 #include "adapters/primary/ui/parameter/ParameterSceneManager.hpp"
 #include "adapters/primary/ui/parameter/ParameterWidgetMappingManager.hpp"
 
-// Mock pour LVGL (car pas disponible dans l'environnement de test)
-extern "C" {
-    // Structures LVGL minimales pour les tests
-    struct _lv_obj_t {
-        int dummy;
-    };
-    
-    _lv_obj_t* lv_obj_create(_lv_obj_t* parent) {
-        return reinterpret_cast<_lv_obj_t*>(0x1000 + rand() % 1000);
-    }
-    
-    void lv_obj_delete(_lv_obj_t* obj) {
-        // Mock delete
-    }
-    
-    void lv_obj_set_size(_lv_obj_t* obj, int w, int h) {}
-    void lv_obj_set_pos(_lv_obj_t* obj, int x, int y) {}
-    void lv_obj_set_style_bg_color(_lv_obj_t* obj, int color, int state) {}
-    void lv_obj_set_style_bg_opa(_lv_obj_t* obj, int opa, int state) {}
-    void lv_obj_set_style_pad_all(_lv_obj_t* obj, int pad, int state) {}
-    void lv_obj_set_style_border_width(_lv_obj_t* obj, int width, int state) {}
-    void lv_obj_set_style_pad_gap(_lv_obj_t* obj, int gap, int state) {}
-    void lv_obj_set_grid_dsc_array(_lv_obj_t* obj, void* col_dsc, void* row_dsc) {}
-    void lv_obj_set_layout(_lv_obj_t* obj, int layout) {}
-    void lv_obj_set_grid_cell(_lv_obj_t* obj, int align_col, int col, int span_col, int align_row, int row, int span_row) {}
-    void lv_obj_center(_lv_obj_t* obj) {}
-    void lv_obj_move_foreground(_lv_obj_t* obj) {}
-    void lv_obj_invalidate(_lv_obj_t* obj) {}
-    
-    int lv_color_hex(int color) { return color; }
-}
+#include "lvgl_test_mocks.hpp"
 
 class TestParameterSceneManager {
 public:

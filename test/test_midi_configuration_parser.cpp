@@ -52,7 +52,7 @@ public:
         info.name = "Test Control";
         info.control_id = 100;
         
-        TEST_ASSERT_TRUE(parser.validateMidiControlInfo(info));
+        TEST_ASSERT_TRUE(parser.validateMidiControlInfo(info).isSuccess());
     }
 
     static void test_validate_midi_control_info_invalid_cc() {
@@ -66,7 +66,7 @@ public:
         info.name = "Test Control";
         info.control_id = 100;
         
-        TEST_ASSERT_FALSE(parser.validateMidiControlInfo(info));
+        TEST_ASSERT_FALSE(parser.validateMidiControlInfo(info).isSuccess());
     }
 
     static void test_validate_midi_control_info_invalid_channel() {
@@ -78,7 +78,7 @@ public:
         info.name = "Test Control";
         info.control_id = 100;
         
-        TEST_ASSERT_FALSE(parser.validateMidiControlInfo(info));
+        TEST_ASSERT_FALSE(parser.validateMidiControlInfo(info).isSuccess());
     }
 
     static void test_validate_midi_control_info_empty_name() {
@@ -90,7 +90,7 @@ public:
         info.name = ""; // Empty name
         info.control_id = 100;
         
-        TEST_ASSERT_FALSE(parser.validateMidiControlInfo(info));
+        TEST_ASSERT_FALSE(parser.validateMidiControlInfo(info).isSuccess());
     }
 
     static void test_validate_button_info_valid() {
@@ -101,7 +101,7 @@ public:
         info.parent_encoder_id = 71;
         info.name = "Test Button";
         
-        TEST_ASSERT_TRUE(parser.validateButtonInfo(info));
+        TEST_ASSERT_TRUE(parser.validateButtonInfo(info).isSuccess());
     }
 
     static void test_validate_button_info_invalid_id() {
@@ -112,7 +112,7 @@ public:
         info.parent_encoder_id = 71;
         info.name = "Test Button";
         
-        TEST_ASSERT_FALSE(parser.validateButtonInfo(info));
+        TEST_ASSERT_FALSE(parser.validateButtonInfo(info).isSuccess());
     }
 
     static void test_validate_button_info_empty_name() {
@@ -123,7 +123,7 @@ public:
         info.parent_encoder_id = 71;
         info.name = ""; // Empty name
         
-        TEST_ASSERT_FALSE(parser.validateButtonInfo(info));
+        TEST_ASSERT_FALSE(parser.validateButtonInfo(info).isSuccess());
     }
 
     static void test_extract_with_factory_config() {
@@ -131,8 +131,8 @@ public:
         auto config = ConfigurationFactory::createDefaultConfiguration();
         ConfigurationMidiExtractor parser;
 
-        auto midiResult = parser.extractMidiControls(config);
-        auto buttonResult = parser.extractButtonInfo(config);
+        auto midiResult = parser.extractMidiControls(*config);
+        auto buttonResult = parser.extractButtonInfo(*config);
         
         // Les résultats dépendent de la configuration par défaut
         // Au minimum, les fonctions ne doivent pas planter

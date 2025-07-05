@@ -231,7 +231,7 @@ public:
         TEST_ASSERT_TRUE(result.isSuccess());
         
         // Vérifier les méthodes de validation
-        TEST_ASSERT_TRUE(inputSubsystem->validateInputsStatus());
+        TEST_ASSERT_TRUE(inputSubsystem->validateInputsStatus().isSuccess());
         
         // Vérifier les méthodes de consultation
         auto activeControls = inputSubsystem->getAllActiveControlDefinitions();

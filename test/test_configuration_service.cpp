@@ -26,6 +26,12 @@ public:
             case MockConfiguration::ConfigurationType::EMPTY:
                 controls_ = TestConfigurations::getEmptyConfiguration();
                 break;
+            case MockConfiguration::ConfigurationType::ENCODER_WITH_CHILD_BUTTONS:
+                controls_ = TestConfigurations::getComplexConfiguration(); // Fallback
+                break;
+            case MockConfiguration::ConfigurationType::INVALID:
+                controls_ = TestConfigurations::getEmptyConfiguration(); // Fallback
+                break;
         }
     }
     

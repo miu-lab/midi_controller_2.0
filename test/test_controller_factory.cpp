@@ -3,6 +3,8 @@
 
 #include "core/factories/ControllerFactory.hpp"
 #include "app/di/DependencyContainer.hpp"
+#include "core/domain/events/core/EventBus.hpp"
+#include "app/services/NavigationConfigService.hpp"
 
 /**
  * @brief Mock NavigationConfigService pour les tests
@@ -34,12 +36,14 @@ public:
         
         // Créer et enregistrer un mock NavigationConfigService
         mockNavigationConfigService_ = std::make_shared<MockNavigationConfigServiceForFactory>();
-        // Note: Dans les vrais tests, on utiliserait l'interface NavigationConfigService
-        container_->registerDependency<NavigationConfigService>(
-            std::reinterpret_pointer_cast<NavigationConfigService>(
-                std::shared_ptr<void>(reinterpret_cast<void*>(0x1000), [](void*) {})
-            )
-        );
+        
+        // Créer un vrai NavigationConfigService pour les tests
+        auto navigationService = std::make_shared<NavigationConfigService>();
+        container_->registerDependency<NavigationConfigService>(navigationService);
+        
+        // Utiliser un pointeur factice pour EventBus (constructeur privé)
+        auto eventBus = std::shared_ptr<EventBus>(reinterpret_cast<EventBus*>(0x2000), [](EventBus*) {});
+        container_->registerDependency<EventBus>(eventBus);
     }
 
     void tearDown() {

@@ -1,6 +1,6 @@
 #include <unity.h>
 #include <memory>
-#include <typeinfo>
+#include <type_traits>
 
 #include "core/ui/ViewFactory.hpp"
 #include "adapters/primary/ui/DefaultViewManager.hpp"
@@ -37,19 +37,19 @@ public:
         // Simulation simple - retour de pointeurs factices pour les tests
         static int dummy1, dummy2, dummy3;
         
-        if (typeid(T) == typeid(Ili9341LvglBridge)) {
+        if constexpr (std::is_same_v<T, Ili9341LvglBridge>) {
             if (type_ == DependencyType::MISSING_LVGL_BRIDGE) {
                 return nullptr;
             }
             return std::shared_ptr<T>(reinterpret_cast<T*>(&dummy1), [](T*) {});
         }
-        else if (typeid(T) == typeid(UnifiedConfiguration)) {
+        else if constexpr (std::is_same_v<T, UnifiedConfiguration>) {
             if (type_ == DependencyType::MISSING_UNIFIED_CONFIG) {
                 return nullptr;
             }
             return std::shared_ptr<T>(reinterpret_cast<T*>(&dummy2), [](T*) {});
         }
-        else if (typeid(T) == typeid(EventBus)) {
+        else if constexpr (std::is_same_v<T, EventBus>) {
             if (type_ == DependencyType::MISSING_EVENT_BUS) {
                 return nullptr;
             }

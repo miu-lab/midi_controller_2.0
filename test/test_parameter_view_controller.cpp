@@ -5,41 +5,17 @@
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/UIEvent.hpp"
 #include "core/domain/events/core/EventTypes.hpp"
+#include "core/domain/events/core/EventBus.hpp"
 
-// Mock pour LVGL (car pas disponible dans l'environnement de test)
-extern "C" {
-    struct _lv_obj_t { int dummy; };
-    
-    _lv_obj_t* lv_obj_create(_lv_obj_t* parent) {
-        return reinterpret_cast<_lv_obj_t*>(0x1000 + rand() % 1000);
-    }
-    
-    void lv_obj_delete(_lv_obj_t* obj) {}
-    void lv_obj_set_size(_lv_obj_t* obj, int w, int h) {}
-    void lv_obj_set_pos(_lv_obj_t* obj, int x, int y) {}
-    void lv_obj_set_style_bg_color(_lv_obj_t* obj, int color, int state) {}
-    void lv_obj_set_style_bg_opa(_lv_obj_t* obj, int opa, int state) {}
-    void lv_obj_set_style_pad_all(_lv_obj_t* obj, int pad, int state) {}
-    void lv_obj_set_style_border_width(_lv_obj_t* obj, int width, int state) {}
-    void lv_obj_set_style_pad_gap(_lv_obj_t* obj, int gap, int state) {}
-    void lv_obj_set_grid_dsc_array(_lv_obj_t* obj, void* col_dsc, void* row_dsc) {}
-    void lv_obj_set_layout(_lv_obj_t* obj, int layout) {}
-    void lv_obj_set_grid_cell(_lv_obj_t* obj, int align_col, int col, int span_col, int align_row, int row, int span_row) {}
-    void lv_obj_center(_lv_obj_t* obj) {}
-    void lv_obj_move_foreground(_lv_obj_t* obj) {}
-    void lv_obj_invalidate(_lv_obj_t* obj) {}
-    void lv_screen_load(_lv_obj_t* screen) {}
-    
-    int lv_color_hex(int color) { return color; }
-}
+#include "lvgl_test_mocks.hpp"
 
-// Mock classes pour les dépendances (héritage pour polymorphisme)
-class MockIli9341LvglBridge : public Ili9341LvglBridge {
+// Mock classes pour les dépendances (sans héritage pour éviter les problèmes de constructeur)
+class MockIli9341LvglBridge {
 public:
-    MockIli9341LvglBridge() : Ili9341LvglBridge(nullptr, 0, 0, 0, 0, 0, 0, 0) {}
-    void refresh() override {}
-    void init() override {}
-    void clear() override {}
+    MockIli9341LvglBridge() = default;
+    void refresh() {}
+    void init() {}
+    void clear() {}
 };
 
 class MockUnifiedConfiguration : public UnifiedConfiguration {
@@ -48,16 +24,16 @@ public:
     // Les méthodes virtuelles seront héritées
 };
 
-class MockEventBus : public EventBus {
+class MockEventBus {
 public:
     MockEventBus() : next_id_(1) {}
     
-    SubscriptionId subscribeHigh(EventListener* listener) override {
+    SubscriptionId subscribeHigh(EventListener* listener) {
         listeners_[next_id_] = listener;
         return next_id_++;
     }
     
-    void unsubscribe(SubscriptionId id) override {
+    void unsubscribe(SubscriptionId id) {
         listeners_.erase(id);
     }
     
@@ -76,14 +52,14 @@ private:
 
 class TestParameterViewController {
 public:
-    static std::shared_ptr<MockIli9341LvglBridge> mockBridge;
-    static std::shared_ptr<MockUnifiedConfiguration> mockConfig;
-    static std::shared_ptr<MockEventBus> mockEventBus;
+    static std::shared_ptr<Ili9341LvglBridge> mockBridge;
+    static std::shared_ptr<UnifiedConfiguration> mockConfig;
+    static std::shared_ptr<EventBus> mockEventBus;
     
     static void setUp() {
-        mockBridge = std::make_shared<MockIli9341LvglBridge>();
-        mockConfig = std::make_shared<MockUnifiedConfiguration>();
-        mockEventBus = std::make_shared<MockEventBus>();
+        mockBridge = std::shared_ptr<Ili9341LvglBridge>(nullptr);
+        mockConfig = std::shared_ptr<UnifiedConfiguration>(nullptr);
+        mockEventBus = std::shared_ptr<EventBus>(nullptr);
     }
     
     static void tearDown() {
@@ -364,9 +340,9 @@ public:
 };
 
 // Définitions statiques
-std::shared_ptr<MockIli9341LvglBridge> TestParameterViewController::mockBridge;
-std::shared_ptr<MockUnifiedConfiguration> TestParameterViewController::mockConfig;
-std::shared_ptr<MockEventBus> TestParameterViewController::mockEventBus;
+std::shared_ptr<Ili9341LvglBridge> TestParameterViewController::mockBridge;
+std::shared_ptr<UnifiedConfiguration> TestParameterViewController::mockConfig;
+std::shared_ptr<EventBus> TestParameterViewController::mockEventBus;
 
 // Fonctions de test Unity
 void test_parameter_view_controller_constructor_default() {

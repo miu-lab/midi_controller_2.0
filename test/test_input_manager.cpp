@@ -5,6 +5,9 @@
 #include "core/input/InputManager.hpp"
 #include "config/unified/ControlDefinition.hpp"
 
+// Forward declaration seulement
+class InputController;
+
 /**
  * @brief Mock InputController pour les tests
  */
@@ -31,7 +34,6 @@ public:
         config_.enableEventProcessing = true;
         
         inputManager_ = std::make_unique<InputManager>(config_);
-        mockInputController_ = std::make_shared<InputController>();
         
         // Créer des définitions de contrôles de test
         createTestControlDefinitions();
@@ -39,7 +41,6 @@ public:
 
     void tearDown() {
         inputManager_.reset();
-        mockInputController_.reset();
         testControlDefinitions_.clear();
     }
 
@@ -250,7 +251,6 @@ public:
 private:
     InputManager::ManagerConfig config_;
     std::unique_ptr<InputManager> inputManager_;
-    std::shared_ptr<InputController> mockInputController_;
     std::vector<ControlDefinition> testControlDefinitions_;
 
     void createTestControlDefinitions() {
@@ -270,8 +270,8 @@ private:
         encoderDef.hardware.type = InputType::ENCODER;
         
         ControlDefinition::EncoderConfig encConfig;
-        encConfig.pinA = pinA;
-        encConfig.pinB = pinB;
+        encConfig.pinA = GpioPin{pinA};
+        encConfig.pinB = GpioPin{pinB};
         encConfig.ppr = 24;
         encConfig.sensitivity = 1.0f;
         encConfig.enableAcceleration = false;
@@ -288,9 +288,9 @@ private:
         buttonDef.hardware.type = InputType::BUTTON;
         
         ControlDefinition::ButtonConfig btnConfig;
-        btnConfig.pin = pin;
+        btnConfig.pin = GpioPin{pin};
         btnConfig.activeLow = true;
-        btnConfig.mode = ButtonMode::PULLUP;
+        // btnConfig.mode = PinMode::PULLUP;
         btnConfig.debounceMs = 50;
         btnConfig.longPressMs = std::nullopt;
         

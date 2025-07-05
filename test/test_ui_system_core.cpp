@@ -1,7 +1,26 @@
 #include <unity.h>
 #include <memory>
+#include <functional>
 
 #include "core/ui/UISystemCore.hpp"
+#include "core/ui/DisplayManager.hpp"
+// EventManager non défini dans le codebase
+
+// Forward declarations and minimal implementations for incomplete types
+class EventManager {
+public:
+    virtual ~EventManager() = default;
+};
+
+class ViewManager {
+public:
+    virtual ~ViewManager() = default;
+};
+
+class ViewManagerEventListener {
+public:
+    virtual ~ViewManagerEventListener() = default;
+};
 
 /**
  * @brief Mock ViewManager pour les tests
@@ -126,10 +145,10 @@ public:
      * @brief Test initialize avec tous les composants valides
      */
     void testInitializeSuccess() {
-        // Arrange - utiliser des pointeurs factices pour éviter la déréférence
-        auto viewManager = std::shared_ptr<ViewManager>(reinterpret_cast<ViewManager*>(0x1000), [](ViewManager*) {});
-        auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
+        // Arrange - utiliser des pointeurs nullptr pour les tests
+        auto viewManager = std::shared_ptr<ViewManager>(nullptr);
+        auto displayManager = std::unique_ptr<DisplayManager>(nullptr);
+        auto eventManager = std::unique_ptr<EventManager>(nullptr);
         
         // Act
         auto result = uiCore_->initialize(std::move(viewManager), std::move(displayManager), std::move(eventManager));
@@ -145,8 +164,8 @@ public:
      */
     void testInitializeMissingViewManager() {
         // Arrange
-        auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
+        auto displayManager = std::unique_ptr<DisplayManager>(nullptr);
+        auto eventManager = std::unique_ptr<EventManager>(nullptr);
         
         // Act
         auto result = uiCore_->initialize(nullptr, std::move(displayManager), std::move(eventManager));
@@ -180,9 +199,9 @@ public:
      */
     void testDoubleInitialization() {
         // Arrange
-        auto viewManager = std::shared_ptr<ViewManager>(reinterpret_cast<ViewManager*>(0x1000), [](ViewManager*) {});
-        auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
+        auto viewManager = std::shared_ptr<ViewManager>(nullptr);
+        auto displayManager = std::unique_ptr<DisplayManager>(nullptr);
+        auto eventManager = std::unique_ptr<EventManager>(nullptr);
         
         uiCore_->initialize(viewManager, std::move(displayManager), std::move(eventManager));
         
@@ -277,9 +296,9 @@ private:
     std::unique_ptr<MockEventManagerForCore> mockEventManager_;
 
     void initializeWithMocks() {
-        auto viewManager = std::shared_ptr<ViewManager>(reinterpret_cast<ViewManager*>(0x1000), [](ViewManager*) {});
-        auto displayManager = std::unique_ptr<DisplayManager>(reinterpret_cast<DisplayManager*>(0x2000), [](DisplayManager*) {});
-        auto eventManager = std::unique_ptr<EventManager>(reinterpret_cast<EventManager*>(0x3000), [](EventManager*) {});
+        auto viewManager = std::shared_ptr<ViewManager>(nullptr);
+        auto displayManager = std::unique_ptr<DisplayManager>(nullptr);
+        auto eventManager = std::unique_ptr<EventManager>(nullptr);
         
         uiCore_->initialize(std::move(viewManager), std::move(displayManager), std::move(eventManager));
     }

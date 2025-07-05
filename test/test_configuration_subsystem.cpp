@@ -169,12 +169,12 @@ private:
 
 ConfigurationSubsystemTest* testInstance = nullptr;
 
-void setUp(void) {
+void setUpConfigurationSubsystem(void) {
     testInstance = new ConfigurationSubsystemTest();
     testInstance->setUp();
 }
 
-void tearDown(void) {
+void tearDownConfigurationSubsystem(void) {
     if (testInstance) {
         testInstance->tearDown();
         delete testInstance;
@@ -185,23 +185,33 @@ void tearDown(void) {
 // === FONCTIONS DE TEST ===
 
 void test_init_with_missing_application_configuration() {
+    setUpConfigurationSubsystem();
     testInstance->testInitWithMissingApplicationConfiguration();
+    tearDownConfigurationSubsystem();
 }
 
 void test_init_with_existing_application_configuration() {
+    setUpConfigurationSubsystem();
     testInstance->testInitWithExistingApplicationConfiguration();
+    tearDownConfigurationSubsystem();
 }
 
 void test_control_access_after_init() {
+    setUpConfigurationSubsystem();
     testInstance->testControlAccessAfterInit();
+    tearDownConfigurationSubsystem();
 }
 
 void test_default_configuration_properties() {
+    setUpConfigurationSubsystem();
     testInstance->testDefaultConfigurationProperties();
+    tearDownConfigurationSubsystem();
 }
 
 void test_navigation_functions() {
+    setUpConfigurationSubsystem();
     testInstance->testNavigationFunctions();
+    tearDownConfigurationSubsystem();
 }
 
 // Note: test_init_with_null_container() volontairement omis 

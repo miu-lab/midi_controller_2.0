@@ -4,10 +4,10 @@
 #include "core/domain/events/UIEvent.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 
-// Mock ParameterWidget pour les tests
-class MockParameterWidget : public ParameterWidget {
+// Mock ParameterWidget pour les tests (sans héritage pour éviter problèmes d'override)
+class MockParameterWidget {
 public:
-    MockParameterWidget() : ParameterWidget(nullptr, 80, 120, 70) {
+    MockParameterWidget() {
         hasButtonIndicator_ = false;
         lastCC_ = 0;
         lastChannel_ = 0;
@@ -18,7 +18,7 @@ public:
     }
     
     void setParameter(uint8_t cc_number, uint8_t channel, uint8_t value, 
-                     const String& parameter_name, bool animate = true) override {
+                     const String& parameter_name, bool animate = true) {
         lastCC_ = cc_number;
         lastChannel_ = channel;
         lastValue_ = value;
@@ -27,13 +27,13 @@ public:
         setParameterCalled_ = true;
     }
     
-    void setButtonState(bool pressed, bool animate = true) override {
+    void setButtonState(bool pressed, bool animate = true) {
         lastButtonState_ = pressed;
         lastAnimate_ = animate;
         setButtonStateCalled_ = true;
     }
     
-    bool hasButtonIndicator() const override {
+    bool hasButtonIndicator() const {
         return hasButtonIndicator_;
     }
     
@@ -108,7 +108,7 @@ public:
     
     static ParameterWidget* widgetAccessor(uint8_t index) {
         if (index < 8) {
-            return mockWidgets[index];
+            return reinterpret_cast<ParameterWidget*>(mockWidgets[index]);
         }
         return nullptr;
     }

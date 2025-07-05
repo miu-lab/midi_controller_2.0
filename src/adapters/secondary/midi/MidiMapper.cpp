@@ -13,11 +13,9 @@
 // Construction et initialisation
 //=============================================================================
 
-MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager, 
-                       std::shared_ptr<INavigationService> navigationService)
+MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
     : midiOut_(midiOut),
       commandManager_(commandManager),
-      navigationService_(navigationService),
       defaultConfig_(
           {0, 0, false})  // Canal 0, CC 0, mode absolu
 {
@@ -62,15 +60,6 @@ void MidiMapper::logDiagnostic(const char* format, ...) const {
 #endif
 }
 
-bool MidiMapper::isNavigationControl(InputId controlId) const {
-    // REFACTOR: Priorité au service de navigation injecté
-    if (navigationService_) {
-        return navigationService_->isNavigationControl(controlId);
-    }
-    
-    // LEGACY: Fallback sur l'ancienne méthode pour compatibilité
-    return navigationControls_.count(controlId) > 0;
-}
 
 //=============================================================================
 // Gestion des mappings
@@ -173,9 +162,6 @@ ControlDefinition::MidiConfig MidiMapper::getMidiConfig(InputId controlId) const
     return defaultConfig_;
 }
 
-void MidiMapper::setNavigationControls(const std::set<InputId>& navControlIds) {
-    navigationControls_ = navControlIds;
-}
 
 //=============================================================================
 // Méthodes de traitement des encodeurs
@@ -278,12 +264,6 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Mettre à jour la dernière position
     mappingInfo.lastEncoderPosition = position;
 
-    // Si c'est un contrôle de navigation, ne pas envoyer de MIDI
-    if (isNavigationControl(encoderId)) {
-        // TODO DEBUG MSG
-        // Ne pas traiter en MIDI - laisser ViewManagerEventListener s'en occuper
-        return;
-    }
 
     // Calculer la nouvelle valeur MIDI selon le mode
     int16_t newValue = calculateMidiValue(mappingInfo, delta, position);
@@ -313,10 +293,6 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
 //=============================================================================
 
 void MidiMapper::processButtonEvent(InputId buttonId, bool pressed, MappingControlType type) {
-    // Si c'est un contrôle de navigation, ne pas traiter en MIDI mais laisser passer
-    if (isNavigationControl(buttonId)) {
-        return;
-    }
 
     // Créer une clé composite à partir de l'ID et du type
     uint32_t buttonKey = makeCompositeKey(buttonId, type);
@@ -437,7 +413,3 @@ bool MidiMapper::onEvent(const Event& event) {
     return false;  // Evénement non traité
 }
 
-// PHASE 1.1: Implémentation de getNavigationControlIds pour synchronisation avec NavigationConfigService
-const std::set<InputId>& MidiMapper::getNavigationControlIds() const {
-    return navigationControls_;
-}
