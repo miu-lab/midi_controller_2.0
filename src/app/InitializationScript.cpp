@@ -84,9 +84,10 @@ void InitializationScript::registerBaseServices(std::shared_ptr<DependencyContai
         });
     container->registerDependency<ApplicationConfiguration>(configPtr);
 
-    // Service de navigation
-    container->registerDependency<NavigationConfigService>(
-        std::make_shared<NavigationConfigService>());
+    // REFACTOR: Service de navigation avec interface
+    auto navigationService = std::make_shared<NavigationConfigService>();
+    container->registerDependency<NavigationConfigService>(navigationService);
+    container->registerDependency<INavigationService>(navigationService);
 
     // Gestionnaire de commandes
     container->registerDependency<CommandManager>(std::make_shared<CommandManager>());
@@ -194,11 +195,8 @@ Result<bool> InitializationScript::initializeSubsystems(
                                     1,
                                     "MidiUpdate");
                  
-                 // PHASE 1.1: Synchroniser NavigationConfigService avec les contrôles de navigation détectés
-                 auto navConfigService = container->resolve<NavigationConfigService>();
-                 if (navConfigService) {
-                     syncNavigationControlsWithConfigService(system, navConfigService);
-                 }
+                 // REFACTOR: Navigation maintenant gérée par InputSubsystem
+                 // Plus besoin de synchronisation manuelle depuis MidiSubsystem
              }
              return initResult;
          }});
@@ -291,24 +289,5 @@ void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyCon
     // Plus besoin de configuration de propagation - tout est géré automatiquement
 }
 
-void InitializationScript::syncNavigationControlsWithConfigService(
-    std::shared_ptr<MidiSubsystem> midiSubsystem,
-    std::shared_ptr<NavigationConfigService> navConfigService) {
-    
-    // Obtenir les contrôles de navigation détectés par MidiSubsystem
-    const auto& midiMapper = midiSubsystem->getMidiMapper();
-    
-    // Extraire les IDs des contrôles de navigation du MidiMapper
-    // Note: Cette méthode sera ajoutée au MidiMapper pour exposer les contrôles de navigation
-    auto navigationControlIds = midiMapper.getNavigationControlIds();
-    
-    // Synchroniser avec NavigationConfigService
-    for (InputId controlId : navigationControlIds) {
-        navConfigService->setControlForNavigation(controlId, true);
-        Serial.print("Navigation control registered: ");
-        Serial.println(controlId);
-    }
-    
-    Serial.print("Total navigation controls synchronized: ");
-    Serial.println(navigationControlIds.size());
-}
+// REFACTOR: Méthode supprimée - la synchronisation est maintenant gérée automatiquement
+// par InputSubsystem lors de son initialisation

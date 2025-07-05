@@ -173,27 +173,21 @@ void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {
     // TODO DEBUG MSG
     
     int mappingCount = 0;
-    std::set<InputId> navigationControlIds;
+    
+    // REFACTOR: Plus besoin de gérer les contrôles de navigation ici
+    // Cette responsabilité est maintenant dans InputSubsystem
     
     // Utiliser directement les mappings intégrés dans ControlDefinition
     for (const auto& controlDef : allControlDefinitions) {
         if (!controlDef.enabled) continue;
         
-        // Vérifier si le contrôle est pour la navigation
-        for (const auto& mapping : controlDef.mappings) {
-            if (mapping.role == MappingRole::NAVIGATION) {
-                navigationControlIds.insert(controlDef.id);
-                break; // Un seul mapping de navigation suffit
-            }
-        }
-        
-        // Configurer les mappings MIDI depuis cette définition de contrôle
+        // Configurer seulement les mappings MIDI depuis cette définition de contrôle
         setupMidiMappingFromControlDefinition(controlDef);
         mappingCount++;
     }
     
-    // Configurer les contrôles de navigation dans le mapper
-    midiMapper_->setNavigationControls(navigationControlIds);
+    // REFACTOR: Navigation controls sont maintenant gérés par InputSubsystem
+    // Plus besoin de configurer navigationControls dans MidiMapper ici
     
     // TODO DEBUG MSG
 }

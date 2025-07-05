@@ -17,6 +17,7 @@
 #include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
+#include "core/domain/interfaces/INavigationService.hpp"
 
 /**
  * @brief Mapper qui gère la transformation des événements en commandes MIDI
@@ -31,8 +32,10 @@ public:
      * @brief Constructeur
      * @param midiOut Interface de sortie MIDI
      * @param commandManager Gestionnaire de commandes
+     * @param navigationService Service de navigation pour filtrer les contrôles (optionnel)
      */
-    MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager);
+    MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager, 
+               std::shared_ptr<INavigationService> navigationService = nullptr);
 
     /**
      * @brief Traite les événements reçus du bus d'événements
@@ -72,6 +75,8 @@ public:
     /**
      * @brief Définit les contrôles qui sont utilisés pour la navigation
      * @param navControlIds Ensemble des IDs des contrôles de navigation
+     * 
+     * LEGACY: Maintenu pour compatibilité, mais préférer l'injection via constructeur
      */
     void setNavigationControls(const std::set<InputId>& navControlIds);
 
@@ -79,7 +84,7 @@ public:
      * @brief Obtient les IDs des contrôles de navigation configurés
      * @return Ensemble des IDs des contrôles de navigation
      * 
-     * PHASE 1.1: Méthode ajoutée pour synchroniser avec NavigationConfigService
+     * REFACTOR: Maintenu pour compatibilité avec l'ancien code
      */
     const std::set<InputId>& getNavigationControlIds() const;
 
@@ -182,9 +187,10 @@ private:
 
     MidiOutputPort& midiOut_;
     CommandManager& commandManager_;
+    std::shared_ptr<INavigationService> navigationService_;  // REFACTOR: Service de navigation injecté
     std::unordered_map<uint32_t, MappingInfo> mappings_;  // Clé: (controlId << 8 | controlType)
     std::unordered_map<InputId, std::unique_ptr<SendMidiNoteCommand>> activeNotes_;
-    std::set<InputId> navigationControls_;
+    std::set<InputId> navigationControls_;  // LEGACY: Maintenu pour compatibilité
 
     ControlDefinition::MidiConfig defaultConfig_;  // Configuration par défaut retournée si non trouvée
 };

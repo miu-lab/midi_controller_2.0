@@ -29,6 +29,12 @@ Result<bool> InputSubsystem::init() {
         return Result<bool>::error(Error(ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"));
     }
 
+    // REFACTOR: Récupérer le service de navigation
+    navigationService_ = container_->resolve<INavigationService>();
+    if (!navigationService_) {
+        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "Failed to resolve INavigationService"));
+    }
+
     // Initialiser les composants délégués
     auto delegateResult = initializeDelegatedComponents();
     if (!delegateResult.isSuccess()) {
@@ -40,6 +46,12 @@ Result<bool> InputSubsystem::init() {
     auto setupResult = setupInputManager(controlDefinitions);
     if (!setupResult.isSuccess()) {
         return setupResult;
+    }
+
+    // REFACTOR: Configurer les contrôles de navigation
+    auto navigationResult = configureNavigationControls(controlDefinitions);
+    if (!navigationResult.isSuccess()) {
+        return navigationResult;
     }
 
     // Enregistrer ce sous-système comme implémentation de IInputSystem
@@ -161,5 +173,40 @@ Result<bool> InputSubsystem::setupInputManager(const std::vector<ControlDefiniti
         return initResult;
     }
 
+    return Result<bool>::success(true);
+}
+
+Result<bool> InputSubsystem::configureNavigationControls(const std::vector<ControlDefinition>& controlDefinitions) {
+    if (!navigationService_) {
+        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "NavigationService not available"));
+    }
+
+    // REFACTOR: Logique déplacée de MidiSubsystem vers InputSubsystem
+    // Identifier les contrôles de navigation
+    std::set<InputId> navigationControlIds;
+    
+    for (const auto& controlDef : controlDefinitions) {
+        if (!controlDef.enabled) continue;
+        
+        // Vérifier si le contrôle a des mappings de navigation
+        for (const auto& mapping : controlDef.mappings) {
+            if (mapping.role == MappingRole::NAVIGATION) {
+                navigationControlIds.insert(controlDef.id);
+                break; // Un seul mapping de navigation suffit
+            }
+        }
+    }
+    
+    // Configurer le service de navigation avec les contrôles détectés
+    navigationService_->setNavigationControls(navigationControlIds);
+    
+    // Log pour débogage
+    Serial.print("[InputSubsystem] Navigation controls configured: ");
+    Serial.println(navigationControlIds.size());
+    for (InputId id : navigationControlIds) {
+        Serial.print("  - Control ID: ");
+        Serial.println(id);
+    }
+    
     return Result<bool>::success(true);
 }

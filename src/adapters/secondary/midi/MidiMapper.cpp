@@ -13,9 +13,11 @@
 // Construction et initialisation
 //=============================================================================
 
-MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager)
+MidiMapper::MidiMapper(MidiOutputPort& midiOut, CommandManager& commandManager, 
+                       std::shared_ptr<INavigationService> navigationService)
     : midiOut_(midiOut),
       commandManager_(commandManager),
+      navigationService_(navigationService),
       defaultConfig_(
           {0, 0, false})  // Canal 0, CC 0, mode absolu
 {
@@ -61,6 +63,12 @@ void MidiMapper::logDiagnostic(const char* format, ...) const {
 }
 
 bool MidiMapper::isNavigationControl(InputId controlId) const {
+    // REFACTOR: Priorité au service de navigation injecté
+    if (navigationService_) {
+        return navigationService_->isNavigationControl(controlId);
+    }
+    
+    // LEGACY: Fallback sur l'ancienne méthode pour compatibilité
     return navigationControls_.count(controlId) > 0;
 }
 

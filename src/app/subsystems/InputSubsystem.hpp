@@ -3,10 +3,12 @@
 #include <memory>
 #include <vector>
 #include <optional>
+#include <set>
 
 #include "app/di/DependencyContainer.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"
+#include "core/domain/interfaces/INavigationService.hpp"
 #include "core/input/InputManager.hpp"
 #include "core/factories/ControllerFactory.hpp"
 #include "core/utils/Result.hpp"
@@ -16,9 +18,16 @@ class InputController;
 /**
  * @brief Sous-système de gestion des entrées
  *
+ * REFACTOR: Responsabilité étendue pour inclure la gestion des contrôles de navigation.
  * Cette classe implémente l'interface IInputSystem et délègue
  * la gestion des entrées à InputManager et ControllerFactory.
- * Respecte le principe de responsabilité unique.
+ * 
+ * Nouvelles responsabilités:
+ * - Configuration des contrôles de navigation
+ * - Synchronisation avec INavigationService
+ * - Séparation logique Input vs Navigation
+ * 
+ * Respecte le principe de responsabilité unique étendu pour les inputs.
  */
 class InputSubsystem : public IInputSystem {
 public:
@@ -50,9 +59,21 @@ public:
     size_t getActiveInputCountByType(InputType type) const override;
     Result<void> validateInputsStatus() const override;
 
+    /**
+     * @brief Configure les contrôles de navigation 
+     * 
+     * REFACTOR: Nouvelle méthode pour gérer les contrôles de navigation
+     * directement dans InputSubsystem au lieu de MidiSubsystem.
+     * 
+     * @param controlDefinitions Toutes les définitions de contrôles
+     * @return Result<bool> Succès ou erreur de configuration
+     */
+    Result<bool> configureNavigationControls(const std::vector<ControlDefinition>& controlDefinitions);
+
 private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<IConfiguration> configuration_;
+    std::shared_ptr<INavigationService> navigationService_;
     
     // Composants délégués
     std::unique_ptr<InputManager> inputManager_;
