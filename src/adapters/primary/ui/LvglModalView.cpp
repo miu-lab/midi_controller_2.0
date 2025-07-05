@@ -41,9 +41,7 @@ void LvglModalView::render() {
         lv_screen_load(modal_screen_);
     }
     
-    lv_timer_handler();
-    
-    // Le refresh est géré centralement par MidiControllerApp
+    // Le refresh LVGL est géré centralement par SystemManager
 }
 
 bool LvglModalView::handleEvent(uint8_t eventType, int32_t data) {

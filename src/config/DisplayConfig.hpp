@@ -19,7 +19,7 @@ static constexpr uint8_t ROTATION =
 
 // === BUFFERS HARDWARE ===
 static constexpr size_t FRAMEBUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT;  // 76800 pixels
-static constexpr size_t DIFFBUFFER_SIZE = 4096;                           // Buffer pour différences
+static constexpr size_t DIFFBUFFER_SIZE = 8192;                           // Buffer pour différences
 
 // === BUFFERS LVGL ===
 static constexpr size_t LVGL_BUFFER_LINES = 30;  // Lignes par buffer (optimisé mémoire)

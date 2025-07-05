@@ -155,10 +155,6 @@ void Ili9341LvglBridge::flush_callback(lv_display_t* disp, const lv_area_t* area
         lv_display_flush_ready(disp);
         return;
     }
-
-    // Mesurer le temps de flush pour profiling
-    unsigned long flush_start = micros();
-
     // Conversion coordinates LVGL vers hardware
     int x1 = area->x1;
     int y1 = area->y1;
@@ -167,16 +163,6 @@ void Ili9341LvglBridge::flush_callback(lv_display_t* disp, const lv_area_t* area
     
     // Appel driver hardware
     bridge->driver_->updateRegion(true, reinterpret_cast<uint16_t*>(px_map), x1, x2, y1, y2);
-
-    // Mesurer et enregistrer le temps de flush
-    unsigned long flush_end = micros();
-    unsigned long flush_duration = flush_end - flush_start;
-
-    bridge->flush_call_count_++;
-    bridge->total_flush_time_ += flush_duration;
-    bridge->total_flush_calls_++;
-    bridge->total_flush_time_period_ += flush_duration;
-
-    // Signal LVGL que le flush est terminé
+    // // Signal LVGL que le flush est terminé
     lv_display_flush_ready(disp);
 }

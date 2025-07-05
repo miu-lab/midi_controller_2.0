@@ -42,9 +42,7 @@ void LvglMenuView::render() {
         lv_screen_load(main_screen_);
     }
     
-    lv_timer_handler();
-    
-    // Le refresh est géré centralement par MidiControllerApp
+    // Le refresh LVGL est géré centralement par SystemManager
 }
 
 bool LvglMenuView::handleEvent(uint8_t eventType, int32_t data) {

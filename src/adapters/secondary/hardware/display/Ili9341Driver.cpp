@@ -4,7 +4,6 @@
 
 #include "config/DisplayConfig.hpp"
 
-
 // Buffers statiques DMAMEM - Taille selon orientation configurée
 DMAMEM static uint16_t main_framebuffer[DisplayConfig::FRAMEBUFFER_SIZE];
 
@@ -28,9 +27,7 @@ Ili9341Driver::Config Ili9341Driver::getDefaultConfig() {
 }
 
 Ili9341Driver::Ili9341Driver(const Config& config)
-    : config_(config),
-      initialized_(false),
-      framebuffer_(main_framebuffer) {
+    : config_(config), initialized_(false), framebuffer_(main_framebuffer) {
     // TODO DEBUG MSG
     // TODO DEBUG MSG
 }
@@ -52,18 +49,17 @@ Result<void> Ili9341Driver::initialize() {
     configurePins();
 
     // Créer le driver ILI9341_T4
-    tft_ = std::make_unique<ILI9341_T4::ILI9341Driver>(
-        config_.cs_pin,
-        config_.dc_pin,
-        config_.sck_pin,
-        config_.mosi_pin,
-        config_.miso_pin,
-        config_.rst_pin
-    );
+    tft_ = std::make_unique<ILI9341_T4::ILI9341Driver>(config_.cs_pin,
+                                                       config_.dc_pin,
+                                                       config_.sck_pin,
+                                                       config_.mosi_pin,
+                                                       config_.miso_pin,
+                                                       config_.rst_pin);
 
     if (!tft_) {
         Serial.println("ERROR: Ili9341Driver - Failed to create ILI9341_T4 driver");
-        return Result<void>::error({ErrorCode::HardwareError, "Failed to create ILI9341_T4 driver"});
+        return Result<void>::error(
+            {ErrorCode::HardwareError, "Failed to create ILI9341_T4 driver"});
     }
 
     // Initialiser le driver
@@ -117,8 +113,8 @@ void Ili9341Driver::setupPerformance() {
 // Méthodes d'affichage
 //=============================================================================
 
-void Ili9341Driver::updateRegion(bool redraw_now, uint16_t* pixels, 
-                                 int x1, int x2, int y1, int y2) {
+void Ili9341Driver::updateRegion(bool redraw_now, uint16_t* pixels, int x1, int x2, int y1,
+                                 int y2) {
     if (!initialized_ || !tft_) {
         return;
     }
@@ -150,11 +146,11 @@ void Ili9341Driver::setRotation(uint8_t rotation) {
 void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
     // Dimensions selon rotation
     if (config_.rotation == 1 || config_.rotation == 3) {
-        width = 320;  // Paysage (90° et 270°)
-        height = 240;
+        width = DisplayConfig::SCREEN_WIDTH;  // Paysage (90° et 270°)
+        height = DisplayConfig::SCREEN_HEIGHT;
     } else {
-        width = 240;  // Portrait (0° et 180°)
-        height = 320;
+        width = DisplayConfig::SCREEN_HEIGHT;  // Portrait (0° et 180°)
+        height = DisplayConfig::SCREEN_WIDTH;
     }
 }
 
@@ -163,15 +159,6 @@ void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
 //=============================================================================
 
 void Ili9341Driver::debugMemory() const {
-    // TODO DEBUG MSG
-    // TODO DEBUG MSG
-    // TODO DEBUG MSG
-    // TODO DEBUG MSG
-    // TODO DEBUG MSG
-    // TODO DEBUG MSG
-    // TODO DEBUG MSG
-    
     uint16_t width, height;
     getDimensions(width, height);
-    // TODO DEBUG MSG
 }
