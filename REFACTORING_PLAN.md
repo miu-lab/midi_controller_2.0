@@ -512,12 +512,12 @@ src/adapters/
 - 🔲 Subsystems refactor : 2 jours
 - 🔲 Adapters reorganization : 1 jour
 
-### Phase 4 (Tests) : 🔲 2 jours - À FAIRE
-- 🔲 Tests adaptation : 1 jour
+### Phase 4 (Validation) : 🔲 1 jour - À FAIRE
 - 🔲 Performance validation : 1 jour
+- 🔲 Tests d'intégration manuels : Intégré dans autres phases
 
-**Total estimé : 14 jours**
-**Progression actuelle : ~25% (3.5/14 jours)**
+**Total estimé : 12 jours** *(révisé à la baisse)*
+**Progression actuelle : ~30% (3.5/12 jours)**
 
 ---
 
