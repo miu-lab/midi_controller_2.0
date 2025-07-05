@@ -1,7 +1,7 @@
 #include "MidiSubsystem.hpp"
 
 #include <Arduino.h>
-
+#include <usb_midi.h>
 #include <set>
 
 #include "adapters/secondary/midi/MidiOutputEventAdapter.hpp"
@@ -74,19 +74,27 @@ Result<bool> MidiSubsystem::init() {
     container_->registerDependency<TeensyUsbMidiOut>(baseMidiOut);
     container_->registerDependency<MidiOutputEventAdapter>(midiOutputEventAdapter);
 
-    // Créer le MidiMapper et MidiInHandler
-    // TODO DEBUG MSG
+    // Créer le MidiMapper
     midiMapper_ = std::make_unique<MidiMapper>(*midiOut_, *commandManager_);
     if (!midiMapper_) {
         return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiMapper"});
     }
-    // TODO DEBUG MSG
 
-    midiInHandler_ = std::make_unique<MidiInHandler>();
-    if (!midiInHandler_) {
-        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create MidiInHandler"});
+    // Récupérer l'EventPoolManager depuis le container
+    eventPoolManager_ = container_->resolve<EventPoolManager>();
+    if (!eventPoolManager_) {
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve EventPoolManager"});
     }
-    // TODO DEBUG MSG
+
+    // Créer le HighPerformanceMidiManager
+    HighPerformanceMidiManager::Config midiConfig;
+    midiConfig.enable_event_integration = true;
+    midiConfig.enable_performance_monitoring = true;
+    
+    highPerformanceMidiManager_ = std::make_unique<HighPerformanceMidiManager>(midiConfig, eventPoolManager_);
+    if (!highPerformanceMidiManager_) {
+        return Result<bool>::error({ErrorCode::InitializationFailed, "Failed to create HighPerformanceMidiManager"});
+    }
 
     // Charger les mappings MIDI depuis les ControlDefinition
     loadMidiMappingsFromControlDefinitions();
@@ -102,9 +110,24 @@ Result<bool> MidiSubsystem::init() {
 }
 
 void MidiSubsystem::update() {
-    // Traiter les messages MIDI entrants
-    if (midiInHandler_) {
-        midiInHandler_->update();
+    // Lire les messages MIDI entrants depuis usbMIDI et les envoyer au gestionnaire haute performance
+    if (highPerformanceMidiManager_) {
+        // Lire tous les messages MIDI disponibles
+        while (usbMIDI.read()) {
+            uint8_t type = usbMIDI.getType();
+            uint8_t channel = usbMIDI.getChannel() - 1; // Lib Teensy utilise canaux 1-16, nous utilisons 0-15
+            uint8_t data1 = usbMIDI.getData1();
+            uint8_t data2 = usbMIDI.getData2();
+            
+            // Construire le status byte MIDI
+            uint8_t status = type | channel;
+            
+            // Envoyer au gestionnaire haute performance
+            highPerformanceMidiManager_->processMidiMessage(status, data1, data2);
+        }
+        
+        // Traiter les messages MIDI entrants via le gestionnaire haute performance
+        highPerformanceMidiManager_->update();
     }
 
     // Mettre à jour le MidiMapper (pour les commandes temporisées)
@@ -165,6 +188,23 @@ MidiMapper& MidiSubsystem::getMidiMapper() const {
         return nullMapper;
     }
     return *midiMapper_;
+}
+
+HighPerformanceMidiManager& MidiSubsystem::getHighPerformanceMidiManager() const {
+    if (!highPerformanceMidiManager_) {
+        // Créer un gestionnaire par défaut statique en cas d'urgence
+        static HighPerformanceMidiManager nullManager;
+        return nullManager;
+    }
+    return *highPerformanceMidiManager_;
+}
+
+bool MidiSubsystem::processMidiMessage(uint8_t status, uint8_t data1, uint8_t data2) {
+    if (!highPerformanceMidiManager_) {
+        return false;
+    }
+    
+    return highPerformanceMidiManager_->processMidiMessage(status, data1, data2);
 }
 
 void MidiSubsystem::loadMidiMappingsFromControlDefinitions() const {

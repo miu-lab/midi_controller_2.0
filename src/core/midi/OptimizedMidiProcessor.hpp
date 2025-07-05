@@ -34,15 +34,19 @@ public:
     };
     
     /**
-     * @brief Statistiques de performance en temps réel
+     * @brief Statistiques de performance (snapshot non-atomique)
      */
     struct PerformanceStats {
-        std::atomic<uint32_t> messages_processed{0};
-        std::atomic<uint32_t> messages_dropped{0};
-        std::atomic<uint32_t> max_latency_us{0};
-        std::atomic<uint32_t> avg_latency_us{0};
-        std::atomic<uint32_t> buffer_overruns{0};
-        std::atomic<uint32_t> callback_errors{0};
+        uint32_t messages_processed;
+        uint32_t messages_dropped;
+        uint32_t max_latency_us;
+        uint32_t avg_latency_us;
+        uint32_t buffer_overruns;
+        uint32_t callback_errors;
+        
+        PerformanceStats() 
+            : messages_processed(0), messages_dropped(0), max_latency_us(0)
+            , avg_latency_us(0), buffer_overruns(0), callback_errors(0) {}
     };
     
     /**
@@ -249,10 +253,17 @@ public:
     // === STATISTIQUES ET MONITORING ===
     
     /**
-     * @brief Obtient les statistiques de performance
+     * @brief Obtient les statistiques de performance (lecture thread-safe)
      */
     PerformanceStats getStats() const {
-        return stats_;
+        PerformanceStats copy;
+        copy.messages_processed = stats_.messages_processed.load(std::memory_order_relaxed);
+        copy.messages_dropped = stats_.messages_dropped.load(std::memory_order_relaxed);
+        copy.max_latency_us = stats_.max_latency_us.load(std::memory_order_relaxed);
+        copy.avg_latency_us = stats_.avg_latency_us.load(std::memory_order_relaxed);
+        copy.buffer_overruns = stats_.buffer_overruns.load(std::memory_order_relaxed);
+        copy.callback_errors = stats_.callback_errors.load(std::memory_order_relaxed);
+        return copy;
     }
     
     /**
@@ -307,32 +318,27 @@ private:
         uint8_t type = status & 0xF0;
         uint8_t channel = status & 0x0F;
         
-        try {
-            switch (type) {
-                case 0xB0: // Control Change
-                    dispatchCcCallbacks(channel, message.data1, message.data2);
-                    break;
-                    
-                case 0x90: // Note On
-                    if (message.data2 == 0) {
-                        // Note On avec vélocité 0 = Note Off
-                        dispatchNoteOffCallbacks(channel, message.data1, 0);
-                    } else {
-                        dispatchNoteOnCallbacks(channel, message.data1, message.data2);
-                    }
-                    break;
-                    
-                case 0x80: // Note Off
-                    dispatchNoteOffCallbacks(channel, message.data1, message.data2);
-                    break;
-                    
-                default:
-                    // Type de message non supporté, ignorer silencieusement
-                    break;
-            }
-        } catch (...) {
-            // Capturer toute exception pour éviter de planter le système
-            stats_.callback_errors.fetch_add(1, std::memory_order_relaxed);
+        switch (type) {
+            case 0xB0: // Control Change
+                dispatchCcCallbacks(channel, message.data1, message.data2);
+                break;
+                
+            case 0x90: // Note On
+                if (message.data2 == 0) {
+                    // Note On avec vélocité 0 = Note Off
+                    dispatchNoteOffCallbacks(channel, message.data1, 0);
+                } else {
+                    dispatchNoteOnCallbacks(channel, message.data1, message.data2);
+                }
+                break;
+                
+            case 0x80: // Note Off
+                dispatchNoteOffCallbacks(channel, message.data1, message.data2);
+                break;
+                
+            default:
+                // Type de message non supporté, ignorer silencieusement
+                break;
         }
     }
     
@@ -404,6 +410,13 @@ private:
     std::atomic<size_t> note_on_callback_count_;
     std::atomic<size_t> note_off_callback_count_;
     
-    // Statistiques de performance
-    mutable PerformanceStats stats_;
+    // Statistiques de performance (version atomique interne)
+    mutable struct {
+        std::atomic<uint32_t> messages_processed{0};
+        std::atomic<uint32_t> messages_dropped{0};
+        std::atomic<uint32_t> max_latency_us{0};
+        std::atomic<uint32_t> avg_latency_us{0};
+        std::atomic<uint32_t> buffer_overruns{0};
+        std::atomic<uint32_t> callback_errors{0};
+    } stats_;
 };

@@ -181,13 +181,14 @@ public:
         auto buffer_status = processor_.getBufferStatus();
         
         GlobalStats global_stats;
+        // Copie manuelle pour éviter les problèmes avec std::atomic
         global_stats.processor_stats = processor_stats;
         global_stats.batch_stats = batch_stats;
         global_stats.buffer_status = buffer_status;
         
         // Calculer les métriques agrégées
         global_stats.total_messages_per_second = messages_last_second_;
-        global_stats.total_latency_us = processor_stats.avg_latency_us.load();
+        global_stats.total_latency_us = processor_stats.avg_latency_us;
         global_stats.system_load_ratio = calculateSystemLoad();
         global_stats.is_realtime_capable = isRealtimeCapable();
         
@@ -201,7 +202,7 @@ public:
         auto stats = processor_.getStats();
         auto buffer_status = processor_.getBufferStatus();
         
-        return stats.max_latency_us.load() < PerformanceConfig::MAX_MIDI_LATENCY_US &&
+        return stats.max_latency_us < PerformanceConfig::MAX_MIDI_LATENCY_US &&
                buffer_status.incoming_usage < 0.8f &&
                !processor_.isOverloaded();
     }
@@ -232,13 +233,13 @@ public:
         info += "=== MIDI Performance Diagnostics ===\n";
         info += "Messages/sec: " + String(global_stats.total_messages_per_second) + "\n";
         info += "Avg Latency: " + String(global_stats.total_latency_us) + "μs\n";
-        info += "Max Latency: " + String(global_stats.processor_stats.max_latency_us.load()) + "μs\n";
+        info += "Max Latency: " + String(global_stats.processor_stats.max_latency_us) + "μs\n";
         info += "Buffer Usage: " + String(global_stats.buffer_status.incoming_usage * 100.0f, 1) + "%\n";
         info += "Batch Usage: " + String(global_stats.batch_stats.usage_ratio * 100.0f, 1) + "%\n";
         info += "System Load: " + String(global_stats.system_load_ratio * 100.0f, 1) + "%\n";
         info += "Realtime: " + String(global_stats.is_realtime_capable ? "YES" : "NO") + "\n";
-        info += "Buffer Overruns: " + String(global_stats.processor_stats.buffer_overruns.load()) + "\n";
-        info += "Callback Errors: " + String(global_stats.processor_stats.callback_errors.load()) + "\n";
+        info += "Buffer Overruns: " + String(global_stats.processor_stats.buffer_overruns) + "\n";
+        info += "Callback Errors: " + String(global_stats.processor_stats.callback_errors) + "\n";
         
         return info;
     }
@@ -318,7 +319,7 @@ private:
         
         if ((now - last_monitoring_ms_) >= config_.monitoring_interval_ms) {
             // Calculer les messages par seconde
-            auto current_messages = processor_.getStats().messages_processed.load();
+            auto current_messages = processor_.getStats().messages_processed;
             messages_last_second_ = current_messages - last_message_count_;
             last_message_count_ = current_messages;
             last_monitoring_ms_ = now;

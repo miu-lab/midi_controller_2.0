@@ -29,4 +29,37 @@ constexpr unsigned long DUPLICATE_CHECK_MS = 1.5;   // Vérification doublons
 // === MODES PERFORMANCE ===
 constexpr bool PERFORMANCE_MODE_DEFAULT = true;     // Mode normal par défaut
 
+// === TAILLES MAXIMALES ETL (pour éviter les allocations dynamiques) ===
+
+// EventBus et système d'événements
+constexpr size_t MAX_EVENT_SUBSCRIBERS = 32;        // Nombre max d'abonnés aux événements
+constexpr size_t MAX_EVENT_QUEUE_SIZE = 64;         // Taille max de la queue d'événements
+
+// MIDI - chemins critiques
+constexpr size_t MAX_MIDI_CALLBACKS = 24;           // Max callbacks MIDI (CC, Note, etc.)
+constexpr size_t MAX_MIDI_PENDING_PARAMS = 128;     // Max paramètres MIDI en attente de batch
+constexpr size_t MAX_MIDI_MESSAGES_QUEUE = 256;     // Queue des messages MIDI entrants
+
+// Configuration et contrôles
+constexpr size_t MAX_CONTROL_DEFINITIONS = 64;      // Max définitions de contrôles
+constexpr size_t MAX_MIDI_MAPPINGS = 128;           // Max mappings MIDI
+
+// Navigation et UI
+constexpr size_t MAX_NAVIGATION_ACTIONS = 32;       // Max actions de navigation
+constexpr size_t MAX_UI_COMPONENTS = 16;            // Max composants UI actifs
+
+// Pools d'objets
+constexpr size_t EVENT_POOL_SIZE = 128;             // Taille du pool d'événements
+constexpr size_t MIDI_EVENT_POOL_SIZE = 256;        // Pool spécialisé pour événements MIDI
+constexpr size_t UI_EVENT_POOL_SIZE = 64;           // Pool pour événements UI
+
+// === CONFIGURATION DE LA MÉMOIRE ===
+constexpr size_t STACK_SIZE_BYTES = 8192;           // Taille stack par défaut
+constexpr size_t HEAP_FRAGMENT_THRESHOLD = 1024;    // Seuil de fragmentation heap
+
+// === CONFIGURATION DES PERFORMANCES TEMPS RÉEL ===
+constexpr unsigned long MAX_MIDI_LATENCY_US = 1000;  // Latence MIDI max (1ms)
+constexpr unsigned long MAX_UI_UPDATE_TIME_US = 16000; // Temps max mise à jour UI (16ms)
+constexpr unsigned long MAX_INPUT_LATENCY_US = 500;    // Latence input max (0.5ms)
+
 }  // namespace PerformanceConfig
