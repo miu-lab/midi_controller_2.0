@@ -1,14 +1,13 @@
 #pragma once
 
 #include "IEventBus.hpp"
-#include <vector>
 #include <atomic>
 #include <algorithm>
 #include <memory>
 #include <mutex>
-#include <map>
 #include <Arduino.h>
 #include "config/PerformanceConfig.hpp"
+#include "config/ETLConfig.hpp"
 #include "../MidiEvents.hpp"
 #include "../UIEvent.hpp"
 
@@ -47,8 +46,7 @@ public:
         , initialized_(false)
         , started_(false)
         , processedEventCount_(0) {
-        // Réserver de l'espace pour éviter les réallocations fréquentes
-        subscriptions_.reserve(24);
+        // ETL containers ont une taille fixe, pas besoin de reserve()
         
         // Initialiser les compteurs
         for (auto& counter : eventCounters_) {
@@ -421,7 +419,7 @@ private:
     
     // === Variables de base ===
     Config config_;
-    std::vector<Subscription> subscriptions_;
+    ETLConfig::EventSubscriptionVector<Subscription> subscriptions_;
     SubscriptionId nextId_;
     
     // === Variables de cycle de vie ===
@@ -442,7 +440,7 @@ private:
         bool needs_ui_update = false;
     };
     
-    std::map<uint16_t, PendingParameter> pending_parameters_; // Key: (channel << 8) | controller
+    ETLConfig::MidiPendingMap<uint16_t, PendingParameter> pending_parameters_; // Key: (channel << 8) | controller
     unsigned long last_ui_batch_ms_ = 0;
     unsigned long last_status_batch_ms_ = 0;
     SubscriptionId batching_subscription_id_ = 0;

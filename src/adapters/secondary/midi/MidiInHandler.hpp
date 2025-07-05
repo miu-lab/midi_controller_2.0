@@ -1,7 +1,6 @@
 #pragma once
 #include <functional>
-#include <vector>
-
+#include "config/ETLConfig.hpp"
 #include "core/domain/types.hpp"
 
 /**
@@ -24,10 +23,10 @@ public:
     void update();
 
 private:
-    // Callbacks
-    std::vector<CcCallback> ccCallbacks_;
-    std::vector<NoteCallback> noteOnCallbacks_;
-    std::vector<NoteCallback> noteOffCallbacks_;
+    // Callbacks avec tailles fixes ETL (évite allocations dynamiques)
+    ETLConfig::MidiCallbackVector<CcCallback> ccCallbacks_;
+    ETLConfig::MidiCallbackVector<NoteCallback> noteOnCallbacks_;
+    ETLConfig::MidiCallbackVector<NoteCallback> noteOffCallbacks_;
 
     // Méthodes de traitement des messages
     void handleControlChange(MidiChannel channel, MidiCC cc, uint8_t value);

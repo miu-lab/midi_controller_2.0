@@ -3,9 +3,9 @@
 #include <functional>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <any>
 #include "core/utils/Result.hpp"
+#include "config/ETLConfig.hpp"
 
 // Helper pour générer un ID de type sans utiliser typeid
 class TypeIdGenerator {
@@ -178,6 +178,6 @@ public:
     }
 
 private:
-    std::unordered_map<const void*, std::shared_ptr<void>> dependencies_;
-    std::unordered_map<const void*, std::any> factories_;
+    ETLConfig::DependencyMap<const void*, std::shared_ptr<void>> dependencies_;
+    ETLConfig::DependencyMap<const void*, std::any> factories_;
 };
