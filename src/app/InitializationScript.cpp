@@ -22,6 +22,7 @@
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
 #include "core/TaskScheduler.hpp"
+#include "core/memory/EventPoolManager.hpp"
 
 #include "core/utils/Error.hpp"
 
@@ -34,6 +35,14 @@ Result<bool> InitializationScript::initializeContainer(
     // Étape 1: Services de base
     Serial.println("Registering base services...");
     registerBaseServices(container, config);
+
+    // Créer et enregistrer l'EventPoolManager
+    Serial.println("Setting up EventPoolManager...");
+    auto eventPoolManager = std::make_shared<EventPoolManager>();
+    container->registerDependency<EventPoolManager>(eventPoolManager);
+    
+    // Initialiser l'EventFactory avec le pool manager
+    EventFactory::initialize(eventPoolManager);
 
     // Créer et enregistrer l'EventBus via injection de dépendance
     Serial.println("Setting up EventBus...");
