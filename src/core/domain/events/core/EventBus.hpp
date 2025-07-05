@@ -6,6 +6,11 @@
 #include <algorithm>
 #include <memory>
 #include <mutex>
+#include <map>
+#include <Arduino.h>
+#include "config/PerformanceConfig.hpp"
+#include "../MidiEvents.hpp"
+#include "../UIEvent.hpp"
 
 /**
  * @brief Implémentation du bus d'événements unifié
@@ -13,12 +18,35 @@
  * Combine EventBus et OptimizedEventBus en une seule classe moderne
  * qui implémente l'interface IEventBus pour l'injection de dépendance.
  */
-class EventBus : public MidiController::Events::IEventBus {
+class EventBus : public MidiController::Events::IEventBus, public EventListener {
 public:
     /**
-     * @brief Constructeur par défaut
+     * @brief Configuration unifiée pour EventBus (inclut batching)
      */
-    EventBus() : nextId_(1) {
+    struct Config {
+        // Configuration du batching
+        unsigned long ui_update_interval_ms;     ///< 60 FPS pour UI
+        unsigned long status_update_interval_ms; ///< 10 FPS pour status
+        bool coalesce_identical_values;          ///< Fusionner valeurs identiques
+        bool enable_batching;                    ///< Activer le batching
+        
+        Config() 
+            : ui_update_interval_ms(PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS)
+            , status_update_interval_ms(100)
+            , coalesce_identical_values(true)
+            , enable_batching(true) {}
+    };
+    
+    /**
+     * @brief Constructeur avec configuration
+     * @param config Configuration pour EventBus
+     */
+    explicit EventBus(const Config& config = Config()) 
+        : config_(config)
+        , nextId_(1)
+        , initialized_(false)
+        , started_(false)
+        , processedEventCount_(0) {
         // Réserver de l'espace pour éviter les réallocations fréquentes
         subscriptions_.reserve(24);
         
@@ -239,6 +267,116 @@ public:
             counter.store(0, std::memory_order_relaxed);
         }
     }
+    
+    // === Nouvelles méthodes de gestion du cycle de vie (consolidées depuis EventManager) ===
+    
+    /**
+     * @brief Initialise le bus d'événements
+     * @return true si l'initialisation a réussi
+     */
+    bool initialize() override {
+        if (initialized_) {
+            return true;
+        }
+        
+        // Initialiser le batching si activé
+        if (config_.enable_batching) {
+            initializeBatching();
+        }
+        
+        initialized_ = true;
+        return true;
+    }
+    
+    /**
+     * @brief Démarre le bus d'événements (active le batching si configuré)
+     */
+    void start() override {
+        if (!initialized_) {
+            initialize();
+        }
+        
+        if (started_) {
+            return;
+        }
+        
+        // Démarrer le batching si activé
+        if (config_.enable_batching) {
+            startBatching();
+        }
+        
+        started_ = true;
+    }
+    
+    /**
+     * @brief Arrête le bus d'événements
+     */
+    void stop() override {
+        if (!started_) {
+            return;
+        }
+        
+        // Arrêter le batching
+        if (config_.enable_batching) {
+            stopBatching();
+        }
+        
+        started_ = false;
+    }
+    
+    /**
+     * @brief Met à jour le bus (traite les batchs en attente)
+     */
+    void update() override {
+        if (!started_) {
+            return;
+        }
+        
+        // Traiter les batchs en attente
+        if (config_.enable_batching) {
+            processPendingBatches();
+        }
+        
+        processedEventCount_++;
+    }
+    
+    /**
+     * @brief Vérifie si le bus est démarré
+     * @return true si démarré
+     */
+    bool isStarted() const override {
+        return started_;
+    }
+    
+    /**
+     * @brief Obtient les statistiques du gestionnaire
+     * @return Nombre d'événements traités
+     */
+    size_t getProcessedEventCount() const override {
+        return processedEventCount_;
+    }
+    
+    // === Interface EventListener (pour le batching interne) ===
+    
+    /**
+     * @brief Traite les événements pour le batching (interface EventListener)
+     * @param event Événement reçu
+     * @return true si l'événement a été traité
+     */
+    bool onEvent(const Event& event) override {
+        if (!started_ || !config_.enable_batching) {
+            return false;
+        }
+        
+        // Traiter seulement les événements MIDI CC pour le batching
+        if (event.getType() == EventTypes::MidiControlChange) {
+            const auto& midi_event = static_cast<const MidiCCEvent&>(event);
+            handleMidiCCEventForBatching(midi_event);
+            return true; // Événement consommé pour le batching
+        }
+        
+        return false;
+    }
 
 private:
     /**
@@ -281,9 +419,180 @@ private:
         return false;
     }
     
+    // === Variables de base ===
+    Config config_;
     std::vector<Subscription> subscriptions_;
     SubscriptionId nextId_;
     
+    // === Variables de cycle de vie ===
+    bool initialized_;
+    bool started_;
+    size_t processedEventCount_;
+    
     // Compteurs atomiques pour le suivi des événements traités (diagnostics)
     std::array<std::atomic<uint32_t>, 3> eventCounters_; // Un compteur par type d'événement haute priorité
+    
+    // === Variables de batching (intégrées depuis EventBatcher) ===
+    struct PendingParameter {
+        uint8_t controller;
+        uint8_t channel;
+        uint8_t value;
+        String name;
+        unsigned long last_update_ms;
+        bool needs_ui_update = false;
+    };
+    
+    std::map<uint16_t, PendingParameter> pending_parameters_; // Key: (channel << 8) | controller
+    unsigned long last_ui_batch_ms_ = 0;
+    unsigned long last_status_batch_ms_ = 0;
+    SubscriptionId batching_subscription_id_ = 0;
+    
+    // === Méthodes de batching (intégrées depuis EventBatcher) ===
+    
+    /**
+     * @brief Initialise le système de batching
+     */
+    void initializeBatching() {
+        // Rien de spécifique à initialiser pour le moment
+    }
+    
+    /**
+     * @brief Démarre le batching (s'abonne aux événements MIDI)
+     */
+    void startBatching() {
+        if (batching_subscription_id_ == 0) {
+            // S'abonner aux événements avec haute priorité pour traiter avant l'UI
+            batching_subscription_id_ = subscribe(this, EventPriority::PRIORITY_HIGH);
+        }
+    }
+    
+    /**
+     * @brief Arrête le batching
+     */
+    void stopBatching() {
+        if (batching_subscription_id_ > 0) {
+            unsubscribe(batching_subscription_id_);
+            batching_subscription_id_ = 0;
+        }
+        
+        // Vider les batchs en attente
+        flushUIBatch();
+    }
+    
+    /**
+     * @brief Traite les batchs en attente (appelé périodiquement)
+     */
+    void processPendingBatches() {
+        unsigned long now = millis();
+        
+        // Traiter le batch UI si nécessaire
+        if ((now - last_ui_batch_ms_) >= config_.ui_update_interval_ms) {
+            flushUIBatch();
+            last_ui_batch_ms_ = now;
+        }
+        
+        // Traiter le batch status si nécessaire
+        if ((now - last_status_batch_ms_) >= config_.status_update_interval_ms) {
+            flushStatusBatch();
+            last_status_batch_ms_ = now;
+        }
+    }
+    
+    /**
+     * @brief Traite un événement MIDI CC pour le batching
+     */
+    void handleMidiCCEventForBatching(const MidiCCEvent& midi_event) {
+        uint16_t key = getParameterKey(midi_event.controller, midi_event.channel);
+        unsigned long now = millis();
+        
+        // Chercher ou créer l'entrée
+        auto it = pending_parameters_.find(key);
+        if (it == pending_parameters_.end()) {
+            // Nouveau paramètre
+            PendingParameter param;
+            param.controller = midi_event.controller;
+            param.channel = midi_event.channel;
+            param.value = midi_event.value;
+            param.name = "CC" + String(midi_event.controller);
+            param.last_update_ms = now;
+            param.needs_ui_update = true;
+            
+            pending_parameters_[key] = param;
+            
+        } else {
+            // Paramètre existant - mise à jour
+            PendingParameter& param = it->second;
+            
+            // Vérifier si la valeur a changé
+            if (config_.coalesce_identical_values && param.value == midi_event.value) {
+                return; // Valeur identique, ignorer
+            }
+            
+            param.value = midi_event.value;
+            param.last_update_ms = now;
+            param.needs_ui_update = true;
+        }
+    }
+    
+    /**
+     * @brief Génère une clé unique pour un paramètre
+     */
+    uint16_t getParameterKey(uint8_t controller, uint8_t channel) const {
+        return (static_cast<uint16_t>(channel) << 8) | controller;
+    }
+    
+    /**
+     * @brief Envoie les événements UI batchés
+     */
+    void flushUIBatch() {
+        for (auto& [key, param] : pending_parameters_) {
+            if (param.needs_ui_update) {
+                // Créer et envoyer l'événement UI optimisé
+                UIParameterUpdateEvent ui_event(
+                    param.controller,
+                    param.channel,
+                    param.value,
+                    param.name
+                );
+                
+                // Publier directement via la méthode de base (pas de récursion)
+                publishDirect(ui_event);
+                param.needs_ui_update = false;
+            }
+        }
+    }
+    
+    /**
+     * @brief Envoie les événements de status batchés
+     */
+    void flushStatusBatch() {
+        // Pour l'instant, pas d'événements de status à traiter
+        // Peut être étendu plus tard pour des mises à jour de status général
+    }
+    
+    /**
+     * @brief Publication directe sans batching (pour éviter la récursion)
+     */
+    bool publishDirect(Event& event) {
+        bool handled = false;
+        
+        // Traiter tous les abonnements (déjà triés par priorité)
+        // Mais exclure l'abonnement du batching pour éviter la récursion
+        for (auto& subscription : subscriptions_) {
+            if (subscription.active && subscription.listener && 
+                subscription.id != batching_subscription_id_) {
+                if (subscription.listener->onEvent(event)) {
+                    handled = true;
+                    event.setHandled();
+                }
+                
+                // Arrêter la propagation si demandé
+                if (!event.shouldPropagate()) {
+                    break;
+                }
+            }
+        }
+        
+        return handled;
+    }
 };

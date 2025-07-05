@@ -64,15 +64,17 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
             return Result<bool>::error(viewManagerResult.error().value());
         }
 
-        // Créer EventManager (remplace EventBatcher)
-        EventManager::Config managerConfig;
-        managerConfig.uiUpdateIntervalMs = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS *
-                                          PerformanceConfig::VSYNC_SPACING;
-        managerConfig.coalesceIdenticalValues = true;
-        managerConfig.enableBatching = true;
-        auto eventManager = std::make_unique<EventManager>(managerConfig);
-        eventManager->initialize();
-        eventManager->start();
+        // Récupérer EventBus unifié depuis le container (remplace EventManager)
+        auto eventBus = container_->resolve<MidiController::Events::IEventBus>();
+        if (!eventBus) {
+            return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IEventBus"});
+        }
+        
+        // Initialiser et démarrer EventBus si nécessaire
+        if (!eventBus->isStarted()) {
+            eventBus->initialize();
+            eventBus->start();
+        }
 
         // Créer DisplayManager
         std::unique_ptr<DisplayManager> displayManager = nullptr;
@@ -84,7 +86,7 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         auto initResult = uiCore_->initialize(
             viewManagerResult.value().value(),
             std::move(displayManager),
-            std::move(eventManager)
+            eventBus
         );
         
         if (!initResult.isSuccess()) {

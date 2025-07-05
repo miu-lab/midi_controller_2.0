@@ -141,6 +141,41 @@ public:
      * @brief Réinitialise les compteurs de traitement d'événements
      */
     virtual void resetEventProcessingCounters() = 0;
+    
+    // === Gestion du cycle de vie (intégré depuis EventManager) ===
+    
+    /**
+     * @brief Initialise le bus d'événements
+     * @return true si l'initialisation a réussi
+     */
+    virtual bool initialize() = 0;
+    
+    /**
+     * @brief Démarre le bus d'événements (active le batching si configuré)
+     */
+    virtual void start() = 0;
+    
+    /**
+     * @brief Arrête le bus d'événements
+     */
+    virtual void stop() = 0;
+    
+    /**
+     * @brief Met à jour le bus (traite les batchs en attente)
+     */
+    virtual void update() = 0;
+    
+    /**
+     * @brief Vérifie si le bus est démarré
+     * @return true si démarré
+     */
+    virtual bool isStarted() const = 0;
+    
+    /**
+     * @brief Obtient les statistiques du gestionnaire
+     * @return Nombre d'événements traités
+     */
+    virtual size_t getProcessedEventCount() const = 0;
 };
 
 } // namespace MidiController::Events

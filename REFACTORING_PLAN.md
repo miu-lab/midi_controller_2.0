@@ -117,7 +117,7 @@ Ce document détaille le plan complet de refactoring et d'amélioration du proje
 - ✅ Compilation réussie et optimisée
 - ✅ Architecture prête pour systèmes embarqués stricts
 
-### 1.4 Migration EventBus vers Injection de Dépendance 🔄 EN COURS
+### 1.4 Migration EventBus vers Injection de Dépendance ✅ TERMINÉ
 
 **Objectif** : Migrer EventBus du pattern singleton vers l'injection de dépendance pour plus de cohérence et maintenabilité
 
@@ -128,28 +128,38 @@ Ce document détaille le plan complet de refactoring et d'amélioration du proje
 - **Découplage** : Élimination des dépendances singleton cachées
 - **Cycle de vie maîtrisé** : EventBus géré par le DI container
 
-#### Étapes Prévues :
-1. **Création de l'interface IEventBus** 🔲
-   - [ ] Définir l'interface abstraite pour le bus d'événements
-   - [ ] Extraire les méthodes essentielles d'EventBus
-   - [ ] Namespace cohérent avec l'architecture
+#### Étapes Réalisées :
+1. **Création de l'interface IEventBus** ✅
+   - ✅ Définir l'interface abstraite pour le bus d'événements
+   - ✅ Extraire les méthodes essentielles d'EventBus
+   - ✅ Namespace cohérent avec l'architecture (MidiController::Events::IEventBus)
 
-2. **Refactorisation d'EventBus** 🔲
-   - [ ] Transformer EventBus en EventBusImpl : public IEventBus
-   - [ ] Supprimer le pattern singleton
-   - [ ] Conserver toute la logique métier actuelle
+2. **Refactorisation d'EventBus** ✅
+   - ✅ Transformer EventBus en implémentation : public IEventBus
+   - ✅ Supprimer le pattern singleton
+   - ✅ Conserver toute la logique métier actuelle
+   - ✅ Ajout des annotations `override` sur toutes les méthodes
 
-3. **Mise à jour du DI Container** 🔲
-   - [ ] Enregistrement d'EventBusImpl dans InitializationScript
-   - [ ] Interface IEventBus disponible pour injection
-   - [ ] Suppression des accès `getInstance()`
+3. **Mise à jour du DI Container** ✅
+   - ✅ Enregistrement d'EventBus dans InitializationScript
+   - ✅ Interface IEventBus disponible pour injection
+   - ✅ Suppression des accès `getInstance()`
 
-4. **Migration des consommateurs** 🔲
-   - [ ] Injection d'IEventBus dans les constructeurs
-   - [ ] Suppression des accès directs à EventBus::getInstance()
-   - [ ] Tests de compilation à chaque étape
+4. **Migration des consommateurs** ✅
+   - ✅ ViewManagerEventListener: injection d'IEventBus via constructeur
+   - ✅ MidiOutputEventAdapter: injection d'IEventBus pour publication
+   - ✅ EventBatcher: injection d'IEventBus pour abonnement/publication
+   - ✅ EventManager: injection d'IEventBus via constructeur
+   - ✅ UISubsystem et MidiSubsystem: résolution depuis le container
+   - ✅ Tests de compilation réussis
 
-### 1.5 Consolidation EventBus/EventManager 🔲 À FAIRE
+#### Résultats :
+- ✅ Compilation réussie
+- ✅ Élimination complète du pattern singleton pour EventBus
+- ✅ Architecture cohérente avec injection de dépendance
+- ✅ Prêt pour l'intégration de mocks et tests
+
+### 1.5 Consolidation EventBus/EventManager 🔄 EN COURS
 
 **Objectif** : Unifier l'API d'événements et éliminer la confusion entre EventBus et EventManager
 

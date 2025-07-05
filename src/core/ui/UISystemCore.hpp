@@ -7,8 +7,11 @@
 // Forward declarations
 class ViewManager;
 class DisplayManager;
-class EventManager;
 class ViewManagerEventListener;
+
+namespace MidiController::Events {
+    class IEventBus;
+}
 
 /**
  * @brief Noyau centralisé pour la logique UI
@@ -47,13 +50,13 @@ public:
      * @brief Initialise le noyau UI avec les composants nécessaires
      * @param viewManager Gestionnaire de vues
      * @param displayManager Gestionnaire d'affichage
-     * @param eventManager Gestionnaire d'événements unifié
+     * @param eventBus Bus d'événements unifié
      * @return Result indiquant le succès ou l'erreur
      */
     Result<bool> initialize(
         std::shared_ptr<ViewManager> viewManager,
         std::unique_ptr<DisplayManager> displayManager,
-        std::unique_ptr<EventManager> eventManager);
+        std::shared_ptr<MidiController::Events::IEventBus> eventBus);
 
     /**
      * @brief Met à jour tous les composants UI dans le bon ordre
@@ -105,7 +108,7 @@ private:
     // Composants UI centralisés
     std::shared_ptr<ViewManager> viewManager_;
     std::unique_ptr<DisplayManager> displayManager_;
-    std::unique_ptr<EventManager> eventManager_;
+    std::shared_ptr<MidiController::Events::IEventBus> eventBus_;
     std::unique_ptr<ViewManagerEventListener> eventListener_;
 
     /**
@@ -115,7 +118,7 @@ private:
     bool validateComponents() const;
 
     /**
-     * @brief Traite les événements UI via EventManager
+     * @brief Traite les événements UI via EventBus
      */
     void processEvents();
 
