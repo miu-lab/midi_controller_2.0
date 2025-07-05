@@ -72,17 +72,19 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /** Size of memory available for `lv_malloc()` in bytes (>= 2kB) */
-    #define LV_MEM_SIZE (32 * 1024U)          /**< [bytes] - Plus de mémoire pour meilleure performance */
+    #define LV_MEM_SIZE LVGL_MEMORY_POOL_SIZE          /**< [bytes] - Taille configurée via PerformanceDefines.h */
 
     /** Size of the memory expand for `lv_malloc()` in bytes */
     #define LV_MEM_POOL_EXPAND_SIZE 0
 
     /** Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too. */
-    #define LV_MEM_ADR 0     /**< 0: unused*/
+    #define LV_MEM_ADR 0     /**< 0: unused - utilise allocateur custom*/
     /* Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc */
     #if LV_MEM_ADR == 0
-        #undef LV_MEM_POOL_INCLUDE
-        #undef LV_MEM_POOL_ALLOC
+        #if LVGL_USE_DMA_MEMORY
+            #define LV_MEM_POOL_INCLUDE "src/adapters/secondary/hardware/display/LvglMemory.hpp"
+            #define LV_MEM_POOL_ALLOC getLvglMemoryPool
+        #endif
     #endif
 #endif  /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
