@@ -2,19 +2,20 @@
 
 #include "adapters/secondary/storage/ControlDefinitionStore.hpp"
 
-void ControlDefinitionStore::saveControlDefinition(const ControlDefinition& controlDef) {
+Result<void> ControlDefinitionStore::saveControlDefinition(const ControlDefinition& controlDef) {
     storage_[controlDef.id] = controlDef;
+    return Result<void>::success();
 }
 
-std::optional<ControlDefinition> ControlDefinitionStore::loadControlDefinition(InputId id) const {
+Result<ControlDefinition> ControlDefinitionStore::loadControlDefinition(InputId id) const {
     auto it = storage_.find(id);
     if (it != storage_.end()) {
-        return it->second;
+        return Result<ControlDefinition>::success(it->second);
     }
-    return std::nullopt;
+    return Result<ControlDefinition>::error({ErrorCode::OperationFailed, "Control definition not found"});
 }
 
-std::vector<ControlDefinition> ControlDefinitionStore::loadAllControlDefinitions() const {
+Result<std::vector<ControlDefinition>> ControlDefinitionStore::loadAllControlDefinitions() const {
     std::vector<ControlDefinition> result;
     result.reserve(storage_.size());
     
@@ -22,9 +23,10 @@ std::vector<ControlDefinition> ControlDefinitionStore::loadAllControlDefinitions
         result.push_back(pair.second);
     }
     
-    return result;
+    return Result<std::vector<ControlDefinition>>::success(result);
 }
 
-void ControlDefinitionStore::clearAll() {
+Result<void> ControlDefinitionStore::clearAll() {
     storage_.clear();
+    return Result<void>::success();
 }

@@ -29,7 +29,8 @@ Result<bool> ConfigurationLoader::validateConfigurations() {
     const auto& unifiedConfig = appConfig_->getUnifiedConfiguration();
     
     // Validate using the existing validation method
-    if (!unifiedConfig.validate()) {
+    auto validationResult = unifiedConfig.validate();
+    if (validationResult.isError()) {
         return Result<bool>::error(
             {ErrorCode::ConfigError, "Configuration validation failed"});
     }

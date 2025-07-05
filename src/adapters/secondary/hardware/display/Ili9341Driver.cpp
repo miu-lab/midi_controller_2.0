@@ -39,10 +39,10 @@ Ili9341Driver::Ili9341Driver(const Config& config)
 // Initialisation hardware
 //=============================================================================
 
-bool Ili9341Driver::initialize() {
+Result<void> Ili9341Driver::initialize() {
     if (initialized_) {
         Serial.println("Ili9341Driver already initialized");
-        return true;
+        return Result<void>::success();
     }
 
     Serial.println("Ili9341Driver: Starting initialization...");
@@ -63,7 +63,7 @@ bool Ili9341Driver::initialize() {
 
     if (!tft_) {
         Serial.println("ERROR: Ili9341Driver - Failed to create ILI9341_T4 driver");
-        return false;
+        return Result<void>::error({ErrorCode::HardwareError, "Failed to create ILI9341_T4 driver"});
     }
 
     // Initialiser le driver
@@ -84,7 +84,7 @@ bool Ili9341Driver::initialize() {
     Serial.println("Ili9341Driver: Initialization completed successfully");
     initialized_ = true;
 
-    return true;
+    return Result<void>::success();
 }
 
 void Ili9341Driver::configurePins() {

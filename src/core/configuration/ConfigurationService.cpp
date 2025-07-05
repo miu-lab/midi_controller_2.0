@@ -83,7 +83,8 @@ size_t ConfigurationService::getInputCountByType(InputType type) const {
 bool ConfigurationService::validateAllConfigurations() const {
     if (appConfig_) {
         const auto& unifiedConfig = appConfig_->getUnifiedConfiguration();
-        return unifiedConfig.validate();
+        auto validationResult = unifiedConfig.validate();
+        return validationResult.isSuccess();
     }
     return false;
 }

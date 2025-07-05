@@ -5,6 +5,7 @@
 
 #include "config/unified/ControlDefinition.hpp"
 #include "core/domain/types.hpp"
+#include "core/utils/Result.hpp"
 
 /**
  * @brief Port de sortie pour le stockage des profils
@@ -22,43 +23,45 @@ public:
     /**
      * @brief Obtient la définition de contrôle complète pour un ID
      * @param id Identifiant du contrôle
-     * @return La définition complète s'elle existe, std::nullopt sinon
+     * @return Result contenant la définition ou une erreur
      */
-    virtual std::optional<ControlDefinition> getControlDefinition(InputId id) const = 0;
+    virtual Result<ControlDefinition> getControlDefinition(InputId id) const = 0;
 
     /**
      * @brief Définit une définition de contrôle complète
      * @param controlDef Définition complète du contrôle
+     * @return Result<void> avec détails d'erreur en cas d'échec
      */
-    virtual void setControlDefinition(const ControlDefinition& controlDef) = 0;
+    virtual Result<void> setControlDefinition(const ControlDefinition& controlDef) = 0;
 
     /**
      * @brief Obtient toutes les définitions de contrôles
-     * @return Un vecteur de toutes les définitions configurées
+     * @return Result contenant le vecteur de définitions ou une erreur
      */
-    virtual std::vector<ControlDefinition> getAllControlDefinitions() const = 0;
+    virtual Result<std::vector<ControlDefinition>> getAllControlDefinitions() const = 0;
 
     /**
      * @brief Sauvegarde les mappings actuels dans le stockage persistant
-     * @return true si la sauvegarde a réussi, false sinon
+     * @return Result<void> avec détails d'erreur en cas d'échec
      */
-    virtual bool saveProfile() = 0;
+    virtual Result<void> saveProfile() = 0;
 
     /**
      * @brief Charge des mappings depuis le stockage persistant
-     * @return true si le chargement a réussi, false sinon
+     * @return Result<void> avec détails d'erreur en cas d'échec
      */
-    virtual bool loadProfile() = 0;
+    virtual Result<void> loadProfile() = 0;
 
     /**
      * @brief Réinitialise tous les mappings aux valeurs par défaut
+     * @return Result<void> avec détails d'erreur en cas d'échec
      */
-    virtual void resetToDefaults() = 0;
+    virtual Result<void> resetToDefaults() = 0;
 
     /**
      * @brief Supprime un mapping
      * @param id Identifiant du contrôle
-     * @return true si le mapping a été supprimé, false s'il n'existait pas
+     * @return Result<void> avec détails d'erreur en cas d'échec
      */
-    virtual bool removeBinding(InputId id) = 0;
+    virtual Result<void> removeBinding(InputId id) = 0;
 };

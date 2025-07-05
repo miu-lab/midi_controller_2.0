@@ -104,22 +104,26 @@ size_t InputSubsystem::getActiveInputCountByType(InputType type) const {
                         });
 }
 
-bool InputSubsystem::validateInputsStatus() const {
+Result<void> InputSubsystem::validateInputsStatus() const {
     if (!initialized_) {
-        return false;
+        return Result<void>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
     }
     
     // Vérifier que InputManager est opérationnel
-    if (!inputManager_ || !inputManager_->isOperational()) {
-        return false;
+    if (!inputManager_) {
+        return Result<void>::error({ErrorCode::DependencyMissing, "InputManager not available"});
+    }
+    
+    if (!inputManager_->isOperational()) {
+        return Result<void>::error({ErrorCode::OperationFailed, "InputManager not operational"});
     }
     
     // Vérifier que le contrôleur est créé
     if (!inputController_) {
-        return false;
+        return Result<void>::error({ErrorCode::DependencyMissing, "InputController not created"});
     }
     
-    return true;
+    return Result<void>::success();
 }
 
 Result<bool> InputSubsystem::initializeDelegatedComponents() {

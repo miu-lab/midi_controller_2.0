@@ -6,6 +6,7 @@
 #include <typeindex>
 #include <unordered_map>
 #include <any>
+#include "core/utils/Result.hpp"
 
 // Helper pour générer un ID de type sans utiliser typeid
 class TypeIdGenerator {
@@ -79,6 +80,44 @@ public:
         }
 
         return nullptr;
+    }
+
+    /**
+     * @brief Récupère une instance partagée avec gestion d'erreurs explicite
+     * 
+     * @tparam T Type de l'instance à récupérer
+     * @return Result<std::shared_ptr<T>> Instance partagée ou erreur détaillée
+     */
+    template<typename T>
+    Result<std::shared_ptr<T>> resolveResult() {
+        auto it = dependencies_.find(TypeIdGenerator::getTypeId<T>());
+        if (it != dependencies_.end()) {
+            auto instance = std::static_pointer_cast<T>(it->second);
+            if (instance) {
+                return Result<std::shared_ptr<T>>::success(instance);
+            } else {
+                return Result<std::shared_ptr<T>>::error({ErrorCode::DependencyMissing, "Failed to cast dependency to requested type"});
+            }
+        }
+
+        // Vérifier les factories
+        auto factoryIt = factories_.find(TypeIdGenerator::getTypeId<T>());
+        if (factoryIt != factories_.end()) {
+            auto factory = std::any_cast<std::function<std::shared_ptr<T>()>>(&factoryIt->second);
+            if (factory) {
+                auto instance = (*factory)();
+                if (instance) {
+                    registerDependency<T>(instance);
+                    return Result<std::shared_ptr<T>>::success(instance);
+                } else {
+                    return Result<std::shared_ptr<T>>::error({ErrorCode::InitializationFailed, "Factory returned null instance"});
+                }
+            } else {
+                return Result<std::shared_ptr<T>>::error({ErrorCode::InitializationFailed, "Failed to cast factory function"});
+            }
+        }
+
+        return Result<std::shared_ptr<T>>::error({ErrorCode::DependencyMissing, "Dependency not registered"});
     }
 
     /**

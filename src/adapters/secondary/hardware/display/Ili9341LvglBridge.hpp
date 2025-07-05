@@ -2,6 +2,7 @@
 
 #include "Ili9341Driver.hpp"
 #include "config/DisplayConfig.hpp"
+#include "core/utils/Result.hpp"
 #include <lvgl.h>
 #include <memory>
 
@@ -38,9 +39,9 @@ public:
 
     /**
      * @brief Initialise LVGL et connecte au hardware
-     * @return true si succès
+     * @return Result<void> avec détails d'erreur en cas d'échec
      */
-    bool initialize();
+    Result<void> initialize();
 
     /**
      * @brief Obtient le display LVGL

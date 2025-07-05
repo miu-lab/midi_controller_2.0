@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "config/unified/ControlDefinition.hpp"
+#include "core/utils/Result.hpp"
 
 /**
  * @brief Parser pour extraire les informations MIDI depuis la configuration
@@ -81,16 +82,16 @@ public:
     /**
      * @brief Valide une information de contrôle MIDI
      * @param info Information à valider
-     * @return true si l'information est valide
+     * @return Result<void> avec détails d'erreur en cas d'échec de validation
      */
-    bool validateMidiControlInfo(const MidiControlInfo& info) const;
+    Result<void> validateMidiControlInfo(const MidiControlInfo& info) const;
 
     /**
      * @brief Valide une information de bouton
      * @param info Information à valider
-     * @return true si l'information est valide
+     * @return Result<void> avec détails d'erreur en cas d'échec de validation
      */
-    bool validateButtonInfo(const ButtonInfo& info) const;
+    Result<void> validateButtonInfo(const ButtonInfo& info) const;
 
 private:
     ParserConfig config_;

@@ -48,7 +48,7 @@ public:
     std::vector<ControlDefinition> getAllActiveControlDefinitions() const override;
     std::optional<ControlDefinition> getControlDefinitionById(InputId id) const override;
     size_t getActiveInputCountByType(InputType type) const override;
-    bool validateInputsStatus() const override;
+    Result<void> validateInputsStatus() const override;
 
 private:
     std::shared_ptr<DependencyContainer> container_;

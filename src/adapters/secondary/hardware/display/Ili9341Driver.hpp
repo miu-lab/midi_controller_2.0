@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "config/DisplayConfig.hpp"
+#include "core/utils/Result.hpp"
 
 /**
  * @brief Driver hardware pur pour écran ILI9341 via ILI9341_T4
@@ -42,9 +43,9 @@ public:
 
     /**
      * @brief Initialise le hardware
-     * @return true si succès
+     * @return Result<void> avec détails d'erreur en cas d'échec
      */
-    bool initialize();
+    Result<void> initialize();
 
     /**
      * @brief Met à jour une région de l'écran

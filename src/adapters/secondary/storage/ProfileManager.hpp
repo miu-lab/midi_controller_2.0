@@ -10,13 +10,13 @@
  */
 class ProfileManager : public ProfileStoragePort {
 public:
-    std::optional<ControlDefinition> getControlDefinition(InputId id) const override;
-    void setControlDefinition(const ControlDefinition& controlDef) override;
-    std::vector<ControlDefinition> getAllControlDefinitions() const override;
-    bool saveProfile() override;
-    bool loadProfile() override;
-    void resetToDefaults() override;
-    bool removeBinding(InputId id) override;
+    Result<ControlDefinition> getControlDefinition(InputId id) const override;
+    Result<void> setControlDefinition(const ControlDefinition& controlDef) override;
+    Result<std::vector<ControlDefinition>> getAllControlDefinitions() const override;
+    Result<void> saveProfile() override;
+    Result<void> loadProfile() override;
+    Result<void> resetToDefaults() override;
+    Result<void> removeBinding(InputId id) override;
 
 private:
     std::unordered_map<InputId, ControlDefinition> controlDefinitions_;

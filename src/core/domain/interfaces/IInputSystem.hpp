@@ -60,7 +60,7 @@ public:
     
     /**
      * @brief Vérifie si toutes les entrées sont initialisées correctement
-     * @return true si toutes les entrées sont fonctionnelles
+     * @return Result<void> avec détails d'erreur en cas d'échec de validation
      */
-    virtual bool validateInputsStatus() const = 0;
+    virtual Result<void> validateInputsStatus() const = 0;
 };

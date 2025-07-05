@@ -1,19 +1,20 @@
 #include "adapters/secondary/storage/ProfileManager.hpp"
 #include "config/unified/ControlBuilder.hpp"
 
-std::optional<ControlDefinition> ProfileManager::getControlDefinition(InputId id) const {
+Result<ControlDefinition> ProfileManager::getControlDefinition(InputId id) const {
     auto it = controlDefinitions_.find(id);
     if (it != controlDefinitions_.end()) {
-        return it->second;
+        return Result<ControlDefinition>::success(it->second);
     }
-    return std::nullopt;
+    return Result<ControlDefinition>::error({ErrorCode::OperationFailed, "Control definition not found"});
 }
 
-void ProfileManager::setControlDefinition(const ControlDefinition& controlDef) {
+Result<void> ProfileManager::setControlDefinition(const ControlDefinition& controlDef) {
     controlDefinitions_[controlDef.id] = controlDef;
+    return Result<void>::success();
 }
 
-std::vector<ControlDefinition> ProfileManager::getAllControlDefinitions() const {
+Result<std::vector<ControlDefinition>> ProfileManager::getAllControlDefinitions() const {
     std::vector<ControlDefinition> result;
     result.reserve(controlDefinitions_.size());
 
@@ -21,28 +22,29 @@ std::vector<ControlDefinition> ProfileManager::getAllControlDefinitions() const 
         result.push_back(pair.second);
     }
 
-    return result;
+    return Result<std::vector<ControlDefinition>>::success(result);
 }
 
-bool ProfileManager::saveProfile() {
+Result<void> ProfileManager::saveProfile() {
     // Implémentation simple - à développer avec un vrai stockage persistant
-    return true;
+    return Result<void>::success();
 }
 
-bool ProfileManager::loadProfile() {
+Result<void> ProfileManager::loadProfile() {
     // Implémentation simple - à développer avec un vrai stockage persistant
-    return true;
+    return Result<void>::success();
 }
 
-void ProfileManager::resetToDefaults() {
-
+Result<void> ProfileManager::resetToDefaults() {
+    controlDefinitions_.clear();
+    return Result<void>::success();
 }
 
-bool ProfileManager::removeBinding(InputId id) {
+Result<void> ProfileManager::removeBinding(InputId id) {
     auto it = controlDefinitions_.find(id);
     if (it != controlDefinitions_.end()) {
         controlDefinitions_.erase(it);
-        return true;
+        return Result<void>::success();
     }
-    return false;
+    return Result<void>::error({ErrorCode::OperationFailed, "Control definition not found to remove"});
 }

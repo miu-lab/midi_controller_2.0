@@ -103,7 +103,8 @@ Result<bool> InitializationScript::setupHardwareAdapters(
     // 1. Créer et initialiser le driver hardware
     Ili9341Driver::Config driverConfig = Ili9341Driver::getDefaultConfig();
     auto driver = std::make_shared<Ili9341Driver>(driverConfig);
-    if (!driver->initialize()) {
+    auto driverInitResult = driver->initialize();
+    if (driverInitResult.isError()) {
         return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du driver hardware ILI9341"});
     }
     // TODO DEBUG MSG
@@ -112,7 +113,8 @@ Result<bool> InitializationScript::setupHardwareAdapters(
     // TODO DEBUG MSG
     Ili9341LvglBridge::LvglConfig lvglConfig = Ili9341LvglBridge::getDefaultLvglConfig();
     auto bridge = std::make_shared<Ili9341LvglBridge>(driver, lvglConfig);
-    if (!bridge->initialize()) {
+    auto bridgeInitResult = bridge->initialize();
+    if (bridgeInitResult.isError()) {
         return Result<bool>::error({ErrorCode::HardwareError, "Échec d'initialisation du bridge LVGL"});
     }
     // TODO DEBUG MSG

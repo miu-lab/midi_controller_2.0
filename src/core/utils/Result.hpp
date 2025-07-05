@@ -101,3 +101,79 @@ private:
   explicit Result(const T& value) : result_(value) {}
   explicit Result(const E& error) : result_(error) {}
 };
+
+/**
+ * @brief Spécialisation pour Result<void> 
+ * Utilisée pour les opérations qui ne retournent pas de valeur mais peuvent échouer
+ */
+template<typename E>
+class Result<void, E> {
+public:
+  /**
+   * @brief Construit un résultat représentant un succès
+   * @return Result<void> représentant le succès
+   */
+  static Result<void, E> success() {
+    return Result(true);
+  }
+  
+  /**
+   * @brief Construit un résultat représentant une erreur
+   * @param error Description de l'erreur
+   * @return Result<void> contenant l'erreur
+   */
+  static Result<void, E> error(const E& error) {
+    return Result(error);
+  }
+  
+  /**
+   * @brief Vérifie si le résultat est un succès
+   * @return true si succès, false si erreur
+   */
+  bool isSuccess() const {
+    return std::holds_alternative<bool>(result_);
+  }
+  
+  /**
+   * @brief Vérifie si le résultat est une erreur
+   * @return true si erreur, false si succès
+   */
+  bool isError() const {
+    return !isSuccess();
+  }
+  
+  /**
+   * @brief Récupère l'erreur si échec
+   * @return std::optional contenant l'erreur si échec, vide sinon
+   */
+  std::optional<E> error() const {
+    if (!isSuccess()) {
+      return std::get<E>(result_);
+    }
+    return std::nullopt;
+  }
+  
+  /**
+   * @brief Exécute l'un des deux callbacks selon le résultat
+   * 
+   * @tparam SuccessCallback Type du callback en cas de succès
+   * @tparam ErrorCallback Type du callback en cas d'erreur
+   * @param onSuccess Callback appelé en cas de succès
+   * @param onError Callback appelé en cas d'erreur avec l'erreur
+   * @return Auto - Le résultat du callback exécuté
+   */
+  template<typename SuccessCallback, typename ErrorCallback>
+  auto match(SuccessCallback&& onSuccess, ErrorCallback&& onError) const {
+    if (isSuccess()) {
+      return onSuccess();
+    } else {
+      return onError(*error());
+    }
+  }
+  
+private:
+  std::variant<bool, E> result_;
+  
+  explicit Result(bool success) : result_(success) {}
+  explicit Result(const E& error) : result_(error) {}
+};

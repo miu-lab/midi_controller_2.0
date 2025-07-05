@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "config/unified/ControlDefinition.hpp"
+#include "core/utils/Result.hpp"
 
 /**
  * @brief Configuration unifiée moderne
@@ -43,8 +44,9 @@ public:
 
     /**
      * @brief Valide la cohérence de toute la configuration
+     * @return Result<void> avec détails d'erreur en cas d'échec de validation
      */
-    bool validate() const;
+    Result<void> validate() const;
 
     /**
      * @brief Obtient les statistiques de la configuration

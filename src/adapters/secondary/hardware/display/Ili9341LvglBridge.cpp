@@ -39,15 +39,15 @@ Ili9341LvglBridge::~Ili9341LvglBridge() {
     // TODO DEBUG MSG
 }
 
-bool Ili9341LvglBridge::initialize() {
+Result<void> Ili9341LvglBridge::initialize() {
     if (initialized_) {
         Serial.println("LvglBridge already initialized");
-        return true;
+        return Result<void>::success();
     }
     
     if (!driver_) {
         Serial.println("ERROR: LvglBridge - Driver is null");
-        return false;
+        return Result<void>::error({ErrorCode::DependencyMissing, "Hardware driver is null"});
     }
     
     Serial.println("LvglBridge: Starting initialization...");
@@ -56,14 +56,14 @@ bool Ili9341LvglBridge::initialize() {
     Serial.println("LvglBridge: Setting up LVGL core...");
     if (!setupLvglCore()) {
         Serial.println("ERROR: LvglBridge - setupLvglCore failed");
-        return false;
+        return Result<void>::error({ErrorCode::InitializationFailed, "LVGL core setup failed"});
     }
     
     // Allouer buffers LVGL
     Serial.println("LvglBridge: Allocating LVGL buffers...");
     if (!allocateLvglBuffers()) {
         Serial.println("ERROR: LvglBridge - allocateLvglBuffers failed");
-        return false;
+        return Result<void>::error({ErrorCode::InitializationFailed, "LVGL buffer allocation failed"});
     }
     
     // Setup display LVGL
@@ -71,12 +71,12 @@ bool Ili9341LvglBridge::initialize() {
     if (!setupLvglDisplay()) {
         Serial.println("ERROR: LvglBridge - setupLvglDisplay failed");
         freeLvglBuffers();
-        return false;
+        return Result<void>::error({ErrorCode::InitializationFailed, "LVGL display setup failed"});
     }
     
     initialized_ = true;
     Serial.println("LvglBridge: Initialization completed successfully");
-    return true;
+    return Result<void>::success();
 }
 
 void Ili9341LvglBridge::refreshDisplay() {

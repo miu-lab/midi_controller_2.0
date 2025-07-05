@@ -55,25 +55,25 @@ std::vector<ControlDefinition> UnifiedConfiguration::getControlsByRole(MappingRo
     return result;
 }
 
-bool UnifiedConfiguration::validate() const {
+Result<void> UnifiedConfiguration::validate() const {
     // Vérifier l'unicité des IDs
     std::unordered_set<InputId> seenIds;
 
     for (const auto& control : controls_) {
         // Vérifier l'ID principal
         if (control.id == 0) {
-            return false;  // ID 0 invalide
+            return Result<void>::error({ErrorCode::ConfigurationError, "Control ID cannot be 0"});
         }
 
         if (!seenIds.insert(control.id).second) {
-            return false;  // Duplicate ID
+            return Result<void>::error({ErrorCode::ConfigurationError, "Duplicate control ID found"});
         }
 
         // Vérifier l'ID du bouton d'encodeur
         if (control.hardware.type == InputType::ENCODER && control.hardware.encoderButtonPin) {
             InputId buttonId = control.getEncoderButtonId();
             if (!seenIds.insert(buttonId).second) {
-                return false;  // Duplicate button ID
+                return Result<void>::error({ErrorCode::ConfigurationError, "Duplicate encoder button ID found"});
             }
         }
 
@@ -82,12 +82,12 @@ bool UnifiedConfiguration::validate() const {
             // MappingRole n'a pas de valeur NONE, on vérifie juste la cohérence
             if (mapping.appliesTo == MappingControlType::ENCODER &&
                 control.hardware.type != InputType::ENCODER) {
-                return false;
+                return Result<void>::error({ErrorCode::ConfigurationError, "Encoder mapping on non-encoder control"});
             }
         }
     }
 
-    return true;
+    return Result<void>::success();
 }
 
 UnifiedConfiguration::Stats UnifiedConfiguration::getStats() const {

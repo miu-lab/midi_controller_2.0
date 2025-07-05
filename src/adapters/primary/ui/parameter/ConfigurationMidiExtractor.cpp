@@ -28,7 +28,8 @@ ConfigurationMidiExtractor::extractMidiControls(const UnifiedConfiguration& conf
                 // Extraire seulement les contrôles MIDI des encodeurs (pas les boutons)
                 auto midiInfo = extractFromEncoder(control);
                 if (midiInfo.has_value()) {
-                    if (validateMidiControlInfo(midiInfo.value())) {
+                    auto validationResult = validateMidiControlInfo(midiInfo.value());
+                    if (validationResult.isSuccess()) {
                         midiControls.push_back(midiInfo.value());
                         logInfo("Added ENCODER MIDI control: ID=" + String(midiInfo->control_id) + 
                                ", CC=" + String(midiInfo->cc_number) + 
@@ -64,7 +65,8 @@ std::vector<ConfigurationMidiExtractor::ButtonInfo> ConfigurationMidiExtractor::
         if (control.hardware.type == InputType::BUTTON && control.enabled) {
             auto buttonInfo = extractButtonFromControl(control);
             if (buttonInfo.has_value()) {
-                if (validateButtonInfo(buttonInfo.value())) {
+                auto validationResult = validateButtonInfo(buttonInfo.value());
+                if (validationResult.isSuccess()) {
                     buttonInfos.push_back(buttonInfo.value());
                     if (buttonInfo->hasParent()) {
                         logInfo("Found button " + String(buttonInfo->button_id) + " with parent " + String(buttonInfo->parent_encoder_id));
@@ -83,7 +85,8 @@ std::vector<ConfigurationMidiExtractor::ButtonInfo> ConfigurationMidiExtractor::
                 info.parent_encoder_id = control.id;  // L'encodeur est le parent
                 info.name = String(control.label.c_str()) + " BTN";
                 
-                if (validateButtonInfo(info)) {
+                auto validationResult = validateButtonInfo(info);
+                if (validationResult.isSuccess()) {
                     logInfo("Found integrated encoder button " + String(info.button_id) + " for encoder " + String(info.parent_encoder_id));
                     buttonInfos.push_back(info);
                 }
@@ -95,42 +98,42 @@ std::vector<ConfigurationMidiExtractor::ButtonInfo> ConfigurationMidiExtractor::
     return buttonInfos;
 }
 
-bool ConfigurationMidiExtractor::validateMidiControlInfo(const MidiControlInfo& info) const {
+Result<void> ConfigurationMidiExtractor::validateMidiControlInfo(const MidiControlInfo& info) const {
     // Valider le numéro CC
     if (info.cc_number > config_.maxCCNumber) {
         logError("Invalid CC number: " + String(info.cc_number) + " > " + String(config_.maxCCNumber));
-        return false;
+        return Result<void>::error({ErrorCode::ConfigurationError, "Invalid CC number"});
     }
     
     // Valider le canal MIDI (0-15 interne, 1-16 externe)
     if (info.channel > 15) {
         logError("Invalid MIDI channel: " + String(info.channel));
-        return false;
+        return Result<void>::error({ErrorCode::ConfigurationError, "Invalid MIDI channel"});
     }
     
     // Valider que le nom n'est pas vide
     if (info.name.length() == 0) {
         logError("Empty control name for ID=" + String(info.control_id));
-        return false;
+        return Result<void>::error({ErrorCode::ConfigurationError, "Empty control name"});
     }
     
-    return true;
+    return Result<void>::success();
 }
 
-bool ConfigurationMidiExtractor::validateButtonInfo(const ButtonInfo& info) const {
+Result<void> ConfigurationMidiExtractor::validateButtonInfo(const ButtonInfo& info) const {
     // Valider l'ID du bouton
     if (info.button_id == 0) {
         logError("Invalid button ID: 0");
-        return false;
+        return Result<void>::error({ErrorCode::ConfigurationError, "Invalid button ID"});
     }
     
     // Valider que le nom n'est pas vide
     if (info.name.length() == 0) {
         logError("Empty button name for ID=" + String(info.button_id));
-        return false;
+        return Result<void>::error({ErrorCode::ConfigurationError, "Empty button name"});
     }
     
-    return true;
+    return Result<void>::success();
 }
 
 std::optional<ConfigurationMidiExtractor::MidiControlInfo>

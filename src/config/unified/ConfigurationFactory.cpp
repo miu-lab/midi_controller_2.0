@@ -252,7 +252,8 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .build());
 
     // Validation finale
-    if (!config->validate()) {
+    auto validationResult = config->validate();
+    if (validationResult.isError()) {
         // Configuration validation failed - log error in production
         // In embedded environment, we continue with invalid config
     }
