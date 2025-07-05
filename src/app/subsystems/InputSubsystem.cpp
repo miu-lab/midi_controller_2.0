@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+// #include "NavigationSubsystem.hpp" // TODO: Réintégrer après refactoring interface
 #include "core/utils/Error.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
@@ -181,8 +182,20 @@ Result<bool> InputSubsystem::configureNavigationControls(const std::vector<Contr
         return Result<bool>::error({ErrorCode::DependencyMissing, "NavigationService not available"});
     }
 
-    // REFACTOR: Logique déplacée de MidiSubsystem vers InputSubsystem
-    // Identifier les contrôles de navigation
+    // REFACTOR: La configuration détaillée est maintenant gérée par NavigationSubsystem
+    // InputSubsystem ne fait plus que déléguer
+    
+    // TODO: Récupérer le NavigationSubsystem depuis le container si disponible
+    // auto navigationSubsystem = container_->resolve<NavigationSubsystem>();
+    // if (navigationSubsystem) {
+    //     // Utiliser le nouveau NavigationSubsystem pour configuration avancée
+    //     auto result = navigationSubsystem->configureNavigationControls(controlDefinitions);
+    //     if (!result.isSuccess()) {
+    //         return result;
+    //     }
+    // }
+    
+    // Identifier les contrôles de navigation pour l'ancien service (compatibilité)
     std::set<InputId> navigationControlIds;
     
     for (const auto& controlDef : controlDefinitions) {
@@ -192,21 +205,13 @@ Result<bool> InputSubsystem::configureNavigationControls(const std::vector<Contr
         for (const auto& mapping : controlDef.mappings) {
             if (mapping.role == MappingRole::NAVIGATION) {
                 navigationControlIds.insert(controlDef.id);
-                break; // Un seul mapping de navigation suffit
+                break;
             }
         }
     }
     
-    // Configurer le service de navigation avec les contrôles détectés
+    // Configurer l'ancien service de navigation (compatibilité)
     navigationService_->setNavigationControls(navigationControlIds);
-    
-    // Log pour débogage
-    Serial.print("[InputSubsystem] Navigation controls configured: ");
-    Serial.println(navigationControlIds.size());
-    for (InputId id : navigationControlIds) {
-        Serial.print("  - Control ID: ");
-        Serial.println(id);
-    }
     
     return Result<bool>::success(true);
 }

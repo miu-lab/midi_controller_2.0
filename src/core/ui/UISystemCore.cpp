@@ -1,7 +1,7 @@
 #include "UISystemCore.hpp"
 
-#include "adapters/primary/ui/ViewManager.hpp"
-#include "adapters/primary/ui/ViewManagerEventListener.hpp"
+#include "adapters/ui/views/ViewManager.hpp"
+#include "adapters/ui/views/ViewManagerEventListener.hpp"
 #include "core/ui/DisplayManager.hpp"
 #include "core/domain/events/core/IEventBus.hpp"
 #include "core/utils/Error.hpp"

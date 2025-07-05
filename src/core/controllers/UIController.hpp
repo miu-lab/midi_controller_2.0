@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "adapters/primary/ui/ViewManager.hpp"
+#include "adapters/ui/views/ViewManager.hpp"
 #include "MenuController.hpp"
 #include "core/domain/types.hpp"
 

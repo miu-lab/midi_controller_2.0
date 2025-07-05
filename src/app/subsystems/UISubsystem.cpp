@@ -1,6 +1,6 @@
 #include "UISubsystem.hpp"
 
-#include "adapters/primary/ui/DefaultViewManager.hpp"
+#include "adapters/ui/views/DefaultViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "config/PerformanceConfig.hpp"
 

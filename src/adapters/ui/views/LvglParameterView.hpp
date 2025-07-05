@@ -6,13 +6,13 @@
 #include <map>
 #include <memory>
 
-#include "adapters/primary/ui/parameter/ConfigurationMidiExtractor.hpp"
-#include "adapters/primary/ui/parameter/ParameterEventHandler.hpp"
-#include "adapters/primary/ui/parameter/ParameterSceneManager.hpp"
-#include "adapters/primary/ui/parameter/ParameterWidgetMappingManager.hpp"
+#include "adapters/ui/events/ConfigurationMidiExtractor.hpp"
+#include "adapters/ui/events/ParameterEventHandler.hpp"
+#include "adapters/ui/events/ParameterSceneManager.hpp"
+#include "adapters/ui/events/ParameterWidgetMappingManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
-#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
-#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
+#include "adapters/ui/components/ButtonIndicator.hpp"
+#include "adapters/ui/components/ParameterWidget.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/UIEvent.hpp"

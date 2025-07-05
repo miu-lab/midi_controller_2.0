@@ -8,6 +8,7 @@
 
 // Déclarations anticipées pour réduire les inclusions
 class NavigationConfigService;
+class NavigationSubsystem;
 class CommandManager;
 class InputController;
 class InputSubsystem;

@@ -4,7 +4,7 @@
 #include "core/domain/events/core/EventTypes.hpp"
 #include <memory>
 #include "core/domain/events/MidiEvents.hpp"
-#include "adapters/primary/ui/ViewManager.hpp"
+#include "adapters/ui/views/ViewManager.hpp"
 #include "core/domain/events/core/Event.hpp"
 
 /**

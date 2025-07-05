@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "ParameterWidgetMappingManager.hpp"
-#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
+#include "adapters/ui/components/ParameterWidget.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/UIEvent.hpp"
 #include "core/domain/events/core/EventBus.hpp"

@@ -1,8 +1,8 @@
 #include "ViewFactory.hpp"
 
 #include "app/di/DependencyContainer.hpp"
-#include "adapters/primary/ui/DefaultViewManager.hpp"
-#include "adapters/primary/ui/ViewManager.hpp"
+#include "adapters/ui/views/DefaultViewManager.hpp"
+#include "adapters/ui/views/ViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/domain/events/core/EventBus.hpp"

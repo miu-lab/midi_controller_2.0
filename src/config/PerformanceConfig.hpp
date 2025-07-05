@@ -20,6 +20,7 @@ constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = LVGL_REFRESH_PERIOD_MS;
 constexpr unsigned long MAX_UPDATE_TIME_US = 30000;  // 30ms cycle principal
 constexpr unsigned long INPUT_TIME_INTERVAL = 1000;  // 1ms pour input
 constexpr unsigned long MIDI_TIME_INTERVAL = 2000;   // 2ms pour MIDI
+constexpr unsigned long NAVIGATION_TIME_INTERVAL = 10000; // 10ms pour navigation
 constexpr unsigned long UI_TIME_INTERVAL = 16667;    // 16ms pour UI
 
 // === RATE LIMITING ===

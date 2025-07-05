@@ -1,6 +1,6 @@
 #include "ParameterWidget.hpp"
-#include "adapters/ui/lvgl/theme/UITheme.hpp"
-#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
+#include "adapters/ui/components/UITheme.hpp"
+#include "adapters/ui/components/ButtonIndicator.hpp"
 #include "core/utils/FlashStrings.hpp"
 
 

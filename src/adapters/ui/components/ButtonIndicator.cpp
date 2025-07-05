@@ -1,5 +1,5 @@
 #include "ButtonIndicator.hpp"
-#include "adapters/ui/lvgl/theme/UITheme.hpp"
+#include "adapters/ui/components/UITheme.hpp"
 
 //=============================================================================
 // Constructeur et destructeur

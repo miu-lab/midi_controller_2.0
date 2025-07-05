@@ -1,6 +1,6 @@
 #pragma once
 
-#include "adapters/primary/ui/ViewManager.hpp"
+#include "adapters/ui/views/ViewManager.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/commands/ui/NavigateMenuCommand.hpp"
 #include "core/domain/types.hpp"

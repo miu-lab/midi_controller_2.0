@@ -7,8 +7,8 @@
 #include <memory>
 
 #include "ParameterWidgetMappingManager.hpp"
-#include "adapters/ui/lvgl/widgets/ButtonIndicator.hpp"
-#include "adapters/ui/lvgl/widgets/ParameterWidget.hpp"
+#include "adapters/ui/components/ButtonIndicator.hpp"
+#include "adapters/ui/components/ParameterWidget.hpp"
 
 /**
  * @brief Gestionnaire de scène LVGL pour les widgets de paramètres

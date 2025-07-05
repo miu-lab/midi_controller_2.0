@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 // Inclusions nécessaires pour l'implémentation
-#include "adapters/primary/ui/DefaultViewManager.hpp"
+#include "adapters/ui/views/DefaultViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341Driver.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
@@ -12,6 +12,7 @@
 #include "app/subsystems/ConfigurationSubsystem.hpp"
 #include "app/subsystems/InputSubsystem.hpp"
 #include "app/subsystems/MidiSubsystem.hpp"
+// #include "app/subsystems/NavigationSubsystem.hpp" // TODO: Réintégrer après refactoring interface
 #include "app/subsystems/UISubsystem.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/controllers/MenuController.hpp"
@@ -178,6 +179,22 @@ Result<bool> InitializationScript::initializeSubsystems(
              container->registerDependency<IConfiguration>(system);
              return system->init();
          }});
+    // TODO: Réintégrer NavigationSubsystem après refactoring interface
+    // subsystems.push_back({"Navigation",
+    //      std::make_shared<NavigationSubsystem>(container),
+    //      [&]() -> Result<bool> {
+    //          auto system = std::static_pointer_cast<NavigationSubsystem>(subsystems[1].instance);
+    //          container->registerDependency<NavigationSubsystem>(system);
+    //          container->registerDependency<INavigationService>(system);
+    //          auto initResult = system->init();
+    //          if (initResult.isSuccess()) {
+    //              scheduler->addTask([system]() { system->update(); },
+    //                                 PerformanceConfig::NAVIGATION_TIME_INTERVAL,
+    //                                 0,
+    //                                 "NavigationUpdate");
+    //          }
+    //          return initResult;
+    //      }});
     subsystems.push_back({"Input",
          std::make_shared<InputSubsystem>(container),
          [&]() -> Result<bool> {
