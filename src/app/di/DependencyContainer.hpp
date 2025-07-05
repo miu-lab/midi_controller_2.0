@@ -3,7 +3,6 @@
 #include <functional>
 #include <memory>
 #include <string>
-#include <typeindex>
 #include <unordered_map>
 #include <any>
 #include "core/utils/Result.hpp"

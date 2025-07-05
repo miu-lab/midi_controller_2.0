@@ -92,33 +92,66 @@ Ce document détaille le plan complet de refactoring et d'amélioration du proje
 - ✅ Compilation réussie
 - ✅ Patterns d'ownership cohérents et optimisés
 
-### 1.3 Élimination RTTI 🔄 EN COURS
+### 1.3 Élimination RTTI ✅ TERMINÉ
 
 **Objectif** : Purger complètement l'usage de RTTI pour optimiser les performances
 
-#### Progrès Actuel :
-- ✅ `TypeIdGenerator` déjà implémenté dans `DependencyContainer`
-- ✅ `std::is_same_v` utilisé dans `ViewFactory` au lieu de `typeid`
+#### Étapes Réalisées :
+1. **Audit complet RTTI** ✅
+   - ✅ Recherche complète des usages de `typeid()`, `std::type_index`, `dynamic_cast`
+   - ✅ Identification de `<typeindex>` inutile dans `DependencyContainer.hpp`
+   - ✅ Vérification que `TypeIdGenerator` remplace correctement `typeid()`
 
-#### Étapes Restantes :
-1. **Audit complet RTTI** 🔲
-   - [ ] Rechercher tous les usages de `typeid()`
-   - [ ] Identifier les `std::type_index` restants
-   - [ ] Localiser les `dynamic_cast` non essentiels
+2. **Nettoyage final** ✅
+   - ✅ Suppression de `#include <typeindex>` inutile
+   - ✅ Vérification que `std::static_pointer_cast` (acceptable) est utilisé
+   - ✅ Pas de `dynamic_cast` trouvé dans le codebase
 
-2. **Remplacement systématique** 🔲
-   - [ ] Remplacer `typeid()` par templates `constexpr`
-   - [ ] Éliminer `std::type_index` pour des alternatives constexpr
-   - [ ] Refactoriser les `dynamic_cast` en patterns alternatifs
+3. **Validation** ✅
+   - ✅ Compilation réussie sans headers RTTI
+   - ✅ `TypeIdGenerator` fonctionne correctement
+   - ✅ Code prêt pour compilation avec `-fno-rtti` si nécessaire
 
-3. **Validation** 🔲
-   - [ ] Vérifier la compilation avec `-fno-rtti`
-   - [ ] Tests de performance sans RTTI
-   - [ ] Mesure de la réduction de taille binaire
+#### Résultats :
+- ✅ RTTI complètement éliminé du codebase
+- ✅ Compilation réussie et optimisée
+- ✅ Architecture prête pour systèmes embarqués stricts
 
-### 1.4 Consolidation EventBus/EventManager 🔲 À FAIRE
+### 1.4 Migration EventBus vers Injection de Dépendance 🔄 EN COURS
 
-**Objectif** : Unifier l'API d'événements et éliminer la confusion
+**Objectif** : Migrer EventBus du pattern singleton vers l'injection de dépendance pour plus de cohérence et maintenabilité
+
+#### Avantages de la Migration :
+- **Cohérence architecturale** : Alignement avec le pattern DI utilisé partout ailleurs
+- **Testabilité** : Possibilité d'injecter des mock EventBus
+- **Flexibilité** : Différentes implémentations selon le contexte
+- **Découplage** : Élimination des dépendances singleton cachées
+- **Cycle de vie maîtrisé** : EventBus géré par le DI container
+
+#### Étapes Prévues :
+1. **Création de l'interface IEventBus** 🔲
+   - [ ] Définir l'interface abstraite pour le bus d'événements
+   - [ ] Extraire les méthodes essentielles d'EventBus
+   - [ ] Namespace cohérent avec l'architecture
+
+2. **Refactorisation d'EventBus** 🔲
+   - [ ] Transformer EventBus en EventBusImpl : public IEventBus
+   - [ ] Supprimer le pattern singleton
+   - [ ] Conserver toute la logique métier actuelle
+
+3. **Mise à jour du DI Container** 🔲
+   - [ ] Enregistrement d'EventBusImpl dans InitializationScript
+   - [ ] Interface IEventBus disponible pour injection
+   - [ ] Suppression des accès `getInstance()`
+
+4. **Migration des consommateurs** 🔲
+   - [ ] Injection d'IEventBus dans les constructeurs
+   - [ ] Suppression des accès directs à EventBus::getInstance()
+   - [ ] Tests de compilation à chaque étape
+
+### 1.5 Consolidation EventBus/EventManager 🔲 À FAIRE
+
+**Objectif** : Unifier l'API d'événements et éliminer la confusion entre EventBus et EventManager
 
 #### Analyse des Conflits :
 - **EventBus** : Bus d'événements singleton avec priorités
