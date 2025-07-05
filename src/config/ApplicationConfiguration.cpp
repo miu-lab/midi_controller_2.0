@@ -5,7 +5,6 @@
 #include "config/unified/ConfigurationFactory.hpp"  // Pour la factory STL
 #include "config/unified/UnifiedConfiguration.hpp"
 
-
 ApplicationConfiguration::ApplicationConfiguration() {
     // === INITIALISATION DU SYSTÈME UNIFIÉ MODERNE ===
 

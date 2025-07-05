@@ -1,9 +1,9 @@
 #pragma once
 
-#include "PerformanceConfig.hpp"
-#include "MidiConfig.hpp"
-#include "InputConfig.hpp"
 #include "HardwareConfig.hpp"
+#include "InputConfig.hpp"
+#include "MidiConfig.hpp"
+#include "PerformanceConfig.hpp"
 
 /**
  * @brief Agrégation des configurations pour l'ApplicationConfiguration

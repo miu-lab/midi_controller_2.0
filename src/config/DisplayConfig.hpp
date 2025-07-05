@@ -1,11 +1,11 @@
 #pragma once
 
-#include "PerformanceConfig.hpp"
 #include "HardwareConfig.hpp"
+#include "PerformanceConfig.hpp"
 
 /**
  * @brief Configuration complète de l'affichage ILI9341
- * 
+ *
  * Centralise TOUTE la configuration liée à l'affichage :
  * dimensions, buffers LVGL, pins hardware, performance.
  */
@@ -23,19 +23,20 @@ static constexpr size_t DIFFBUFFER_SIZE = 4096;                           // Buf
 
 // === BUFFERS LVGL ===
 static constexpr size_t LVGL_BUFFER_LINES = 30;  // Lignes par buffer (optimisé mémoire)
-static constexpr size_t LVGL_BUFFER_SIZE = SCREEN_WIDTH * LVGL_BUFFER_LINES;  // 9600 pixels → 7200 pixels
+static constexpr size_t LVGL_BUFFER_SIZE =
+    SCREEN_WIDTH * LVGL_BUFFER_LINES;  // 9600 pixels → 7200 pixels
 
 // === PERFORMANCE AFFICHAGE ===
 static constexpr unsigned long REFRESH_PERIOD_MS = PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS;
 static constexpr int REFRESH_RATE_HZ = PerformanceConfig::DISPLAY_REFRESH_RATE_HZ;
 
 // === PINS HARDWARE ILI9341 ===
-static constexpr uint8_t CS_PIN = 9;   // Chip Select
-static constexpr uint8_t DC_PIN = 10;  // Data/Command
-static constexpr uint8_t RST_PIN = 6;  // Reset
-static constexpr uint8_t MOSI_PIN = 11; // Master Out Slave In
-static constexpr uint8_t SCK_PIN = 13;  // Serial Clock
-static constexpr uint8_t MISO_PIN = 12; // Master In Slave Out
+static constexpr uint8_t CS_PIN = 9;     // Chip Select
+static constexpr uint8_t DC_PIN = 10;    // Data/Command
+static constexpr uint8_t RST_PIN = 6;    // Reset
+static constexpr uint8_t MOSI_PIN = 11;  // Master Out Slave In
+static constexpr uint8_t SCK_PIN = 13;   // Serial Clock
+static constexpr uint8_t MISO_PIN = 12;  // Master In Slave Out
 
 // === COMMUNICATION SPI ===
 static constexpr uint32_t SPI_SPEED = HardwareConfig::SPI_SPEED_DISPLAY;  // 40MHz

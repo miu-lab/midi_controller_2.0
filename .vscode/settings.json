@@ -1,3 +1,8 @@
 {
-    "files.associations": {}
+    "files.associations": {},
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modifications",
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "C_Cpp.clang_format_sortIncludes": true,
+    "C_Cpp.formatting": "default"
 }
