@@ -76,6 +76,14 @@ public:
     void setNavigationControls(const std::set<InputId>& navControlIds);
 
     /**
+     * @brief Obtient les IDs des contrôles de navigation configurés
+     * @return Ensemble des IDs des contrôles de navigation
+     * 
+     * PHASE 1.1: Méthode ajoutée pour synchroniser avec NavigationConfigService
+     */
+    const std::set<InputId>& getNavigationControlIds() const;
+
+    /**
      * @brief Traite un changement d'encodeur
      *
      * Cette méthode est responsable de :

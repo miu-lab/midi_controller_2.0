@@ -147,6 +147,9 @@ extern void test_controller_factory_is_operational();
 extern void test_controller_factory_configuration_without_validation();
 extern void test_controller_factory_configuration_without_auto_register();
 
+// Tests Navigation Controls Sync (Phase 1.1)
+extern void runNavigationControlsSyncTests();
+
 // Fonctions setUp/tearDown par défaut pour Unity
 // Note: les tests spécifiques peuvent redéfinir ces fonctions
 void setUp(void) __attribute__((weak));
@@ -329,6 +332,9 @@ int main() {
     RUN_TEST(test_controller_factory_is_operational);
     RUN_TEST(test_controller_factory_configuration_without_validation);
     RUN_TEST(test_controller_factory_configuration_without_auto_register);
+    
+    // Tests Navigation Controls Sync (Phase 1.1)
+    runNavigationControlsSyncTests();
     
     UNITY_END();
     

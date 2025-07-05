@@ -1,3 +1,9 @@
+// === CODE LEGACY - À SUPPRIMER APRÈS MIGRATION MENU ===
+// TODO: Supprimer après implémentation complète du nouveau système de menu modulaire
+// Date: 2024-01-05
+// Remplacé par: MenuViewController, MenuSceneManager, MenuEventHandler (Phase 2+)
+// Ce fichier utilise une approche basique avec lv_list au lieu d'une architecture modulaire
+
 #include "LvglMenuView.hpp"
 #include "ViewManager.hpp"
 #include "config/DisplayConfig.hpp"

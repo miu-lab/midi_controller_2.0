@@ -428,3 +428,8 @@ bool MidiMapper::onEvent(const Event& event) {
 
     return false;  // Evénement non traité
 }
+
+// PHASE 1.1: Implémentation de getNavigationControlIds pour synchronisation avec NavigationConfigService
+const std::set<InputId>& MidiMapper::getNavigationControlIds() const {
+    return navigationControls_;
+}

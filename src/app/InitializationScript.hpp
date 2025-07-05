@@ -49,4 +49,12 @@ private:
 
     // Configuration des écouteurs MIDI prioritaires
     static void setupMidiEventListeners(std::shared_ptr<DependencyContainer> container);
+    
+public:
+    // PHASE 1.1: Synchronisation des contrôles de navigation
+    static void syncNavigationControlsWithConfigService(
+        std::shared_ptr<MidiSubsystem> midiSubsystem,
+        std::shared_ptr<NavigationConfigService> navConfigService);
+
+private:
 };

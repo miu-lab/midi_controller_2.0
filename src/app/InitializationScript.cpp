@@ -193,6 +193,12 @@ Result<bool> InitializationScript::initializeSubsystems(
                                     PerformanceConfig::MIDI_TIME_INTERVAL,
                                     1,
                                     "MidiUpdate");
+                 
+                 // PHASE 1.1: Synchroniser NavigationConfigService avec les contrôles de navigation détectés
+                 auto navConfigService = container->resolve<NavigationConfigService>();
+                 if (navConfigService) {
+                     syncNavigationControlsWithConfigService(system, navConfigService);
+                 }
              }
              return initResult;
          }});
@@ -283,4 +289,26 @@ void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyCon
         return;
     }
     // Plus besoin de configuration de propagation - tout est géré automatiquement
+}
+
+void InitializationScript::syncNavigationControlsWithConfigService(
+    std::shared_ptr<MidiSubsystem> midiSubsystem,
+    std::shared_ptr<NavigationConfigService> navConfigService) {
+    
+    // Obtenir les contrôles de navigation détectés par MidiSubsystem
+    const auto& midiMapper = midiSubsystem->getMidiMapper();
+    
+    // Extraire les IDs des contrôles de navigation du MidiMapper
+    // Note: Cette méthode sera ajoutée au MidiMapper pour exposer les contrôles de navigation
+    auto navigationControlIds = midiMapper.getNavigationControlIds();
+    
+    // Synchroniser avec NavigationConfigService
+    for (InputId controlId : navigationControlIds) {
+        navConfigService->setControlForNavigation(controlId, true);
+        Serial.print("Navigation control registered: ");
+        Serial.println(controlId);
+    }
+    
+    Serial.print("Total navigation controls synchronized: ");
+    Serial.println(navigationControlIds.size());
 }
