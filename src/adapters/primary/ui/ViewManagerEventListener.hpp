@@ -1,7 +1,8 @@
 #pragma once
 
-#include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/core/IEventBus.hpp"
 #include "core/domain/events/core/EventTypes.hpp"
+#include <memory>
 #include "core/domain/events/MidiEvents.hpp"
 #include "adapters/primary/ui/ViewManager.hpp"
 #include "core/domain/events/core/Event.hpp"
@@ -16,8 +17,9 @@ public:
     /**
      * @brief Constructeur
      * @param viewManager Gestionnaire de vues à mettre à jour
+     * @param eventBus Bus d'événements pour s'abonner/désabonner
      */
-    explicit ViewManagerEventListener(ViewManager& viewManager);
+    explicit ViewManagerEventListener(ViewManager& viewManager, std::shared_ptr<MidiController::Events::IEventBus> eventBus);
     
     /**
      * @brief Destructeur
@@ -85,4 +87,5 @@ private:
     
     ViewManager& m_viewManager;        // Gestionnaire de vues à mettre à jour
     SubscriptionId m_subscriptionId;   // ID d'abonnement aux événements
+    std::shared_ptr<MidiController::Events::IEventBus> m_eventBus; // Bus d'événements injecté
 };

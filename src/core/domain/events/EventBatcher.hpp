@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/domain/events/core/Event.hpp"
-#include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/core/IEventBus.hpp"
 #include "config/PerformanceConfig.hpp"
 #include "MidiEvents.hpp"
 #include "UIEvent.hpp"
@@ -31,8 +31,10 @@ public:
 
     /**
      * @brief Constructeur
+     * @param config Configuration du batching
+     * @param eventBus Bus d'événements pour s'abonner/publier
      */
-    explicit EventBatcher(const BatchConfig& config = BatchConfig());
+    explicit EventBatcher(const BatchConfig& config = BatchConfig(), std::shared_ptr<MidiController::Events::IEventBus> eventBus = nullptr);
 
     /**
      * @brief Démarrer le batching (s'abonner aux événements MIDI)
@@ -68,6 +70,7 @@ private:
     BatchConfig config_;
     bool started_ = false;
     SubscriptionId subscription_id_ = 0;
+    std::shared_ptr<MidiController::Events::IEventBus> eventBus_;
     
     // État des paramètres en attente
     std::map<uint16_t, PendingParameter> pending_parameters_;  // Key: (channel << 8) | controller

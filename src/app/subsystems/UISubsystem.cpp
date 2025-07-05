@@ -93,7 +93,13 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
 
         // Configurer l'écouteur d'événements
         if (uiCore_->getViewManager()) {
-            auto eventListener = std::make_unique<ViewManagerEventListener>(*uiCore_->getViewManager());
+            // Récupérer EventBus pour ViewManagerEventListener
+            auto eventBus = container_->resolve<MidiController::Events::IEventBus>();
+            if (!eventBus) {
+                return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IEventBus"});
+            }
+            
+            auto eventListener = std::make_unique<ViewManagerEventListener>(*uiCore_->getViewManager(), eventBus);
             auto listenerResult = uiCore_->configureEventListener(std::move(eventListener));
             if (!listenerResult.isSuccess()) {
                 return Result<bool>::error(listenerResult.error().value());

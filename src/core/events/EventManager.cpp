@@ -1,7 +1,8 @@
 #include "EventManager.hpp"
 
-EventManager::EventManager(const Config& config)
+EventManager::EventManager(const Config& config, std::shared_ptr<MidiController::Events::IEventBus> eventBus)
     : config_(config)
+    , eventBus_(eventBus)
     , initialized_(false)
     , started_(false)
     , processedEventCount_(0) {
@@ -16,8 +17,11 @@ bool EventManager::initialize() {
         return true;
     }
 
-    // Obtenir l'instance EventBus
-    eventBus_ = EventBus::getSharedInstance();
+    // EventBus maintenant injecté via le constructeur
+    if (!eventBus_) {
+        // Gérer le cas où EventBus n'est pas injecté
+        return false;
+    }
 
     // Créer et configurer l'EventBatcher si activé
     if (config_.enableBatching) {
@@ -101,12 +105,8 @@ void EventManager::unsubscribe(SubscriptionId subscriptionId) {
     eventBus_->unsubscribe(subscriptionId);
 }
 
-EventBus& EventManager::getEventBus() {
-    if (!eventBus_) {
-        // Fallback au singleton si pas encore initialisé
-        return EventBus::getInstance();
-    }
-    return *eventBus_;
+MidiController::Events::IEventBus* EventManager::getEventBus() {
+    return eventBus_.get();
 }
 
 bool EventManager::isStarted() const {
@@ -123,5 +123,5 @@ void EventManager::configureEventBatcher() {
     batchConfig.status_update_interval_ms = config_.statusUpdateIntervalMs;
     batchConfig.coalesce_identical_values = config_.coalesceIdenticalValues;
 
-    eventBatcher_ = std::make_unique<EventBatcher>(batchConfig);
+    eventBatcher_ = std::make_unique<EventBatcher>(batchConfig, eventBus_);
 }

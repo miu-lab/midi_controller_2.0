@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 #include "core/domain/events/core/Event.hpp"
-#include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/core/IEventBus.hpp"
 #include "core/domain/events/EventBatcher.hpp"
 
 /**
@@ -34,8 +34,9 @@ public:
     /**
      * @brief Constructeur avec configuration
      * @param config Configuration pour EventManager
+     * @param eventBus Bus d'événements injecté (optionnel)
      */
-    explicit EventManager(const Config& config = Config{});
+    explicit EventManager(const Config& config = Config{}, std::shared_ptr<MidiController::Events::IEventBus> eventBus = nullptr);
     
     /**
      * @brief Destructeur
@@ -88,9 +89,9 @@ public:
 
     /**
      * @brief Obtient une référence à l'EventBus sous-jacent
-     * @return Référence à EventBus
+     * @return Référence à IEventBus
      */
-    EventBus& getEventBus();
+    MidiController::Events::IEventBus* getEventBus();
 
     /**
      * @brief Vérifie si le gestionnaire est démarré
@@ -107,7 +108,7 @@ public:
 private:
     Config config_;
     std::unique_ptr<EventBatcher> eventBatcher_;
-    std::shared_ptr<EventBus> eventBus_;
+    std::shared_ptr<MidiController::Events::IEventBus> eventBus_;
     bool initialized_;
     bool started_;
     size_t processedEventCount_;

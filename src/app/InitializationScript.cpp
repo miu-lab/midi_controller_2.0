@@ -18,6 +18,7 @@
 #include "core/controllers/UIController.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/core/IEventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/listeners/UIControllerEventListener.hpp"
 #include "core/TaskScheduler.hpp"
@@ -34,10 +35,11 @@ Result<bool> InitializationScript::initializeContainer(
     Serial.println("Registering base services...");
     registerBaseServices(container, config);
 
-    // Enregistrer l'EventBus singleton
+    // Créer et enregistrer l'EventBus via injection de dépendance
     Serial.println("Setting up EventBus...");
-    auto eventBus = EventBus::getSharedInstance();
+    auto eventBus = std::make_shared<EventBus>();
     container->registerDependency<EventBus>(eventBus);
+    container->registerDependency<MidiController::Events::IEventBus>(eventBus);
 
     // Créer et enregistrer le TaskScheduler
     auto taskScheduler = std::make_shared<TaskScheduler>();

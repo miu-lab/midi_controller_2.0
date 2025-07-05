@@ -50,8 +50,14 @@ Result<bool> MidiSubsystem::init() {
         }
     }
 
+    // Récupérer EventBus pour MidiOutputEventAdapter
+    auto eventBus = container_->resolve<MidiController::Events::IEventBus>();
+    if (!eventBus) {
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IEventBus"});
+    }
+    
     // Créer l'MidiOutputEventAdapter qui va décorer directement TeensyUsbMidiOut
-    auto midiOutputEventAdapter = std::make_shared<MidiOutputEventAdapter>(*baseMidiOut);
+    auto midiOutputEventAdapter = std::make_shared<MidiOutputEventAdapter>(*baseMidiOut, eventBus);
     if (!midiOutputEventAdapter) {
         return Result<bool>::error(
             {ErrorCode::InitializationFailed, "Failed to create MidiOutputEventAdapter"});

@@ -1,76 +1,37 @@
 #pragma once
 
-#include "core/domain/events/core/Event.hpp"
-#include "core/domain/events/core/EventTypes.hpp"
+#include "IEventBus.hpp"
 #include <vector>
 #include <atomic>
 #include <algorithm>
 #include <memory>
 #include <mutex>
 
-// Identifiant d'abonnement
-using SubscriptionId = uint16_t;
-
 /**
- * @brief Classe de base pour les écouteurs d'événements
- */
-class EventListener {
-public:
-    virtual ~EventListener() = default;
-    
-    /**
-     * @brief Méthode appelée lorsqu'un événement est reçu
-     * @param event Événement reçu
-     * @return true si l'événement a été traité, false sinon
-     */
-    virtual bool onEvent(const Event& event) = 0;
-};
-
-/**
- * @brief Niveau de priorité pour les écouteurs d'événements
- */
-enum class EventPriority : uint8_t {
-    PRIORITY_HIGH = 0,    // Haute priorité (chemin critique MIDI)
-    PRIORITY_NORMAL = 1,  // Priorité normale
-    PRIORITY_LOW = 2      // Basse priorité
-};
-
-/**
- * @brief Bus d'événements unifié - Architecture simplifiée
+ * @brief Implémentation du bus d'événements unifié
+ * 
  * Combine EventBus et OptimizedEventBus en une seule classe moderne
+ * qui implémente l'interface IEventBus pour l'injection de dépendance.
  */
-class EventBus {
+class EventBus : public MidiController::Events::IEventBus {
 public:
     /**
-     * @brief Récupère l'instance unique du bus d'événements
-     * @return Instance du bus d'événements
+     * @brief Constructeur par défaut
      */
-    static EventBus& getInstance() {
-        static EventBus instance;
-        return instance;
-    }
-    
-    /**
-     * @brief Récupère une instance partagée sécurisée du bus d'événements
-     * @return Pointeur partagé vers l'instance unique
-     */
-    static std::shared_ptr<EventBus> getSharedInstance() {
-        static std::shared_ptr<EventBus> sharedInstance;
-        static std::once_flag initFlag;
+    EventBus() : nextId_(1) {
+        // Réserver de l'espace pour éviter les réallocations fréquentes
+        subscriptions_.reserve(24);
         
-        std::call_once(initFlag, []() {
-            // Utiliser un deleter personnalisé qui ne fait rien
-            // car le singleton ne doit jamais être détruit
-            sharedInstance.reset(&getInstance(), [](EventBus*) {});
-        });
-        
-        return sharedInstance;
+        // Initialiser les compteurs
+        for (auto& counter : eventCounters_) {
+            counter.store(0, std::memory_order_relaxed);
+        }
     }
     
     /**
      * @brief Destructeur
      */
-    ~EventBus() = default;
+    ~EventBus() override = default;
     
     /**
      * @brief S'abonne au bus d'événements avec priorité
@@ -78,7 +39,7 @@ public:
      * @param priority Niveau de priorité
      * @return Identifiant d'abonnement, 0 si échec
      */
-    SubscriptionId subscribe(EventListener* listener, EventPriority priority = EventPriority::PRIORITY_NORMAL) {
+    SubscriptionId subscribe(EventListener* listener, EventPriority priority = EventPriority::PRIORITY_NORMAL) override {
         if (!listener) {
             return 0;
         }
@@ -103,7 +64,7 @@ public:
      * @param priority Priorité numérique (0-255)
      * @return Identifiant d'abonnement
      */
-    SubscriptionId subscribe(EventListener* listener, uint8_t priority) {
+    SubscriptionId subscribe(EventListener* listener, uint8_t priority) override {
         EventPriority eventPriority = EventPriority::PRIORITY_NORMAL;
         if (priority >= 200) {
             eventPriority = EventPriority::PRIORITY_HIGH;
@@ -117,15 +78,15 @@ public:
     /**
      * @brief Méthodes utilitaires pour un usage simplifié
      */
-    SubscriptionId subscribeHigh(EventListener* listener) {
+    SubscriptionId subscribeHigh(EventListener* listener) override {
         return subscribe(listener, EventPriority::PRIORITY_HIGH);
     }
     
-    SubscriptionId subscribeNormal(EventListener* listener) {
+    SubscriptionId subscribeNormal(EventListener* listener) override {
         return subscribe(listener, EventPriority::PRIORITY_NORMAL);
     }
     
-    SubscriptionId subscribeLow(EventListener* listener) {
+    SubscriptionId subscribeLow(EventListener* listener) override {
         return subscribe(listener, EventPriority::PRIORITY_LOW);
     }
     
@@ -134,7 +95,7 @@ public:
      * @param id Identifiant d'abonnement
      * @return true si désabonnement réussi, false sinon
      */
-    bool unsubscribe(SubscriptionId id) {
+    bool unsubscribe(SubscriptionId id) override {
         auto it = std::find_if(subscriptions_.begin(), subscriptions_.end(),
                               [id](const Subscription& sub) { return sub.id == id; });
         
@@ -151,7 +112,7 @@ public:
      * @param id Identifiant d'abonnement
      * @return true si mise en pause réussie, false sinon
      */
-    bool pause(SubscriptionId id) {
+    bool pause(SubscriptionId id) override {
         return setSubscriptionActive(id, false);
     }
     
@@ -160,7 +121,7 @@ public:
      * @param id Identifiant d'abonnement
      * @return true si reprise réussie, false sinon
      */
-    bool resume(SubscriptionId id) {
+    bool resume(SubscriptionId id) override {
         return setSubscriptionActive(id, true);
     }
     
@@ -169,7 +130,7 @@ public:
      * @param event Événement à publier
      * @return true si au moins un abonné a traité l'événement, false sinon
      */
-    bool publish(Event& event) {
+    bool publish(Event& event) override {
         bool handled = false;
         
         // Traiter tous les abonnements (déjà triés par priorité)
@@ -202,7 +163,7 @@ public:
     /**
      * @brief Surcharge pour pointeur
      */
-    bool publish(Event* event) {
+    bool publish(Event* event) override {
         if (event) {
             return publish(*event);
         }
@@ -212,7 +173,7 @@ public:
     /**
      * @brief Supprime tous les abonnements
      */
-    void clear() {
+    void clear() override {
         subscriptions_.clear();
     }
     
@@ -221,7 +182,7 @@ public:
      * @param id Identifiant d'abonnement
      * @return true si l'abonnement existe, false sinon
      */
-    bool exists(SubscriptionId id) const {
+    bool exists(SubscriptionId id) const override {
         return std::any_of(subscriptions_.begin(), subscriptions_.end(),
                           [id](const Subscription& sub) { return sub.id == id; });
     }
@@ -231,7 +192,7 @@ public:
      * @param id Identifiant d'abonnement
      * @return true si l'abonnement est actif, false sinon
      */
-    bool isActive(SubscriptionId id) const {
+    bool isActive(SubscriptionId id) const override {
         auto it = std::find_if(subscriptions_.begin(), subscriptions_.end(),
                               [id](const Subscription& sub) { return sub.id == id; });
         
@@ -242,7 +203,7 @@ public:
      * @brief Obtient le nombre d'abonnements
      * @return Nombre d'abonnements
      */
-    int getCount() const {
+    int getCount() const override {
         return subscriptions_.size();
     }
     
@@ -250,7 +211,7 @@ public:
      * @brief Obtient la capacité actuelle du vecteur
      * @return Capacité du vecteur
      */
-    int getCapacity() const {
+    int getCapacity() const override {
         return subscriptions_.capacity();
     }
     
@@ -259,7 +220,7 @@ public:
      * @param eventType Type d'événement haute priorité
      * @return Nombre d'événements traités de ce type
      */
-    uint32_t getEventProcessingCount(EventType eventType) const {
+    uint32_t getEventProcessingCount(EventType eventType) const override {
         if (eventType >= EventTypes::HighPriorityEncoderChanged && 
             eventType <= EventTypes::HighPriorityButtonPress) {
             uint8_t index = eventType - EventTypes::HighPriorityEncoderChanged;
@@ -273,7 +234,7 @@ public:
     /**
      * @brief Réinitialise les compteurs de traitement d'événements
      */
-    void resetEventProcessingCounters() {
+    void resetEventProcessingCounters() override {
         for (auto& counter : eventCounters_) {
             counter.store(0, std::memory_order_relaxed);
         }
@@ -290,16 +251,6 @@ private:
         bool active;
     };
     
-    // Constructeur privé (singleton)
-    EventBus() : nextId_(1) {
-        // Réserver de l'espace pour éviter les réallocations fréquentes
-        subscriptions_.reserve(24);
-        
-        // Initialiser les compteurs
-        for (auto& counter : eventCounters_) {
-            counter.store(0, std::memory_order_relaxed);
-        }
-    }
     
     // Empêcher la copie
     EventBus(const EventBus&) = delete;

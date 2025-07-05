@@ -2,7 +2,8 @@
 
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/core/Event.hpp"
-#include "core/domain/events/core/EventBus.hpp"
+#include "core/domain/events/core/IEventBus.hpp"
+#include <memory>
 #include "core/ports/output/MidiOutputPort.hpp"
 #include "core/utils/AppStrings.hpp"
 #include "core/utils/FlashStrings.hpp"
@@ -18,8 +19,10 @@ public:
     /**
      * @brief Constructeur
      * @param basePort Port MIDI de base à décorer
+     * @param eventBus Bus d'événements pour publier les événements
      */
-    explicit MidiOutputEventAdapter(MidiOutputPort& basePort) : m_basePort(basePort) {}
+    explicit MidiOutputEventAdapter(MidiOutputPort& basePort, std::shared_ptr<MidiController::Events::IEventBus> eventBus) 
+        : m_basePort(basePort), m_eventBus(eventBus) {}
 
     /**
      * @brief Vérifie si le port MIDI supporte les événements
@@ -40,8 +43,10 @@ public:
         m_basePort.sendControlChange(ch, cc, value);
 
         // Émettre un événement MidiCC
-        MidiCCEvent event(ch, cc, value, source);
-        EventBus::getInstance().publish(event);
+        if (m_eventBus) {
+            MidiCCEvent event(ch, cc, value, source);
+            m_eventBus->publish(event);
+        }
     }
 
     /**
@@ -67,8 +72,10 @@ public:
         m_basePort.sendNoteOn(ch, note, velocity);
 
         // Émettre un événement MidiNoteOn
-        MidiNoteOnEvent event(ch, note, velocity, source);
-        EventBus::getInstance().publish(event);
+        if (m_eventBus) {
+            MidiNoteOnEvent event(ch, note, velocity, source);
+            m_eventBus->publish(event);
+        }
     }
 
     /**
@@ -94,8 +101,10 @@ public:
         m_basePort.sendNoteOff(ch, note, velocity);
 
         // Émettre un événement MidiNoteOff
-        MidiNoteOffEvent event(ch, note, velocity, source);
-        EventBus::getInstance().publish(event);
+        if (m_eventBus) {
+            MidiNoteOffEvent event(ch, note, velocity, source);
+            m_eventBus->publish(event);
+        }
     }
 
     /**
@@ -150,4 +159,5 @@ public:
 
 private:
     MidiOutputPort& m_basePort;  // Port MIDI de base
+    std::shared_ptr<MidiController::Events::IEventBus> m_eventBus;  // Bus d'événements injecté
 };

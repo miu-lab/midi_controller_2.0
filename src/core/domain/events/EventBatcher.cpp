@@ -1,16 +1,17 @@
 #include "EventBatcher.hpp"
 
 
-EventBatcher::EventBatcher(const BatchConfig& config)
-    : config_(config) {
+EventBatcher::EventBatcher(const BatchConfig& config, std::shared_ptr<MidiController::Events::IEventBus> eventBus)
+    : config_(config), eventBus_(eventBus) {
 }
 
 void EventBatcher::start() {
     if (started_) return;
     
     // S'abonner aux événements avec l'API unifiée
-    EventBus& eventBus = EventBus::getInstance();
-    subscription_id_ = eventBus.subscribe(this, 90); // Priorité haute pour traiter avant l'UI
+    if (eventBus_) {
+        subscription_id_ = eventBus_->subscribe(this, 90); // Priorité haute pour traiter avant l'UI
+    }
     
     started_ = true;
 }
@@ -19,9 +20,8 @@ void EventBatcher::stop() {
     if (!started_) return;
     
     // Se désabonner
-    if (subscription_id_ > 0) {
-        EventBus& eventBus = EventBus::getInstance();
-        eventBus.unsubscribe(subscription_id_);
+    if (subscription_id_ > 0 && eventBus_) {
+        eventBus_->unsubscribe(subscription_id_);
         subscription_id_ = 0;
     }
     
@@ -97,7 +97,7 @@ void EventBatcher::processPendingBatches() {
 }
 
 void EventBatcher::flushUIBatch() {
-    EventBus& eventBus = EventBus::getInstance();
+    if (!eventBus_) return;
     
     for (auto& [key, param] : pending_parameters_) {
         if (param.needs_ui_update) {
@@ -109,7 +109,7 @@ void EventBatcher::flushUIBatch() {
                 param.name
             );
             
-            eventBus.publish(ui_event);
+            eventBus_->publish(ui_event);
             param.needs_ui_update = false;
             
         }

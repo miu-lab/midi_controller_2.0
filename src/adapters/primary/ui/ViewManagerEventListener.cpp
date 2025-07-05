@@ -2,8 +2,8 @@
 
 
 
-ViewManagerEventListener::ViewManagerEventListener(ViewManager& viewManager)
-    : m_viewManager(viewManager), m_subscriptionId(0) {
+ViewManagerEventListener::ViewManagerEventListener(ViewManager& viewManager, std::shared_ptr<MidiController::Events::IEventBus> eventBus)
+    : m_viewManager(viewManager), m_subscriptionId(0), m_eventBus(eventBus) {
 }
 
 ViewManagerEventListener::~ViewManagerEventListener() {
@@ -11,15 +11,15 @@ ViewManagerEventListener::~ViewManagerEventListener() {
 }
 
 void ViewManagerEventListener::subscribe() {
-    if (m_subscriptionId == 0) {
-        m_subscriptionId = EventBus::getInstance().subscribe(this);
+    if (m_subscriptionId == 0 && m_eventBus) {
+        m_subscriptionId = m_eventBus->subscribe(this);
         // TODO DEBUG MSG
     }
 }
 
 void ViewManagerEventListener::unsubscribe() {
-    if (m_subscriptionId != 0) {
-        EventBus::getInstance().unsubscribe(m_subscriptionId);
+    if (m_subscriptionId != 0 && m_eventBus) {
+        m_eventBus->unsubscribe(m_subscriptionId);
         m_subscriptionId = 0;
     }
 }
