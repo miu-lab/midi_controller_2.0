@@ -28,7 +28,7 @@ Result<bool> UISystemCore::initialize(
     // Valider les composants selon la configuration
     if (!validateComponents()) {
         return Result<bool>::error(
-            Error(ErrorCode::DependencyMissing, "Required UI components missing")
+            {ErrorCode::DependencyMissing, "Required UI components missing"}
         );
     }
 
@@ -50,13 +50,13 @@ void UISystemCore::update() {
 Result<bool> UISystemCore::showMessage(const std::string& message) {
     if (!isOperational()) {
         return Result<bool>::error(
-            Error(ErrorCode::OperationFailed, "UI system not operational")
+            {ErrorCode::OperationFailed, "UI system not operational"}
         );
     }
 
     if (!viewManager_) {
         return Result<bool>::error(
-            Error(ErrorCode::DependencyMissing, "ViewManager not available")
+            {ErrorCode::DependencyMissing, "ViewManager not available"}
         );
     }
 
@@ -68,13 +68,13 @@ Result<bool> UISystemCore::showMessage(const std::string& message) {
 Result<bool> UISystemCore::clearDisplay() {
     if (!isOperational()) {
         return Result<bool>::error(
-            Error(ErrorCode::OperationFailed, "UI system not operational")
+            {ErrorCode::OperationFailed, "UI system not operational"}
         );
     }
 
     if (!viewManager_) {
         return Result<bool>::error(
-            Error(ErrorCode::DependencyMissing, "ViewManager not available")
+            {ErrorCode::DependencyMissing, "ViewManager not available"}
         );
     }
 
@@ -96,7 +96,7 @@ bool UISystemCore::isOperational() const {
 Result<bool> UISystemCore::configureEventListener(std::unique_ptr<ViewManagerEventListener> eventListener) {
     if (!viewManager_) {
         return Result<bool>::error(
-            Error(ErrorCode::DependencyMissing, "ViewManager required for event listener")
+            {ErrorCode::DependencyMissing, "ViewManager required for event listener"}
         );
     }
 

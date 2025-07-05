@@ -43,7 +43,7 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
     // Initialiser UISystemCore si l'UI complète est activée
     if (fullUIEnabled_) {
         if (!viewFactory_ || !uiCore_) {
-            return Result<bool>::error(Error(ErrorCode::DependencyMissing, "ViewFactory or UISystemCore not available"));
+            return Result<bool>::error({ErrorCode::DependencyMissing, "ViewFactory or UISystemCore not available"});
         }
 
         // Mettre à jour la configuration du core pour activer Full UI
@@ -118,7 +118,7 @@ void UISubsystem::update() {
 
 Result<bool> UISubsystem::showMessage(const std::string& message) {
     if (!initialized_ || !uiCore_) {
-        return Result<bool>::error(Error(ErrorCode::OperationFailed, "UI not initialized"));
+        return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized"});
     }
 
     // Déléguer à UISystemCore
@@ -127,7 +127,7 @@ Result<bool> UISubsystem::showMessage(const std::string& message) {
 
 Result<bool> UISubsystem::clearDisplay() {
     if (!initialized_ || !uiCore_) {
-        return Result<bool>::error(Error(ErrorCode::OperationFailed, "UI not initialized"));
+        return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized"});
     }
 
     // Déléguer à UISystemCore

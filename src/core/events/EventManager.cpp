@@ -17,9 +17,7 @@ bool EventManager::initialize() {
     }
 
     // Obtenir l'instance EventBus
-    eventBus_ = std::shared_ptr<EventBus>(&EventBus::getInstance(), [](EventBus*) {
-        // Custom deleter qui ne fait rien car EventBus est un singleton
-    });
+    eventBus_ = EventBus::getSharedInstance();
 
     // Créer et configurer l'EventBatcher si activé
     if (config_.enableBatching) {

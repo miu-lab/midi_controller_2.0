@@ -77,21 +77,21 @@ public:
      * @brief Obtient le gestionnaire d'encodeurs
      * @return Pointeur vers EncoderManager ou nullptr
      */
-    std::shared_ptr<EncoderManager> getEncoderManager() const;
+    EncoderManager* getEncoderManager() const;
 
     /**
      * @brief Obtient le gestionnaire de boutons
      * @return Pointeur vers DigitalButtonManager ou nullptr
      */
-    std::shared_ptr<DigitalButtonManager> getButtonManager() const;
+    DigitalButtonManager* getButtonManager() const;
 
 private:
     ManagerConfig config_;
     bool initialized_;
 
     // Gestionnaires de matériel
-    std::shared_ptr<EncoderManager> encoderManager_;
-    std::shared_ptr<DigitalButtonManager> buttonManager_;
+    std::unique_ptr<EncoderManager> encoderManager_;
+    std::unique_ptr<DigitalButtonManager> buttonManager_;
 
     // Processeurs d'événements
     std::unique_ptr<ProcessEncoders> processEncoders_;

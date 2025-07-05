@@ -36,8 +36,7 @@ Result<bool> InitializationScript::initializeContainer(
 
     // Enregistrer l'EventBus singleton
     Serial.println("Setting up EventBus...");
-    auto& eventBusInstance = EventBus::getInstance();
-    std::shared_ptr<EventBus> eventBus(&eventBusInstance, [](EventBus*){});
+    auto eventBus = EventBus::getSharedInstance();
     container->registerDependency<EventBus>(eventBus);
 
     // Créer et enregistrer le TaskScheduler
@@ -75,12 +74,13 @@ Result<bool> InitializationScript::initializeContainer(
 
 void InitializationScript::registerBaseServices(std::shared_ptr<DependencyContainer> container,
                                                 const ApplicationConfiguration& config) {
-    // Configuration de l'application - Créer un shared_ptr vers la référence existante
-    // Note: On assume que config reste valide pendant la durée de vie du container
+    // Configuration de l'application - Wrapped pointer avec garantie de cycle de vie
+    // Note: Le caller garantit que 'config' reste valide pendant toute la durée de vie du container
     std::shared_ptr<ApplicationConfiguration> configPtr(
         const_cast<ApplicationConfiguration*>(&config), 
         [](ApplicationConfiguration*) {
-            // Custom deleter qui ne fait rien car on ne possède pas l'objet
+            // Custom deleter vide - l'objet n'est pas détruit par ce shared_ptr
+            // L'ownership réel reste chez le caller
         });
     container->registerDependency<ApplicationConfiguration>(configPtr);
 

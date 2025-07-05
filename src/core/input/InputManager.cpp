@@ -76,7 +76,7 @@ void InputManager::update() {
 
 Result<bool> InputManager::reconfigure(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!initialized_) {
-        return Result<bool>::error(Error(ErrorCode::OperationFailed, "InputManager not initialized"));
+        return Result<bool>::error({ErrorCode::OperationFailed, "InputManager not initialized"});
     }
 
     // Réinitialiser complètement avec les nouvelles configurations
@@ -120,12 +120,12 @@ bool InputManager::isOperational() const {
     return true;
 }
 
-std::shared_ptr<EncoderManager> InputManager::getEncoderManager() const {
-    return encoderManager_;
+EncoderManager* InputManager::getEncoderManager() const {
+    return encoderManager_.get();
 }
 
-std::shared_ptr<DigitalButtonManager> InputManager::getButtonManager() const {
-    return buttonManager_;
+DigitalButtonManager* InputManager::getButtonManager() const {
+    return buttonManager_.get();
 }
 
 std::vector<EncoderConfig> InputManager::extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
@@ -186,7 +186,7 @@ Result<bool> InputManager::createManagers(const std::vector<EncoderConfig>& enco
                                          const std::vector<ButtonConfig>& buttonConfigs) {
     // Créer le gestionnaire d'encodeurs si activé et qu'il y a des configurations
     if (config_.enableEncoders && !encoderConfigs.empty()) {
-        encoderManager_ = std::make_shared<EncoderManager>(encoderConfigs);
+        encoderManager_ = std::make_unique<EncoderManager>(encoderConfigs);
         if (!encoderManager_) {
             return Result<bool>::error(Error(ErrorCode::InitializationFailed, "Failed to create EncoderManager"));
         }
@@ -194,7 +194,7 @@ Result<bool> InputManager::createManagers(const std::vector<EncoderConfig>& enco
 
     // Créer le gestionnaire de boutons si activé et qu'il y a des configurations
     if (config_.enableButtons && !buttonConfigs.empty()) {
-        buttonManager_ = std::make_shared<DigitalButtonManager>(buttonConfigs);
+        buttonManager_ = std::make_unique<DigitalButtonManager>(buttonConfigs);
         if (!buttonManager_) {
             return Result<bool>::error(Error(ErrorCode::InitializationFailed, "Failed to create DigitalButtonManager"));
         }

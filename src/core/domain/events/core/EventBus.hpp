@@ -5,6 +5,8 @@
 #include <vector>
 #include <atomic>
 #include <algorithm>
+#include <memory>
+#include <mutex>
 
 // Identifiant d'abonnement
 using SubscriptionId = uint16_t;
@@ -46,6 +48,23 @@ public:
     static EventBus& getInstance() {
         static EventBus instance;
         return instance;
+    }
+    
+    /**
+     * @brief Récupère une instance partagée sécurisée du bus d'événements
+     * @return Pointeur partagé vers l'instance unique
+     */
+    static std::shared_ptr<EventBus> getSharedInstance() {
+        static std::shared_ptr<EventBus> sharedInstance;
+        static std::once_flag initFlag;
+        
+        std::call_once(initFlag, []() {
+            // Utiliser un deleter personnalisé qui ne fait rien
+            // car le singleton ne doit jamais être détruit
+            sharedInstance.reset(&getInstance(), [](EventBus*) {});
+        });
+        
+        return sharedInstance;
     }
     
     /**

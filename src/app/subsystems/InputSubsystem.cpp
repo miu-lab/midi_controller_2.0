@@ -26,13 +26,13 @@ Result<bool> InputSubsystem::init() {
     // Récupérer la configuration
     configuration_ = container_->resolve<IConfiguration>();
     if (!configuration_) {
-        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"));
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IConfiguration"});
     }
 
     // REFACTOR: Récupérer le service de navigation
     navigationService_ = container_->resolve<INavigationService>();
     if (!navigationService_) {
-        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "Failed to resolve INavigationService"));
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve INavigationService"});
     }
 
     // Initialiser les composants délégués
@@ -75,7 +75,7 @@ void InputSubsystem::update() {
 
 Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!initialized_ || !inputManager_) {
-        return Result<bool>::error(Error(ErrorCode::OperationFailed, "InputSubsystem not initialized"));
+        return Result<bool>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
     }
 
     // Déléguer la reconfiguration à InputManager
@@ -140,7 +140,7 @@ Result<void> InputSubsystem::validateInputsStatus() const {
 
 Result<bool> InputSubsystem::initializeDelegatedComponents() {
     if (!controllerFactory_) {
-        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "ControllerFactory not available"));
+        return Result<bool>::error({ErrorCode::DependencyMissing, "ControllerFactory not available"});
     }
 
     // Créer InputController via ControllerFactory
@@ -155,16 +155,16 @@ Result<bool> InputSubsystem::initializeDelegatedComponents() {
 
 Result<bool> InputSubsystem::setupInputManager(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!inputManager_ || !inputController_) {
-        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "InputManager or InputController not available"));
+        return Result<bool>::error({ErrorCode::DependencyMissing, "InputManager or InputController not available"});
     }
 
     // Valider les configurations
     if (controlDefinitions.empty()) {
-        return Result<bool>::error(Error(ErrorCode::ConfigError, "No control definitions found"));
+        return Result<bool>::error({ErrorCode::ConfigError, "No control definitions found"});
     }
 
     if (!configuration_->validateAllConfigurations()) {
-        return Result<bool>::error(Error(ErrorCode::ConfigError, "Some control definitions are invalid"));
+        return Result<bool>::error({ErrorCode::ConfigError, "Some control definitions are invalid"});
     }
 
     // Initialiser InputManager avec les définitions et le contrôleur
@@ -178,7 +178,7 @@ Result<bool> InputSubsystem::setupInputManager(const std::vector<ControlDefiniti
 
 Result<bool> InputSubsystem::configureNavigationControls(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!navigationService_) {
-        return Result<bool>::error(Error(ErrorCode::DependencyMissing, "NavigationService not available"));
+        return Result<bool>::error({ErrorCode::DependencyMissing, "NavigationService not available"});
     }
 
     // REFACTOR: Logique déplacée de MidiSubsystem vers InputSubsystem
