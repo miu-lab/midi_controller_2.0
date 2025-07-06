@@ -6,9 +6,10 @@ Ce fichier fournit des conseils à Claude Code (claude.ai/code) lors du travail 
 
 Il s'agit d'un projet de contrôleur MIDI pour la plateforme Teensy utilisant PlatformIO. Il implémente un contrôleur MIDI complet avec :
 - Encodeurs rotatifs, boutons et autres contrôles
-- Écran TFT ILI9341 avec bibliothèque graphique TGX pour l'interface utilisateur
+- Écran TFT ILI9341 avec bibliothèque graphique LVGL 9.3.0 pour l'interface utilisateur
 - Communication MIDI via USB
 - Gestion de profils et configurations personnalisables
+- Architecture hexagonale avec injection de dépendances moderne
 
 ## Architecture
 
@@ -16,18 +17,20 @@ Le projet suit une Architecture Hexagonale (aussi appelée Architecture en Oigno
 
 ### Couches principales
 - **Core** : Contient la logique métier indépendante de la plateforme
-  - **Domain** : Entités principales, interfaces et événements
-  - **Use Cases** : Implémentation de la logique métier (ProcessButtons, ProcessEncoders, ProcessMidiIn, UpdateDisplay, LearnMidiMapping)
-  - **Ports** : Interfaces abstraites pour les adaptateurs
-  - **Controllers** : Orchestration de haut niveau (InputController, MenuController, ProfileController, UIController)
+  - **Domain/Interfaces** : Interfaces pures (IInputManager, IUIManager, IViewFactory, IDisplayManager, IViewManager)
+  - **Use Cases** : Implémentation de la logique métier (ProcessButtons, ProcessEncoders)
+  - **Controllers** : Orchestration de haut niveau (InputController, MenuController, UIController)
+  - **Commands** : Pattern Command pour les opérations (NavigateMenuCommand, SendMidiCCCommand)
+
+- **App** : Orchestration et services applicatifs
+  - **Services** : Services métier (InputManagerService, NavigationConfigService)
+  - **Factories** : Création d'objets avec DI (ViewFactory)
+  - **Subsystems** : Sous-systèmes modulaires (ConfigurationSubsystem, InputSubsystem, MidiSubsystem, UISubsystem)
+  - **DI** : Injection de dépendances via DependencyContainer
 
 - **Adapters** : Implémentations concrètes
-  - **Primary** : Adaptateurs d'entrée (vues UI et gestion de l'affichage)
-  - **Secondary** : Adaptateurs de sortie (interfaces matérielles, sortie MIDI, stockage)
-
-- **App** : Point d'entrée et orchestration de l'application
-  - **Subsystems** : Sous-systèmes modulaires implémentant des interfaces abstraites (IConfiguration, IInputSystem, IMidiSystem, IUISystem)
-  - **DI** : Système moderne d'injection de dépendances via DependencyContainer
+  - **UI** : Adapters UI (UISystemAdapter, vues LVGL)
+  - **Secondary** : Hardware (DisplayManagerAdapter, gestionnaires input), MIDI, Storage
 
 ## Commandes de développement courantes
 
@@ -70,7 +73,7 @@ pio test
 - **Framework** : Arduino
 - **Standard C++** : C++20
 - **Type USB** : USB_MIDI_SERIAL
-- **Affichage** : TFT ILI9341 avec bibliothèque graphique TGX
+- **Affichage** : TFT ILI9341 avec bibliothèque graphique LVGL 9.3.0
 
 ### Gestion de la mémoire
 - Préférer l'allocation statique à l'allocation dynamique
@@ -95,6 +98,33 @@ pio test
 
 ## Ajouter de nouvelles fonctionnalités
 
+## Architecture détaillée
+
+### Structure actuelle des interfaces (Core)
+Le core définit les contrats via des interfaces pures :
+- `IInputManager` : Gestion centralisée des entrées utilisateur
+- `IUIManager` : Gestion de l'interface utilisateur  
+- `IViewFactory` : Création de gestionnaires de vues
+- `IDisplayManager` : Gestion optimisée de l'affichage
+- `IViewManager` : Navigation entre les vues
+- `IInputSystem`, `IMidiSystem`, `IUISystem` : Interfaces de sous-systèmes
+
+### Services applicatifs (App)
+- **InputManagerService** : Implémente IInputManager, coordonne les gestionnaires hardware
+- **NavigationConfigService** : Configuration de la navigation
+- **ViewFactory** : Création de ViewManager avec injection de dépendances
+
+### Adapters
+- **UISystemAdapter** : Adapter principal UI, remplace l'ancien UISystemCore
+- **DisplayManagerAdapter** : Gestion de l'affichage avec timing optimisé
+- **Vues LVGL** : LvglMenuView, LvglParameterView, LvglModalView, LvglSplashScreenView
+
+### Injection de dépendances
+Le système utilise DependencyContainer pour :
+- Enregistrement des services et interfaces
+- Résolution automatique des dépendances
+- Configuration centralisée dans InitializationScript
+
 Pour ajouter un nouveau sous-système :
 
 1. Définir l'interface dans `core/domain/interfaces/IFeatureName.hpp`
@@ -114,12 +144,42 @@ Pour ajouter un nouveau sous-système :
 - Utiliser le mocking pour la simulation du matériel
 
 ## Fichiers importants
-- `src/main.cpp` : Point d'entrée
-- `src/app/MidiControllerApp.cpp` : Classe principale de l'application
+- `src/main.cpp` : Point d'entrée minimal
+- `src/app/SystemManager.cpp` : Gestionnaire système principal
+- `src/app/MidiControllerApp.cpp` : Application principale
 - `src/app/InitializationScript.hpp` : Configuration de l'injection de dépendances
+- `src/app/services/InputManagerService.hpp` : Service centralisé de gestion des entrées
+- `src/adapters/ui/UISystemAdapter.hpp` : Adapter principal UI
+- `src/core/domain/interfaces/` : Interfaces de l'architecture hexagonale
 - `src/config/unified/UnifiedConfiguration.cpp` : Gestion de la configuration
 - `platformio.ini` : Configuration de compilation
 
+## État actuel du projet
+
+### Migration Architecture Hexagonale ✅ TERMINÉE
+- **Classes migrées** : InputManager → InputManagerService, UISystemCore → UISystemAdapter
+- **Interfaces créées** : IInputManager, IUIManager, IViewFactory, IDisplayManager, IViewManager  
+- **Dépendances inversées** : Commands et Controllers utilisent maintenant des interfaces
+- **Compilation** : ✅ Projet compile sans erreurs
+
+### Technologies actuelles
+- **Interface graphique** : LVGL 9.3.0 (migration TGX → LVGL terminée)
+- **Conteneurs temps réel** : ETL (Embedded Template Library) 20.39.4
+- **Architecture** : Hexagonale avec injection de dépendances
+- **Gestion d'erreurs** : Pattern Result<T, E>
+
+### Composants clés post-migration
+- `InputManagerService` : Service centralisé remplaçant InputManager
+- `UISystemAdapter` : Adapter UI remplaçant UISystemCore  
+- `DisplayManagerAdapter` : Gestion optimisée de l'affichage
+- `ViewFactory` : Factory moderne avec DI dans app/factories/
+
 ## Memories
 
-- Concernant l'intégration LVGL (2024-01-01) : Plan d'action détaillé à élaborer dans `docs/ui/lvgl_integration.md` avec une approche structurée pour l'intégration de la bibliothèque graphique LVGL dans le contrôleur MIDI
+- **Migration Architecture Hexagonale (2025-01-06)** : Migration complète réalisée avec succès
+  - Création de 5 nouvelles interfaces dans core/domain/interfaces/
+  - Déplacement de 4 classes vers les bonnes couches architecturales
+  - Correction de toutes les violations de dépendances
+  - Projet compile et respecte l'architecture hexagonale
+
+- Concernant l'intégration LVGL : ✅ TERMINÉE - Le projet utilise maintenant LVGL 9.3.0 avec succès
