@@ -11,8 +11,8 @@ InputSubsystem::InputSubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container), initialized_(false) {
     // Créer les composants délégués
     if (container_) {
-        InputManager::ManagerConfig managerConfig;
-        inputManager_ = std::make_unique<InputManager>(managerConfig);
+        IInputManager::ManagerConfig managerConfig;
+        inputManager_ = std::make_shared<InputManagerService>(managerConfig);
         
         ControllerFactory::FactoryConfig factoryConfig;
         controllerFactory_ = std::make_unique<ControllerFactory>(container_, factoryConfig);
@@ -70,7 +70,7 @@ void InputSubsystem::update() {
         return;
     }
 
-    // Déléguer la mise à jour à InputManager
+    // Déléguer la mise à jour à InputManagerService
     inputManager_->update();
 }
 
@@ -79,7 +79,7 @@ Result<bool> InputSubsystem::configureInputs(const std::vector<ControlDefinition
         return Result<bool>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
     }
 
-    // Déléguer la reconfiguration à InputManager
+    // Déléguer la reconfiguration à InputManagerService
     return inputManager_->reconfigure(controlDefinitions);
 }
 
@@ -122,13 +122,13 @@ Result<void> InputSubsystem::validateInputsStatus() const {
         return Result<void>::error({ErrorCode::OperationFailed, "InputSubsystem not initialized"});
     }
     
-    // Vérifier que InputManager est opérationnel
+    // Vérifier que InputManagerService est opérationnel
     if (!inputManager_) {
-        return Result<void>::error({ErrorCode::DependencyMissing, "InputManager not available"});
+        return Result<void>::error({ErrorCode::DependencyMissing, "InputManagerService not available"});
     }
     
     if (!inputManager_->isOperational()) {
-        return Result<void>::error({ErrorCode::OperationFailed, "InputManager not operational"});
+        return Result<void>::error({ErrorCode::OperationFailed, "InputManagerService not operational"});
     }
     
     // Vérifier que le contrôleur est créé
@@ -156,7 +156,7 @@ Result<bool> InputSubsystem::initializeDelegatedComponents() {
 
 Result<bool> InputSubsystem::setupInputManager(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!inputManager_ || !inputController_) {
-        return Result<bool>::error({ErrorCode::DependencyMissing, "InputManager or InputController not available"});
+        return Result<bool>::error({ErrorCode::DependencyMissing, "InputManagerService or InputController not available"});
     }
 
     // Valider les configurations
@@ -168,7 +168,7 @@ Result<bool> InputSubsystem::setupInputManager(const std::vector<ControlDefiniti
         return Result<bool>::error({ErrorCode::ConfigError, "Some control definitions are invalid"});
     }
 
-    // Initialiser InputManager avec les définitions et le contrôleur
+    // Initialiser InputManagerService avec les définitions et le contrôleur
     auto initResult = inputManager_->initialize(controlDefinitions, inputController_);
     if (!initResult.isSuccess()) {
         return initResult;

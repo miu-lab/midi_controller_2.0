@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "core/domain/interfaces/IViewFactory.hpp"
 #include "core/utils/Result.hpp"
 
 // Forward declarations
@@ -14,25 +15,11 @@ class EventBus;
 /**
  * @brief Factory pour la création de ViewManager
  * 
- * Cette classe centralise la logique de création des gestionnaires de vues
- * en utilisant l'injection de dépendances et en respectant les configurations.
+ * Cette classe implémente IViewFactory et centralise la logique de création
+ * des gestionnaires de vues en utilisant l'injection de dépendances.
  */
-class ViewFactory {
+class ViewFactory : public IViewFactory {
 public:
-    /**
-     * @brief Configuration pour la création de ViewManager
-     */
-    struct ViewManagerConfig {
-        bool enableFullUI;
-        bool enableEventListener;
-        bool registerInContainer;
-        
-        ViewManagerConfig() 
-            : enableFullUI(false)
-            , enableEventListener(true)
-            , registerInContainer(true) {}
-    };
-
     /**
      * @brief Constructeur avec conteneur de dépendances
      * @param container Conteneur pour résoudre les dépendances
@@ -42,14 +29,14 @@ public:
     /**
      * @brief Destructeur
      */
-    ~ViewFactory() = default;
+    ~ViewFactory() override = default;
 
     /**
      * @brief Crée un ViewManager avec la configuration spécifiée
      * @param config Configuration pour la création
      * @return Result contenant le ViewManager créé ou une erreur
      */
-    Result<std::shared_ptr<ViewManager>> createViewManager(const ViewManagerConfig& config = ViewManagerConfig());
+    Result<std::shared_ptr<ViewManager>> createViewManager(const ViewManagerConfig& config = ViewManagerConfig()) override;
 
     /**
      * @brief Crée un DefaultViewManager avec les dépendances LVGL
@@ -61,7 +48,7 @@ public:
      * @brief Vérifie si toutes les dépendances nécessaires sont disponibles
      * @return true si toutes les dépendances sont présentes
      */
-    bool validateDependencies() const;
+    bool validateDependencies() const override;
 
 private:
     std::shared_ptr<DependencyContainer> container_;

@@ -1,14 +1,14 @@
-#include "DisplayManager.hpp"
+#include "DisplayManagerAdapter.hpp"
 #include <Arduino.h>
 #include "config/PerformanceConfig.hpp"
 
-DisplayManager::DisplayManager(std::shared_ptr<Ili9341LvglBridge> lvglBridge)
+DisplayManagerAdapter::DisplayManagerAdapter(std::shared_ptr<Ili9341LvglBridge> lvglBridge)
     : lvglBridge_(lvglBridge)
     , refreshIntervalMs_(PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS * PerformanceConfig::VSYNC_SPACING)
     , lastRefreshTime_(0) {
 }
 
-void DisplayManager::update() {
+void DisplayManagerAdapter::update() {
     if (!lvglBridge_) {
         return;
     }
@@ -21,7 +21,7 @@ void DisplayManager::update() {
     }
 }
 
-void DisplayManager::forceRefresh() {
+void DisplayManagerAdapter::forceRefresh() {
     if (!lvglBridge_) {
         return;
     }
@@ -30,14 +30,14 @@ void DisplayManager::forceRefresh() {
     lastRefreshTime_ = getCurrentTime();
 }
 
-void DisplayManager::setRefreshInterval(unsigned long intervalMs) {
+void DisplayManagerAdapter::setRefreshInterval(unsigned long intervalMs) {
     refreshIntervalMs_ = intervalMs;
 }
 
-unsigned long DisplayManager::getRefreshInterval() const {
+unsigned long DisplayManagerAdapter::getRefreshInterval() const {
     return refreshIntervalMs_;
 }
 
-unsigned long DisplayManager::getCurrentTime() const {
+unsigned long DisplayManagerAdapter::getCurrentTime() const {
     return millis();
 }

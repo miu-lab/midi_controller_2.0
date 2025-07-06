@@ -2,11 +2,13 @@
 
 #include <memory>
 #include <string>
+
+#include "core/domain/interfaces/IUIManager.hpp"
 #include "core/utils/Result.hpp"
 
 // Forward declarations
 class ViewManager;
-class DisplayManager;
+class IDisplayManager;
 class ViewManagerEventListener;
 
 namespace MidiController::Events {
@@ -14,79 +16,60 @@ namespace MidiController::Events {
 }
 
 /**
- * @brief Noyau centralisé pour la logique UI
+ * @brief Adapter pour la gestion centralisée du système UI
  * 
- * Cette classe centralise la logique métier du système UI qui était
- * précédemment dispersée dans UISubsystem, en respectant le principe SRP.
+ * Cette classe implémente IUIManager et centralise la logique UI
+ * qui était précédemment dans UISystemCore, respectant l'architecture hexagonale.
  */
-class UISystemCore {
+class UISystemAdapter : public IUIManager {
 public:
     /**
-     * @brief Configuration pour UISystemCore
-     */
-    struct CoreConfig {
-        bool enableFullUI;
-        bool enableEventProcessing;
-        bool enableDisplayRefresh;
-        
-        CoreConfig() 
-            : enableFullUI(false)
-            , enableEventProcessing(true) 
-            , enableDisplayRefresh(true) {}
-    };
-
-    /**
      * @brief Constructeur avec configuration
-     * @param config Configuration du noyau UI
+     * @param config Configuration du système UI
      */
-    explicit UISystemCore(const CoreConfig& config = CoreConfig());
+    explicit UISystemAdapter(const UIConfig& config = UIConfig());
 
     /**
      * @brief Destructeur
      */
-    ~UISystemCore() = default;
+    ~UISystemAdapter() override = default;
 
     /**
-     * @brief Initialise le noyau UI avec les composants nécessaires
-     * @param viewManager Gestionnaire de vues
-     * @param displayManager Gestionnaire d'affichage
+     * @brief Initialise le système UI avec un bus d'événements
      * @param eventBus Bus d'événements unifié
      * @return Result indiquant le succès ou l'erreur
      */
-    Result<bool> initialize(
-        std::shared_ptr<ViewManager> viewManager,
-        std::unique_ptr<DisplayManager> displayManager,
-        std::shared_ptr<MidiController::Events::IEventBus> eventBus);
+    Result<bool> initialize(std::shared_ptr<MidiController::Events::IEventBus> eventBus) override;
 
     /**
      * @brief Met à jour tous les composants UI dans le bon ordre
      */
-    void update();
+    void update() override;
 
     /**
      * @brief Affiche un message modal
      * @param message Message à afficher
      * @return Result indiquant le succès ou l'erreur
      */
-    Result<bool> showMessage(const std::string& message);
+    Result<bool> showMessage(const std::string& message) override;
 
     /**
      * @brief Efface l'affichage et ferme les modals
      * @return Result indiquant le succès ou l'erreur
      */
-    Result<bool> clearDisplay();
+    Result<bool> clearDisplay() override;
 
     /**
-     * @brief Vérifie si le noyau est initialisé
+     * @brief Vérifie si le système est initialisé
      * @return true si initialisé
      */
-    bool isInitialized() const;
+    bool isInitialized() const override;
 
     /**
-     * @brief Vérifie si le noyau est opérationnel
+     * @brief Vérifie si le système est opérationnel
      * @return true si tous les composants sont présents et l'UI activée
      */
-    bool isOperational() const;
+    bool isOperational() const override;
 
     /**
      * @brief Configure l'écouteur d'événements UI
@@ -101,13 +84,25 @@ public:
      */
     std::shared_ptr<ViewManager> getViewManager() const;
 
+    /**
+     * @brief Initialise avec tous les composants nécessaires
+     * @param viewManager Gestionnaire de vues
+     * @param displayManager Gestionnaire d'affichage
+     * @param eventBus Bus d'événements unifié
+     * @return Result indiquant le succès ou l'erreur
+     */
+    Result<bool> initializeWithComponents(
+        std::shared_ptr<ViewManager> viewManager,
+        std::unique_ptr<IDisplayManager> displayManager,
+        std::shared_ptr<MidiController::Events::IEventBus> eventBus);
+
 private:
-    CoreConfig config_;
+    UIConfig config_;
     bool initialized_;
 
     // Composants UI centralisés
     std::shared_ptr<ViewManager> viewManager_;
-    std::unique_ptr<DisplayManager> displayManager_;
+    std::unique_ptr<IDisplayManager> displayManager_;
     std::shared_ptr<MidiController::Events::IEventBus> eventBus_;
     std::unique_ptr<ViewManagerEventListener> eventListener_;
 

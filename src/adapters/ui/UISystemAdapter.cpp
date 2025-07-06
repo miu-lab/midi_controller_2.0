@@ -1,19 +1,32 @@
-#include "UISystemCore.hpp"
+#include "UISystemAdapter.hpp"
 
 #include "adapters/ui/views/ViewManager.hpp"
 #include "adapters/ui/views/ViewManagerEventListener.hpp"
-#include "core/ui/DisplayManager.hpp"
+#include "core/domain/interfaces/IDisplayManager.hpp"
 #include "core/domain/events/core/IEventBus.hpp"
 #include "core/utils/Error.hpp"
 
-UISystemCore::UISystemCore(const CoreConfig& config)
+UISystemAdapter::UISystemAdapter(const UIConfig& config)
     : config_(config)
     , initialized_(false) {
 }
 
-Result<bool> UISystemCore::initialize(
+Result<bool> UISystemAdapter::initialize(std::shared_ptr<MidiController::Events::IEventBus> eventBus) {
+    if (initialized_) {
+        return Result<bool>::success(true);
+    }
+
+    // Stocker le bus d'événements
+    eventBus_ = eventBus;
+
+    // Marquer comme initialisé si on a au moins le bus d'événements
+    initialized_ = true;
+    return Result<bool>::success(true);
+}
+
+Result<bool> UISystemAdapter::initializeWithComponents(
     std::shared_ptr<ViewManager> viewManager,
-    std::unique_ptr<DisplayManager> displayManager,
+    std::unique_ptr<IDisplayManager> displayManager,
     std::shared_ptr<MidiController::Events::IEventBus> eventBus) {
     
     if (initialized_) {
@@ -36,7 +49,7 @@ Result<bool> UISystemCore::initialize(
     return Result<bool>::success(true);
 }
 
-void UISystemCore::update() {
+void UISystemAdapter::update() {
     if (!isOperational()) {
         return;
     }
@@ -47,7 +60,7 @@ void UISystemCore::update() {
     refreshDisplay();
 }
 
-Result<bool> UISystemCore::showMessage(const std::string& message) {
+Result<bool> UISystemAdapter::showMessage(const std::string& message) {
     if (!isOperational()) {
         return Result<bool>::error(
             {ErrorCode::OperationFailed, "UI system not operational"}
@@ -65,7 +78,7 @@ Result<bool> UISystemCore::showMessage(const std::string& message) {
     return Result<bool>::success(true);
 }
 
-Result<bool> UISystemCore::clearDisplay() {
+Result<bool> UISystemAdapter::clearDisplay() {
     if (!isOperational()) {
         return Result<bool>::error(
             {ErrorCode::OperationFailed, "UI system not operational"}
@@ -83,17 +96,17 @@ Result<bool> UISystemCore::clearDisplay() {
     return Result<bool>::success(true);
 }
 
-bool UISystemCore::isInitialized() const {
+bool UISystemAdapter::isInitialized() const {
     return initialized_;
 }
 
-bool UISystemCore::isOperational() const {
+bool UISystemAdapter::isOperational() const {
     return initialized_ && 
            config_.enableFullUI && 
            viewManager_ != nullptr;
 }
 
-Result<bool> UISystemCore::configureEventListener(std::unique_ptr<ViewManagerEventListener> eventListener) {
+Result<bool> UISystemAdapter::configureEventListener(std::unique_ptr<ViewManagerEventListener> eventListener) {
     if (!viewManager_) {
         return Result<bool>::error(
             {ErrorCode::DependencyMissing, "ViewManager required for event listener"}
@@ -110,11 +123,11 @@ Result<bool> UISystemCore::configureEventListener(std::unique_ptr<ViewManagerEve
     return Result<bool>::success(true);
 }
 
-std::shared_ptr<ViewManager> UISystemCore::getViewManager() const {
+std::shared_ptr<ViewManager> UISystemAdapter::getViewManager() const {
     return viewManager_;
 }
 
-bool UISystemCore::validateComponents() const {
+bool UISystemAdapter::validateComponents() const {
     // ViewManager est toujours requis si Full UI est activé
     if (config_.enableFullUI && !viewManager_) {
         return false;
@@ -133,19 +146,19 @@ bool UISystemCore::validateComponents() const {
     return true;
 }
 
-void UISystemCore::processEvents() {
+void UISystemAdapter::processEvents() {
     if (config_.enableEventProcessing && eventBus_) {
         eventBus_->update();
     }
 }
 
-void UISystemCore::updateViewManager() {
+void UISystemAdapter::updateViewManager() {
     if (viewManager_) {
         viewManager_->update();
     }
 }
 
-void UISystemCore::refreshDisplay() {
+void UISystemAdapter::refreshDisplay() {
     if (config_.enableDisplayRefresh && displayManager_) {
         displayManager_->update();
     }

@@ -9,9 +9,12 @@
 #include "core/utils/Result.hpp"
 #include "adapters/ui/views/ViewManagerEventListener.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
-#include "core/ui/DisplayManager.hpp"
-#include "core/ui/ViewFactory.hpp"
-#include "core/ui/UISystemCore.hpp"
+#include "adapters/secondary/hardware/display/DisplayManagerAdapter.hpp"
+#include "app/factories/ViewFactory.hpp"
+#include "adapters/ui/UISystemAdapter.hpp"
+#include "core/domain/interfaces/IUIManager.hpp"
+#include "core/domain/interfaces/IViewFactory.hpp"
+#include "core/domain/interfaces/IDisplayManager.hpp"
 
 class ViewManager;
 
@@ -66,8 +69,8 @@ private:
     std::shared_ptr<DependencyContainer> container_;
     std::shared_ptr<IConfiguration> configuration_;
     std::shared_ptr<Ili9341LvglBridge> m_lvglBridge;
-    std::unique_ptr<ViewFactory> viewFactory_;
-    std::unique_ptr<UISystemCore> uiCore_;
+    std::shared_ptr<ViewFactory> viewFactory_;
+    std::shared_ptr<UISystemAdapter> uiAdapter_;
 
     bool fullUIEnabled_ = false;
     bool initialized_ = false;

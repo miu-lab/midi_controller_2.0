@@ -1,6 +1,6 @@
 #pragma once
 
-#include "adapters/ui/views/ViewManager.hpp"
+#include "core/domain/interfaces/IViewManager.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/commands/ui/NavigateMenuCommand.hpp"
 #include "core/domain/types.hpp"
@@ -18,7 +18,7 @@ public:
      * @param viewManager Gestionnaire de vues
      * @param commandManager Gestionnaire de commandes
      */
-    MenuController(ViewManager& viewManager, CommandManager& commandManager);
+    MenuController(IViewManager& viewManager, CommandManager& commandManager);
 
     /**
      * @brief Entre dans un menu
@@ -71,6 +71,6 @@ public:
     bool redoNavigation();
 
 private:
-    ViewManager& viewManager_;
+    IViewManager& viewManager_;
     CommandManager& commandManager_;
 };

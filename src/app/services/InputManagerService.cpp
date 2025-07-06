@@ -1,4 +1,4 @@
-#include "InputManager.hpp"
+#include "InputManagerService.hpp"
 
 #include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
 #include "adapters/secondary/hardware/input/encoders/EncoderManager.hpp"
@@ -7,15 +7,15 @@
 #include "core/use_cases/ProcessEncoders.hpp"
 #include "core/utils/Error.hpp"
 
-InputManager::InputManager(const ManagerConfig& config)
+InputManagerService::InputManagerService(const ManagerConfig& config)
     : config_(config)
     , initialized_(false) {
 }
 
-InputManager::~InputManager() = default;
+InputManagerService::~InputManagerService() = default;
 
-Result<bool> InputManager::initialize(const std::vector<ControlDefinition>& controlDefinitions,
-                                     std::shared_ptr<InputController> inputController) {
+Result<bool> InputManagerService::initialize(const std::vector<ControlDefinition>& controlDefinitions,
+                                            std::shared_ptr<InputController> inputController) {
     if (initialized_) {
         return Result<bool>::success(true);
     }
@@ -48,7 +48,7 @@ Result<bool> InputManager::initialize(const std::vector<ControlDefinition>& cont
     return Result<bool>::success(true);
 }
 
-void InputManager::update() {
+void InputManagerService::update() {
     if (!isOperational()) {
         return;
     }
@@ -74,9 +74,9 @@ void InputManager::update() {
     }
 }
 
-Result<bool> InputManager::reconfigure(const std::vector<ControlDefinition>& controlDefinitions) {
+Result<bool> InputManagerService::reconfigure(const std::vector<ControlDefinition>& controlDefinitions) {
     if (!initialized_) {
-        return Result<bool>::error({ErrorCode::OperationFailed, "InputManager not initialized"});
+        return Result<bool>::error({ErrorCode::OperationFailed, "InputManagerService not initialized"});
     }
 
     // Réinitialiser complètement avec les nouvelles configurations
@@ -92,7 +92,7 @@ Result<bool> InputManager::reconfigure(const std::vector<ControlDefinition>& con
     return initialize(controlDefinitions, inputController_);
 }
 
-bool InputManager::isOperational() const {
+bool InputManagerService::isOperational() const {
     if (!initialized_) {
         return false;
     }
@@ -120,15 +120,15 @@ bool InputManager::isOperational() const {
     return true;
 }
 
-EncoderManager* InputManager::getEncoderManager() const {
+EncoderManager* InputManagerService::getEncoderManager() const {
     return encoderManager_.get();
 }
 
-DigitalButtonManager* InputManager::getButtonManager() const {
+DigitalButtonManager* InputManagerService::getButtonManager() const {
     return buttonManager_.get();
 }
 
-std::vector<EncoderConfig> InputManager::extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
+std::vector<EncoderConfig> InputManagerService::extractEncoderConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
     std::vector<EncoderConfig> encoderConfigs;
     
     for (const auto& controlDef : controlDefinitions) {
@@ -154,7 +154,7 @@ std::vector<EncoderConfig> InputManager::extractEncoderConfigs(const std::vector
     return encoderConfigs;
 }
 
-std::vector<ButtonConfig> InputManager::extractButtonConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
+std::vector<ButtonConfig> InputManagerService::extractButtonConfigs(const std::vector<ControlDefinition>& controlDefinitions) const {
     std::vector<ButtonConfig> buttonConfigs;
     
     for (const auto& controlDef : controlDefinitions) {
@@ -182,8 +182,8 @@ std::vector<ButtonConfig> InputManager::extractButtonConfigs(const std::vector<C
     return buttonConfigs;
 }
 
-Result<bool> InputManager::createManagers(const std::vector<EncoderConfig>& encoderConfigs,
-                                         const std::vector<ButtonConfig>& buttonConfigs) {
+Result<bool> InputManagerService::createManagers(const std::vector<EncoderConfig>& encoderConfigs,
+                                                 const std::vector<ButtonConfig>& buttonConfigs) {
     // Créer le gestionnaire d'encodeurs si activé et qu'il y a des configurations
     if (config_.enableEncoders && !encoderConfigs.empty()) {
         encoderManager_ = std::make_unique<EncoderManager>(encoderConfigs);
@@ -203,7 +203,7 @@ Result<bool> InputManager::createManagers(const std::vector<EncoderConfig>& enco
     return Result<bool>::success(true);
 }
 
-Result<bool> InputManager::initializeProcessors() {
+Result<bool> InputManagerService::initializeProcessors() {
     // Créer le processeur d'encodeurs si activé et gestionnaire disponible
     if (config_.enableEncoders && encoderManager_) {
         processEncoders_ = std::make_unique<ProcessEncoders>(encoderManager_->getEncoders());
@@ -223,7 +223,7 @@ Result<bool> InputManager::initializeProcessors() {
     return Result<bool>::success(true);
 }
 
-void InputManager::connectProcessors() {
+void InputManagerService::connectProcessors() {
     if (!inputController_) {
         return;
     }

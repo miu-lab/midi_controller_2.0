@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-UIController::UIController(ViewManager& viewManager, MenuController& menuController)
+UIController::UIController(IViewManager& viewManager, MenuController& menuController)
     : viewManager_(viewManager),
       menuController_(menuController),
       currentState_(UIState::MAIN_SCREEN) {}
@@ -48,13 +48,13 @@ void UIController::navigateToDebugScreen() {
     currentState_ = UIState::MAIN_SCREEN;
 }
 
-void UIController::showModalDialog(const String& message, const String& okLabel,
-                                   const String& cancelLabel) {
+void UIController::showModalDialog(const std::string& message, const std::string& okLabel,
+                                   const std::string& cancelLabel) {
     // Dans une implémentation complète, nous passerions les labels au ViewManager
     // Pour cette démonstration, nous les ignorons
 
     // Demander au ViewManager d'afficher la boîte de dialogue
-    viewManager_.showModal(message);
+    viewManager_.showModal(message.c_str());
     currentState_ = UIState::MODAL_DIALOG;
 }
 

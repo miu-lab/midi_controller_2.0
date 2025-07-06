@@ -11,13 +11,13 @@
 
 UISubsystem::UISubsystem(std::shared_ptr<DependencyContainer> container)
     : container_(container) {
-    // Créer la ViewFactory et UISystemCore
+    // Créer la ViewFactory et UISystemAdapter
     if (container_) {
-        viewFactory_ = std::make_unique<ViewFactory>(container_);
+        viewFactory_ = std::make_shared<ViewFactory>(container_);
         
-        UISystemCore::CoreConfig coreConfig;
-        coreConfig.enableFullUI = false; // Sera activé lors de l'initialisation
-        uiCore_ = std::make_unique<UISystemCore>(coreConfig);
+        IUIManager::UIConfig uiConfig;
+        uiConfig.enableFullUI = false; // Sera activé lors de l'initialisation
+        uiAdapter_ = std::make_shared<UISystemAdapter>(uiConfig);
     }
 }
 
@@ -40,21 +40,21 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         // TODO DEBUG MSG
     }
 
-    // Initialiser UISystemCore si l'UI complète est activée
+    // Initialiser UISystemAdapter si l'UI complète est activée
     if (fullUIEnabled_) {
-        if (!viewFactory_ || !uiCore_) {
-            return Result<bool>::error({ErrorCode::DependencyMissing, "ViewFactory or UISystemCore not available"});
+        if (!viewFactory_ || !uiAdapter_) {
+            return Result<bool>::error({ErrorCode::DependencyMissing, "ViewFactory or UISystemAdapter not available"});
         }
 
-        // Mettre à jour la configuration du core pour activer Full UI
-        UISystemCore::CoreConfig coreConfig;
-        coreConfig.enableFullUI = true;
-        coreConfig.enableEventProcessing = true;
-        coreConfig.enableDisplayRefresh = true;
-        uiCore_ = std::make_unique<UISystemCore>(coreConfig);
+        // Mettre à jour la configuration pour activer Full UI
+        IUIManager::UIConfig uiConfig;
+        uiConfig.enableFullUI = true;
+        uiConfig.enableEventProcessing = true;
+        uiConfig.enableDisplayRefresh = true;
+        uiAdapter_ = std::make_shared<UISystemAdapter>(uiConfig);
 
         // Créer les composants via ViewFactory avec Full UI activé
-        ViewFactory::ViewManagerConfig viewManagerConfig;
+        IViewFactory::ViewManagerConfig viewManagerConfig;
         viewManagerConfig.enableFullUI = true;
         viewManagerConfig.enableEventListener = true;
         viewManagerConfig.registerInContainer = true;
@@ -76,14 +76,14 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
             eventBus->start();
         }
 
-        // Créer DisplayManager
-        std::unique_ptr<DisplayManager> displayManager = nullptr;
+        // Créer DisplayManagerAdapter
+        std::unique_ptr<DisplayManagerAdapter> displayManager = nullptr;
         if (m_lvglBridge) {
-            displayManager = std::make_unique<DisplayManager>(m_lvglBridge);
+            displayManager = std::make_unique<DisplayManagerAdapter>(m_lvglBridge);
         }
 
-        // Initialiser UISystemCore avec tous les composants
-        auto initResult = uiCore_->initialize(
+        // Initialiser UISystemAdapter avec tous les composants
+        auto initResult = uiAdapter_->initializeWithComponents(
             viewManagerResult.value().value(),
             std::move(displayManager),
             eventBus
@@ -94,15 +94,15 @@ Result<bool> UISubsystem::init(bool enableFullUI) {
         }
 
         // Configurer l'écouteur d'événements
-        if (uiCore_->getViewManager()) {
+        if (uiAdapter_->getViewManager()) {
             // Récupérer EventBus pour ViewManagerEventListener
             auto eventBus = container_->resolve<MidiController::Events::IEventBus>();
             if (!eventBus) {
                 return Result<bool>::error({ErrorCode::DependencyMissing, "Failed to resolve IEventBus"});
             }
             
-            auto eventListener = std::make_unique<ViewManagerEventListener>(*uiCore_->getViewManager(), eventBus);
-            auto listenerResult = uiCore_->configureEventListener(std::move(eventListener));
+            auto eventListener = std::make_unique<ViewManagerEventListener>(*uiAdapter_->getViewManager(), eventBus);
+            auto listenerResult = uiAdapter_->configureEventListener(std::move(eventListener));
             if (!listenerResult.isSuccess()) {
                 return Result<bool>::error(listenerResult.error().value());
             }
@@ -118,26 +118,26 @@ void UISubsystem::update() {
         return;
     }
 
-    // Déléguer la mise à jour à UISystemCore
-    if (uiCore_) {
-        uiCore_->update();
+    // Déléguer la mise à jour à UISystemAdapter
+    if (uiAdapter_) {
+        uiAdapter_->update();
     }
 }
 
 Result<bool> UISubsystem::showMessage(const std::string& message) {
-    if (!initialized_ || !uiCore_) {
+    if (!initialized_ || !uiAdapter_) {
         return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized"});
     }
 
-    // Déléguer à UISystemCore
-    return uiCore_->showMessage(message);
+    // Déléguer à UISystemAdapter
+    return uiAdapter_->showMessage(message);
 }
 
 Result<bool> UISubsystem::clearDisplay() {
-    if (!initialized_ || !uiCore_) {
+    if (!initialized_ || !uiAdapter_) {
         return Result<bool>::error({ErrorCode::OperationFailed, "UI not initialized"});
     }
 
-    // Déléguer à UISystemCore
-    return uiCore_->clearDisplay();
+    // Déléguer à UISystemAdapter
+    return uiAdapter_->clearDisplay();
 }

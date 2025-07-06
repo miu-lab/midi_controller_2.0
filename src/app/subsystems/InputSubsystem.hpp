@@ -9,7 +9,8 @@
 #include "core/domain/interfaces/IConfiguration.hpp"
 #include "core/domain/interfaces/IInputSystem.hpp"
 #include "core/domain/interfaces/INavigationService.hpp"
-#include "core/input/InputManager.hpp"
+#include "app/services/InputManagerService.hpp"
+#include "core/domain/interfaces/IInputManager.hpp"
 #include "core/factories/ControllerFactory.hpp"
 #include "core/utils/Result.hpp"
 
@@ -76,7 +77,7 @@ private:
     std::shared_ptr<INavigationService> navigationService_;
     
     // Composants délégués
-    std::unique_ptr<InputManager> inputManager_;
+    std::shared_ptr<InputManagerService> inputManager_;
     std::unique_ptr<ControllerFactory> controllerFactory_;
     std::shared_ptr<InputController> inputController_;
 

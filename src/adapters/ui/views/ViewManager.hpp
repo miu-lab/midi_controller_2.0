@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include "core/domain/interfaces/IViewManager.hpp"
 
 /**
  * @brief Types de vues disponibles
@@ -19,7 +20,7 @@ enum class ViewType {
  * - ParameterFocus : Vue par défaut pour affichage paramètres MIDI
  * - Menu : Navigation et configuration
  */
-class ViewManager {
+class ViewManager : public virtual IViewManager {
 public:
     /**
      * @brief Initialise le gestionnaire de vues
@@ -67,6 +68,12 @@ public:
      * @param message Message à afficher
      */
     virtual void showModal(const String& message) = 0;
+    
+    /**
+     * @brief Affiche une boîte de dialogue modale (surcharge pour compatibilité avec IViewManager)
+     * @param message Message à afficher
+     */
+    void showModal(const char* message) override { showModal(String(message)); }
 
     /**
      * @brief Masque la boîte de dialogue modale
@@ -78,6 +85,12 @@ public:
      * @param direction Direction de navigation (+1 suivant, -1 précédent)
      */
     virtual void navigateMenu(int8_t direction) = 0;
+    
+    /**
+     * @brief Navigation dans le menu (surcharge pour compatibilité avec IViewManager)
+     * @param direction Direction de navigation (positif = suivant, négatif = précédent)
+     */
+    void navigateMenu(int direction) override { navigateMenu(static_cast<int8_t>(direction)); }
 
     /**
      * @brief Sélection d'élément de menu (bouton/clic encodeur)

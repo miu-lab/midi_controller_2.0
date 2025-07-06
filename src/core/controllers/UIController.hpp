@@ -1,8 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
-#include "adapters/ui/views/ViewManager.hpp"
+#include "core/domain/interfaces/IViewManager.hpp"
 #include "MenuController.hpp"
 #include "core/domain/types.hpp"
 
@@ -19,7 +20,7 @@ public:
      * @param viewManager Gestionnaire de vues
      * @param menuController Contrôleur de menu
      */
-    UIController(ViewManager& viewManager, MenuController& menuController);
+    UIController(IViewManager& viewManager, MenuController& menuController);
 
     /**
      * @brief États possibles de l'interface utilisateur
@@ -58,8 +59,8 @@ public:
      * @param okLabel Label du bouton OK (optionnel)
      * @param cancelLabel Label du bouton Annuler (optionnel)
      */
-    void showModalDialog(const String& message, const String& okLabel = "OK",
-                         const String& cancelLabel = "Annuler");
+    void showModalDialog(const std::string& message, const std::string& okLabel = "OK",
+                         const std::string& cancelLabel = "Annuler");
 
     /**
      * @brief Gestion de la rotation d'un encodeur de navigation
@@ -89,7 +90,7 @@ public:
     UIState getCurrentState() const;
 
 private:
-    ViewManager& viewManager_;
+    IViewManager& viewManager_;
     MenuController& menuController_;
     UIState currentState_;
 };

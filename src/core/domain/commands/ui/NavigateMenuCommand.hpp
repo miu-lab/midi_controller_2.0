@@ -5,7 +5,7 @@
 #include "core/domain/commands/Command.hpp"
 
 // Forward declaration pour éviter les dépendances circulaires
-class ViewManager;
+class IViewManager;
 
 /**
  * @brief Commande pour naviguer dans un menu
@@ -29,7 +29,7 @@ public:
      * @param action Action à effectuer
      * @param itemIndex Index de l'élément (pour GO_TO_ITEM)
      */
-    NavigateMenuCommand(ViewManager& viewManager, Action action, int itemIndex = -1);
+    NavigateMenuCommand(IViewManager& viewManager, Action action, int itemIndex = -1);
 
     /**
      * @brief Exécute la commande : effectue l'action de navigation
@@ -55,7 +55,7 @@ public:
     const char* getDescription() const override;
 
 private:
-    ViewManager& viewManager_;
+    IViewManager& viewManager_;
     Action action_;
     int itemIndex_;
     int previousIndex_;

@@ -2,9 +2,9 @@
 
 #include <cstdio>  // Pour snprintf
 
-#include "adapters/ui/views/ViewManager.hpp"
+#include "core/domain/interfaces/IViewManager.hpp"
 
-NavigateMenuCommand::NavigateMenuCommand(ViewManager& viewManager, Action action, int itemIndex)
+NavigateMenuCommand::NavigateMenuCommand(IViewManager& viewManager, Action action, int itemIndex)
     : viewManager_(viewManager),
       action_(action),
       itemIndex_(itemIndex),

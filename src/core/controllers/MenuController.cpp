@@ -1,6 +1,6 @@
 #include "MenuController.hpp"
 
-MenuController::MenuController(ViewManager& viewManager, CommandManager& commandManager)
+MenuController::MenuController(IViewManager& viewManager, CommandManager& commandManager)
     : viewManager_(viewManager), commandManager_(commandManager) {}
 
 void MenuController::enterMenu() {

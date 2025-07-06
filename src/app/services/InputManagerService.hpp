@@ -6,6 +6,7 @@
 #include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
 #include "adapters/secondary/hardware/input/encoders/EncoderConfig.hpp"
 #include "config/unified/ControlDefinition.hpp"
+#include "core/domain/interfaces/IInputManager.hpp"
 #include "core/utils/Result.hpp"
 
 // Forward declarations
@@ -16,35 +17,24 @@ class ProcessButtons;
 class InputController;
 
 /**
- * @brief Gestionnaire centralisé pour les entrées utilisateur
+ * @brief Service de gestion centralisée des entrées utilisateur
  * 
- * Cette classe centralise la logique de gestion des entrées,
- * respectant le principe de responsabilité unique.
+ * Cette classe implémente IInputManager et centralise la logique
+ * de gestion des entrées, respectant l'architecture hexagonale.
  */
-class InputManager {
+class InputManagerService : public IInputManager {
 public:
-    /**
-     * @brief Configuration pour InputManager
-     */
-    struct ManagerConfig {
-        bool enableEncoders;
-        bool enableButtons;
-        bool enableEventProcessing;
-        
-        ManagerConfig() : enableEncoders(true), enableButtons(true), enableEventProcessing(true) {}
-    };
-
     /**
      * @brief Constructeur avec configuration
      * @param config Configuration du gestionnaire
      */
-    explicit InputManager(const ManagerConfig& config = ManagerConfig());
+    explicit InputManagerService(const ManagerConfig& config = ManagerConfig());
 
     /**
      * @brief Destructeur par défaut
      * Défini dans le .cpp pour éviter les problèmes de types incomplets
      */
-    ~InputManager();
+    ~InputManagerService() override;
 
     /**
      * @brief Initialise le gestionnaire avec les définitions de contrôles
@@ -53,25 +43,25 @@ public:
      * @return Result<bool> Succès ou erreur
      */
     Result<bool> initialize(const std::vector<ControlDefinition>& controlDefinitions,
-                           std::shared_ptr<InputController> inputController);
+                           std::shared_ptr<InputController> inputController) override;
 
     /**
      * @brief Met à jour tous les composants de gestion des entrées
      */
-    void update();
+    void update() override;
 
     /**
      * @brief Reconfigure les entrées avec nouvelles définitions
      * @param controlDefinitions Nouvelles définitions de contrôles
      * @return Result<bool> Succès ou erreur
      */
-    Result<bool> reconfigure(const std::vector<ControlDefinition>& controlDefinitions);
+    Result<bool> reconfigure(const std::vector<ControlDefinition>& controlDefinitions) override;
 
     /**
      * @brief Vérifie si le gestionnaire est opérationnel
      * @return true si le gestionnaire est initialisé et opérationnel
      */
-    bool isOperational() const;
+    bool isOperational() const override;
 
     /**
      * @brief Obtient le gestionnaire d'encodeurs
