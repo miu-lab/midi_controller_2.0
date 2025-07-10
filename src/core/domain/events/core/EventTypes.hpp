@@ -36,6 +36,12 @@ namespace EventTypes {
     constexpr EventType SystemStartup = 3000;
     constexpr EventType SystemShutdown = 3001;
     constexpr EventType SystemError = 3002;
+    
+    // Types d'événements de navigation - plage 4000-4999
+    constexpr EventType NavigationRequested = 4000;
+    constexpr EventType StateChangeRequested = 4001;
+    constexpr EventType BackRequested = 4002;
+    constexpr EventType HomeRequested = 4003;
 };
 
 /**

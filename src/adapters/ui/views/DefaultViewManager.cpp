@@ -183,3 +183,28 @@ void DefaultViewManager::deactivateAllViews() {
     parameterView_->setActive(false);
     menuView_->setActive(false);
 }
+
+// === NOUVELLES MÉTHODES POUR COMPATIBILITÉ NAVIGATION STATE ===
+
+void DefaultViewManager::setCurrentView(ViewType type, uint8_t parameter) {
+    activateView(type);
+    needsDisplayUpdate_ = true;
+}
+
+void DefaultViewManager::showParameterEdit(uint8_t ccNumber, uint8_t channel, uint8_t value) {
+    // Pour l'instant, utiliser la vue paramètre normale
+    // Dans une implémentation future, on pourrait avoir une vue d'édition spécifique
+    showParameterFocus(ccNumber, channel, value, "Edit");
+}
+
+void DefaultViewManager::showDebugView() {
+    // Pour l'instant, retourner à la vue paramètre
+    // Dans une implémentation future, créer une vue de debug spécifique
+    showHome();
+}
+
+void DefaultViewManager::showProfileSelection() {
+    // Pour l'instant, afficher le menu
+    // Dans une implémentation future, créer une vue de sélection de profil
+    showMenu();
+}

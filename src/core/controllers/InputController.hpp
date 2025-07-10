@@ -4,34 +4,31 @@
 #include <memory>
 
 #include "app/services/NavigationConfigService.hpp"
+#include "config/unified/UnifiedConfiguration.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/core/EventTypes.hpp"
+#include "core/domain/navigation/NavigationEvent.hpp"
 #include "core/domain/types.hpp"
-
-// Forward declaration
-class UIController;
 
 /**
  * @brief Contrôleur dédié à la gestion des entrées physiques
  *
- * Ce contrôleur est responsable du routage des entrées physiques (encodeurs, boutons)
- * vers les contrôleurs appropriés en fonction de la configuration.
- * 
- * Architecture:
- * - Les contrôles de navigation utilisent des callbacks directs
- * - Les contrôles MIDI utilisent le bus d'événements haute priorité (OptimizedEventBus)
- * - Cette séparation permet d'optimiser les performances pour les événements MIDI critiques
+ * Ce contrôleur route les entrées physiques vers :
+ * - Événements de navigation pour les contrôles configurés comme navigation
+ * - Événements MIDI pour les contrôles configurés comme MIDI
  */
 class InputController {
 public:
     /**
      * @brief Constructeur avec injection de dépendances
      * @param navigationConfig Service de configuration de navigation
-     * @param eventBus Bus d'événements optimisé
+     * @param unifiedConfig Configuration unifiée des contrôles
+     * @param eventBus Bus d'événements
      */
     InputController(std::shared_ptr<NavigationConfigService> navigationConfig,
-                    std::shared_ptr<EventBus> eventBus = nullptr);
+                    std::shared_ptr<UnifiedConfiguration> unifiedConfig,
+                    std::shared_ptr<EventBus> eventBus);
 
     /**
      * @brief Traite la rotation d'un encodeur
@@ -49,7 +46,36 @@ public:
      */
     void processButtonPress(ButtonId id, bool pressed);
 
-    private:
-    std::shared_ptr<NavigationConfigService> m_navigationConfig;
-    std::shared_ptr<EventBus> eventBus_;  // Bus d'événements unifié
+private:
+    // === DÉPENDANCES ===
+    std::shared_ptr<NavigationConfigService> navigationConfig_;
+    std::shared_ptr<UnifiedConfiguration> unifiedConfig_;
+    std::shared_ptr<EventBus> eventBus_;
+    
+    // === MÉTHODES PRIVÉES ===
+    
+    /**
+     * @brief Traite un input de navigation
+     */
+    void handleNavigationInput(InputId id, bool isPressed = true, int8_t relativeChange = 0);
+    
+    /**
+     * @brief Extrait l'action de navigation depuis la configuration
+     */
+    NavigationAction extractNavigationAction(const ControlDefinition& control, bool isEncoder) const;
+    
+    /**
+     * @brief Détermine le paramètre pour l'action de navigation
+     */
+    int determineNavigationParameter(const ControlDefinition& control, int8_t relativeChange) const;
+    
+    /**
+     * @brief Émet un événement de navigation
+     */
+    void emitNavigationEvent(NavigationAction action, int parameter = 0);
+    
+    /**
+     * @brief Émet un événement MIDI haute priorité
+     */
+    void emitMidiEvent(InputId id, bool isEncoder, int32_t absolutePosition = 0, int8_t relativeChange = 0, bool pressed = false);
 };

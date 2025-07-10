@@ -2,6 +2,7 @@
 
 #include "core/controllers/InputController.hpp"
 #include "app/services/NavigationConfigService.hpp"
+#include "config/unified/UnifiedConfiguration.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/utils/Error.hpp"
 
@@ -34,11 +35,19 @@ Result<std::shared_ptr<InputController>> ControllerFactory::createInputControlle
         );
     }
 
+    // Résoudre UnifiedConfiguration
+    auto unifiedConfig = container_->resolve<UnifiedConfiguration>();
+    if (!unifiedConfig) {
+        return Result<std::shared_ptr<InputController>>::error(
+            Error(ErrorCode::DependencyMissing, "Failed to resolve UnifiedConfiguration for InputController")
+        );
+    }
+
     // Résoudre EventBus (optionnel)
     auto eventBus = container_->resolve<EventBus>();
 
     // Créer InputController avec les dépendances résolues
-    auto inputController = std::make_shared<InputController>(navigationConfig, eventBus);
+    auto inputController = std::make_shared<InputController>(navigationConfig, unifiedConfig, eventBus);
     if (!inputController) {
         return Result<std::shared_ptr<InputController>>::error(
             Error(ErrorCode::InitializationFailed, "Failed to create InputController")

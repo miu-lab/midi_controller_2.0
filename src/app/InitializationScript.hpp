@@ -8,6 +8,8 @@
 
 // Déclarations anticipées pour réduire les inclusions
 class NavigationConfigService;
+class NavigationStateManager;
+class NavigationController;
 class NavigationSubsystem;
 class CommandManager;
 class InputController;
@@ -15,7 +17,6 @@ class InputSubsystem;
 class MidiSubsystem;
 class UISubsystem;
 class MenuController;
-class UIController;
 
 /**
  * @brief Script d'initialisation du système
@@ -47,9 +48,14 @@ private:
         std::shared_ptr<DependencyContainer> container);
 
     static bool setupControllers(std::shared_ptr<DependencyContainer> container);
+    
+    static void registerNavigationServices(std::shared_ptr<DependencyContainer> container);
 
     // Configuration des écouteurs MIDI prioritaires
     static void setupMidiEventListeners(std::shared_ptr<DependencyContainer> container);
+    
+    // Création du contrôleur d'entrée après l'initialisation des sous-systèmes
+    static Result<bool> createInputController(std::shared_ptr<DependencyContainer> container);
     
     // REFACTOR: Méthode supprimée - synchronisation automatique maintenant
 

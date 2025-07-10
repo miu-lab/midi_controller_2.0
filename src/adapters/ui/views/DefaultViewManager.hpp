@@ -68,6 +68,33 @@ public:
      * @brief Réinitialise le flag de mise à jour
      */
     void clearDisplayUpdateFlag() override { needsDisplayUpdate_ = false; }
+    
+    // === NOUVELLES MÉTHODES POUR COMPATIBILITÉ AVEC NAVIGATION STATE ===
+    
+    /**
+     * @brief Définit la vue actuelle par type
+     */
+    void setCurrentView(ViewType type, uint8_t parameter = 0);
+    
+    /**
+     * @brief Obtient le type de vue actuel
+     */
+    ViewType getCurrentViewType() const { return currentView_; }
+    
+    /**
+     * @brief Affiche la vue d'édition de paramètre
+     */
+    void showParameterEdit(uint8_t ccNumber, uint8_t channel, uint8_t value);
+    
+    /**
+     * @brief Affiche la vue de debug (placeholder)
+     */
+    void showDebugView();
+    
+    /**
+     * @brief Affiche la sélection de profil (placeholder)
+     */
+    void showProfileSelection();
 
 private:
     // Dépendances

@@ -16,12 +16,12 @@
 #include "app/subsystems/UISubsystem.hpp"
 #include "core/controllers/InputController.hpp"
 #include "core/controllers/MenuController.hpp"
-#include "core/controllers/UIController.hpp"
+#include "core/controllers/NavigationController.hpp"
+#include "core/domain/navigation/NavigationStateManager.hpp"
 #include "core/domain/commands/CommandManager.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/core/IEventBus.hpp"
 #include "core/domain/interfaces/IConfiguration.hpp"
-#include "core/listeners/UIControllerEventListener.hpp"
 #include "core/TaskScheduler.hpp"
 #include "core/memory/EventPoolManager.hpp"
 
@@ -71,6 +71,19 @@ Result<bool> InitializationScript::initializeContainer(
         Serial.print("Subsystem init failed: ");
         Serial.println(subsystemResult.error().value().message);
         return subsystemResult;
+    }
+
+    // Étape 3.5: Services de navigation (après création du ViewManager)
+    Serial.println("Registering navigation services...");
+    registerNavigationServices(container);
+
+    // Étape 3.6: Créer InputController (après UnifiedConfiguration disponible)
+    Serial.println("Creating InputController...");
+    auto inputResult = createInputController(container);
+    if (inputResult.isError()) {
+        Serial.print("InputController creation failed: ");
+        Serial.println(inputResult.error().value().message);
+        return inputResult;
     }
 
     // Étape 4: Contrôleurs et interactions
@@ -147,22 +160,6 @@ Result<bool> InitializationScript::setupHardwareAdapters(
 
 Result<bool> InitializationScript::initializeSubsystems(
     std::shared_ptr<DependencyContainer> container) {
-    // Créer le contrôleur d'entrée avant les sous-systèmes
-    auto navConfig = container->resolve<NavigationConfigService>();
-    if (!navConfig) {
-        return Result<bool>::error({ErrorCode::DependencyMissing, "Impossible de résoudre NavigationConfigService"});
-    }
-
-    // Récupérer l'EventBus
-    auto eventBus = container->resolve<EventBus>();
-    if (!eventBus) {
-        // TODO DEBUG MSG
-    }
-
-    // Créer InputController avec l'EventBus
-    auto inputController = std::make_shared<InputController>(navConfig, eventBus);
-    container->registerDependency<InputController>(inputController);
-
     // Récupérer le TaskScheduler
     auto scheduler = container->resolve<TaskScheduler>();
     if (!scheduler) {
@@ -268,24 +265,10 @@ bool InitializationScript::setupControllers(std::shared_ptr<DependencyContainer>
     auto menuController = std::make_shared<MenuController>(*viewManager, *commandManager);
     container->registerDependency<MenuController>(menuController);
 
-    auto uiController = std::make_shared<UIController>(*viewManager, *menuController);
-    container->registerDependency<UIController>(uiController);
-
-    // Configurer l'interaction entre InputController et UIController
-    auto inputController = container->resolve<InputController>();
-
-    // Instancier et abonner UIControllerEventListener
-    auto uiControllerRef = *uiController; // Obtenir une référence
-    auto navServiceRef = *container->resolve<NavigationConfigService>(); // Obtenir une référence
-    auto uiEventListener = std::make_shared<UIControllerEventListener>(uiControllerRef, navServiceRef);
-    container->registerDependency<UIControllerEventListener>(uiEventListener);
-
-    auto eventBus = container->resolve<EventBus>();
-    if (eventBus) {
-        eventBus->subscribe(uiEventListener.get());
-        // TODO DEBUG MSG
-    } else {
-        // TODO DEBUG MSG
+    // Initialiser le NavigationController
+    auto navigationController = container->resolve<NavigationController>();
+    if (navigationController) {
+        navigationController->initialize();
     }
 
     return true;
@@ -319,3 +302,50 @@ void InitializationScript::setupMidiEventListeners(std::shared_ptr<DependencyCon
 
 // REFACTOR: Méthode supprimée - la synchronisation est maintenant gérée automatiquement
 // par InputSubsystem lors de son initialisation
+
+void InitializationScript::registerNavigationServices(std::shared_ptr<DependencyContainer> container) {
+    // Récupérer les dépendances nécessaires
+    auto viewManager = container->resolve<ViewManager>();
+    auto eventBus = container->resolve<EventBus>();
+    
+    if (!viewManager || !eventBus) {
+        Serial.println("Error: ViewManager or EventBus not available for navigation services");
+        return;
+    }
+    
+    // Créer NavigationStateManager
+    auto stateManager = std::make_shared<NavigationStateManager>(*viewManager);
+    container->registerDependency<NavigationStateManager>(stateManager);
+    
+    // Créer NavigationController
+    auto navigationController = std::make_shared<NavigationController>(stateManager, eventBus);
+    container->registerDependency<NavigationController>(navigationController);
+    
+    Serial.println("Navigation services registered successfully");
+}
+
+Result<bool> InitializationScript::createInputController(std::shared_ptr<DependencyContainer> container) {
+    // Créer le contrôleur d'entrée après l'initialisation des sous-systèmes
+    auto navConfig = container->resolve<NavigationConfigService>();
+    if (!navConfig) {
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Impossible de résoudre NavigationConfigService"});
+    }
+
+    // Récupérer l'EventBus
+    auto eventBus = container->resolve<EventBus>();
+    if (!eventBus) {
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Impossible de résoudre EventBus"});
+    }
+
+    // Récupérer UnifiedConfiguration pour InputController
+    auto unifiedConfig = container->resolve<UnifiedConfiguration>();
+    if (!unifiedConfig) {
+        return Result<bool>::error({ErrorCode::DependencyMissing, "Impossible de résoudre UnifiedConfiguration"});
+    }
+    
+    // Créer InputController avec toutes les dépendances
+    auto inputController = std::make_shared<InputController>(navConfig, unifiedConfig, eventBus);
+    container->registerDependency<InputController>(inputController);
+
+    return Result<bool>::success(true);
+}

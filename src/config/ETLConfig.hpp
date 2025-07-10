@@ -5,6 +5,7 @@
 #include <etl/flat_map.h>
 #include <etl/unordered_map.h>
 #include <etl/array.h>
+#include <etl/stack.h>
 
 /**
  * @brief Configuration ETL pour remplacer STL dans les chemins critiques
@@ -55,6 +56,18 @@ using NavigationActionVector = etl::vector<T, PerformanceConfig::MAX_NAVIGATION_
 // Composants UI
 template<typename T>
 using UIComponentVector = etl::vector<T, PerformanceConfig::MAX_UI_COMPONENTS>;
+
+// Stack pour historique de navigation (taille fixe)
+template<typename T, size_t N = 8>
+using NavigationHistoryStack = etl::stack<T, N>;
+
+// Table de routage des actions de navigation
+template<typename T>
+using NavigationActionRouteArray = etl::array<T, 16>;
+
+// Table de transition des états
+template<typename T>
+using StateTransitionTable = etl::array<T, 32>;
 
 // === Queues et buffers ===
 
