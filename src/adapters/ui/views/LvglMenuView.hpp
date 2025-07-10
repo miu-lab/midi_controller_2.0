@@ -50,9 +50,7 @@ private:
     // Méthodes privées
     void setupMainScreen();
     void setupNativeMenu();
-    void createMainMenuSection(lv_obj_t* parent_page);
-    void createSettingsSection(lv_obj_t* parent_page);
-    void addSettingsItems(lv_obj_t* settings_page);
+    void createSimpleMenu(lv_obj_t* main_page);
     void updateSelection();
     void cleanupLvglObjects();
     

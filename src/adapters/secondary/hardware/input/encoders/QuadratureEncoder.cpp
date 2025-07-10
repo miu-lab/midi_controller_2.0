@@ -7,9 +7,11 @@ QuadratureEncoder::QuadratureEncoder(const EncoderConfig& cfg)
     : id_(cfg.id),
       encoder_(cfg.pinA.pin, cfg.pinB.pin),
       ppr_(cfg.ppr),
+      stepsPerDetent_(cfg.stepsPerDetent),
       lastPosition_(0),
       physicalPosition_(0),
-      absolutePosition_(0) {
+      absolutePosition_(0),
+      stepAccumulator_(0) {
     // Pre-calcul du facteur de normalisation
     // REFERENCE_PPR correspond au PPR standard des encodeurs mécaniques
     const int32_t REFERENCE_PPR = 24;
@@ -61,12 +63,30 @@ int8_t QuadratureEncoder::readDelta() {
     lastPosition_ = newPosition;
     physicalPosition_ += delta;
 
-    // Calculer le delta normalisé avec facteur d'échelle
-    int32_t normalizedDelta = (delta * normalizationFactor_) >> 8;
+    // Accumulation pour encodeurs crantés : 1 cran = stepsPerDetent_ ticks
+    stepAccumulator_ += delta;
+    
+    // Calculer combien de "crans complets" ont été franchis
+    int8_t detentSteps = 0;
+    if (abs(stepAccumulator_) >= stepsPerDetent_) {
+        // Calculer le nombre de crans complets
+        detentSteps = stepAccumulator_ / static_cast<int32_t>(stepsPerDetent_);
+        
+        // Garder le reste pour l'accumulation suivante
+        stepAccumulator_ %= static_cast<int32_t>(stepsPerDetent_);
+    }
+    
+    // Si pas de cran complet, pas de mouvement
+    if (detentSteps == 0) {
+        return 0;
+    }
 
-    // S'assurer qu'un mouvement physique réel produise au moins 1 delta
-    if (delta != 0 && normalizedDelta == 0) {
-        normalizedDelta = (delta > 0) ? 1 : -1;
+    // Appliquer la normalisation sur les crans complets seulement
+    int32_t normalizedDelta = (detentSteps * normalizationFactor_) >> 8;
+
+    // S'assurer qu'un cran physique produise au moins 1 delta
+    if (detentSteps != 0 && normalizedDelta == 0) {
+        normalizedDelta = (detentSteps > 0) ? 1 : -1;
     }
 
     // Limiter le delta à la plage d'un int8_t
@@ -74,8 +94,8 @@ int8_t QuadratureEncoder::readDelta() {
                     : (normalizedDelta < INT8_MIN) ? INT8_MIN
                                                    : static_cast<int8_t>(normalizedDelta);
 
-    // Recalculer la position absolue
-    absolutePosition_ = (physicalPosition_ * normalizationFactor_) >> 8;
+    // Recalculer la position absolue basée sur les crans complets
+    absolutePosition_ += result;
 
     return result;
 }
@@ -100,6 +120,7 @@ void QuadratureEncoder::resetPosition() {
     // Réinitialiser la position physique et la position absolue à zéro
     physicalPosition_ = 0;
     absolutePosition_ = 0;
+    stepAccumulator_ = 0;  // Réinitialiser l'accumulateur de crans
 
     // Garder la dernière position physique, sinon cela pourrait générer des deltas indésirables
     // Nous réinitialisons seulement le compteur de position absolue

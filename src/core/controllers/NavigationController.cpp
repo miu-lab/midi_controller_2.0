@@ -3,7 +3,7 @@
 #include <functional>
 
 // Table de routage statique
-const etl::array<NavigationController::ActionRoute, 12> NavigationController::ACTION_ROUTES = {{
+const etl::array<NavigationController::ActionRoute, 11> NavigationController::ACTION_ROUTES = {{
     // Actions de navigation générale
     {NavigationAction::MENU_ENTER, AppState::MENU, true, false},
     {NavigationAction::MENU_EXIT, AppState::PARAMETER_FOCUS, false, false},
@@ -14,7 +14,7 @@ const etl::array<NavigationController::ActionRoute, 12> NavigationController::AC
     {NavigationAction::PARAMETER_CANCEL, AppState::PARAMETER_FOCUS, false, false},
     
     // Actions contextuelles (pas de routage direct)
-    {NavigationAction::ITEM_NAVIGATOR, AppState::MENU, false, true},
+    // ITEM_NAVIGATOR supprimé - traité contextuellement
     {NavigationAction::ITEM_VALIDATE, AppState::MENU, false, true},
     {NavigationAction::ITEM_NEXT, AppState::MENU, false, false},
     {NavigationAction::ITEM_PREVIOUS, AppState::MENU, false, false},

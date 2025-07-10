@@ -18,6 +18,12 @@ void InputController::processEncoderTurn(EncoderId id, int32_t absolutePosition,
         return;
     }
     
+    // Vérifier dans la configuration unifiée
+    if (isNavigationControlInConfig(id)) {
+        handleNavigationInput(id, true, relativeChange);
+        return;
+    }
+    
     // Sinon, émettre événement MIDI
     emitMidiEvent(id, true, absolutePosition, relativeChange);
 }
@@ -77,8 +83,29 @@ NavigationAction InputController::extractNavigationAction(const ControlDefinitio
 }
 
 int InputController::determineNavigationParameter(const ControlDefinition& control, int8_t relativeChange) const {
-    // Pour les encodeurs, utiliser le changement relatif comme paramètre
+    // Pour les encodeurs, appliquer la sensibilité configurée comme pour MIDI
     if (control.hardware.type == InputType::ENCODER) {
+        // Récupérer la configuration encodeur
+        const auto& encoderConfig = std::get<ControlDefinition::EncoderConfig>(control.hardware.config);
+        
+        // Appliquer la sensibilité de la même manière que MidiMapper
+        float sensitivity = encoderConfig.sensitivity;
+        
+        if (sensitivity != 1.0f) {
+            // Appliquer la sensibilité tout en préservant le signe
+            int32_t delta_sign = (relativeChange > 0) ? 1 : -1;
+            int32_t delta_abs = abs(relativeChange);
+            
+            // Appliquer la sensibilité et assurer qu'un mouvement réel produit au moins 1 delta
+            int32_t scaled_delta_abs = static_cast<int32_t>(delta_abs * sensitivity);
+            if (scaled_delta_abs == 0 && delta_abs > 0) scaled_delta_abs = 1;
+            
+            int32_t result = scaled_delta_abs * delta_sign;
+            
+            // Limiter à la plage d'un int pour éviter les débordements
+            return (result > INT_MAX) ? INT_MAX : (result < INT_MIN) ? INT_MIN : static_cast<int>(result);
+        }
+        
         return static_cast<int>(relativeChange);
     }
     

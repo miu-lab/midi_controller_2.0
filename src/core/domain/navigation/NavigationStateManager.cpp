@@ -159,6 +159,9 @@ void NavigationStateManager::handleNavigationAction(NavigationAction action, int
             
         case NavigationAction::ITEM_NAVIGATOR:
             // Navigation dans l'état actuel (pas de changement d'état)
+            if (currentContext_.state == AppState::MENU) {
+                viewManager_.navigateMenu(parameter);
+            }
             break;
             
         case NavigationAction::ITEM_VALIDATE:

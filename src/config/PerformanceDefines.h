@@ -7,7 +7,7 @@
 #pragma once
 
 /* Refresh rate - compatible C */
-#define LVGL_REFRESH_RATE_HZ 60
+#define LVGL_REFRESH_RATE_HZ 120
 #define LVGL_REFRESH_PERIOD_MS (1000 / LVGL_REFRESH_RATE_HZ)
 
 /* LVGL Memory Configuration */

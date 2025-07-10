@@ -31,6 +31,7 @@ private:
     EncoderId id_;
     Encoder encoder_;  // Utilisation de la classe Encoder au lieu de la gestion manuelle
     uint16_t ppr_;     // Pulses Par Revolution
+    uint8_t stepsPerDetent_;  // Nombre de steps par cran mécanique
 
     // Variables pour le calcul du delta
     int32_t lastPosition_;
@@ -43,4 +44,7 @@ private:
 
     // Facteur de normalisation pré-calculé
     int32_t normalizationFactor_;
+    
+    // Accumulation pour les encodeurs crantés
+    int32_t stepAccumulator_;  // Accumule les steps jusqu'au seuil stepsPerDetent
 };

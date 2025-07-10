@@ -74,7 +74,7 @@ public:
         return *this;
     }
 
-    ControlBuilder& withAcceleration(bool enable = true, uint8_t stepsPerDetent = 4) {
+    ControlBuilder& withStepPerDetent(bool enable = true, uint8_t stepsPerDetent = 4) {
         if (std::holds_alternative<ControlDefinition::EncoderConfig>(control_.hardware.config)) {
             auto& enc = std::get<ControlDefinition::EncoderConfig>(control_.hardware.config);
             enc.enableAcceleration = enable;

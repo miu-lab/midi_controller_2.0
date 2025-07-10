@@ -128,7 +128,7 @@ private:
     };
     
     // Table de routage statique
-    static const etl::array<ActionRoute, 12> ACTION_ROUTES;
+    static const etl::array<ActionRoute, 11> ACTION_ROUTES;
     
     // === MÉTHODES PRIVÉES ===
     
