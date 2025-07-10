@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "core/domain/types.hpp"
+#include "core/domain/navigation/NavigationAction.hpp"
 
 /**
  * @brief Définition complète d'un contrôle unifiant hardware et mappings
@@ -57,7 +58,8 @@ struct ControlDefinition {
     };
 
     struct NavigationConfig {
-        std::string action;  // "HOME", "BACK", "ITEM_NAVIGATOR", etc.
+        NavigationAction action;  // Action de navigation typée
+        int parameter = 0;        // Paramètre optionnel
     };
 
     struct MappingSpec {

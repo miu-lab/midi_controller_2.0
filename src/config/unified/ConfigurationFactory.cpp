@@ -16,7 +16,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withDescription("Bouton Menu")
                            .asButton(32, 30, ButtonMode::TOGGLE)
                            .withLongPress(1000)
-                           .withNavigation("HOME", MappingControlType::BUTTON)
+                           .asHomeButton()
                            .withDisplayOrder(1)
                            .build());
 
@@ -26,7 +26,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("Navigation")
                            .withDescription("Bouton OK")
                            .asButton(31, 30, ButtonMode::MOMENTARY)
-                           .withNavigation("BACK", MappingControlType::BUTTON)
+                           .asBackButton()
                            .withDisplayOrder(2)
                            .build());
 
@@ -222,7 +222,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
             .asRotaryEncoder(25, 24, 96)
             .withSensitivity(1.5f)
             .withAcceleration(true, 4)
-            .withNavigation("ITEM_NAVIGATOR", MappingControlType::ENCODER)
+            .asItemNavigator()
             .build());
 
     // Encodeur Navigation (partie bouton)
@@ -234,7 +234,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
             .withDisplayOrder(9)
             .asButton(26, 30)
             .asChildOf(79)
-            .withNavigation("ITEM_VALIDATE", MappingControlType::BUTTON)
+            .asItemValidator()
             .build());
 
     // === ENCODEUR OPTIQUE ===

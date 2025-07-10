@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config/unified/ControlDefinition.hpp"
+#include "core/domain/navigation/NavigationAction.hpp"
 
 /**
  * @brief Builder fluide pour créer des définitions de contrôles
@@ -144,7 +145,7 @@ public:
         return *this;
     }
 
-    ControlBuilder& withNavigation(const std::string& action, MappingControlType appliesTo = MappingControlType::ENCODER) {
+    ControlBuilder& withNavigation(NavigationAction action, MappingControlType appliesTo = MappingControlType::ENCODER, int parameter = 0) {
         ControlDefinition::MappingSpec mapping;
         mapping.role = MappingRole::NAVIGATION;
         mapping.appliesTo = appliesTo;
@@ -152,9 +153,44 @@ public:
         mapping.config = ControlDefinition::NavigationConfig();
         auto& nav = std::get<ControlDefinition::NavigationConfig>(mapping.config);
         nav.action = action;
+        nav.parameter = parameter;
 
         control_.mappings.push_back(mapping);
         return *this;
+    }
+
+    // === MÉTHODES HELPER POUR ACTIONS COURANTES ===
+
+    ControlBuilder& asHomeButton() {
+        return withNavigation(NavigationAction::HOME, MappingControlType::BUTTON);
+    }
+
+    ControlBuilder& asBackButton() {
+        return withNavigation(NavigationAction::BACK, MappingControlType::BUTTON);
+    }
+
+    ControlBuilder& asItemNavigator() {
+        return withNavigation(NavigationAction::ITEM_NAVIGATOR, MappingControlType::ENCODER);
+    }
+
+    ControlBuilder& asItemValidator() {
+        return withNavigation(NavigationAction::ITEM_VALIDATE, MappingControlType::BUTTON);
+    }
+
+    ControlBuilder& asMenuEnterButton() {
+        return withNavigation(NavigationAction::MENU_ENTER, MappingControlType::BUTTON);
+    }
+
+    ControlBuilder& asMenuExitButton() {
+        return withNavigation(NavigationAction::MENU_EXIT, MappingControlType::BUTTON);
+    }
+
+    ControlBuilder& asParameterEditor() {
+        return withNavigation(NavigationAction::PARAMETER_EDIT, MappingControlType::ENCODER);
+    }
+
+    ControlBuilder& asParameterValidator() {
+        return withNavigation(NavigationAction::PARAMETER_VALIDATE, MappingControlType::BUTTON);
     }
 
 
