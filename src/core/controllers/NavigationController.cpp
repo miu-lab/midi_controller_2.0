@@ -190,6 +190,10 @@ bool NavigationController::isActionValidInCurrentContext(NavigationAction action
 }
 
 void NavigationController::handleSpecialAction(NavigationAction action, int parameter) {
+    if (!stateManager_) {
+        return;
+    }
+    
     switch (action) {
         case NavigationAction::HOME:
             stateManager_->handleHomeAction();
@@ -200,7 +204,7 @@ void NavigationController::handleSpecialAction(NavigationAction action, int para
             break;
             
         default:
-            // Ne devrait pas arriver
+            // Action spéciale inconnue
             break;
     }
 }

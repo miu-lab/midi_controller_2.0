@@ -26,8 +26,8 @@ bool AppStateUtils::isValidTransition(AppState from, AppState to) {
     // Transitions invalides
     switch (from) {
         case AppState::SPLASH_SCREEN:
-            // Depuis splash, on peut seulement aller vers PARAMETER_FOCUS
-            return to == AppState::PARAMETER_FOCUS;
+            // Depuis splash, on peut aller vers PARAMETER_FOCUS ou MENU
+            return to == AppState::PARAMETER_FOCUS || to == AppState::MENU;
             
         case AppState::MODAL_DIALOG:
             // Depuis modal, on ne peut pas aller vers splash

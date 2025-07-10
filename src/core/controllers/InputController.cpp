@@ -23,8 +23,8 @@ void InputController::processEncoderTurn(EncoderId id, int32_t absolutePosition,
 }
 
 void InputController::processButtonPress(ButtonId id, bool pressed) {
-    // Vérifier si c'est un contrôle de navigation
-    if (navigationConfig_ && navigationConfig_->isNavigationControl(id)) {
+    // Vérifier si c'est un contrôle de navigation via UnifiedConfiguration
+    if (unifiedConfig_ && isNavigationControlInConfig(id)) {
         if (pressed) {  // Traiter seulement les appuis, pas les relâchements
             handleNavigationInput(id, pressed);
         }
@@ -51,9 +51,6 @@ void InputController::handleNavigationInput(InputId id, bool isPressed, int8_t r
     // Extraire l'action de navigation
     bool isEncoder = (control.hardware.type == InputType::ENCODER);
     NavigationAction action = extractNavigationAction(control, isEncoder);
-    
-    // HOME est une action valide, on ne doit pas l'ignorer
-    // Nous n'avons pas de valeur "invalide" dans NavigationAction
     
     // Déterminer le paramètre
     int parameter = determineNavigationParameter(control, relativeChange);
@@ -97,6 +94,25 @@ void InputController::emitNavigationEvent(NavigationAction action, int parameter
     // Créer et publier l'événement de navigation
     NavigationEvent event(action, parameter);
     eventBus_->publish(event);
+}
+
+bool InputController::isNavigationControlInConfig(InputId id) const {
+    if (!unifiedConfig_) {
+        return false;
+    }
+    
+    // Trouver la définition du contrôle
+    auto controlOpt = unifiedConfig_->findControlById(id);
+    if (!controlOpt.has_value()) {
+        return false;
+    }
+    
+    const ControlDefinition& control = controlOpt.value();
+    
+    // Vérifier s'il a des mappings de navigation
+    auto navigationMappings = control.getMappingsForRole(MappingRole::NAVIGATION);
+    
+    return !navigationMappings.empty();
 }
 
 void InputController::emitMidiEvent(InputId id, bool isEncoder, int32_t absolutePosition, 

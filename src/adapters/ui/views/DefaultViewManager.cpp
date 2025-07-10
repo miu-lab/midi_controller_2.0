@@ -145,14 +145,8 @@ void DefaultViewManager::navigateMenu(int8_t direction) {
 void DefaultViewManager::selectMenuItem() {
     if (!initialized_ || currentView_ != ViewType::Menu) return;
     
-    int selectedIndex = menuView_->getCurrentIndex();
-    switch (selectedIndex) {
-    case 0:
-        showHome();
-        break;
-    default:
-        break;
-    }
+    // Utiliser la nouvelle API du widget menu natif
+    menuView_->selectEnter();
 }
 
 void DefaultViewManager::activateView(ViewType type) {

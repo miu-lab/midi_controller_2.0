@@ -78,4 +78,9 @@ private:
      * @brief Émet un événement MIDI haute priorité
      */
     void emitMidiEvent(InputId id, bool isEncoder, int32_t absolutePosition = 0, int8_t relativeChange = 0, bool pressed = false);
+    
+    /**
+     * @brief Vérifie si un contrôle est configuré pour la navigation
+     */
+    bool isNavigationControlInConfig(InputId id) const;
 };

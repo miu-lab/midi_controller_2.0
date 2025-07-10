@@ -1,9 +1,3 @@
-// === CODE LEGACY - À SUPPRIMER APRÈS MIGRATION MENU ===
-// TODO: Supprimer après implémentation complète du nouveau système de menu modulaire
-// Date: 2024-01-05
-// Remplacé par: MenuViewController, MenuSceneManager, MenuEventHandler (Phase 2+)
-// Ce fichier utilise une approche basique avec lv_list au lieu d'une architecture modulaire
-
 #pragma once
 
 #include <Arduino.h>
@@ -13,7 +7,10 @@
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
 
 /**
- * @brief Vue menu simplifiée utilisant LVGL
+ * @brief Vue menu utilisant le widget lv_menu natif de LVGL 9.3.0
+ * 
+ * Cette implémentation utilise le widget menu natif de LVGL pour une navigation
+ * hiérarchique moderne avec pages et sections organisées.
  */
 class LvglMenuView {
 public:
@@ -31,6 +28,7 @@ public:
     // Navigation
     void selectNext();
     void selectPrevious();
+    void selectEnter(); // Valider la sélection courante
     int getCurrentIndex() const { return selected_index_; }
     
     // ViewManager reference (pour callbacks)
@@ -47,11 +45,17 @@ private:
     
     // Objets LVGL
     lv_obj_t* main_screen_;
-    lv_obj_t* menu_list_;
+    lv_obj_t* menu_;
     
     // Méthodes privées
     void setupMainScreen();
-    void setupMenuList();
+    void setupNativeMenu();
+    void createMainMenuSection(lv_obj_t* parent_page);
+    void createSettingsSection(lv_obj_t* parent_page);
+    void addSettingsItems(lv_obj_t* settings_page);
     void updateSelection();
     void cleanupLvglObjects();
+    
+    // Event handler statique pour LVGL
+    static void menuItemEventHandler(lv_event_t* e);
 };

@@ -136,13 +136,7 @@ void NavigationStateManager::handleHomeAction() {
 }
 
 void NavigationStateManager::handleNavigationAction(NavigationAction action, int parameter) {
-    Serial.print("Navigation: Action ");
-    Serial.print(static_cast<int>(action));
-    Serial.print(" with parameter ");
-    Serial.println(parameter);
-    
     if (!isActionValidInCurrentState(action)) {
-        Serial.println("Navigation: Action not valid in current state");
         return;
     }
     
@@ -222,43 +216,32 @@ void NavigationStateManager::executeStateTransition(const AppStateContext& newCo
 }
 
 void NavigationStateManager::updateViewFromState(const AppStateContext& context) {
-    // Debug: afficher la transition d'état
-    Serial.print("Navigation: State transition to ");
-    Serial.println(static_cast<int>(context.state));
-    
     switch (context.state) {
         case AppState::SPLASH_SCREEN:
             // Splash géré automatiquement par DefaultViewManager
-            Serial.println("Navigation: Showing splash screen");
             break;
             
         case AppState::PARAMETER_FOCUS:
-            Serial.println("Navigation: Showing home view");
             viewManager_.showHome();
             break;
             
         case AppState::MENU:
-            Serial.println("Navigation: Showing menu view");
             viewManager_.showMenu();
             break;
             
         case AppState::PARAMETER_EDIT:
-            Serial.println("Navigation: Parameter edit mode");
             // Édition de paramètre - reste sur la vue actuelle
             break;
             
         case AppState::MODAL_DIALOG:
-            Serial.println("Navigation: Modal dialog mode");
             // Modal géré séparément
             break;
             
         case AppState::DEBUG_VIEW:
-            Serial.println("Navigation: Debug view mode");
             // Vue de debug - pas encore implémentée
             break;
             
         case AppState::PROFILE_SELECTION:
-            Serial.println("Navigation: Profile selection mode");
             // Sélection de profil - pas encore implémentée
             break;
     }

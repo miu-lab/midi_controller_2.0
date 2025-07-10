@@ -41,9 +41,9 @@ pio run
 
 ### Compiler pour un environnement spécifique
 ```bash
-pio run -e MIDI_CONTROLLER_DEVELOPMENT  # Build développement avec debug
-pio run -e MIDI_CONTROLLER_PRODUCTION   # Build production
-pio run -e MIDI_CONTROLLER_DEBUG       # Build debug verbeux
+pio run -e dev         # Build développement avec debug
+pio run -e prod        # Build production
+pio run -e debug       # Build debug verbeux
 ```
 
 ### Téléverser vers le Teensy
