@@ -35,6 +35,16 @@ public:
     virtual void selectMenuItem() = 0;
 
     /**
+     * @brief Retourne à la page racine du menu
+     */
+    virtual void goBackToMenuRoot() = 0;
+
+    /**
+     * @brief Remonte d'un niveau dans la hiérarchie de menu
+     */
+    virtual void goBackOneLevel() = 0;
+
+    /**
      * @brief Affiche un modal avec un message
      * @param message Message à afficher
      */

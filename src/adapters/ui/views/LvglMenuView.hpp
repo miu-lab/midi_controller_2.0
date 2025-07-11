@@ -29,6 +29,8 @@ public:
     void selectNext();
     void selectPrevious();
     void selectEnter(); // Valider la sélection courante
+    void goBackToRoot(); // Retourner à la page racine
+    void goBackOneLevel(); // Remonter d'un niveau dans la hiérarchie
     int getCurrentIndex() const { return selected_index_; }
     
     // ViewManager reference (pour callbacks)
@@ -47,13 +49,32 @@ private:
     lv_obj_t* main_screen_;
     lv_obj_t* menu_;
     
+    // Pages du menu sophistiqué
+    lv_obj_t* root_page_;
+    lv_obj_t* wifi_page_;
+    lv_obj_t* bluetooth_page_;
+    lv_obj_t* audio_page_;
+    lv_obj_t* input_page_;
+    lv_obj_t* display_page_;
+    lv_obj_t* about_page_;
+    
     // Méthodes privées
     void setupMainScreen();
     void setupNativeMenu();
-    void createSimpleMenu(lv_obj_t* main_page);
+    void createSophisticatedMenu();
+    void createSubPages();
+    void createRootPageContent();
+    void createWiFiPage();
+    void createBluetoothPage();
+    void createAudioPage();
+    void createInputPage();
+    void createDisplayPage();
+    void createAboutPage();
+    void applyItemStyle(lv_obj_t* item);
     void updateSelection();
     void cleanupLvglObjects();
     
-    // Event handler statique pour LVGL
+    // Event handlers statiques pour LVGL
     static void menuItemEventHandler(lv_event_t* e);
+    static void menuPageChangeCallback(lv_event_t* e);
 };

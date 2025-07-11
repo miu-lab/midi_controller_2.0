@@ -90,6 +90,12 @@ bool NavigationStateManager::popState() {
     AppStateContext previousContext = stateHistory_.top();
     stateHistory_.pop();
     
+    // Si on était en état MENU et qu'on fait un BACK, 
+    // synchroniser la vue LVGL pour remonter d'un niveau
+    if (currentContext_.state == AppState::MENU) {
+        viewManager_.goBackOneLevel();
+    }
+    
     executeStateTransition(previousContext);
     return true;
 }
@@ -167,8 +173,8 @@ void NavigationStateManager::handleNavigationAction(NavigationAction action, int
         case NavigationAction::ITEM_VALIDATE:
             // Validation selon l'état actuel
             if (currentContext_.state == AppState::MENU) {
-                // Validation d'un élément de menu - rester dans le menu
-                setState(AppState::MENU, static_cast<uint8_t>(parameter));
+                // Validation d'un élément de menu - déclencher la sélection
+                viewManager_.selectMenuItem();
             }
             break;
             

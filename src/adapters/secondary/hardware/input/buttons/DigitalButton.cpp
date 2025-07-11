@@ -9,6 +9,7 @@ DigitalButton::DigitalButton(const ButtonConfig& cfg)
                        : (cfg_.gpio.mode == PinMode::PULLDOWN) ? INPUT_PULLDOWN
                                                                : INPUT;
 
+
     pinMode(pinNumber, pinModeValue);
     button_.attach(pinNumber, pinModeValue);
     button_.interval(cfg_.debounceMs);  // Utiliser le délai de debounce configuré
@@ -16,6 +17,8 @@ DigitalButton::DigitalButton(const ButtonConfig& cfg)
     // Lire l'état initial du bouton sans déclencher d'événement
     button_.update();
     prevPressed_ = cfg_.activeLow ? (button_.read() == LOW) : (button_.read() == HIGH);
+    
+    
     // S'assurer que les états initiaux sont cohérents avec l'état physique
     if (cfg_.mode == ButtonMode::MOMENTARY) {
         pressed_ = prevPressed_;
@@ -34,6 +37,8 @@ void DigitalButton::update() {
 
     // Détecter les changements d'état physique (front montant)
     bool rising = rawPressed && !prevPressed_;
+    
+    
     prevPressed_ = rawPressed;
 
     // Mettre à jour l'état logique selon le mode du bouton

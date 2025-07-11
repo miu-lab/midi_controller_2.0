@@ -3,7 +3,7 @@
 #include <functional>
 
 // Table de routage statique
-const etl::array<NavigationController::ActionRoute, 11> NavigationController::ACTION_ROUTES = {{
+const etl::array<NavigationController::ActionRoute, 10> NavigationController::ACTION_ROUTES = {{
     // Actions de navigation générale
     {NavigationAction::MENU_ENTER, AppState::MENU, true, false},
     {NavigationAction::MENU_EXIT, AppState::PARAMETER_FOCUS, false, false},
@@ -15,7 +15,7 @@ const etl::array<NavigationController::ActionRoute, 11> NavigationController::AC
     
     // Actions contextuelles (pas de routage direct)
     // ITEM_NAVIGATOR supprimé - traité contextuellement
-    {NavigationAction::ITEM_VALIDATE, AppState::MENU, false, true},
+    // ITEM_VALIDATE supprimé - traité contextuellement
     {NavigationAction::ITEM_NEXT, AppState::MENU, false, false},
     {NavigationAction::ITEM_PREVIOUS, AppState::MENU, false, false},
     
@@ -69,7 +69,14 @@ void NavigationController::handleStateChangeEvent(const StateChangeEvent& event)
         return;
     }
     
-    forceStateChange(event.getNewState(), event.getParameter(), event.getSubState());
+    // Si parameter=1, cela indique qu'on veut pousser l'état actuel dans l'historique
+    // (pour la navigation vers sous-page)
+    if (event.getParameter() == 1 && event.getNewState() == AppState::MENU) {
+        // Pousser l'état MENU avec subState=1 pour créer un contexte différent du courant
+        stateManager_->pushState(event.getNewState(), 0, 1);
+    } else {
+        forceStateChange(event.getNewState(), event.getParameter(), event.getSubState());
+    }
 }
 
 void NavigationController::handleBackRequestedEvent(const BackRequestedEvent& event) {
@@ -185,8 +192,13 @@ bool NavigationController::isActionValidInCurrentContext(NavigationAction action
         return false;
     }
     
-    return stateManager_->getCurrentContext().state != AppState::SPLASH_SCREEN ||
-           action == NavigationAction::HOME;
+    AppState currentState = stateManager_->getCurrentContext().state;
+    
+    // Validation basique : toutes les actions sauf depuis SPLASH_SCREEN
+    // Les actions HOME et BACK sont toujours valides
+    return (currentState != AppState::SPLASH_SCREEN) || 
+           (action == NavigationAction::HOME) ||
+           (action == NavigationAction::BACK);
 }
 
 void NavigationController::handleSpecialAction(NavigationAction action, int parameter) {
@@ -230,19 +242,19 @@ void NavigationController::handleNormalAction(NavigationAction action, int param
 
 bool NavigationController::onEvent(const Event& event) {
     switch (event.getType()) {
-        case EventTypes::NavigationRequested:
+        case NavigationEventTypes::NAVIGATION_REQUESTED:
             handleNavigationEvent(static_cast<const NavigationEvent&>(event));
             return true;
             
-        case EventTypes::StateChangeRequested:
+        case NavigationEventTypes::STATE_CHANGE_REQUESTED:
             handleStateChangeEvent(static_cast<const StateChangeEvent&>(event));
             return true;
             
-        case EventTypes::BackRequested:
+        case NavigationEventTypes::BACK_REQUESTED:
             handleBackRequestedEvent(static_cast<const BackRequestedEvent&>(event));
             return true;
             
-        case EventTypes::HomeRequested:
+        case NavigationEventTypes::HOME_REQUESTED:
             handleHomeRequestedEvent(static_cast<const HomeRequestedEvent&>(event));
             return true;
             

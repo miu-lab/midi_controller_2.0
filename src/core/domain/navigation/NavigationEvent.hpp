@@ -14,6 +14,7 @@ namespace NavigationEventTypes {
     constexpr EventType STATE_CHANGE_REQUESTED = 4001;
     constexpr EventType BACK_REQUESTED = 4002;
     constexpr EventType HOME_REQUESTED = 4003;
+    constexpr EventType MENU_ROOT_REQUESTED = 4004;
 }
 
 /**
@@ -131,4 +132,23 @@ public:
      * @brief Nom de l'événement pour debug
      */
     const char* getEventName() const override { return "HomeRequestedEvent"; }
+};
+
+/**
+ * @brief Événement retour à la page racine du menu
+ * 
+ * Demande au ViewManager de retourner à la page racine du menu LVGL.
+ */
+class MenuRootRequestedEvent : public Event {
+public:
+    /**
+     * @brief Constructeur
+     */
+    MenuRootRequestedEvent()
+        : Event(NavigationEventTypes::MENU_ROOT_REQUESTED, EventCategory::UI) {}
+    
+    /**
+     * @brief Nom de l'événement pour debug
+     */
+    const char* getEventName() const override { return "MenuRootRequestedEvent"; }
 };

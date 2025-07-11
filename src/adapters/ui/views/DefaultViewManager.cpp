@@ -1,4 +1,5 @@
 #include "DefaultViewManager.hpp"
+#include "core/domain/navigation/NavigationEvent.hpp"
 
 DefaultViewManager::DefaultViewManager(std::shared_ptr<Ili9341LvglBridge> lvglBridge,
                                      std::shared_ptr<UnifiedConfiguration> unifiedConfig,
@@ -143,10 +144,49 @@ void DefaultViewManager::navigateMenu(int8_t direction) {
 }
 
 void DefaultViewManager::selectMenuItem() {
-    if (!initialized_ || currentView_ != ViewType::Menu) return;
+    if (!initialized_) {
+        return;
+    }
+    
+    if (currentView_ != ViewType::Menu) {
+        return;
+    }
+    
+    if (!menuView_) {
+        return;
+    }
     
     // Utiliser la nouvelle API du widget menu natif
     menuView_->selectEnter();
+}
+
+void DefaultViewManager::onSubPageEntered() {
+    if (!eventBus_) {
+        return;
+    }
+    
+    // Créer un événement spécial pour pousser l'état actuel dans l'historique
+    // On utilise un subState différent pour créer un contexte unique à pousser
+    StateChangeEvent subPageEvent(AppState::MENU, 1, 0); // parameter=1 pour différencier
+    eventBus_->publish(subPageEvent);
+}
+
+void DefaultViewManager::goBackToMenuRoot() {
+    if (!menuView_) {
+        return;
+    }
+    
+    // Retourner à la page racine du menu LVGL
+    menuView_->goBackToRoot();
+}
+
+void DefaultViewManager::goBackOneLevel() {
+    if (!menuView_) {
+        return;
+    }
+    
+    // Remonter d'un niveau dans la hiérarchie LVGL
+    menuView_->goBackOneLevel();
 }
 
 void DefaultViewManager::activateView(ViewType type) {

@@ -98,6 +98,16 @@ public:
     virtual void selectMenuItem() = 0;
 
     /**
+     * @brief Retourne à la page racine du menu
+     */
+    virtual void goBackToMenuRoot() = 0;
+
+    /**
+     * @brief Remonte d'un niveau dans la hiérarchie de menu
+     */
+    virtual void goBackOneLevel() = 0;
+
+    /**
      * @brief Vérifie si l'affichage a besoin d'être mis à jour
      * @return true si une mise à jour est nécessaire
      */

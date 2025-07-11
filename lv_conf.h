@@ -715,7 +715,7 @@
 
 #define LV_USE_BUTTON        1
 
-#define LV_USE_BUTTONMATRIX  0
+#define LV_USE_BUTTONMATRIX  1
 
 #define LV_USE_CALENDAR   0
 #if LV_USE_CALENDAR
@@ -763,13 +763,13 @@
 
 #define LV_USE_MENU       1
 
-#define LV_USE_MSGBOX     0
+#define LV_USE_MSGBOX     1
 
 #define LV_USE_ROLLER     0   /**< Requires: lv_label */
 
 #define LV_USE_SCALE      0
 
-#define LV_USE_SLIDER     0   /**< Requires: lv_bar */
+#define LV_USE_SLIDER     1   /**< Requires: lv_bar */
 
 #define LV_USE_SPAN       0
 #if LV_USE_SPAN
@@ -781,7 +781,7 @@
 
 #define LV_USE_SPINNER    0
 
-#define LV_USE_SWITCH     0
+#define LV_USE_SWITCH     1
 
 #define LV_USE_TABLE      0
 
@@ -1012,7 +1012,7 @@
 #define LV_USE_SNAPSHOT 0
 
 /** 1: Enable system monitor component */
-#define LV_USE_SYSMON   1
+#define LV_USE_SYSMON   0
 #if LV_USE_SYSMON
     /** Get the idle percentage. E.g. uint32_t my_get_idle(void); */
     #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent

@@ -59,6 +59,21 @@ public:
     void selectMenuItem() override;
     
     /**
+     * @brief Notifie qu'on entre dans une sous-page de menu
+     */
+    void onSubPageEntered();
+    
+    /**
+     * @brief Retourne à la page racine du menu
+     */
+    void goBackToMenuRoot();
+
+    /**
+     * @brief Remonte d'un niveau dans la hiérarchie de menu
+     */
+    void goBackOneLevel();
+    
+    /**
      * @brief Vérifie si l'affichage a besoin d'être mis à jour
      * @return true si une mise à jour est nécessaire
      */

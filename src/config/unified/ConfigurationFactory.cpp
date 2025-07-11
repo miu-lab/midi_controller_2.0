@@ -225,16 +225,15 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
             .build());
 
     // Encodeur Navigation (partie bouton)
-    config->addControl(
-        ControlBuilder(1079, "nav_encoder_button")
-            .withLabel("Nav Btn")
-            .inGroup("Navigation")
-            .withDescription("Bouton Navigation")
-            .withDisplayOrder(9)
-            .asButton(26, 30)
-            .asChildOf(79)
-            .asItemValidator()
-            .build());
+    config->addControl(ControlBuilder(1079, "nav_encoder_button")
+                           .withLabel("Nav Btn")
+                           .inGroup("Navigation")
+                           .withDescription("Bouton Navigation")
+                           .withDisplayOrder(9)
+                           .asButton(8, 30)
+                           .asChildOf(79)
+                           .asItemValidator()
+                           .build());
 
     // === ENCODEUR OPTIQUE ===
 
