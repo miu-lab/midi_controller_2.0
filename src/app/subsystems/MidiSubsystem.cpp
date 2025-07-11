@@ -7,9 +7,6 @@
 #include "adapters/secondary/midi/MidiOutputEventAdapter.hpp"
 #include "adapters/secondary/midi/TeensyUsbMidiOut.hpp"
 #include "core/domain/commands/CommandManager.hpp"
-#include "core/domain/strategies/AbsoluteMappingStrategy.hpp"
-#include "core/domain/strategies/MidiMappingFactory.hpp"
-#include "core/domain/strategies/RelativeMappingStrategy.hpp"
 #include "core/utils/Error.hpp"
 
 MidiSubsystem::MidiSubsystem(std::shared_ptr<DependencyContainer> container)
@@ -252,26 +249,6 @@ void MidiSubsystem::setupMidiMappingFromControlDefinition(const ControlDefinitio
         return; // Pas de mappings MIDI pour ce contrôle
     }
     
-    // Déterminer le type de stratégie à utiliser en fonction du premier mapping MIDI
-    std::unique_ptr<IMidiMappingStrategy> strategy;
-    
-    for (const auto& mappingSpec : controlDef.mappings) {
-        if (mappingSpec.role == MappingRole::MIDI) {
-            const auto& midiConfig = std::get<ControlDefinition::MidiConfig>(mappingSpec.config);
-            
-            if (midiConfig.isRelative) {
-                strategy = MidiMappingFactory::createRelative();
-            } else {
-                strategy = MidiMappingFactory::createAbsolute(0, 127);
-            }
-            break; // Utiliser le premier mapping trouvé pour déterminer la stratégie
-        }
-    }
-    
-    if (strategy) {
-        // Configurer le mapping dans MidiMapper en utilisant la nouvelle méthode
-        midiMapper_->setMappingFromControlDefinition(controlDef, std::move(strategy));
-        
-        // TODO DEBUG MSG
-    }
+    // Configuration simplifiée : pas besoin de stratégies
+    midiMapper_->setMappingFromControlDefinition(controlDef);
 }

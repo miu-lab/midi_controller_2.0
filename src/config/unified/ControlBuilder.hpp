@@ -115,7 +115,7 @@ public:
 
     // === MAPPINGS ===
 
-    ControlBuilder& withMidiCC(uint8_t cc, uint8_t channel = 0, bool relative = true) {
+    ControlBuilder& withMidiCC(uint8_t cc, uint8_t channel = 0, bool relative = false) {
         ControlDefinition::MappingSpec mapping;
         mapping.role = MappingRole::MIDI;
         mapping.appliesTo = MappingControlType::ENCODER;

@@ -218,7 +218,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("Navigation")
                            .withDescription("Encodeur Navigation")
                            .withDisplayOrder(9)
-                           .asRotaryEncoder(25, 24, 96)
+                           .asRotaryEncoder(25, 24)
                            .withStepPerDetent(true, 4)
                            .asItemNavigator()
                            .build());
@@ -243,6 +243,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withDescription("Encodeur Precision")
                            .withDisplayOrder(10)
                            .asRotaryEncoder(2, 3, 600)
+                           .withStepPerDetent(true, 1)
                            .withMidiCC(10, 0, true)
                            .build());
 

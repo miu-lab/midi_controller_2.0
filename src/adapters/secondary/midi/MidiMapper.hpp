@@ -14,15 +14,14 @@
 #include "core/domain/commands/midi/SendMidiNoteCommand.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include "core/domain/events/core/EventBus.hpp"
-#include "core/domain/strategies/MidiMappingStrategy.hpp"
 #include "core/domain/types.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
 
 /**
  * @brief Mapper qui gère la transformation des événements en commandes MIDI
  *
- * Cette classe utilise le Command Pattern et le Strategy Pattern
- * pour transformer les événements d'entrée en commandes MIDI.
+ * Cette classe utilise le Command Pattern pour transformer 
+ * les événements d'entrée en commandes MIDI avec mapping direct.
  * Elle implémente l'interface EventListener pour recevoir des événements optimisés.
  */
 class MidiMapper : public EventListener {
@@ -45,9 +44,8 @@ public:
     /**
      * @brief Définit le mapping pour un contrôle à partir d'une définition complète
      * @param controlDef Définition complète du contrôle avec mappings intégrés
-     * @param strategy Stratégie de mapping à utiliser
      */
-    void setMappingFromControlDefinition(const ControlDefinition& controlDef, std::unique_ptr<IMidiMappingStrategy> strategy);
+    void setMappingFromControlDefinition(const ControlDefinition& controlDef);
 
     /**
      * @brief Supprime le mapping pour un contrôle
@@ -78,7 +76,7 @@ public:
      * - Limiter le taux d'envoi des messages MIDI (via shouldProcessEncoder)
      * - Détecter et éliminer les doublons
      * - Suivre les positions des encodeurs
-     * - Appliquer les stratégies de mapping MIDI appropriées
+     * - Appliquer le mapping MIDI direct (position → valeur MIDI)
      *
      * @param encoderId ID de l'encodeur
      * @param position Position absolue de l'encodeur
@@ -113,13 +111,12 @@ private:
     // Types et structures
     //=============================================================================
 
-    // Structure pour stocker les informations de mapping
+    // Structure pour stocker les informations de mapping simplifiée
     struct MappingInfo {
         ControlDefinition::MidiConfig midiConfig;
-        std::unique_ptr<IMidiMappingStrategy> strategy;
         uint8_t lastMidiValue;
         int32_t lastEncoderPosition;
-        int32_t midiOffset = 0;  // Offset pour le référentiel flottant
+        bool isFirstCall;  // Pour détecter le premier appel et initialiser correctement
     };
 
     //=============================================================================

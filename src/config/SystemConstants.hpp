@@ -117,6 +117,7 @@ namespace SystemConstants {
         
         // Limites entrées (utilisées)
         constexpr int32_t MAX_ABSOLUTE_POSITION = INT_MAX;
+        constexpr int32_t MIN_ABSOLUTE_POSITION = INT_MIN;  // Autoriser les positions négatives
         constexpr int8_t MAX_RELATIVE_CHANGE = 127;
         constexpr int8_t MIN_RELATIVE_CHANGE = -128;
     }

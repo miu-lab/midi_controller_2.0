@@ -42,9 +42,12 @@ private:
     // Position absolue normalisée (cumulative)
     int32_t absolutePosition_;
 
-    // Facteur de normalisation pré-calculé
-    int32_t normalizationFactor_;
+    // Facteur de normalisation pré-calculé (flottant pour plus de précision)
+    float normalizationRatio_;
     
     // Accumulation pour les encodeurs crantés
     int32_t stepAccumulator_;  // Accumule les steps jusqu'au seuil stepsPerDetent
+    
+    // Accumulation flottante pour la normalisation PPR
+    float normalizedAccumulator_;  // Accumule les mouvements normalisés
 };

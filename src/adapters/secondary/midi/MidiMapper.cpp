@@ -65,21 +65,19 @@ void MidiMapper::logDiagnostic(const char* format, ...) const {
 // Gestion des mappings
 //=============================================================================
 
-void MidiMapper::setMappingFromControlDefinition(const ControlDefinition& controlDef,
-                            std::unique_ptr<IMidiMappingStrategy> strategy) {
+void MidiMapper::setMappingFromControlDefinition(const ControlDefinition& controlDef) {
     // Traiter le premier mapping MIDI trouvé dans la définition de contrôle
     for (const auto& mappingSpec : controlDef.mappings) {
         if (mappingSpec.role == MappingRole::MIDI) {
             // Extraire la configuration MIDI
             const auto& midiConfig = std::get<ControlDefinition::MidiConfig>(mappingSpec.config);
             
-            // Créer une nouvelle info de mapping
+            // Créer une nouvelle info de mapping simplifiée
             MappingInfo info;
             info.midiConfig = midiConfig;
-            info.strategy = std::move(strategy);  // Déplacer la stratégie unique
             info.lastMidiValue = 0;
-            info.lastEncoderPosition = 0;
-            info.midiOffset = 0;
+            info.lastEncoderPosition = 0;  // Sera initialisé lors du premier appel
+            info.isFirstCall = true;
 
             // Créer une clé composite qui inclut le type de contrôle
             uint32_t compositeKey = makeCompositeKey(controlDef.id, mappingSpec.appliesTo);
@@ -205,36 +203,27 @@ int32_t MidiMapper::applyEncoderSensitivity(int32_t delta, EncoderId encoderId) 
 
 int16_t MidiMapper::calculateMidiValue(MappingInfo& info, int32_t delta, int32_t position) {
     const ControlDefinition::MidiConfig& midiConfig = info.midiConfig;
-    int16_t newValue;
-
+    
+    uint8_t newValue;
+    
     if (midiConfig.isRelative) {
-        // Mode relatif avec sensibilité configurable
-        float sensitivity =
-            SystemConstants::Input::DEFAULT_ENCODER_SENSITIVITY;  // Ajustez cette valeur selon vos besoins
-        newValue = info.lastMidiValue + (int)(delta * sensitivity);
+        // Mode relatif : ajouter le delta à la dernière valeur
+        int16_t temp = info.lastMidiValue + delta;
+        newValue = constrain(temp, 0, 127);
     } else {
-        // Mode absolu avec référentiel flottant et sensibilité
-        int32_t adjustedPosition = position - info.midiOffset;
-
-        // Si la position ajustée sort des limites MIDI, mettre à jour l'offset
-        if (adjustedPosition < 0) {
-            info.midiOffset += adjustedPosition;
-            adjustedPosition = 0;
-        } else if (adjustedPosition > 127) {
-            info.midiOffset += (adjustedPosition - 127);
-            adjustedPosition = 127;
-        }
-
-        newValue = adjustedPosition;
+        // Mode absolu avec OFFSET : décaler la position pour que le centre soit 64
+        // Plage encodeur typique : -127 à +127 -> MIDI 0 à 127
+        int32_t offsetPosition = position + 64;  // Décaler de 64 pour centrer
+        newValue = constrain(offsetPosition, 0, 127);
     }
 
-    // Garantir que la valeur est dans la plage MIDI valide (0-127)
-    return constrain(newValue, 0, 127);
+    return newValue;
 }
 
 void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // MidiMapper est responsable de tout le traitement des encodeurs MIDI,
     // y compris la limitation de taux, le suivi des positions et la détection des doublons.
+
 
     // Vérifier si l'encodeur doit être traité (limitation de taux)
     if (!shouldProcessEncoder(encoderId, position)) {
@@ -245,12 +234,18 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     uint32_t encoderKey = makeCompositeKey(encoderId, MappingControlType::ENCODER);
     auto it = mappings_.find(encoderKey);
     if (it == mappings_.end()) {
-        logDiagnostic("No mapping found for encoder %d", encoderId);
         return;  // Pas de mapping pour cet encodeur
     }
 
     auto& [key, mappingInfo] = *it;
     const ControlDefinition::MidiConfig& midiConfig = mappingInfo.midiConfig;
+
+    // Si c'est le premier appel, initialiser avec la position actuelle
+    if (mappingInfo.isFirstCall) {
+        mappingInfo.lastEncoderPosition = position;
+        mappingInfo.isFirstCall = false;
+        return;  // Pas de changement lors de l'initialisation
+    }
 
     // Calculer le delta de mouvement
     int32_t delta = position - mappingInfo.lastEncoderPosition;
@@ -264,7 +259,6 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
     // Mettre à jour la dernière position
     mappingInfo.lastEncoderPosition = position;
 
-
     // Calculer la nouvelle valeur MIDI selon le mode
     int16_t newValue = calculateMidiValue(mappingInfo, delta, position);
 
@@ -273,7 +267,6 @@ void MidiMapper::processEncoderChange(EncoderId encoderId, int32_t position) {
         return;
     }
 
-    // TODO DEBUG MSG
 
     // Mettre à jour et envoyer la nouvelle valeur
     mappingInfo.lastMidiValue = static_cast<uint8_t>(newValue);

@@ -53,7 +53,7 @@ private:
     }
     
     bool isValidAbsolutePosition(int32_t absolutePosition) const {
-        return absolutePosition >= 0 && 
+        return absolutePosition >= SystemConstants::Validation::MIN_ABSOLUTE_POSITION && 
                absolutePosition <= SystemConstants::Validation::MAX_ABSOLUTE_POSITION;
     }
 };
