@@ -3,7 +3,7 @@
 #include <memory>
 #include "core/domain/interfaces/IDisplayManager.hpp"
 #include "core/domain/events/core/IEventBus.hpp"
-#include "config/UISystemConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 namespace MidiController::Events {
     class IEventBus;
@@ -51,14 +51,14 @@ protected:
      */
     bool isWithinTimeout(uint32_t timeoutMs) const {
         // Implémentation simplifiée - pourrait être étendue avec chronométrage réel
-        return timeoutMs <= UISystemConstants::Timing::UPDATE_INTERVAL_MS * 5;
+        return timeoutMs <= SystemConstants::Timing::SYSTEM_UPDATE_INTERVAL_MS * 5;
     }
     
     /**
      * @brief Traite les événements de base
      */
     virtual void processBaseEvents() {
-        if (eventBus_ && UISystemConstants::Validation::VALIDATE_EVENT_BUS_REQUIRED) {
+        if (eventBus_ && SystemConstants::Validation::VALIDATE_EVENT_BUS_REQUIRED) {
             eventBus_->update();
         }
     }

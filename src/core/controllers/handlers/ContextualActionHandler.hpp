@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseNavigationHandler.hpp"
-#include "config/NavigationConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Handler spécialisé pour les actions contextuelles

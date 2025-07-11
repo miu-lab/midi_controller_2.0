@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseUIProcessor.hpp"
-#include "config/UISystemConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Processor spécialisé pour le traitement des événements UI
@@ -21,7 +21,7 @@ public:
             return false;
         }
         
-        if (!isWithinTimeout(UISystemConstants::Timing::EVENT_PROCESSING_TIMEOUT_MS)) {
+        if (!isWithinTimeout(SystemConstants::Timing::EVENT_PROCESSING_TIMEOUT_MS)) {
             return false;
         }
         
@@ -33,12 +33,12 @@ public:
      * @brief Vérifie si le traitement d'événements est configuré
      */
     bool isEventProcessingEnabled() const {
-        return UISystemConstants::System::DEFAULT_ENABLE_EVENT_PROCESSING;
+        return SystemConstants::UI::DEFAULT_ENABLE_EVENT_PROCESSING;
     }
 
 protected:
     bool isValidContext() const override {
         return BaseUIProcessor::isValidContext() && 
-               UISystemConstants::Validation::VALIDATE_EVENT_BUS_REQUIRED;
+               SystemConstants::Validation::VALIDATE_EVENT_BUS_REQUIRED;
     }
 };

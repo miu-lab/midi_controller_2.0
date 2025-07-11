@@ -1,5 +1,5 @@
 #include "NavigationController.hpp"
-#include "config/NavigationConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 NavigationController::NavigationController(std::shared_ptr<NavigationStateManager> stateManager,
                                          std::shared_ptr<EventBus> eventBus)
@@ -119,7 +119,7 @@ bool NavigationController::isActionValidInCurrentContext(NavigationAction action
     
     // Validation basique : toutes les actions sauf depuis SPLASH_SCREEN
     // Les actions HOME et BACK sont toujours valides
-    return (currentState != NavigationConstants::DefaultStates::INITIAL_STATE) || 
+    return (currentState != AppState::PARAMETER_FOCUS) || 
            (action == NavigationAction::HOME) ||
            (action == NavigationAction::BACK);
 }

@@ -4,7 +4,7 @@
 #include "processors/NavigationInputProcessor.hpp"
 #include "processors/MidiInputProcessor.hpp"
 #include "app/services/NavigationConfigService.hpp"
-#include "config/InputConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Gestionnaire centralisé des processors d'input

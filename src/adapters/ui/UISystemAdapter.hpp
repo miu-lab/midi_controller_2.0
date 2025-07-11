@@ -6,7 +6,7 @@
 #include "core/domain/interfaces/IUIManager.hpp"
 #include "core/utils/Result.hpp"
 #include "UIProcessorManager.hpp"
-#include "config/UISystemConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 // Forward declarations
 class ViewManager;

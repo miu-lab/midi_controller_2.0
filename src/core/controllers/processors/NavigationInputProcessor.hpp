@@ -2,7 +2,7 @@
 
 #include "BaseInputProcessor.hpp"
 #include "core/domain/navigation/NavigationEvent.hpp"
-#include "config/InputConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Processor spécialisé pour les entrées de navigation
@@ -49,7 +49,7 @@ public:
         }
         
         // Traiter seulement les appuis selon configuration
-        if (!pressed && InputConstants::Navigation::PROCESS_BUTTON_PRESS_ONLY) {
+        if (!pressed && SystemConstants::Buttons::PROCESS_PRESS_ONLY) {
             return false;
         }
         
@@ -64,7 +64,7 @@ public:
         }
         
         NavigationAction action = extractNavigationAction(control, false);
-        int parameter = InputConstants::Navigation::DEFAULT_BUTTON_PARAMETER;
+        int parameter = SystemConstants::Buttons::DEFAULT_PARAMETER;
         
         emitNavigationEvent(action, parameter);
         return true;
@@ -83,13 +83,13 @@ private:
         }
         
         // Actions par défaut depuis les constantes
-        return isEncoder ? InputConstants::DefaultActions::ENCODER_DEFAULT 
-                        : InputConstants::DefaultActions::BUTTON_DEFAULT;
+        return isEncoder ? SystemConstants::Encoders::DEFAULT_ACTION 
+                        : SystemConstants::Buttons::DEFAULT_ACTION;
     }
     
     int calculateEncoderParameter(const ControlDefinition& control, int8_t relativeChange) const {
         if (control.hardware.type != InputType::ENCODER) {
-            return InputConstants::Navigation::DEFAULT_ENCODER_PARAMETER;
+            return SystemConstants::Encoders::DEFAULT_PARAMETER;
         }
         
         const auto& encoderConfig = std::get<ControlDefinition::EncoderConfig>(control.hardware.config);

@@ -2,7 +2,7 @@
 #include "ViewManager.hpp"
 #include "DefaultViewManager.hpp"
 #include "config/DisplayConfig.hpp"
-#include "config/UIConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 LvglMenuView::LvglMenuView(std::shared_ptr<Ili9341LvglBridge> bridge)
     : bridge_(bridge), view_manager_(nullptr),
@@ -150,7 +150,7 @@ void LvglMenuView::setupMainScreen() {
     // lv_obj_center(main_screen_);
     // lv_obj_set_style_margin_hor(main_screen_, 20, 0);
 
-    lv_obj_set_style_bg_color(main_screen_, lv_color_hex(UIConstants::Colors::BLACK), 0);
+    lv_obj_set_style_bg_color(main_screen_, lv_color_hex(SystemConstants::UI::COLOR_BLACK), 0);
     lv_obj_set_style_bg_opa(main_screen_, LV_OPA_100, 0);
 }
 
@@ -167,7 +167,7 @@ void LvglMenuView::setupBasicMenu() {
 
     // Style minimal pour le menu
     lv_obj_set_style_bg_opa(menu_, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_text_color(menu_, lv_color_hex(UIConstants::Colors::WHITE), 0);
+    lv_obj_set_style_text_color(menu_, lv_color_hex(SystemConstants::UI::COLOR_WHITE), 0);
     
     // Ajouter callback pour notifications de changement de page
     lv_obj_add_event_cb(menu_, menuPageChangeCallback, LV_EVENT_VALUE_CHANGED, this);
@@ -203,12 +203,12 @@ void LvglMenuView::createRootPageContent() {
     lv_obj_t* section = page_builder_->createSection(root_page_);
 
     // Créer tous les éléments de navigation avec UIConstants
-    page_builder_->createNavigationItem(section, UIConstants::Labels::WIFI_SETTINGS, wifi_page_);
-    page_builder_->createNavigationItem(section, UIConstants::Labels::BLUETOOTH_SETTINGS, bluetooth_page_);
-    page_builder_->createNavigationItem(section, UIConstants::Labels::AUDIO_SETTINGS, audio_page_);
-    page_builder_->createNavigationItem(section, UIConstants::Labels::INPUT_SETTINGS, input_page_);
-    page_builder_->createNavigationItem(section, UIConstants::Labels::DISPLAY_SETTINGS, display_page_);
-    page_builder_->createNavigationItem(section, UIConstants::Labels::ABOUT, about_page_);
+    page_builder_->createNavigationItem(section, SystemConstants::Labels::WIFI_SETTINGS, wifi_page_);
+    page_builder_->createNavigationItem(section, SystemConstants::Labels::BLUETOOTH_SETTINGS, bluetooth_page_);
+    page_builder_->createNavigationItem(section, SystemConstants::Labels::AUDIO_SETTINGS, audio_page_);
+    page_builder_->createNavigationItem(section, "Input Settings", input_page_);
+    page_builder_->createNavigationItem(section, "Display Settings", display_page_);
+    page_builder_->createNavigationItem(section, "About", about_page_);
 }
 
 // ===================================================================

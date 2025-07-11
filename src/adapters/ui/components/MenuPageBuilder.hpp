@@ -2,7 +2,7 @@
 
 #include <lvgl.h>
 #include <functional>
-#include "config/UIConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Builder pour créer des pages de menu LVGL de manière cohérente

@@ -5,7 +5,7 @@
 #include "core/domain/interfaces/IDisplayManager.hpp"
 #include "core/domain/events/core/IEventBus.hpp"
 #include "core/utils/Error.hpp"
-#include "config/UISystemConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 UISystemAdapter::UISystemAdapter(const UIConfig& config)
     : config_(config)
@@ -15,7 +15,7 @@ UISystemAdapter::UISystemAdapter(const UIConfig& config)
 Result<bool> UISystemAdapter::initialize(std::shared_ptr<MidiController::Events::IEventBus> eventBus) {
     if (initialized_) {
         return Result<bool>::error(
-            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::ALREADY_INITIALIZED}
+            {ErrorCode::OperationFailed, SystemConstants::ErrorMessages::ALREADY_INITIALIZED}
         );
     }
 
@@ -41,7 +41,7 @@ Result<bool> UISystemAdapter::initializeWithComponents(
     
     if (initialized_) {
         return Result<bool>::error(
-            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::ALREADY_INITIALIZED}
+            {ErrorCode::OperationFailed, SystemConstants::ErrorMessages::ALREADY_INITIALIZED}
         );
     }
 
@@ -59,7 +59,7 @@ Result<bool> UISystemAdapter::initializeWithComponents(
     // Valider les composants selon la configuration
     if (!validateComponents()) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::COMPONENTS_MISSING}
+            {ErrorCode::DependencyMissing, SystemConstants::ErrorMessages::COMPONENTS_MISSING}
         );
     }
 
@@ -81,13 +81,13 @@ void UISystemAdapter::update() {
 Result<bool> UISystemAdapter::showMessage(const std::string& message) {
     if (!isOperational()) {
         return Result<bool>::error(
-            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::UI_NOT_OPERATIONAL}
+            {ErrorCode::OperationFailed, SystemConstants::ErrorMessages::SYSTEM_NOT_OPERATIONAL}
         );
     }
 
     if (!processorManager_) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::VIEWMANAGER_MISSING}
+            {ErrorCode::DependencyMissing, SystemConstants::ErrorMessages::NULL_VIEW_MANAGER}
         );
     }
 
@@ -105,13 +105,13 @@ Result<bool> UISystemAdapter::showMessage(const std::string& message) {
 Result<bool> UISystemAdapter::clearDisplay() {
     if (!isOperational()) {
         return Result<bool>::error(
-            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::UI_NOT_OPERATIONAL}
+            {ErrorCode::OperationFailed, SystemConstants::ErrorMessages::SYSTEM_NOT_OPERATIONAL}
         );
     }
 
     if (!processorManager_) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::VIEWMANAGER_MISSING}
+            {ErrorCode::DependencyMissing, SystemConstants::ErrorMessages::NULL_VIEW_MANAGER}
         );
     }
 
@@ -140,7 +140,7 @@ bool UISystemAdapter::isOperational() const {
 Result<bool> UISystemAdapter::configureEventListener(std::unique_ptr<ViewManagerEventListener> eventListener) {
     if (!processorManager_ || !processorManager_->getViewManager()) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::LISTENER_REQUIRES_VIEWMANAGER}
+            {ErrorCode::DependencyMissing, SystemConstants::ErrorMessages::NULL_VIEW_MANAGER}
         );
     }
 
@@ -181,7 +181,7 @@ bool UISystemAdapter::validateComponents() const {
 
 bool UISystemAdapter::isConfigurationValid() const {
     // Vérifications de base de la configuration
-    if (UISystemConstants::Validation::STRICT_COMPONENT_VALIDATION) {
+    if (SystemConstants::Validation::STRICT_COMPONENT_VALIDATION) {
         // Vérifier que la configuration est cohérente
         if (config_.enableDisplayRefresh && !config_.enableFullUI) {
             return false; // Refresh sans UI n'a pas de sens

@@ -4,7 +4,7 @@
 #include "processors/EventUIProcessor.hpp"
 #include "processors/ViewUIProcessor.hpp"
 #include "processors/DisplayUIProcessor.hpp"
-#include "config/UISystemConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Gestionnaire centralisé des processors UI

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseNavigationHandler.hpp"
-#include "config/NavigationConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Handler spécialisé pour les actions sur les paramètres
@@ -63,6 +63,6 @@ private:
         if (getCurrentState() == AppState::PARAMETER_EDIT && canGoBack()) {
             return getPreviousState();
         }
-        return NavigationConstants::DefaultStates::FALLBACK_STATE;
+        return AppState::PARAMETER_FOCUS;
     }
 };

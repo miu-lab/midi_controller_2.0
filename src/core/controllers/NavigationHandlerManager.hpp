@@ -9,7 +9,7 @@
 #include "handlers/ParameterActionHandler.hpp"
 #include "handlers/ContextualActionHandler.hpp"
 #include "core/domain/navigation/NavigationStateManager.hpp"
-#include "config/NavigationConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Gestionnaire centralisé des handlers de navigation

@@ -4,7 +4,7 @@
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/types.hpp"
-#include "config/InputConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Classe de base pour tous les processors d'input
@@ -58,7 +58,7 @@ protected:
      * @brief Applique la sensibilité à un changement relatif
      */
     int applySensitivity(int8_t relativeChange, float sensitivity) const {
-        if (sensitivity == InputConstants::Sensitivity::DEFAULT_SENSITIVITY) {
+        if (sensitivity == SystemConstants::Encoders::DEFAULT_SENSITIVITY) {
             return static_cast<int>(relativeChange);
         }
         
@@ -69,18 +69,18 @@ protected:
         // Appliquer la sensibilité et assurer qu'un mouvement réel produit au moins 1 delta
         int32_t scaledDeltaAbs = static_cast<int32_t>(deltaAbs * sensitivity);
         if (scaledDeltaAbs == 0 && deltaAbs > 0) {
-            scaledDeltaAbs = InputConstants::Sensitivity::MIN_DELTA_THRESHOLD;
+            scaledDeltaAbs = SystemConstants::Encoders::MIN_DELTA_THRESHOLD;
         }
         
         int32_t result = scaledDeltaAbs * deltaSign;
         
         // Protection contre les débordements
-        if (InputConstants::Validation::ENABLE_OVERFLOW_PROTECTION) {
-            if (result > InputConstants::Sensitivity::MAX_DELTA_VALUE) {
-                return InputConstants::Sensitivity::MAX_DELTA_VALUE;
+        if (SystemConstants::Validation::ENABLE_OVERFLOW_PROTECTION) {
+            if (result > SystemConstants::Encoders::MAX_DELTA_VALUE) {
+                return SystemConstants::Encoders::MAX_DELTA_VALUE;
             }
-            if (result < InputConstants::Sensitivity::MIN_DELTA_VALUE) {
-                return InputConstants::Sensitivity::MIN_DELTA_VALUE;
+            if (result < SystemConstants::Encoders::MIN_DELTA_VALUE) {
+                return SystemConstants::Encoders::MIN_DELTA_VALUE;
             }
         }
         

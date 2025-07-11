@@ -2,7 +2,7 @@
 
 #include "BaseUIProcessor.hpp"
 #include "adapters/ui/views/ViewManager.hpp"
-#include "config/UISystemConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Processor spécialisé pour la gestion des vues UI
@@ -23,7 +23,7 @@ public:
             return false;
         }
         
-        if (!isWithinTimeout(UISystemConstants::Timing::VIEW_MANAGER_TIMEOUT_MS)) {
+        if (!isWithinTimeout(SystemConstants::Timing::VIEW_MANAGER_TIMEOUT_MS)) {
             return false;
         }
         
@@ -39,7 +39,7 @@ public:
             return false;
         }
         
-        if (message.length() > UISystemConstants::Modal::MAX_MESSAGE_LENGTH) {
+        if (message.length() > SystemConstants::UI::MAX_MESSAGE_LENGTH) {
             return false;
         }
         

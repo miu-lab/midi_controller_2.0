@@ -2,7 +2,7 @@
 
 #include "BaseInputProcessor.hpp"
 #include "core/domain/events/MidiEvents.hpp"
-#include "config/InputConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Processor spécialisé pour les entrées MIDI
@@ -24,7 +24,7 @@ public:
         }
         
         // Validation des limites
-        if (InputConstants::Validation::STRICT_INPUT_VALIDATION) {
+        if (SystemConstants::Validation::STRICT_INPUT_VALIDATION) {
             if (!isValidRelativeChange(relativeChange) || !isValidAbsolutePosition(absolutePosition)) {
                 return;
             }
@@ -48,12 +48,12 @@ public:
 
 private:
     bool isValidRelativeChange(int8_t relativeChange) const {
-        return relativeChange >= InputConstants::Limits::MIN_RELATIVE_CHANGE &&
-               relativeChange <= InputConstants::Limits::MAX_RELATIVE_CHANGE;
+        return relativeChange >= SystemConstants::Validation::MIN_RELATIVE_CHANGE &&
+               relativeChange <= SystemConstants::Validation::MAX_RELATIVE_CHANGE;
     }
     
     bool isValidAbsolutePosition(int32_t absolutePosition) const {
         return absolutePosition >= 0 && 
-               absolutePosition <= InputConstants::Limits::MAX_ABSOLUTE_POSITION;
+               absolutePosition <= SystemConstants::Validation::MAX_ABSOLUTE_POSITION;
     }
 };

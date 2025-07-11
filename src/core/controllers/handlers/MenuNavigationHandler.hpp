@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseNavigationHandler.hpp"
-#include "config/NavigationConstants.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Handler spécialisé pour la navigation dans les menus
@@ -47,7 +47,7 @@ private:
     
     bool handleMenuExit(int parameter) {
         // Sortir du menu = retour à l'état précédent ou PARAMETER_FOCUS
-        AppState targetState = canGoBack() ? getPreviousState() : NavigationConstants::DefaultStates::FALLBACK_STATE;
+        AppState targetState = canGoBack() ? getPreviousState() : AppState::PARAMETER_FOCUS;
         performStateTransition(targetState, static_cast<uint8_t>(parameter), false);
         return true;
     }
