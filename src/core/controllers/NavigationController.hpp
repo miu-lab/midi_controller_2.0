@@ -1,12 +1,12 @@
 #pragma once
 
 #include <memory>
-#include <etl/array.h>
 
 #include "core/domain/navigation/NavigationStateManager.hpp"
 #include "core/domain/navigation/NavigationEvent.hpp"
 #include "core/domain/events/core/EventBus.hpp"
 #include "core/domain/events/core/IEventBus.hpp"
+#include "NavigationHandlerManager.hpp"
 
 /**
  * @brief Contrôleur central pour la navigation
@@ -109,63 +109,16 @@ private:
     std::shared_ptr<NavigationStateManager> stateManager_;
     std::shared_ptr<EventBus> eventBus_;
     
+    // === SYSTÈME DE HANDLERS ===
+    std::unique_ptr<NavigationHandlerManager> handlerManager_;
+    
     // === ÉTAT D'INITIALISATION ===
     bool initialized_;
     
-    // === TABLES DE ROUTAGE ===
-    
-    /**
-     * @brief Structure pour le routage d'actions
-     */
-    struct ActionRoute {
-        NavigationAction action;
-        AppState targetState;
-        bool pushToHistory;      // true = pushState(), false = setState()
-        bool requiresParameter;
-        
-        ActionRoute(NavigationAction act, AppState target, bool push = false, bool reqParam = false)
-            : action(act), targetState(target), pushToHistory(push), requiresParameter(reqParam) {}
-    };
-    
-    // Table de routage statique
-    static const etl::array<ActionRoute, 10> ACTION_ROUTES;
-    
     // === MÉTHODES PRIVÉES ===
-    
-    /**
-     * @brief Exécute une action contextuelle
-     */
-    void executeContextualAction(NavigationAction action, int parameter);
-    
-    /**
-     * @brief Détermine l'état cible selon l'action et le contexte
-     */
-    AppState determineTargetState(NavigationAction action, AppState currentState) const;
-    
-    /**
-     * @brief Trouve la route pour une action donnée
-     */
-    const ActionRoute* findActionRoute(NavigationAction action) const;
     
     /**
      * @brief Vérifie si l'action est valide dans le contexte actuel
      */
     bool isActionValidInCurrentContext(NavigationAction action) const;
-    
-    /**
-     * @brief Traite les actions spéciales (HOME, BACK)
-     */
-    void handleSpecialAction(NavigationAction action, int parameter);
-    
-    /**
-     * @brief Traite les actions de navigation normale
-     */
-    void handleNormalAction(NavigationAction action, int parameter);
-    
-    // === CALLBACKS D'ÉVÉNEMENTS ===
-    
-    /**
-     * @brief Callback générique pour tous les événements de navigation
-     */
-    void onNavigationEventReceived(const Event& event);
 };

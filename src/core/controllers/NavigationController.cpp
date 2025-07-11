@@ -1,36 +1,11 @@
 #include "NavigationController.hpp"
-
-#include <functional>
-
-// Table de routage statique
-const etl::array<NavigationController::ActionRoute, 10> NavigationController::ACTION_ROUTES = {{
-    // Actions de navigation générale
-    {NavigationAction::MENU_ENTER, AppState::MENU, true, false},
-    {NavigationAction::MENU_EXIT, AppState::PARAMETER_FOCUS, false, false},
-    
-    // Actions de paramètres
-    {NavigationAction::PARAMETER_EDIT, AppState::PARAMETER_EDIT, true, true},
-    {NavigationAction::PARAMETER_VALIDATE, AppState::PARAMETER_FOCUS, false, false},
-    {NavigationAction::PARAMETER_CANCEL, AppState::PARAMETER_FOCUS, false, false},
-    
-    // Actions contextuelles (pas de routage direct)
-    // ITEM_NAVIGATOR supprimé - traité contextuellement
-    // ITEM_VALIDATE supprimé - traité contextuellement
-    {NavigationAction::ITEM_NEXT, AppState::MENU, false, false},
-    {NavigationAction::ITEM_PREVIOUS, AppState::MENU, false, false},
-    
-    // Actions spéciales (traitées séparément)
-    {NavigationAction::HOME, AppState::PARAMETER_FOCUS, false, false},
-    {NavigationAction::BACK, AppState::PARAMETER_FOCUS, false, false},
-    
-    // Actions avancées
-    {NavigationAction::TOGGLE_VIEW, AppState::DEBUG_VIEW, false, false}
-}};
+#include "config/NavigationConstants.hpp"
 
 NavigationController::NavigationController(std::shared_ptr<NavigationStateManager> stateManager,
                                          std::shared_ptr<EventBus> eventBus)
     : stateManager_(stateManager)
     , eventBus_(eventBus)
+    , handlerManager_(std::make_unique<NavigationHandlerManager>(stateManager))
     , initialized_(false) {
 }
 
@@ -57,10 +32,6 @@ void NavigationController::subscribeToEvents() {
 }
 
 void NavigationController::handleNavigationEvent(const NavigationEvent& event) {
-    if (!stateManager_) {
-        return;
-    }
-    
     routeNavigationAction(event.getAction(), event.getParameter());
 }
 
@@ -100,14 +71,10 @@ void NavigationController::routeNavigationAction(NavigationAction action, int pa
         return;
     }
     
-    // Traiter les actions spéciales en premier
-    if (action == NavigationAction::HOME || action == NavigationAction::BACK) {
-        handleSpecialAction(action, parameter);
-        return;
+    // Déléguer au système de handlers spécialisés
+    if (handlerManager_) {
+        handlerManager_->handleAction(action, parameter);
     }
-    
-    // Traiter les actions normales
-    handleNormalAction(action, parameter);
 }
 
 void NavigationController::forceStateChange(AppState newState, uint8_t parameter, uint8_t subState) {
@@ -142,50 +109,6 @@ size_t NavigationController::getNavigationHistorySize() const {
     return stateManager_->getHistorySize();
 }
 
-void NavigationController::executeContextualAction(NavigationAction action, int parameter) {
-    stateManager_->handleNavigationAction(action, parameter);
-}
-
-AppState NavigationController::determineTargetState(NavigationAction action, AppState currentState) const {
-    // Trouver la route pour cette action
-    const ActionRoute* route = findActionRoute(action);
-    if (!route) {
-        return currentState;
-    }
-    
-    // Certaines actions ont un état cible contextuel
-    switch (action) {
-        case NavigationAction::BACK:
-            return stateManager_->getPreviousState();
-            
-        case NavigationAction::MENU_EXIT:
-            // Sortir du menu = retour à l'état précédent ou PARAMETER_FOCUS
-            if (stateManager_->canGoBack()) {
-                return stateManager_->getPreviousState();
-            }
-            return AppState::PARAMETER_FOCUS;
-            
-        case NavigationAction::PARAMETER_VALIDATE:
-        case NavigationAction::PARAMETER_CANCEL:
-            // Validation/annulation de paramètre = retour à l'état précédent
-            if (currentState == AppState::PARAMETER_EDIT && stateManager_->canGoBack()) {
-                return stateManager_->getPreviousState();
-            }
-            return AppState::PARAMETER_FOCUS;
-            
-        default:
-            return route->targetState;
-    }
-}
-
-const NavigationController::ActionRoute* NavigationController::findActionRoute(NavigationAction action) const {
-    for (const auto& route : ACTION_ROUTES) {
-        if (route.action == action) {
-            return &route;
-        }
-    }
-    return nullptr;
-}
 
 bool NavigationController::isActionValidInCurrentContext(NavigationAction action) const {
     if (!stateManager_) {
@@ -196,48 +119,9 @@ bool NavigationController::isActionValidInCurrentContext(NavigationAction action
     
     // Validation basique : toutes les actions sauf depuis SPLASH_SCREEN
     // Les actions HOME et BACK sont toujours valides
-    return (currentState != AppState::SPLASH_SCREEN) || 
+    return (currentState != NavigationConstants::DefaultStates::INITIAL_STATE) || 
            (action == NavigationAction::HOME) ||
            (action == NavigationAction::BACK);
-}
-
-void NavigationController::handleSpecialAction(NavigationAction action, int parameter) {
-    if (!stateManager_) {
-        return;
-    }
-    
-    switch (action) {
-        case NavigationAction::HOME:
-            stateManager_->handleHomeAction();
-            break;
-            
-        case NavigationAction::BACK:
-            stateManager_->handleBackAction();
-            break;
-            
-        default:
-            // Action spéciale inconnue
-            break;
-    }
-}
-
-void NavigationController::handleNormalAction(NavigationAction action, int parameter) {
-    const ActionRoute* route = findActionRoute(action);
-    if (!route) {
-        // Action non trouvée, traiter contextuellement
-        executeContextualAction(action, parameter);
-        return;
-    }
-    
-    // Déterminer l'état cible
-    AppState targetState = determineTargetState(action, getCurrentState());
-    
-    // Exécuter la transition
-    if (route->pushToHistory) {
-        stateManager_->pushState(targetState, static_cast<uint8_t>(parameter));
-    } else {
-        stateManager_->setState(targetState, static_cast<uint8_t>(parameter));
-    }
 }
 
 bool NavigationController::onEvent(const Event& event) {

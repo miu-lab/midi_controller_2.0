@@ -36,17 +36,9 @@ bool LvglMenuView::init() {
     // D'abord créer le menu de base SANS contenu
     setupBasicMenu();
     
-    // Debug: Vérifier initialisation ETL builders
-    Serial.println("LvglMenuView: Initializing ETL builders...");
-    
-    // Utiliser ETL optional pour allocation statique (pas de new/delete)
+    // Initialiser les builders ETL avec allocation statique
     page_builder_.emplace(menu_);
-    Serial.println("LvglMenuView: page_builder_ created");
-    
     page_factory_.emplace(*page_builder_);
-    Serial.println("LvglMenuView: page_factory_ created");
-    
-    Serial.println("LvglMenuView: ETL builders initialization complete");
     
     // MAINTENANT créer le contenu avec les builders initialisés
     createSophisticatedMenu();
@@ -197,12 +189,6 @@ void LvglMenuView::createSophisticatedMenu() {
 }
 
 void LvglMenuView::createSubPages() {
-    // Debug: Vérifier que la factory est bien initialisée
-    if (!page_factory_.has_value()) {
-        Serial.println("ERROR: page_factory_ not initialized!");
-        return;
-    }
-    
     // Builder Pattern ETL - allocation statique pure
     wifi_page_ = page_factory_->createWiFiPage(root_page_);
     bluetooth_page_ = page_factory_->createBluetoothPage(root_page_);
@@ -213,12 +199,6 @@ void LvglMenuView::createSubPages() {
 }
 
 void LvglMenuView::createRootPageContent() {
-    // Debug: Vérifier que le builder est bien initialisé
-    if (!page_builder_.has_value()) {
-        Serial.println("ERROR: page_builder_ not initialized!");
-        return;
-    }
-    
     // Builder Pattern ETL pur - allocation statique garantie
     lv_obj_t* section = page_builder_->createSection(root_page_);
 
