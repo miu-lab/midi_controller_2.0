@@ -5,6 +5,7 @@
 #include "core/domain/interfaces/IDisplayManager.hpp"
 #include "core/domain/events/core/IEventBus.hpp"
 #include "core/utils/Error.hpp"
+#include "config/UISystemConstants.hpp"
 
 UISystemAdapter::UISystemAdapter(const UIConfig& config)
     : config_(config)
@@ -13,13 +14,22 @@ UISystemAdapter::UISystemAdapter(const UIConfig& config)
 
 Result<bool> UISystemAdapter::initialize(std::shared_ptr<MidiController::Events::IEventBus> eventBus) {
     if (initialized_) {
-        return Result<bool>::success(true);
+        return Result<bool>::error(
+            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::ALREADY_INITIALIZED}
+        );
     }
 
-    // Stocker le bus d'événements
-    eventBus_ = eventBus;
+    if (!isConfigurationValid()) {
+        return Result<bool>::error(
+            {ErrorCode::ConfigurationError, "Invalid UI system configuration"}
+        );
+    }
 
-    // Marquer comme initialisé si on a au moins le bus d'événements
+    // Créer un processor manager minimal avec seulement EventBus
+    if (eventBus) {
+        processorManager_ = std::make_unique<UIProcessorManager>(nullptr, nullptr, eventBus);
+    }
+
     initialized_ = true;
     return Result<bool>::success(true);
 }
@@ -30,18 +40,26 @@ Result<bool> UISystemAdapter::initializeWithComponents(
     std::shared_ptr<MidiController::Events::IEventBus> eventBus) {
     
     if (initialized_) {
-        return Result<bool>::success(true);
+        return Result<bool>::error(
+            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::ALREADY_INITIALIZED}
+        );
     }
 
-    // Stocker les composants
-    viewManager_ = viewManager;
-    displayManager_ = std::move(displayManager);
-    eventBus_ = eventBus;
+    if (!isConfigurationValid()) {
+        return Result<bool>::error(
+            {ErrorCode::ConfigurationError, "Invalid UI system configuration"}
+        );
+    }
+
+    // Créer le processor manager avec tous les composants
+    processorManager_ = std::make_unique<UIProcessorManager>(
+        viewManager, std::move(displayManager), eventBus
+    );
 
     // Valider les composants selon la configuration
     if (!validateComponents()) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, "Required UI components missing"}
+            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::COMPONENTS_MISSING}
         );
     }
 
@@ -54,45 +72,57 @@ void UISystemAdapter::update() {
         return;
     }
 
-    // Mettre à jour dans le bon ordre pour optimiser les performances
-    processEvents();
-    updateViewManager();
-    refreshDisplay();
+    // Déléguer au processor manager qui gère l'ordre optimal
+    if (processorManager_) {
+        processorManager_->executeUpdateCycle();
+    }
 }
 
 Result<bool> UISystemAdapter::showMessage(const std::string& message) {
     if (!isOperational()) {
         return Result<bool>::error(
-            {ErrorCode::OperationFailed, "UI system not operational"}
+            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::UI_NOT_OPERATIONAL}
         );
     }
 
-    if (!viewManager_) {
+    if (!processorManager_) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, "ViewManager not available"}
+            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::VIEWMANAGER_MISSING}
         );
     }
 
-    // Utiliser le système modal LVGL
-    viewManager_->showModal(message.c_str());
+    // Déléguer au processor manager
+    bool success = processorManager_->showMessage(message);
+    if (!success) {
+        return Result<bool>::error(
+            {ErrorCode::OperationFailed, "Failed to show modal message"}
+        );
+    }
+
     return Result<bool>::success(true);
 }
 
 Result<bool> UISystemAdapter::clearDisplay() {
     if (!isOperational()) {
         return Result<bool>::error(
-            {ErrorCode::OperationFailed, "UI system not operational"}
+            {ErrorCode::OperationFailed, UISystemConstants::ErrorMessages::UI_NOT_OPERATIONAL}
         );
     }
 
-    if (!viewManager_) {
+    if (!processorManager_) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, "ViewManager not available"}
+            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::VIEWMANAGER_MISSING}
         );
     }
 
-    // Cacher le modal et retourner à la vue principale
-    viewManager_->hideModal();
+    // Déléguer au processor manager
+    bool success = processorManager_->clearDisplay();
+    if (!success) {
+        return Result<bool>::error(
+            {ErrorCode::OperationFailed, "Failed to clear display"}
+        );
+    }
+
     return Result<bool>::success(true);
 }
 
@@ -103,13 +133,14 @@ bool UISystemAdapter::isInitialized() const {
 bool UISystemAdapter::isOperational() const {
     return initialized_ && 
            config_.enableFullUI && 
-           viewManager_ != nullptr;
+           processorManager_ && 
+           processorManager_->areProcessorsOperational();
 }
 
 Result<bool> UISystemAdapter::configureEventListener(std::unique_ptr<ViewManagerEventListener> eventListener) {
-    if (!viewManager_) {
+    if (!processorManager_ || !processorManager_->getViewManager()) {
         return Result<bool>::error(
-            {ErrorCode::DependencyMissing, "ViewManager required for event listener"}
+            {ErrorCode::DependencyMissing, UISystemConstants::ErrorMessages::LISTENER_REQUIRES_VIEWMANAGER}
         );
     }
 
@@ -124,42 +155,42 @@ Result<bool> UISystemAdapter::configureEventListener(std::unique_ptr<ViewManager
 }
 
 std::shared_ptr<ViewManager> UISystemAdapter::getViewManager() const {
-    return viewManager_;
+    if (!processorManager_) {
+        return nullptr;
+    }
+    return processorManager_->getViewManager();
 }
 
 bool UISystemAdapter::validateComponents() const {
-    // ViewManager est toujours requis si Full UI est activé
-    if (config_.enableFullUI && !viewManager_) {
+    if (!processorManager_) {
         return false;
     }
 
-    // DisplayManager est requis si le refresh est activé
-    if (config_.enableDisplayRefresh && config_.enableFullUI && !displayManager_) {
+    // ViewManager est requis si Full UI est activé
+    if (config_.enableFullUI && !processorManager_->getViewManager()) {
         return false;
     }
 
-    // EventManager est requis si le traitement d'événements est activé
-    if (config_.enableEventProcessing && config_.enableFullUI && !eventBus_) {
+    // Vérifier que les processors sont opérationnels selon la configuration
+    if (config_.enableFullUI && !processorManager_->areProcessorsOperational()) {
         return false;
     }
 
     return true;
 }
 
-void UISystemAdapter::processEvents() {
-    if (config_.enableEventProcessing && eventBus_) {
-        eventBus_->update();
+bool UISystemAdapter::isConfigurationValid() const {
+    // Vérifications de base de la configuration
+    if (UISystemConstants::Validation::STRICT_COMPONENT_VALIDATION) {
+        // Vérifier que la configuration est cohérente
+        if (config_.enableDisplayRefresh && !config_.enableFullUI) {
+            return false; // Refresh sans UI n'a pas de sens
+        }
+        
+        if (config_.enableEventProcessing && !config_.enableFullUI) {
+            return false; // Événements UI sans UI n'a pas de sens
+        }
     }
-}
-
-void UISystemAdapter::updateViewManager() {
-    if (viewManager_) {
-        viewManager_->update();
-    }
-}
-
-void UISystemAdapter::refreshDisplay() {
-    if (config_.enableDisplayRefresh && displayManager_) {
-        displayManager_->update();
-    }
+    
+    return true;
 }

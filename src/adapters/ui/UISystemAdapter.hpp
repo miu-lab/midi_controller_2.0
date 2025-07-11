@@ -5,6 +5,8 @@
 
 #include "core/domain/interfaces/IUIManager.hpp"
 #include "core/utils/Result.hpp"
+#include "UIProcessorManager.hpp"
+#include "config/UISystemConstants.hpp"
 
 // Forward declarations
 class ViewManager;
@@ -100,10 +102,8 @@ private:
     UIConfig config_;
     bool initialized_;
 
-    // Composants UI centralisés
-    std::shared_ptr<ViewManager> viewManager_;
-    std::unique_ptr<IDisplayManager> displayManager_;
-    std::shared_ptr<MidiController::Events::IEventBus> eventBus_;
+    // === SYSTÈME DE PROCESSORS ===
+    std::unique_ptr<UIProcessorManager> processorManager_;
     std::unique_ptr<ViewManagerEventListener> eventListener_;
 
     /**
@@ -113,17 +113,7 @@ private:
     bool validateComponents() const;
 
     /**
-     * @brief Traite les événements UI via EventBus
+     * @brief Vérifie si la configuration système est valide
      */
-    void processEvents();
-
-    /**
-     * @brief Met à jour le gestionnaire de vues
-     */
-    void updateViewManager();
-
-    /**
-     * @brief Rafraîchit l'affichage
-     */
-    void refreshDisplay();
+    bool isConfigurationValid() const;
 };
