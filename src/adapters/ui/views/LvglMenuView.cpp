@@ -2,6 +2,7 @@
 #include "ViewManager.hpp"
 #include "DefaultViewManager.hpp"
 #include "config/DisplayConfig.hpp"
+#include "config/UIConstants.hpp"
 
 LvglMenuView::LvglMenuView(std::shared_ptr<Ili9341LvglBridge> bridge)
     : bridge_(bridge), view_manager_(nullptr),
@@ -15,6 +16,10 @@ LvglMenuView::LvglMenuView(std::shared_ptr<Ili9341LvglBridge> bridge)
 LvglMenuView::~LvglMenuView() {
     setActive(false);
     cleanupLvglObjects();
+    
+    // Nettoyer les builders ETL optional (automatique)
+    page_factory_.reset();
+    page_builder_.reset();
 }
 
 bool LvglMenuView::init() {
@@ -27,7 +32,24 @@ bool LvglMenuView::init() {
     }
     
     setupMainScreen();
-    setupNativeMenu();
+    
+    // D'abord créer le menu de base SANS contenu
+    setupBasicMenu();
+    
+    // Debug: Vérifier initialisation ETL builders
+    Serial.println("LvglMenuView: Initializing ETL builders...");
+    
+    // Utiliser ETL optional pour allocation statique (pas de new/delete)
+    page_builder_.emplace(menu_);
+    Serial.println("LvglMenuView: page_builder_ created");
+    
+    page_factory_.emplace(*page_builder_);
+    Serial.println("LvglMenuView: page_factory_ created");
+    
+    Serial.println("LvglMenuView: ETL builders initialization complete");
+    
+    // MAINTENANT créer le contenu avec les builders initialisés
+    createSophisticatedMenu();
     
     initialized_ = true;
     return true;
@@ -136,11 +158,11 @@ void LvglMenuView::setupMainScreen() {
     // lv_obj_center(main_screen_);
     // lv_obj_set_style_margin_hor(main_screen_, 20, 0);
 
-    lv_obj_set_style_bg_color(main_screen_, lv_color_hex(0x000000), 0);
+    lv_obj_set_style_bg_color(main_screen_, lv_color_hex(UIConstants::Colors::BLACK), 0);
     lv_obj_set_style_bg_opa(main_screen_, LV_OPA_100, 0);
 }
 
-void LvglMenuView::setupNativeMenu() {
+void LvglMenuView::setupBasicMenu() {
     // Créer le groupe LVGL EN PREMIER
     lv_group_t* group = lv_group_get_default();
     if (!group) {
@@ -148,21 +170,15 @@ void LvglMenuView::setupNativeMenu() {
         lv_group_set_default(group);
     }
 
-    // Créer le widget menu natif LVGL - CONFIGURATION SOPHISTIQUEE
+    // Créer le widget menu natif LVGL - SANS contenu pour l'instant
     menu_ = lv_menu_create(main_screen_);
 
     // Style minimal pour le menu
     lv_obj_set_style_bg_opa(menu_, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_text_color(menu_, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_text_color(menu_, lv_color_hex(UIConstants::Colors::WHITE), 0);
     
     // Ajouter callback pour notifications de changement de page
     lv_obj_add_event_cb(menu_, menuPageChangeCallback, LV_EVENT_VALUE_CHANGED, this);
-
-    // Créer les pages du menu sophistiqué
-    createSophisticatedMenu();
-
-    // Charger la page racine
-    lv_menu_set_page(menu_, root_page_);
 }
 
 void LvglMenuView::createSophisticatedMenu() {
@@ -175,282 +191,61 @@ void LvglMenuView::createSophisticatedMenu() {
 
     // Créer le contenu de la page racine
     createRootPageContent();
+    
+    // Charger la page racine une fois tout créé
+    lv_menu_set_page(menu_, root_page_);
 }
 
 void LvglMenuView::createSubPages() {
-    // Page WiFi
-    wifi_page_ = lv_menu_page_create(menu_, "WiFi Settings");
-    lv_obj_set_style_bg_opa(wifi_page_, LV_OPA_TRANSP, 0);
-    createWiFiPage();
-
-    // Page Bluetooth  
-    bluetooth_page_ = lv_menu_page_create(menu_, "Bluetooth Settings");
-    lv_obj_set_style_bg_opa(bluetooth_page_, LV_OPA_TRANSP, 0);
-    createBluetoothPage();
-
-    // Page Audio
-    audio_page_ = lv_menu_page_create(menu_, "Audio Settings");
-    lv_obj_set_style_bg_opa(audio_page_, LV_OPA_TRANSP, 0);
-    createAudioPage();
-
-    // Page Input
-    input_page_ = lv_menu_page_create(menu_, "Input Settings");
-    lv_obj_set_style_bg_opa(input_page_, LV_OPA_TRANSP, 0);
-    createInputPage();
-
-    // Page Display
-    display_page_ = lv_menu_page_create(menu_, "Display Settings");
-    lv_obj_set_style_bg_opa(display_page_, LV_OPA_TRANSP, 0);
-    createDisplayPage();
-
-    // Page About
-    about_page_ = lv_menu_page_create(menu_, "About");
-    lv_obj_set_style_bg_opa(about_page_, LV_OPA_TRANSP, 0);
-    createAboutPage();
+    // Debug: Vérifier que la factory est bien initialisée
+    if (!page_factory_.has_value()) {
+        Serial.println("ERROR: page_factory_ not initialized!");
+        return;
+    }
+    
+    // Builder Pattern ETL - allocation statique pure
+    wifi_page_ = page_factory_->createWiFiPage(root_page_);
+    bluetooth_page_ = page_factory_->createBluetoothPage(root_page_);
+    audio_page_ = page_factory_->createAudioPage(root_page_);
+    input_page_ = page_factory_->createInputPage(root_page_);
+    display_page_ = page_factory_->createDisplayPage(root_page_);
+    about_page_ = page_factory_->createAboutPage(root_page_);
 }
 
 void LvglMenuView::createRootPageContent() {
-    lv_obj_t* section = lv_menu_section_create(root_page_);
-    lv_obj_set_style_bg_opa(section, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_ver(section, 8, 0);
-
-    // WiFi Settings
-    lv_obj_t* wifi_item = lv_menu_cont_create(section);
-    lv_obj_t* wifi_label = lv_label_create(wifi_item);
-    lv_label_set_text(wifi_label, "WiFi Settings");
-    lv_menu_set_load_page_event(menu_, wifi_item, wifi_page_);
-    applyItemStyle(wifi_item);
-
-    // Bluetooth Settings
-    lv_obj_t* bt_item = lv_menu_cont_create(section);
-    lv_obj_t* bt_label = lv_label_create(bt_item);
-    lv_label_set_text(bt_label, "Bluetooth Settings");
-    lv_menu_set_load_page_event(menu_, bt_item, bluetooth_page_);
-    applyItemStyle(bt_item);
-
-    // Audio Settings
-    lv_obj_t* audio_item = lv_menu_cont_create(section);
-    lv_obj_t* audio_label = lv_label_create(audio_item);
-    lv_label_set_text(audio_label, "Audio Settings");
-    lv_menu_set_load_page_event(menu_, audio_item, audio_page_);
-    applyItemStyle(audio_item);
-
-    // Input Settings
-    lv_obj_t* input_item = lv_menu_cont_create(section);
-    lv_obj_t* input_label = lv_label_create(input_item);
-    lv_label_set_text(input_label, "Input Settings");
-    lv_menu_set_load_page_event(menu_, input_item, input_page_);
-    applyItemStyle(input_item);
-
-    // Display Settings
-    lv_obj_t* display_item = lv_menu_cont_create(section);
-    lv_obj_t* display_label = lv_label_create(display_item);
-    lv_label_set_text(display_label, "Display Settings");
-    lv_menu_set_load_page_event(menu_, display_item, display_page_);
-    applyItemStyle(display_item);
-
-    // About
-    lv_obj_t* about_item = lv_menu_cont_create(section);
-    lv_obj_t* about_label = lv_label_create(about_item);
-    lv_label_set_text(about_label, "About");
-    lv_menu_set_load_page_event(menu_, about_item, about_page_);
-    applyItemStyle(about_item);
-}
-
-void LvglMenuView::applyItemStyle(lv_obj_t* item) {
-    // FOND TRANSPARENT pour les items
-    lv_obj_set_style_bg_opa(item, LV_OPA_TRANSP, 0);
-
-    // Style focus automatique via LVGL - BORDURE INTENSE
-    lv_obj_set_style_border_side(item, LV_BORDER_SIDE_LEFT, LV_STATE_FOCUSED);
-    lv_obj_set_style_border_width(item, 5, LV_STATE_FOCUSED);
-    lv_obj_set_style_border_color(item, lv_color_hex(0x96FC6A), LV_STATE_FOCUSED);
-    lv_obj_set_style_border_opa(item, LV_OPA_COVER, LV_STATE_FOCUSED);
-
-    // Ajouter au groupe pour navigation
-    lv_group_t* group = lv_group_get_default();
-    if (group) {
-        lv_group_add_obj(group, item);
+    // Debug: Vérifier que le builder est bien initialisé
+    if (!page_builder_.has_value()) {
+        Serial.println("ERROR: page_builder_ not initialized!");
+        return;
     }
+    
+    // Builder Pattern ETL pur - allocation statique garantie
+    lv_obj_t* section = page_builder_->createSection(root_page_);
+
+    // Créer tous les éléments de navigation avec UIConstants
+    page_builder_->createNavigationItem(section, UIConstants::Labels::WIFI_SETTINGS, wifi_page_);
+    page_builder_->createNavigationItem(section, UIConstants::Labels::BLUETOOTH_SETTINGS, bluetooth_page_);
+    page_builder_->createNavigationItem(section, UIConstants::Labels::AUDIO_SETTINGS, audio_page_);
+    page_builder_->createNavigationItem(section, UIConstants::Labels::INPUT_SETTINGS, input_page_);
+    page_builder_->createNavigationItem(section, UIConstants::Labels::DISPLAY_SETTINGS, display_page_);
+    page_builder_->createNavigationItem(section, UIConstants::Labels::ABOUT, about_page_);
 }
 
-void LvglMenuView::createWiFiPage() {
-    lv_obj_t* section = lv_menu_section_create(wifi_page_);
-    lv_obj_set_style_bg_opa(section, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_ver(section, 8, 0);
-
-    // WiFi Enable Switch
-    lv_obj_t* switch_item = lv_menu_cont_create(section);
-    lv_obj_t* switch_label = lv_label_create(switch_item);
-    lv_label_set_text(switch_label, "Enable WiFi");
-    lv_obj_t* sw = lv_switch_create(switch_item);
-    lv_obj_align(sw, LV_ALIGN_RIGHT_MID, -10, 0);
-    applyItemStyle(switch_item);
-
-    // Network SSID
-    lv_obj_t* ssid_item = lv_menu_cont_create(section);
-    lv_obj_t* ssid_label = lv_label_create(ssid_item);
-    lv_label_set_text(ssid_label, "Network: MyWiFi");
-    applyItemStyle(ssid_item);
-
-    // Signal Strength
-    lv_obj_t* signal_item = lv_menu_cont_create(section);
-    lv_obj_t* signal_label = lv_label_create(signal_item);
-    lv_label_set_text(signal_label, "Signal: Strong");
-    applyItemStyle(signal_item);
-}
-
-void LvglMenuView::createBluetoothPage() {
-    lv_obj_t* section = lv_menu_section_create(bluetooth_page_);
-    lv_obj_set_style_bg_opa(section, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_ver(section, 8, 0);
-
-    // Bluetooth Enable Switch
-    lv_obj_t* switch_item = lv_menu_cont_create(section);
-    lv_obj_t* switch_label = lv_label_create(switch_item);
-    lv_label_set_text(switch_label, "Enable Bluetooth");
-    lv_obj_t* sw = lv_switch_create(switch_item);
-    lv_obj_align(sw, LV_ALIGN_RIGHT_MID, -10, 0);
-    lv_obj_add_state(sw, LV_STATE_CHECKED);
-    applyItemStyle(switch_item);
-
-    // Paired Devices
-    lv_obj_t* devices_item = lv_menu_cont_create(section);
-    lv_obj_t* devices_label = lv_label_create(devices_item);
-    lv_label_set_text(devices_label, "Paired Devices: 2");
-    applyItemStyle(devices_item);
-
-    // Discoverable
-    lv_obj_t* discoverable_item = lv_menu_cont_create(section);
-    lv_obj_t* discoverable_label = lv_label_create(discoverable_item);
-    lv_label_set_text(discoverable_label, "Discoverable");
-    lv_obj_t* discoverable_sw = lv_switch_create(discoverable_item);
-    lv_obj_align(discoverable_sw, LV_ALIGN_RIGHT_MID, -10, 0);
-    applyItemStyle(discoverable_item);
-}
-
-void LvglMenuView::createAudioPage() {
-    lv_obj_t* section = lv_menu_section_create(audio_page_);
-    lv_obj_set_style_bg_opa(section, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_ver(section, 8, 0);
-
-    // Master Volume
-    lv_obj_t* volume_item = lv_menu_cont_create(section);
-    lv_obj_t* volume_label = lv_label_create(volume_item);
-    lv_label_set_text(volume_label, "Master Volume");
-    lv_obj_t* volume_slider = lv_slider_create(volume_item);
-    lv_obj_set_size(volume_slider, 120, 10);
-    lv_obj_align(volume_slider, LV_ALIGN_RIGHT_MID, -10, 0);
-    lv_slider_set_value(volume_slider, 70, LV_ANIM_OFF);
-    applyItemStyle(volume_item);
-
-    // Audio Quality
-    lv_obj_t* quality_item = lv_menu_cont_create(section);
-    lv_obj_t* quality_label = lv_label_create(quality_item);
-    lv_label_set_text(quality_label, "Quality: High");
-    applyItemStyle(quality_item);
-
-    // Sample Rate
-    lv_obj_t* sample_item = lv_menu_cont_create(section);
-    lv_obj_t* sample_label = lv_label_create(sample_item);
-    lv_label_set_text(sample_label, "Sample Rate: 48kHz");
-    applyItemStyle(sample_item);
-}
-
-void LvglMenuView::createInputPage() {
-    lv_obj_t* section = lv_menu_section_create(input_page_);
-    lv_obj_set_style_bg_opa(section, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_ver(section, 8, 0);
-
-    // Encoder Sensitivity
-    lv_obj_t* sensitivity_item = lv_menu_cont_create(section);
-    lv_obj_t* sensitivity_label = lv_label_create(sensitivity_item);
-    lv_label_set_text(sensitivity_label, "Encoder Sensitivity");
-    lv_obj_t* sensitivity_slider = lv_slider_create(sensitivity_item);
-    lv_obj_set_size(sensitivity_slider, 120, 10);
-    lv_obj_align(sensitivity_slider, LV_ALIGN_RIGHT_MID, -10, 0);
-    lv_slider_set_value(sensitivity_slider, 50, LV_ANIM_OFF);
-    applyItemStyle(sensitivity_item);
-
-    // Button Debounce
-    lv_obj_t* debounce_item = lv_menu_cont_create(section);
-    lv_obj_t* debounce_label = lv_label_create(debounce_item);
-    lv_label_set_text(debounce_label, "Button Debounce: 30ms");
-    applyItemStyle(debounce_item);
-
-    // Long Press Time
-    lv_obj_t* longpress_item = lv_menu_cont_create(section);
-    lv_obj_t* longpress_label = lv_label_create(longpress_item);
-    lv_label_set_text(longpress_label, "Long Press: 1000ms");
-    applyItemStyle(longpress_item);
-}
-
-void LvglMenuView::createDisplayPage() {
-    lv_obj_t* section = lv_menu_section_create(display_page_);
-    lv_obj_set_style_bg_opa(section, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_ver(section, 8, 0);
-
-    // Brightness
-    lv_obj_t* brightness_item = lv_menu_cont_create(section);
-    lv_obj_t* brightness_label = lv_label_create(brightness_item);
-    lv_label_set_text(brightness_label, "Brightness");
-    lv_obj_t* brightness_slider = lv_slider_create(brightness_item);
-    lv_obj_set_size(brightness_slider, 120, 10);
-    lv_obj_align(brightness_slider, LV_ALIGN_RIGHT_MID, -10, 0);
-    lv_slider_set_value(brightness_slider, 80, LV_ANIM_OFF);
-    applyItemStyle(brightness_item);
-
-    // Auto Sleep
-    lv_obj_t* sleep_item = lv_menu_cont_create(section);
-    lv_obj_t* sleep_label = lv_label_create(sleep_item);
-    lv_label_set_text(sleep_label, "Auto Sleep");
-    lv_obj_t* sleep_sw = lv_switch_create(sleep_item);
-    lv_obj_align(sleep_sw, LV_ALIGN_RIGHT_MID, -10, 0);
-    lv_obj_add_state(sleep_sw, LV_STATE_CHECKED);
-    applyItemStyle(sleep_item);
-
-    // Sleep Time
-    lv_obj_t* sleep_time_item = lv_menu_cont_create(section);
-    lv_obj_t* sleep_time_label = lv_label_create(sleep_time_item);
-    lv_label_set_text(sleep_time_label, "Sleep Time: 5 min");
-    applyItemStyle(sleep_time_item);
-}
-
-void LvglMenuView::createAboutPage() {
-    lv_obj_t* section = lv_menu_section_create(about_page_);
-    lv_obj_set_style_bg_opa(section, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_pad_ver(section, 8, 0);
-
-    // Device Info
-    lv_obj_t* device_item = lv_menu_cont_create(section);
-    lv_obj_t* device_label = lv_label_create(device_item);
-    lv_label_set_text(device_label, "Device: MIDI Controller");
-    applyItemStyle(device_item);
-
-    // Firmware Version
-    lv_obj_t* fw_item = lv_menu_cont_create(section);
-    lv_obj_t* fw_label = lv_label_create(fw_item);
-    lv_label_set_text(fw_label, "Firmware: v2.0.0");
-    applyItemStyle(fw_item);
-
-    // Hardware Version
-    lv_obj_t* hw_item = lv_menu_cont_create(section);
-    lv_obj_t* hw_label = lv_label_create(hw_item);
-    lv_label_set_text(hw_label, "Hardware: Teensy 4.1");
-    applyItemStyle(hw_item);
-
-    // Memory Usage
-    lv_obj_t* mem_item = lv_menu_cont_create(section);
-    lv_obj_t* mem_label = lv_label_create(mem_item);
-    lv_label_set_text(mem_label, "Memory: 45% used");
-    applyItemStyle(mem_item);
-
-    // Uptime
-    lv_obj_t* uptime_item = lv_menu_cont_create(section);
-    lv_obj_t* uptime_label = lv_label_create(uptime_item);
-    lv_label_set_text(uptime_label, "Uptime: 02:30:45");
-    applyItemStyle(uptime_item);
-}
+// ===================================================================
+// MÉTHODES SUPPRIMÉES - REMPLACÉES PAR MenuPageBuilder et MenuPageFactory
+// ===================================================================
+// 
+// Les méthodes suivantes ont été supprimées pour éliminer la duplication de code :
+// - applyItemStyle() -> remplacée par MenuPageBuilder::applyStandardItemStyle()
+// - createWiFiPage() -> remplacée par MenuPageFactory::createWiFiPage()
+// - createBluetoothPage() -> remplacée par MenuPageFactory::createBluetoothPage()
+// - createAudioPage() -> remplacée par MenuPageFactory::createAudioPage()
+// - createInputPage() -> remplacée par MenuPageFactory::createInputPage()
+// - createDisplayPage() -> remplacée par MenuPageFactory::createDisplayPage()
+// - createAboutPage() -> remplacée par MenuPageFactory::createAboutPage()
+//
+// Ces méthodes contenaient plus de 300 lignes de code dupliqué qui sont maintenant
+// gérées de manière centralisée et réutilisable.
 
 void LvglMenuView::updateSelection() {
     // Navigation gérée automatiquement par LVGL

@@ -3,8 +3,10 @@
 #include <Arduino.h>
 #include <memory>
 #include <lvgl.h>
+#include <etl/optional.h>
 
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
+#include "adapters/ui/components/MenuPageBuilder.hpp"
 
 /**
  * @brief Vue menu utilisant le widget lv_menu natif de LVGL 9.3.0
@@ -58,19 +60,16 @@ private:
     lv_obj_t* display_page_;
     lv_obj_t* about_page_;
     
+    // Builders avec allocation statique ETL pour microcontrôleur
+    etl::optional<MenuPageBuilder> page_builder_;
+    etl::optional<MenuPageFactory> page_factory_;
+    
     // Méthodes privées
     void setupMainScreen();
-    void setupNativeMenu();
+    void setupBasicMenu();
     void createSophisticatedMenu();
     void createSubPages();
     void createRootPageContent();
-    void createWiFiPage();
-    void createBluetoothPage();
-    void createAudioPage();
-    void createInputPage();
-    void createDisplayPage();
-    void createAboutPage();
-    void applyItemStyle(lv_obj_t* item);
     void updateSelection();
     void cleanupLvglObjects();
     
