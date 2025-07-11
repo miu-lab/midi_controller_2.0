@@ -10,22 +10,22 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
     // === BOUTONS STANDALONE (Navigation) ===
 
     // Bouton Menu avec long press
-    config->addControl(ControlBuilder(51, "menu_button")
-                           .withLabel("Menu")
+    config->addControl(ControlBuilder(51, "home_button")
+                           .withLabel("Home")
                            .inGroup("Navigation")
-                           .withDescription("Bouton Menu")
-                           .asButton(32, 30, ButtonMode::TOGGLE)
+                           .withDescription("Bouton Home")
+                           .asButton(32)
                            .withLongPress(1000)
                            .asHomeButton()
                            .withDisplayOrder(1)
                            .build());
 
     // Bouton OK/Validation
-    config->addControl(ControlBuilder(52, "ok_button")
-                           .withLabel("OK")
+    config->addControl(ControlBuilder(52, "back_button")
+                           .withLabel("Back")
                            .inGroup("Navigation")
-                           .withDescription("Bouton OK")
-                           .asButton(31, 30, ButtonMode::MOMENTARY)
+                           .withDescription("Bouton Retour")
+                           .asButton(31)
                            .asBackButton()
                            .withDisplayOrder(2)
                            .build());
@@ -213,16 +213,15 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
     // NOTE: Pins changées de 9,10 vers 4,5 pour éviter conflit avec l'écran (CS=9, DC=10)
 
     // Encodeur Navigation (partie encodeur)
-    config->addControl(
-        ControlBuilder(79, "nav_encoder")
-            .withLabel("Navigation")
-            .inGroup("Navigation")
-            .withDescription("Encodeur Navigation")
-            .withDisplayOrder(9)
-            .asRotaryEncoder(25, 24, 96)
-            .withStepPerDetent(true, 4)
-            .asItemNavigator()
-            .build());
+    config->addControl(ControlBuilder(79, "nav_encoder")
+                           .withLabel("Navigation")
+                           .inGroup("Navigation")
+                           .withDescription("Encodeur Navigation")
+                           .withDisplayOrder(9)
+                           .asRotaryEncoder(25, 24, 96)
+                           .withStepPerDetent(true, 4)
+                           .asItemNavigator()
+                           .build());
 
     // Encodeur Navigation (partie bouton)
     config->addControl(ControlBuilder(1079, "nav_encoder_button")
@@ -244,8 +243,6 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withDescription("Encodeur Precision")
                            .withDisplayOrder(10)
                            .asRotaryEncoder(2, 3, 600)
-                           .withSensitivity(0.1f)
-                           .withStepPerDetent(false)
                            .withMidiCC(10, 0, true)
                            .build());
 
