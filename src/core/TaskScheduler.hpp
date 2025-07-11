@@ -6,9 +6,6 @@
 #include <functional>
 #include <vector>
 
-
-#include "config/debug/TaskSchedulerConfig.hpp"
-
 /**
  * @brief Définition d'un type pour les fonctions de tâches
  */

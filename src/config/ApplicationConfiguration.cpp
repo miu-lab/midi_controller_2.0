@@ -19,29 +19,29 @@ ApplicationConfiguration::ApplicationConfiguration() {
     // // TODO DEBUG MSG
     // // TODO DEBUG MSG
     // Initialisation des paramètres de performance
-    performanceSettings = {ConfigDefaults::PERFORMANCE_MODE,
-                           ConfigDefaults::MAX_UPDATE_TIME_US,
-                           ConfigDefaults::MAX_INPUT_TIME_US,
-                           ConfigDefaults::MAX_MIDI_TIME_US,
-                           ConfigDefaults::MAX_UI_TIME_US};
+    performanceSettings = {SystemConstants::Performance::PERFORMANCE_MODE_DEFAULT,
+                           SystemConstants::Performance::MAX_UPDATE_TIME_US,
+                           SystemConstants::Performance::INPUT_TIME_INTERVAL,
+                           SystemConstants::Performance::MIDI_TIME_INTERVAL,
+                           SystemConstants::Performance::UI_TIME_INTERVAL};
 
     // Initialisation des paramètres d'interface utilisateur
-    uiSettings = {ConfigDefaults::DISPLAY_REFRESH_RATE_HZ,
-                  ConfigDefaults::DISPLAY_REFRESH_PERIOD_MS,
-                  ConfigDefaults::SHOW_DEBUG_INFO,
-                  ConfigDefaults::ENABLE_FULL_UI};
+    uiSettings = {SystemConstants::Performance::DISPLAY_REFRESH_RATE_HZ,
+                  SystemConstants::Performance::DISPLAY_REFRESH_PERIOD_MS,
+                  SystemConstants::UI::SHOW_DEBUG_INFO,
+                  SystemConstants::UI::ENABLE_FULL_UI};
 
     // Initialisation des paramètres de contrôle
-    controlSettings = {ConfigDefaults::DEFAULT_ENCODER_SENSITIVITY,
-                       ConfigDefaults::ENCODER_RATE_LIMIT_MS};
+    controlSettings = {SystemConstants::Input::DEFAULT_ENCODER_SENSITIVITY,
+                       SystemConstants::Performance::ENCODER_RATE_LIMIT_MS};
 
     // Initialisation des paramètres MIDI
-    midiSettings = {ConfigDefaults::DEFAULT_MIDI_CHANNEL,
-                    ConfigDefaults::CC_VALUE_MIN,
-                    ConfigDefaults::CC_VALUE_MAX};
+    midiSettings = {SystemConstants::Audio::DEFAULT_CHANNEL,
+                    SystemConstants::Audio::CC_VALUE_MIN,
+                    SystemConstants::Audio::CC_VALUE_MAX};
 
     // Initialisation des paramètres système
-    systemSettings = {ConfigDefaults::SERIAL_BAUD_RATE, ConfigDefaults::MAX_COMMAND_HISTORY};
+    systemSettings = {SystemConstants::Hardware::SERIAL_BAUD_RATE, SystemConstants::Hardware::MAX_COMMAND_HISTORY};
 }
 
 const ApplicationConfiguration::PerformanceSettings&
@@ -139,29 +139,29 @@ bool ApplicationConfiguration::saveToStorage() const {
 
 void ApplicationConfiguration::resetToDefaults() {
     // Réinitialiser performance
-    performanceSettings = {ConfigDefaults::PERFORMANCE_MODE,
-                           ConfigDefaults::MAX_UPDATE_TIME_US,
-                           ConfigDefaults::MAX_INPUT_TIME_US,
-                           ConfigDefaults::MAX_MIDI_TIME_US,
-                           ConfigDefaults::MAX_UI_TIME_US};
+    performanceSettings = {SystemConstants::Performance::PERFORMANCE_MODE_DEFAULT,
+                           SystemConstants::Performance::MAX_UPDATE_TIME_US,
+                           SystemConstants::Performance::INPUT_TIME_INTERVAL,
+                           SystemConstants::Performance::MIDI_TIME_INTERVAL,
+                           SystemConstants::Performance::UI_TIME_INTERVAL};
 
     // Réinitialiser UI
-    uiSettings = {ConfigDefaults::DISPLAY_REFRESH_RATE_HZ,
-                  ConfigDefaults::DISPLAY_REFRESH_PERIOD_MS,
-                  ConfigDefaults::SHOW_DEBUG_INFO,
-                  ConfigDefaults::ENABLE_FULL_UI};
+    uiSettings = {SystemConstants::Performance::DISPLAY_REFRESH_RATE_HZ,
+                  SystemConstants::Performance::DISPLAY_REFRESH_PERIOD_MS,
+                  SystemConstants::UI::SHOW_DEBUG_INFO,
+                  SystemConstants::UI::ENABLE_FULL_UI};
 
     // Réinitialiser contrôles
-    controlSettings = {ConfigDefaults::DEFAULT_ENCODER_SENSITIVITY,
-                       ConfigDefaults::ENCODER_RATE_LIMIT_MS};
+    controlSettings = {SystemConstants::Input::DEFAULT_ENCODER_SENSITIVITY,
+                       SystemConstants::Performance::ENCODER_RATE_LIMIT_MS};
 
     // Réinitialiser MIDI
-    midiSettings = {ConfigDefaults::DEFAULT_MIDI_CHANNEL,
-                    ConfigDefaults::CC_VALUE_MIN,
-                    ConfigDefaults::CC_VALUE_MAX};
+    midiSettings = {SystemConstants::Audio::DEFAULT_CHANNEL,
+                    SystemConstants::Audio::CC_VALUE_MIN,
+                    SystemConstants::Audio::CC_VALUE_MAX};
 
     // Réinitialiser système
-    systemSettings = {ConfigDefaults::SERIAL_BAUD_RATE, ConfigDefaults::MAX_COMMAND_HISTORY};
+    systemSettings = {SystemConstants::Hardware::SERIAL_BAUD_RATE, SystemConstants::Hardware::MAX_COMMAND_HISTORY};
 
     notifyChange("allSettings");
 }

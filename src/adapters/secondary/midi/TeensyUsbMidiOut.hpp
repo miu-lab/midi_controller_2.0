@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
+#include "config/SystemConstants.hpp"
 #include "core/ports/output/MidiOutputPort.hpp"
 
 /**
@@ -27,8 +28,8 @@ public:
     void flush();
 
 private:
-    // Buffer pour garder la trace des notes actives et éviter les notes bloquées
-    static constexpr size_t MAX_ACTIVE_NOTES = 16;
+    // Buffer pour garder la trace des notes actives et éviter les notes bloquées (utilise SystemConstants)
+    static constexpr size_t MAX_ACTIVE_NOTES = SystemConstants::Audio::MAX_ACTIVE_NOTES;
 
     struct ActiveNote {
         MidiChannel channel;

@@ -5,7 +5,7 @@
 #include <set>
 #include <unordered_map>
 
-#include "config/ConfigDefaults.hpp"
+#include "config/SystemConstants.hpp"
 #include "config/GlobalSettings.hpp"
 #include "config/unified/ControlDefinition.hpp"
 #include "core/domain/types.hpp"
@@ -104,13 +104,10 @@ private:
     // Constantes
     //=============================================================================
 
-    // Taille du pool d'objets pour les commandes MIDI
-    static constexpr size_t COMMAND_POOL_SIZE = 4;
-
-    // Constantes de timing
-    static constexpr unsigned long ENCODER_RATE_LIMIT_MS =
-        ConfigDefaults::ENCODER_RATE_LIMIT_MS;                                               // 60Hz
-    static constexpr unsigned long DUPLICATE_CHECK_MS = ConfigDefaults::DUPLICATE_CHECK_MS;  // 10ms
+    // Constantes de timing (utilise SystemConstants)
+    static constexpr size_t COMMAND_POOL_SIZE = SystemConstants::Audio::COMMAND_POOL_SIZE;
+    static constexpr unsigned long ENCODER_RATE_LIMIT_MS = SystemConstants::Performance::ENCODER_RATE_LIMIT_MS;
+    static constexpr unsigned long DUPLICATE_CHECK_MS = SystemConstants::Performance::DUPLICATE_CHECK_MS;
 
     //=============================================================================
     // Types et structures

@@ -2,7 +2,7 @@
 
 #include <stdarg.h>
 
-#include <config/ConfigDefaults.hpp>
+#include "config/SystemConstants.hpp"
 
 #include "config/GlobalSettings.hpp"
   // Pour avoir accès à PERFORMANCE_MODE
@@ -210,7 +210,7 @@ int16_t MidiMapper::calculateMidiValue(MappingInfo& info, int32_t delta, int32_t
     if (midiConfig.isRelative) {
         // Mode relatif avec sensibilité configurable
         float sensitivity =
-            ConfigDefaults::DEFAULT_ENCODER_SENSITIVITY;  // Ajustez cette valeur selon vos besoins
+            SystemConstants::Input::DEFAULT_ENCODER_SENSITIVITY;  // Ajustez cette valeur selon vos besoins
         newValue = info.lastMidiValue + (int)(delta * sensitivity);
     } else {
         // Mode absolu avec référentiel flottant et sensibilité

@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "config/ConfigDefaults.hpp"
+#include "config/SystemConstants.hpp"
 #include "core/configuration/ConfigurationLoader.hpp"
 #include "core/configuration/ConfigurationService.hpp"
 
@@ -93,11 +93,11 @@ void ConfigurationSubsystem::setControlForNavigation(InputId id, bool isNavigati
 }
 
 bool ConfigurationSubsystem::isDebugEnabled() const {
-    return ConfigDefaults::SHOW_DEBUG_INFO;
+    return SystemConstants::UI::SHOW_DEBUG_INFO;
 }
 
 int ConfigurationSubsystem::midiChannel() const {
-    return ConfigDefaults::DEFAULT_MIDI_CHANNEL;
+    return SystemConstants::Audio::DEFAULT_CHANNEL;
 }
 
 bool ConfigurationSubsystem::isHardwareInitEnabled() const {

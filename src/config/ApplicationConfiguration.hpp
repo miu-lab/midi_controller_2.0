@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "config/ConfigDefaults.hpp"
+#include "config/SystemConstants.hpp"
 #include "config/unified/UnifiedConfiguration.hpp"  // Système unifié moderne
 
 /**
