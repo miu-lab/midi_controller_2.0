@@ -201,7 +201,7 @@ Result<bool> InitializationScript::initializeSubsystems(
              auto initResult = system->init();
              if (initResult.isSuccess()) {
                  scheduler->addTask([system]() { system->update(); },
-                                    PerformanceConfig::INPUT_TIME_INTERVAL,
+                                    SystemConstants::Performance::INPUT_TIME_INTERVAL,
                                     0,
                                     "InputUpdate");
              }
@@ -216,7 +216,7 @@ Result<bool> InitializationScript::initializeSubsystems(
              auto initResult = system->init();
              if (initResult.isSuccess()) {
                  scheduler->addTask([system]() { system->update(); },
-                                    PerformanceConfig::MIDI_TIME_INTERVAL,
+                                    SystemConstants::Performance::MIDI_TIME_INTERVAL,
                                     1,
                                     "MidiUpdate");
                  
@@ -232,7 +232,7 @@ Result<bool> InitializationScript::initializeSubsystems(
              auto initResult = system->init(true);  // true = enable full UI
              if (initResult.isSuccess()) {
                  scheduler->addTask([system]() { system->update(); },
-                                    PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS * 1000,
+                                    SystemConstants::Performance::DISPLAY_REFRESH_PERIOD_MS * 1000,
                                     1,
                                     "UIUpdate");
              }

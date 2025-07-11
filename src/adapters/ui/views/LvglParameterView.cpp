@@ -1,5 +1,5 @@
 #include "LvglParameterView.hpp"
-#include "config/DisplayConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include "core/domain/events/MidiEvents.hpp"
 #include <Arduino.h>
 

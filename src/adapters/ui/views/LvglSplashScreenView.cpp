@@ -1,5 +1,5 @@
 #include "LvglSplashScreenView.hpp"
-#include "config/DisplayConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include <Arduino.h>
 
 

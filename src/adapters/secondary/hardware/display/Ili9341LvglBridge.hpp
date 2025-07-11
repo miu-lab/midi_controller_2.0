@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Ili9341Driver.hpp"
-#include "config/DisplayConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include "core/utils/Result.hpp"
 #include <lvgl.h>
 #include <memory>
@@ -20,7 +20,7 @@ public:
      * @brief Configuration LVGL
      */
     struct LvglConfig {
-        uint16_t buffer_lines = DisplayConfig::LVGL_BUFFER_LINES;  ///< Utilise DisplayConfig
+        uint16_t buffer_lines = SystemConstants::Display::LVGL_BUFFER_LINES;  ///< Utilise SystemConstants
         bool double_buffering = true;      ///< Activer double buffering
     };
 

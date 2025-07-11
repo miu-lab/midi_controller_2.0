@@ -2,7 +2,7 @@
 #pragma once
 #include <optional>
 
-#include "config/InputConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include "core/domain/types.hpp"
 
 /**
@@ -16,7 +16,7 @@ struct EncoderConfig {
     
     // === NOUVELLES FONCTIONNALITÉS ===
     bool invertDirection = false;                    ///< Inverse le sens de rotation
-    float sensitivity = InputConfig::DEFAULT_ENCODER_SENSITIVITY;  ///< Utilise InputConfig
+    float sensitivity = SystemConstants::Input::DEFAULT_ENCODER_SENSITIVITY;  ///< Utilise SystemConstants
     bool enableAcceleration = true;                  ///< Active l'accélération basée sur la vitesse
     uint8_t stepsPerDetent = 4;                      ///< Nombre de steps par cran mécanique
     uint16_t accelerationThreshold = 100;           ///< Seuil d'accélération en ms entre steps

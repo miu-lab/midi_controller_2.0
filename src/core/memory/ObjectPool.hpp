@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <cstddef>
 #include <new>
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 
 /**
  * @brief Pool d'objets à taille fixe pour systèmes embarqués
@@ -253,30 +253,30 @@ namespace Pools {
      * @brief Pool pour les événements généraux
      */
     template<typename T>
-    using EventPool = ObjectPool<T, PerformanceConfig::EVENT_POOL_SIZE>;
+    using EventPool = ObjectPool<T, SystemConstants::Performance::EVENT_POOL_SIZE>;
     
     /**
      * @brief Pool pour les événements MIDI
      */
     template<typename T>
-    using MidiEventPool = ObjectPool<T, PerformanceConfig::MIDI_EVENT_POOL_SIZE>;
+    using MidiEventPool = ObjectPool<T, SystemConstants::Performance::MIDI_EVENT_POOL_SIZE>;
     
     /**
      * @brief Pool pour les événements UI
      */
     template<typename T>
-    using UIEventPool = ObjectPool<T, PerformanceConfig::UI_EVENT_POOL_SIZE>;
+    using UIEventPool = ObjectPool<T, SystemConstants::Performance::UI_EVENT_POOL_SIZE>;
     
     /**
      * @brief Guards correspondants
      */
     template<typename T>
-    using EventGuard = PoolGuard<T, PerformanceConfig::EVENT_POOL_SIZE>;
+    using EventGuard = PoolGuard<T, SystemConstants::Performance::EVENT_POOL_SIZE>;
     
     template<typename T>
-    using MidiEventGuard = PoolGuard<T, PerformanceConfig::MIDI_EVENT_POOL_SIZE>;
+    using MidiEventGuard = PoolGuard<T, SystemConstants::Performance::MIDI_EVENT_POOL_SIZE>;
     
     template<typename T>
-    using UIEventGuard = PoolGuard<T, PerformanceConfig::UI_EVENT_POOL_SIZE>;
+    using UIEventGuard = PoolGuard<T, SystemConstants::Performance::UI_EVENT_POOL_SIZE>;
     
 } // namespace Pools

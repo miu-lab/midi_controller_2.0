@@ -6,7 +6,7 @@ SystemManager::SystemManager()
     : currentState_(State::UNINITIALIZED), lastErrorTime_(0) {}
 
 Result<void> SystemManager::initialize() {
-    Serial.begin(HardwareConfig::SERIAL_BAUD_RATE);
+    Serial.begin(SystemConstants::Hardware::SERIAL_BAUD_RATE);
     Serial.println("=== 🎹 MIDI Controller Initialization ===");
     Serial.print("Build: ");
     Serial.print(__DATE__);

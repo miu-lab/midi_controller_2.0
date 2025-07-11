@@ -4,7 +4,7 @@
 #include "MidiBatchProcessor.hpp"
 #include "core/memory/RingBuffer.hpp"
 #include "core/memory/EventPoolManager.hpp"
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include <memory>
 
 /**
@@ -202,7 +202,7 @@ public:
         auto stats = processor_.getStats();
         auto buffer_status = processor_.getBufferStatus();
         
-        return stats.max_latency_us < PerformanceConfig::MAX_MIDI_LATENCY_US &&
+        return stats.max_latency_us < SystemConstants::Performance::MAX_MIDI_LATENCY_US &&
                buffer_status.incoming_usage < 0.8f &&
                !processor_.isOverloaded();
     }

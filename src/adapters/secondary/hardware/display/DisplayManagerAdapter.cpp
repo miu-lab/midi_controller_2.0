@@ -1,10 +1,10 @@
 #include "DisplayManagerAdapter.hpp"
 #include <Arduino.h>
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 
 DisplayManagerAdapter::DisplayManagerAdapter(std::shared_ptr<Ili9341LvglBridge> lvglBridge)
     : lvglBridge_(lvglBridge)
-    , refreshIntervalMs_(PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS * PerformanceConfig::VSYNC_SPACING)
+    , refreshIntervalMs_(SystemConstants::Performance::DISPLAY_REFRESH_PERIOD_MS * SystemConstants::Performance::VSYNC_SPACING)
     , lastRefreshTime_(0) {
 }
 

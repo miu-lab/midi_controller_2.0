@@ -20,7 +20,9 @@
       "Bash(pio test:*)",
       "Bash(git tag:*)",
       "Bash(pio device monitor:*)",
-      "WebFetch(domain:docs.lvgl.io)"
+      "WebFetch(domain:docs.lvgl.io)",
+      "Bash(sed:*)",
+      "Bash(git restore:*)"
     ],
     "deny": []
   }

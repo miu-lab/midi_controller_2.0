@@ -34,8 +34,8 @@ namespace SystemConstants {
         
         // Timings UI spécifiques
         constexpr uint32_t MODAL_DEFAULT_TIMEOUT_MS = 3000;
-        constexpr uint32_t BUTTON_DEBOUNCE_MS = 50;
-        constexpr uint32_t ENCODER_RATE_LIMIT_MS = 1;
+        constexpr uint32_t BUTTON_DEBOUNCE_MS = 50;  // Dupliqué avec Input::
+        constexpr uint32_t ENCODER_RATE_LIMIT_MS = 1;  // Dupliqué avec Performance::
     }
     
     // ====================
@@ -43,12 +43,12 @@ namespace SystemConstants {
     // ====================
     
     namespace Encoders {
-        // Sensibilité uniforme
+        // Sensibilité uniforme (harmonisé avec InputConfig)
         constexpr float DEFAULT_SENSITIVITY = 1.0f;
         constexpr float MIN_SENSITIVITY = 0.1f;
-        constexpr float MAX_SENSITIVITY = 5.0f;
+        constexpr float MAX_SENSITIVITY = 5.0f;  // Plus sûr que 10.0f pour l'embarqué
         
-        // Configuration hardware
+        // Configuration hardware (unifié avec InputConfig)
         constexpr int32_t STEPS_PER_DETENT = 4;
         constexpr int32_t MIN_DELTA_THRESHOLD = 1;
         constexpr int32_t MAX_DELTA_VALUE = INT_MAX;
@@ -104,9 +104,7 @@ namespace SystemConstants {
         constexpr bool DEFAULT_ENABLE_DISPLAY_REFRESH = true;
         constexpr bool DEFAULT_ENABLE_EVENT_PROCESSING = true;
         
-        // Dimensions
-        constexpr int16_t SCREEN_WIDTH = 320;
-        constexpr int16_t SCREEN_HEIGHT = 240;
+        // Dimensions (utilise Display:: pour éviter duplication)
         constexpr int16_t MENU_ITEM_HEIGHT = 30;
         constexpr int16_t MENU_PADDING = 5;
         constexpr int16_t HEADER_HEIGHT = 40;
@@ -121,7 +119,6 @@ namespace SystemConstants {
         // Limites
         constexpr uint32_t MAX_MESSAGE_LENGTH = 256;
         constexpr uint32_t MAX_CONCURRENT_MODALS = 1;
-        constexpr uint32_t EVENT_QUEUE_SIZE = 64;
     }
     
     // ====================
@@ -139,10 +136,17 @@ namespace SystemConstants {
         constexpr uint8_t VOLUME_MIN = 0;
         constexpr uint8_t VOLUME_MAX = 100;
         
-        // MIDI
-        constexpr uint8_t MIDI_CHANNEL_DEFAULT = 1;
+        // MIDI (harmonisé avec MidiConfig.hpp)
+        constexpr uint8_t DEFAULT_CHANNEL = 0;  // Canal 1 (0-15)
         constexpr uint8_t MIDI_CC_DEFAULT = 1;
+        constexpr uint8_t CC_VALUE_MIN = 0;
+        constexpr uint8_t CC_VALUE_MAX = 127;
+        constexpr uint8_t MIDI_CC_VALUE_DEFAULT = 64;  // Milieu
         constexpr uint8_t MIDI_NOTE_DEFAULT = 60; // C4
+        constexpr uint8_t MIDI_CC_RANGE = 128;  // 0-127
+        
+        // Configuration USB
+        constexpr unsigned long USB_MIDI_BAUD_RATE = 115200;
     }
     
     // ====================
@@ -206,6 +210,126 @@ namespace SystemConstants {
         constexpr const char* LOG_PREFIX_NAVIGATION = "[NAV]";
         constexpr const char* LOG_PREFIX_UI = "[UI]";
         constexpr const char* LOG_PREFIX_AUDIO = "[AUDIO]";
+    }
+    
+    // ====================
+    // HARDWARE (UNIFIÉ - de HardwareConfig.hpp)
+    // ====================
+    
+    namespace Hardware {
+        // Communication série
+        constexpr unsigned long SERIAL_BAUD_RATE = 115200;
+        constexpr size_t MAX_COMMAND_HISTORY = 10;
+        
+        // SPI configuration
+        constexpr uint32_t SPI_SPEED_DISPLAY = 40000000;   // 40MHz
+        constexpr uint32_t SPI_SPEED_DEFAULT = 8000000;    // 8MHz
+        
+        // Pins système
+        constexpr uint8_t LED_BUILTIN_PIN = 13;
+        
+        // Timers et scheduling
+        constexpr unsigned long MAIN_LOOP_INTERVAL_US = 1000;  // 1ms
+        constexpr unsigned long WATCHDOG_TIMEOUT_MS = 5000;    // 5s
+    }
+    
+    // ====================
+    // DISPLAY (UNIFIÉ - de DisplayConfig.hpp)
+    // ====================
+    
+    namespace Display {
+        // Dimensions (remplace les duplicatas dans UI)
+        constexpr uint16_t SCREEN_WIDTH = 320;
+        constexpr uint16_t SCREEN_HEIGHT = 240;
+        constexpr uint8_t ROTATION = 3;  // Paysage inversé
+        
+        // Buffers hardware
+        constexpr size_t FRAMEBUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT;
+        constexpr size_t DIFFBUFFER_SIZE = 8192;
+        
+        // Buffers LVGL
+        constexpr size_t LVGL_BUFFER_LINES = 30;
+        constexpr size_t LVGL_BUFFER_SIZE = SCREEN_WIDTH * LVGL_BUFFER_LINES;
+        
+        // Pins hardware ILI9341
+        constexpr uint8_t CS_PIN = 9;
+        constexpr uint8_t DC_PIN = 10;
+        constexpr uint8_t RST_PIN = 6;
+        constexpr uint8_t MOSI_PIN = 11;
+        constexpr uint8_t SCK_PIN = 13;
+        constexpr uint8_t MISO_PIN = 12;
+        
+        // Communication SPI
+        constexpr uint32_t SPI_SPEED = Hardware::SPI_SPEED_DISPLAY;
+    }
+    
+    // ====================
+    // INPUT (UNIFIÉ - de InputConfig.hpp)
+    // ====================
+    
+    namespace Input {
+        // Configuration encodeurs
+        constexpr uint16_t DEFAULT_PPR = 24;
+        constexpr float DEFAULT_ENCODER_SENSITIVITY = 1.0f;
+        constexpr bool ENABLE_ACCELERATION_DEFAULT = true;
+        constexpr uint16_t ACCELERATION_THRESHOLD_MS = 100;
+        constexpr float MAX_ACCELERATION_FACTOR = 5.0f;
+        
+        // Boutons
+        constexpr unsigned long BUTTON_LONG_PRESS_MS = 1000;
+        
+        // Validation
+        constexpr uint16_t MAX_PPR = 10000;
+        constexpr uint8_t MAX_STEPS_PER_DETENT = 8;
+    }
+    
+    // ====================
+    // PERFORMANCE (UNIFIÉ - de PerformanceConfig.hpp)
+    // ====================
+    
+    namespace Performance {
+        // Refresh rates
+        constexpr int DISPLAY_REFRESH_RATE_HZ = 120;
+        constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = (1000 / DISPLAY_REFRESH_RATE_HZ);
+        constexpr int VSYNC_SPACING = 2;
+        constexpr int DIFF_GAP = 4;
+        
+        // Timeouts d'exécution
+        constexpr unsigned long MAX_UPDATE_TIME_US = 30000;
+        constexpr unsigned long INPUT_TIME_INTERVAL = 2000;
+        constexpr unsigned long MIDI_TIME_INTERVAL = 3000;
+        constexpr unsigned long NAVIGATION_TIME_INTERVAL = 10000;
+        constexpr unsigned long UI_TIME_INTERVAL = 16667;
+        
+        // Rate limiting
+        constexpr unsigned long DUPLICATE_CHECK_MS = 1.5;
+        constexpr unsigned long ENCODER_RATE_LIMIT_MS = 5;
+        constexpr bool PERFORMANCE_MODE_DEFAULT = true;
+        
+        // Tailles ETL (pour éviter allocations dynamiques)
+        constexpr size_t MAX_EVENT_SUBSCRIBERS = 32;
+        constexpr size_t MAX_EVENT_QUEUE_SIZE = 64;
+        constexpr size_t MAX_MIDI_CALLBACKS = 24;
+        constexpr size_t MAX_MIDI_PENDING_PARAMS = 128;
+        constexpr size_t MAX_MIDI_MESSAGES_QUEUE = 256;
+        constexpr size_t MAX_CONTROL_DEFINITIONS = 64;
+        constexpr size_t MAX_MIDI_MAPPINGS = 128;
+        constexpr size_t MAX_NAVIGATION_ACTIONS = 32;
+        constexpr size_t MAX_UI_COMPONENTS = 16;
+        
+        // Pools d'objets
+        constexpr size_t EVENT_POOL_SIZE = 128;
+        constexpr size_t MIDI_EVENT_POOL_SIZE = 256;
+        constexpr size_t UI_EVENT_POOL_SIZE = 64;
+        
+        // Configuration mémoire
+        constexpr size_t STACK_SIZE_BYTES = 8192;
+        constexpr size_t HEAP_FRAGMENT_THRESHOLD = 1024;
+        
+        // Performances temps réel
+        constexpr unsigned long MAX_MIDI_LATENCY_US = 1000;
+        constexpr unsigned long MAX_UI_UPDATE_TIME_US = 16000;
+        constexpr unsigned long MAX_INPUT_LATENCY_US = 500;
     }
     
     // ====================

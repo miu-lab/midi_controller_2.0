@@ -6,7 +6,7 @@
 #include <memory>
 #include <mutex>
 #include <Arduino.h>
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include "config/ETLConfig.hpp"
 #include "../MidiEvents.hpp"
 #include "../UIEvent.hpp"
@@ -30,7 +30,7 @@ public:
         bool enable_batching;                    ///< Activer le batching
         
         Config() 
-            : ui_update_interval_ms(PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS)
+            : ui_update_interval_ms(SystemConstants::Performance::DISPLAY_REFRESH_PERIOD_MS)
             , status_update_interval_ms(100)
             , coalesce_identical_values(true)
             , enable_batching(true) {}

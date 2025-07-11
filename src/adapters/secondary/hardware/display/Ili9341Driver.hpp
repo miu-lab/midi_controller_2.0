@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "config/DisplayConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include "core/utils/Result.hpp"
 
 /**
@@ -21,14 +21,14 @@ public:
      * @brief Configuration hardware pour ILI9341
      */
     struct Config {
-        uint8_t cs_pin = DisplayConfig::CS_PIN;         ///< SPI Chip Select
-        uint8_t dc_pin = DisplayConfig::DC_PIN;         ///< Data/Command
-        uint8_t rst_pin = DisplayConfig::RST_PIN;       ///< Reset
-        uint8_t mosi_pin = DisplayConfig::MOSI_PIN;     ///< SPI MOSI
-        uint8_t sck_pin = DisplayConfig::SCK_PIN;       ///< SPI Clock
-        uint8_t miso_pin = DisplayConfig::MISO_PIN;     ///< SPI MISO
-        uint32_t spi_speed = DisplayConfig::SPI_SPEED;  ///< Vitesse SPI en Hz
-        uint8_t rotation = DisplayConfig::ROTATION;     ///< Rotation écran (0-3)
+        uint8_t cs_pin = SystemConstants::Display::CS_PIN;         ///< SPI Chip Select
+        uint8_t dc_pin = SystemConstants::Display::DC_PIN;         ///< Data/Command
+        uint8_t rst_pin = SystemConstants::Display::RST_PIN;       ///< Reset
+        uint8_t mosi_pin = SystemConstants::Display::MOSI_PIN;     ///< SPI MOSI
+        uint8_t sck_pin = SystemConstants::Display::SCK_PIN;       ///< SPI Clock
+        uint8_t miso_pin = SystemConstants::Display::MISO_PIN;     ///< SPI MISO
+        uint32_t spi_speed = SystemConstants::Display::SPI_SPEED;  ///< Vitesse SPI en Hz
+        uint8_t rotation = SystemConstants::Display::ROTATION;     ///< Rotation écran (0-3)
     };
 
     /**

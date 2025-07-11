@@ -2,7 +2,7 @@
 
 #include "core/memory/RingBuffer.hpp"
 #include "core/domain/types.hpp"
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include <functional>
 #include <array>
 #include <atomic>
@@ -61,7 +61,7 @@ public:
         Config() 
             : enable_timestamping(true)
             , enable_latency_monitoring(true)
-            , max_latency_threshold_us(PerformanceConfig::MAX_MIDI_LATENCY_US)
+            , max_latency_threshold_us(SystemConstants::Performance::MAX_MIDI_LATENCY_US)
             , drop_on_overflow(true) {}
     };
     
@@ -101,7 +101,7 @@ public:
      * @return Index du callback, ou -1 si échec
      */
     int registerCcCallback(CcCallback callback, void* userdata = nullptr) {
-        if (!callback || cc_callback_count_ >= PerformanceConfig::MAX_MIDI_CALLBACKS) {
+        if (!callback || cc_callback_count_ >= SystemConstants::Performance::MAX_MIDI_CALLBACKS) {
             return -1;
         }
         
@@ -117,7 +117,7 @@ public:
      * @brief Enregistre un callback pour Note On
      */
     int registerNoteOnCallback(NoteCallback callback, void* userdata = nullptr) {
-        if (!callback || note_on_callback_count_ >= PerformanceConfig::MAX_MIDI_CALLBACKS) {
+        if (!callback || note_on_callback_count_ >= SystemConstants::Performance::MAX_MIDI_CALLBACKS) {
             return -1;
         }
         
@@ -133,7 +133,7 @@ public:
      * @brief Enregistre un callback pour Note Off
      */
     int registerNoteOffCallback(NoteCallback callback, void* userdata = nullptr) {
-        if (!callback || note_off_callback_count_ >= PerformanceConfig::MAX_MIDI_CALLBACKS) {
+        if (!callback || note_off_callback_count_ >= SystemConstants::Performance::MAX_MIDI_CALLBACKS) {
             return -1;
         }
         
@@ -401,9 +401,9 @@ private:
     MidiBuffers::IncomingMidiBuffer incoming_buffer_;
     
     // Callbacks statiques (pas d'allocation dynamique)
-    std::array<CallbackEntry, PerformanceConfig::MAX_MIDI_CALLBACKS> cc_callbacks_;
-    std::array<CallbackEntry, PerformanceConfig::MAX_MIDI_CALLBACKS> note_on_callbacks_;
-    std::array<CallbackEntry, PerformanceConfig::MAX_MIDI_CALLBACKS> note_off_callbacks_;
+    std::array<CallbackEntry, SystemConstants::Performance::MAX_MIDI_CALLBACKS> cc_callbacks_;
+    std::array<CallbackEntry, SystemConstants::Performance::MAX_MIDI_CALLBACKS> note_on_callbacks_;
+    std::array<CallbackEntry, SystemConstants::Performance::MAX_MIDI_CALLBACKS> note_off_callbacks_;
     
     // Compteurs de callbacks actifs
     std::atomic<size_t> cc_callback_count_;

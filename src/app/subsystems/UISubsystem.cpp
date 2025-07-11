@@ -2,7 +2,7 @@
 
 #include "adapters/ui/views/DefaultViewManager.hpp"
 #include "adapters/secondary/hardware/display/Ili9341LvglBridge.hpp"
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 
 #include "config/unified/UnifiedConfiguration.hpp"
 #include "core/TaskScheduler.hpp"

@@ -7,8 +7,7 @@
 #include "app/MidiControllerApp.hpp"
 #include "app/di/DependencyContainer.hpp"
 #include "config/ApplicationConfiguration.hpp"
-#include "config/HardwareConfig.hpp"
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include "core/utils/Result.hpp"
 
 /**

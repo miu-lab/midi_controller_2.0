@@ -1,6 +1,6 @@
 #pragma once
 
-#include "config/PerformanceConfig.hpp"
+#include "config/SystemConstants.hpp"
 #include "config/ETLConfig.hpp"
 #include "core/domain/types.hpp"
 #include <array>
@@ -44,7 +44,7 @@ public:
         bool enable_status_batching;
         
         Config() 
-            : ui_update_interval_ms(PerformanceConfig::DISPLAY_REFRESH_PERIOD_MS)
+            : ui_update_interval_ms(SystemConstants::Performance::DISPLAY_REFRESH_PERIOD_MS)
             , status_update_interval_ms(100)
             , coalesce_identical_values(true)
             , enable_ui_batching(true)
@@ -217,8 +217,8 @@ public:
         size_t active = active_parameter_count_.load(std::memory_order_relaxed);
         return {
             active,
-            PerformanceConfig::MAX_MIDI_PENDING_PARAMS,
-            static_cast<float>(active) / static_cast<float>(PerformanceConfig::MAX_MIDI_PENDING_PARAMS),
+            SystemConstants::Performance::MAX_MIDI_PENDING_PARAMS,
+            static_cast<float>(active) / static_cast<float>(SystemConstants::Performance::MAX_MIDI_PENDING_PARAMS),
             ui_batches_sent_.load(std::memory_order_relaxed),
             status_batches_sent_.load(std::memory_order_relaxed),
             parameters_coalesced_.load(std::memory_order_relaxed)
@@ -264,7 +264,7 @@ private:
      * @return Index du paramètre, ou -1 si non trouvé
      */
     int findParameter(uint8_t controller, uint8_t channel) const {
-        for (size_t i = 0; i < PerformanceConfig::MAX_MIDI_PENDING_PARAMS; ++i) {
+        for (size_t i = 0; i < SystemConstants::Performance::MAX_MIDI_PENDING_PARAMS; ++i) {
             const auto& param = parameters_[i];
             if (param.active && param.controller == controller && param.channel == channel) {
                 return static_cast<int>(i);
@@ -279,7 +279,7 @@ private:
      * @return Index du slot libre, ou -1 si aucun disponible
      */
     int findFreeSlot() const {
-        for (size_t i = 0; i < PerformanceConfig::MAX_MIDI_PENDING_PARAMS; ++i) {
+        for (size_t i = 0; i < SystemConstants::Performance::MAX_MIDI_PENDING_PARAMS; ++i) {
             if (!parameters_[i].active) {
                 return static_cast<int>(i);
             }
@@ -319,12 +319,12 @@ private:
         }
         
         // Collecter tous les paramètres qui ont besoin d'une mise à jour status
-        static std::array<PendingParameter, PerformanceConfig::MAX_MIDI_PENDING_PARAMS> status_params;
+        static std::array<PendingParameter, SystemConstants::Performance::MAX_MIDI_PENDING_PARAMS> status_params;
         size_t count = 0;
         
         for (auto& param : parameters_) {
             if (param.active && param.needs_status_update && 
-                count < PerformanceConfig::MAX_MIDI_PENDING_PARAMS) {
+                count < SystemConstants::Performance::MAX_MIDI_PENDING_PARAMS) {
                 status_params[count] = param;
                 param.needs_status_update = false;
                 count++;
@@ -342,7 +342,7 @@ private:
     Config config_;
     
     // Tableau statique pour les paramètres (remplace std::map)
-    std::array<PendingParameter, PerformanceConfig::MAX_MIDI_PENDING_PARAMS> parameters_;
+    std::array<PendingParameter, SystemConstants::Performance::MAX_MIDI_PENDING_PARAMS> parameters_;
     
     // Timers pour les batchs
     uint32_t last_ui_batch_ms_;

@@ -12,12 +12,12 @@
 #include <Arduino.h>
 #include <lvgl.h>
 
-#include "config/DisplayConfig.hpp"
+#include "config/SystemConstants.hpp"
 
 
 // Static DMAMEM buffers pour performance optimale - Taille selon orientation configurée
-DMAMEM static lv_color_t lvgl_buffer_1[DisplayConfig::LVGL_BUFFER_SIZE];
-DMAMEM static lv_color_t lvgl_buffer_2[DisplayConfig::LVGL_BUFFER_SIZE];
+DMAMEM static lv_color_t lvgl_buffer_1[SystemConstants::Display::LVGL_BUFFER_SIZE];
+DMAMEM static lv_color_t lvgl_buffer_2[SystemConstants::Display::LVGL_BUFFER_SIZE];
 
 // Instance statique pour callbacks
 static Ili9341LvglBridge* bridge_instance_ = nullptr;
@@ -101,7 +101,7 @@ bool Ili9341LvglBridge::setupLvglCore() {
 
 bool Ili9341LvglBridge::setupLvglDisplay() {
     // Créer display LVGL v9 - Dimensions selon configuration centralisée
-    display_ = lv_display_create(DisplayConfig::SCREEN_WIDTH, DisplayConfig::SCREEN_HEIGHT);
+    display_ = lv_display_create(SystemConstants::Display::SCREEN_WIDTH, SystemConstants::Display::SCREEN_HEIGHT);
     if (!display_) {
         // TODO DEBUG MSG
         return false;
@@ -111,7 +111,7 @@ bool Ili9341LvglBridge::setupLvglDisplay() {
     lv_display_set_buffers(display_,
                            lvgl_buf1_,
                            lvgl_buf2_,
-                           DisplayConfig::LVGL_BUFFER_SIZE * sizeof(lv_color_t),
+                           SystemConstants::Display::LVGL_BUFFER_SIZE * sizeof(lv_color_t),
                            LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     // Définir callback flush
@@ -140,7 +140,7 @@ void Ili9341LvglBridge::freeLvglBuffers() {
 }
 
 Ili9341LvglBridge::LvglConfig Ili9341LvglBridge::getDefaultLvglConfig() {
-    return {.buffer_lines = DisplayConfig::LVGL_BUFFER_LINES,  ///< Lignes dans buffer LVGL
+    return {.buffer_lines = SystemConstants::Display::LVGL_BUFFER_LINES,  ///< Lignes dans buffer LVGL
             .double_buffering = true};
 }
 

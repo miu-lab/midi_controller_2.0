@@ -2,28 +2,28 @@
 
 #include <Arduino.h>
 
-#include "config/DisplayConfig.hpp"
+#include "config/SystemConstants.hpp"
 
 // Buffers statiques DMAMEM - Taille selon orientation configurée
-DMAMEM static uint16_t main_framebuffer[DisplayConfig::FRAMEBUFFER_SIZE];
+DMAMEM static uint16_t main_framebuffer[SystemConstants::Display::FRAMEBUFFER_SIZE];
 
 // Buffers de différence statiques DMAMEM pour optimisation (4KB chacun)
-DMAMEM static uint8_t diffbuffer1[DisplayConfig::DIFFBUFFER_SIZE];
-DMAMEM static uint8_t diffbuffer2[DisplayConfig::DIFFBUFFER_SIZE];
+DMAMEM static uint8_t diffbuffer1[SystemConstants::Display::DIFFBUFFER_SIZE];
+DMAMEM static uint8_t diffbuffer2[SystemConstants::Display::DIFFBUFFER_SIZE];
 
 //=============================================================================
 // Configuration et constructeur
 //=============================================================================
 
 Ili9341Driver::Config Ili9341Driver::getDefaultConfig() {
-    return {.cs_pin = DisplayConfig::CS_PIN,
-            .dc_pin = DisplayConfig::DC_PIN,
-            .rst_pin = DisplayConfig::RST_PIN,
-            .mosi_pin = DisplayConfig::MOSI_PIN,
-            .sck_pin = DisplayConfig::SCK_PIN,
-            .miso_pin = DisplayConfig::MISO_PIN,
-            .spi_speed = DisplayConfig::SPI_SPEED,
-            .rotation = DisplayConfig::ROTATION};
+    return {.cs_pin = SystemConstants::Display::CS_PIN,
+            .dc_pin = SystemConstants::Display::DC_PIN,
+            .rst_pin = SystemConstants::Display::RST_PIN,
+            .mosi_pin = SystemConstants::Display::MOSI_PIN,
+            .sck_pin = SystemConstants::Display::SCK_PIN,
+            .miso_pin = SystemConstants::Display::MISO_PIN,
+            .spi_speed = SystemConstants::Display::SPI_SPEED,
+            .rotation = SystemConstants::Display::ROTATION};
 }
 
 Ili9341Driver::Ili9341Driver(const Config& config)
@@ -103,10 +103,10 @@ void Ili9341Driver::setupDiffBuffers() {
 
 void Ili9341Driver::setupPerformance() {
     // Configuration performance optimisée (selon exemple officiel)
-    tft_->setDiffGap(PerformanceConfig::DIFF_GAP);            // gap petit avec buffers diff 4K
-    tft_->setVSyncSpacing(PerformanceConfig::VSYNC_SPACING);  // minimiser tearing
+    tft_->setDiffGap(SystemConstants::Performance::DIFF_GAP);            // gap petit avec buffers diff 4K
+    tft_->setVSyncSpacing(SystemConstants::Performance::VSYNC_SPACING);  // minimiser tearing
     tft_->setRefreshRate(
-        PerformanceConfig::DISPLAY_REFRESH_RATE_HZ);  // 100Hz pour performance élevée
+        SystemConstants::Performance::DISPLAY_REFRESH_RATE_HZ);  // 100Hz pour performance élevée
 }
 
 //=============================================================================
@@ -146,11 +146,11 @@ void Ili9341Driver::setRotation(uint8_t rotation) {
 void Ili9341Driver::getDimensions(uint16_t& width, uint16_t& height) const {
     // Dimensions selon rotation
     if (config_.rotation == 1 || config_.rotation == 3) {
-        width = DisplayConfig::SCREEN_WIDTH;  // Paysage (90° et 270°)
-        height = DisplayConfig::SCREEN_HEIGHT;
+        width = SystemConstants::Display::SCREEN_WIDTH;  // Paysage (90° et 270°)
+        height = SystemConstants::Display::SCREEN_HEIGHT;
     } else {
-        width = DisplayConfig::SCREEN_HEIGHT;  // Portrait (0° et 180°)
-        height = DisplayConfig::SCREEN_WIDTH;
+        width = SystemConstants::Display::SCREEN_HEIGHT;  // Portrait (0° et 180°)
+        height = SystemConstants::Display::SCREEN_WIDTH;
     }
 }
 
