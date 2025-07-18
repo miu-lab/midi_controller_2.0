@@ -1,0 +1,9 @@
+Manufacturer=Bourns
+PartNumber=PEC11R-4020F-S0024
+PartCategory=Variable Resistor
+PackageCategory=Other
+PinCount=7
+Version=1.5
+Released=2019-10-17 19:03:44
+Downloaded=2025-07-18 07:08:14
+3D=Y
