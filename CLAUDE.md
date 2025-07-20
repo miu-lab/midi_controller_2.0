@@ -179,7 +179,7 @@ pio test
 ### Configuration de la plateforme
 - **Carte** : Teensy 4.1
 - **Framework** : Arduino
-- **Standard C++** : C++20
+- **Standard C++** : C++23
 - **Type USB** : USB_MIDI_SERIAL
 - **Affichage** : TFT ILI9341 avec bibliothèque graphique LVGL 9.3.0
 

@@ -1,0 +1,47 @@
+(footprint "Switch_SPST_2P" (version 20211014) (generator "midi_controller")
+  (layer "F.Cu")
+  (tedit 61649768)
+  (attr through_hole)
+  (descr "Toggle Switch SPST ON-OFF, 2 pins, 3A 250VAC / 6A 125VAC, 6mm mounting hole, 12.7x13.2mm body")
+  (tags "switch toggle SPST ON OFF 2pin 6mm mounting hole 12.7x13.2mm 4.7mm pitch")
+  (fp_text reference "SW**" (at 0 -9.5) (layer "F.SilkS")
+    (effects (font (size 1.2 1.2) (thickness 0.18)))
+  )
+  (fp_text value "Switch_SPST_2P" (at 0 9.5) (layer "F.Fab")
+    (effects (font (size 1.0 1.0) (thickness 0.15)))
+  )
+  (fp_text user "ON" (at -2.35 -7.0) (layer "F.SilkS")
+    (effects (font (size 0.8 0.8) (thickness 0.12)))
+  )
+  (fp_text user "OFF" (at 2.35 -7.0) (layer "F.SilkS")
+    (effects (font (size 0.8 0.8) (thickness 0.12)))
+  )
+  
+  (fp_rect (start -6.35 -6.6) (end 6.35 6.6) (layer "F.Fab") (width 0.12))
+  (fp_rect (start -6.5 -6.75) (end 6.5 6.75) (layer "F.SilkS") (width 0.12))
+  
+  (fp_circle (center 0 -5.0) (end 3.0 -5.0) (layer "F.SilkS") (width 0.12) (fill none))
+  
+  (fp_line (start -8.0 -8.5) (end 8.0 -8.5) (layer "F.CrtYd") (width 0.05))
+  (fp_line (start 8.0 -8.5) (end 8.0 8.5) (layer "F.CrtYd") (width 0.05))
+  (fp_line (start 8.0 8.5) (end -8.0 8.5) (layer "F.CrtYd") (width 0.05))
+  (fp_line (start -8.0 8.5) (end -8.0 -8.5) (layer "F.CrtYd") (width 0.05))
+  
+  (fp_text user "1" (at -2.35 7.5) (layer "F.SilkS")
+    (effects (font (size 0.8 0.8) (thickness 0.12)))
+  )
+  (fp_text user "2" (at 2.35 7.5) (layer "F.SilkS")
+    (effects (font (size 0.8 0.8) (thickness 0.12)))
+  )
+  
+  (pad "1" thru_hole rect (at -2.35 6.0) (size 1.5 2.0) (drill 0.8) (layers *.Cu *.Mask))
+  (pad "2" thru_hole circle (at 2.35 6.0) (size 1.5 2.0) (drill 0.8) (layers *.Cu *.Mask))
+  
+  (pad "MH" np_thru_hole circle (at 0 -5.0) (size 6.2 6.2) (drill 6.0) (layers *.Cu *.Mask))
+  
+  (model "${KIPRJMOD}/component_library/midi_controller/3d_models/Switch_SPST_2P.step"
+    (offset (xyz 0 0 5))
+    (scale (xyz 1 1 1))
+    (rotate (xyz 0 0 0))
+  )
+)

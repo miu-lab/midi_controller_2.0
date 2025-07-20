@@ -12028,7 +12028,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.pjrc.com/teensy/card8a_rev2.pdf"
+		(property "Datasheet" ""
 			(at 0 605.79 0)
 			(effects
 				(font
