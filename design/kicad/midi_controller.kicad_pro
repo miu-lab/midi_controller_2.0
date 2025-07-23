@@ -450,7 +450,9 @@
       "midi_controller"
     ],
     "pinned_symbol_libs": [
-      "midi_controller"
+      "midi_controller",
+      "Electrosmith_Boards",
+      "Connector_Generic"
     ]
   },
   "meta": {

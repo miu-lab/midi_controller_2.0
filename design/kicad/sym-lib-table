@@ -1,4 +1,6 @@
 (sym_lib_table
   (version 7)
   (lib (name "midi_controller")(type "KiCad")(uri "${KIPRJMOD}/component_library/midi_controller/midi_controller.kicad_sym")(options "")(descr "Unified MIDI Controller Component Library"))
+  (lib (name "teensy")(type "EAGLE")(uri "${KIPRJMOD}/component_library/Microcontrollers/Teensy/teensy.lbr")(options "")(descr ""))
+  (lib (name "Electrosmith_Boards")(type "EAGLE")(uri "${KIPRJMOD}/component_library/Microcontrollers/Electrosmith/Electrosmith_Boards.lbr")(options "")(descr ""))
 )
