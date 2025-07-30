@@ -1,0 +1,408 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "3a3ef66a-86d7-4ee5-938a-36ef167a03a9")
+	(paper "A5")
+	(lib_symbols
+		(symbol "midi_controller:MIDI_Encoder_PEC11R"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "ENC_MECH"
+				(at 0 13.462 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Value" "MIDI_Encoder_PEC11R"
+				(at 0 -13.208 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+				)
+			)
+			(property "Footprint" "midi_controller:PEC11R4220FS0024"
+				(at 0 -15.748 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
+				(at 0 -18.288 0)
+				(effects
+					(font
+						(size 1.524 1.524)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
+				(at 0 16.256 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "rotary encoder mechanical bourns PEC11R MIDI control"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MIDI_Encoder_PEC11R_0_1"
+				(rectangle
+					(start -8.89 8.89)
+					(end 8.89 -8.89)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(circle
+					(center 0 0)
+					(radius 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(text "ENC"
+					(at 0 0 0)
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(symbol "MIDI_Encoder_PEC11R_1_1"
+				(pin passive line
+					(at -13.97 2.54 0)
+					(length 5.08)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -13.97 0 0)
+					(length 5.08)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -13.97 -2.54 0)
+					(length 5.08)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 13.97 2.54 180)
+					(length 5.08)
+					(name "SW1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 13.97 -2.54 180)
+					(length 5.08)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(wire
+		(pts
+			(xy 85.09 76.2) (xy 87.63 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1d61cbd7-f383-40dc-a6a0-51afb62c74ce")
+	)
+	(wire
+		(pts
+			(xy 115.57 78.74) (xy 118.11 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "27ccb775-f0ce-4711-80d4-23490bbd30b7")
+	)
+	(wire
+		(pts
+			(xy 115.57 73.66) (xy 118.11 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3dcb4e0c-ac61-4981-8f65-f74f198bed05")
+	)
+	(wire
+		(pts
+			(xy 85.09 78.74) (xy 87.63 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6de1c998-c078-418e-a2f9-8a8dc678edc7")
+	)
+	(wire
+		(pts
+			(xy 85.09 73.66) (xy 87.63 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a6fd4735-2bd6-40f5-b64b-4e06b3bb8243")
+	)
+	(hierarchical_label "QUAD_A"
+		(shape passive)
+		(at 85.09 73.66 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "0ba8d354-d384-40dd-a735-cca550a760e9")
+	)
+	(hierarchical_label "QUAD_B"
+		(shape passive)
+		(at 85.09 78.74 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "11a05208-0796-4c70-ae05-7dcd3b358054")
+	)
+	(hierarchical_label "QUAD_GND"
+		(shape passive)
+		(at 85.09 76.2 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "85f34cf3-4348-4d5c-91ba-e47e04561e8e")
+	)
+	(hierarchical_label "SW_GND"
+		(shape passive)
+		(at 118.11 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9fffc400-03a2-4f04-9c9d-d93d1d111d7f")
+	)
+	(hierarchical_label "SW_A"
+		(shape passive)
+		(at 118.11 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c3c3dc06-63fc-4bf3-b501-eb132a84492b")
+	)
+	(symbol
+		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
+		(at 101.6 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "95890c68-5d60-4e46-8bfe-fca6cc6bb034")
+		(property "Reference" "ENC_MECH1"
+			(at 101.6 62.23 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+			)
+		)
+		(property "Value" "MIDI_Encoder_PEC11R"
+			(at 101.6 64.77 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+			)
+		)
+		(property "Footprint" "midi_controller:PEC11R4220FS0024"
+			(at 101.6 91.948 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
+			(at 101.6 94.488 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
+			(at 101.6 59.944 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "A"
+			(uuid "639c42e6-4c4d-419b-89b0-1ec378adc75e")
+		)
+		(pin "C"
+			(uuid "5f6c64b1-7a5c-4be3-832e-db94287c8146")
+		)
+		(pin "B"
+			(uuid "30c8185e-4615-4689-acd2-e003753a8edf")
+		)
+		(pin "1"
+			(uuid "b569c5c0-b101-48ec-8136-6d9eb7b8f5c7")
+		)
+		(pin "2"
+			(uuid "623c4bed-08c9-4674-b842-e0f94e5bb051")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/f2987add-55a5-4c89-9b33-db7ed86a6cdc"
+					(reference "ENC_MECH9")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/0ace1318-b253-4d85-b784-aa61ad0f89cd"
+					(reference "ENC_MECH2")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/1413c73c-0ad0-4a10-833c-ff3e4825f086"
+					(reference "ENC_MECH6")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/24f763b3-d9d2-44ca-b0de-e5bd6d783cf4"
+					(reference "ENC_MECH7")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/291f4e39-6718-4dda-83a6-20f8f943b75d"
+					(reference "ENC_MECH3")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/3c9339b8-42f1-40cb-9183-aa88346af463"
+					(reference "ENC_MECH4")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/4af660a9-1b0e-40bf-ba48-b976c7e464d4"
+					(reference "ENC_MECH5")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/60e25267-b738-456c-86e0-26223ee5fe23"
+					(reference "ENC_MECH1")
+					(unit 1)
+				)
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/761c51eb-8364-4d00-98cb-27a8734a6aa5"
+					(reference "ENC_MECH8")
+					(unit 1)
+				)
+			)
+		)
+	)
+)

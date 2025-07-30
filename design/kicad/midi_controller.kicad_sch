@@ -9,6 +9,523 @@
 		(rev "v1.0")
 	)
 	(lib_symbols
+		(symbol "74xx:CD74HC4067M"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -8.89 22.86 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "CD74HC4067M"
+				(at 1.27 22.86 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm"
+				(at 22.86 -25.4 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "http://www.ti.com/lit/ds/symlink/cd74hc4067.pdf"
+				(at -8.89 21.59 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "High-Speed CMOS Logic 16-Channel Analog Multiplexer/Demultiplexer, SOIC-24"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "multiplexer demultiplexer mux demux"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SOIC*W*7.5x15.4mm*P1.27mm*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "CD74HC4067M_0_1"
+				(rectangle
+					(start -8.89 21.59)
+					(end 8.89 -24.13)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "CD74HC4067M_1_1"
+				(pin passive line
+					(at -12.7 12.7 0)
+					(length 3.81)
+					(name "COM"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 2.54 0)
+					(length 3.81)
+					(name "S0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "10"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 0 0)
+					(length 3.81)
+					(name "S1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "11"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -2.54 0)
+					(length 3.81)
+					(name "S2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "14"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -5.08 0)
+					(length 3.81)
+					(name "S3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "13"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -15.24 0)
+					(length 3.81)
+					(name "~{E}"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "15"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 25.4 270)
+					(length 3.81)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "24"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 -27.94 90)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "12"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 17.78 180)
+					(length 3.81)
+					(name "I0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 15.24 180)
+					(length 3.81)
+					(name "I1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 12.7 180)
+					(length 3.81)
+					(name "I2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 10.16 180)
+					(length 3.81)
+					(name "I3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 7.62 180)
+					(length 3.81)
+					(name "I4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 5.08 180)
+					(length 3.81)
+					(name "I5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 2.54 180)
+					(length 3.81)
+					(name "I6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 0 180)
+					(length 3.81)
+					(name "I7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -2.54 180)
+					(length 3.81)
+					(name "I8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "23"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -5.08 180)
+					(length 3.81)
+					(name "I9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "22"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -7.62 180)
+					(length 3.81)
+					(name "I10"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "21"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -10.16 180)
+					(length 3.81)
+					(name "I11"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "20"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -12.7 180)
+					(length 3.81)
+					(name "I12"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "19"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -15.24 180)
+					(length 3.81)
+					(name "I13"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "18"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -17.78 180)
+					(length 3.81)
+					(name "I14"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "17"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 -20.32 180)
+					(length 3.81)
+					(name "I15"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "16"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:Conn_01x24_Socket"
 			(pin_names
 				(offset 1.016)
@@ -1098,131 +1615,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:R"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 2.032 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "R"
-				(at 0 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at -1.778 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Resistor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "R res resistor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "R_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "R_0_1"
-				(rectangle
-					(start -1.016 -2.54)
-					(end 1.016 2.54)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "R_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 1.27)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 1.27)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "midi_controller:MIDI_Display_MSP2807"
+		(symbol "MIDI_Display_MSP2807_1"
 			(pin_names
 				(offset 1.016)
 			)
@@ -1230,7 +1623,7 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "D"
-				(at 0 20.32 0)
+				(at 0 17.78 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1238,7 +1631,7 @@
 				)
 			)
 			(property "Value" "MIDI_Display_MSP2807"
-				(at 0 17.78 0)
+				(at 0 15.24 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1264,7 +1657,7 @@
 				)
 			)
 			(property "Description" "2.8 inch TFT LCD Display Module, ILI9341 driver, 320x240 resolution, SPI interface with touch"
-				(at 0 0 0)
+				(at 0 -21.082 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1290,10 +1683,10 @@
 					(hide yes)
 				)
 			)
-			(symbol "MIDI_Display_MSP2807_0_1"
+			(symbol "MIDI_Display_MSP2807_1_0_1"
 				(rectangle
-					(start -15.24 15.24)
-					(end 15.24 -12.7)
+					(start -25.4 12.7)
+					(end 25.4 -12.7)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -1346,9 +1739,9 @@
 					)
 				)
 			)
-			(symbol "MIDI_Display_MSP2807_1_1"
+			(symbol "MIDI_Display_MSP2807_1_1_1"
 				(pin power_in line
-					(at -20.32 10.16 0)
+					(at -30.48 10.16 0)
 					(length 5.08)
 					(name "VCC"
 						(effects
@@ -1366,7 +1759,7 @@
 					)
 				)
 				(pin power_in line
-					(at -20.32 7.62 0)
+					(at -30.48 7.62 0)
 					(length 5.08)
 					(name "GND"
 						(effects
@@ -1384,7 +1777,7 @@
 					)
 				)
 				(pin input line
-					(at -20.32 5.08 0)
+					(at -30.48 5.08 0)
 					(length 5.08)
 					(name "CS"
 						(effects
@@ -1402,7 +1795,7 @@
 					)
 				)
 				(pin input line
-					(at -20.32 2.54 0)
+					(at -30.48 2.54 0)
 					(length 5.08)
 					(name "RST"
 						(effects
@@ -1420,7 +1813,7 @@
 					)
 				)
 				(pin input line
-					(at -20.32 0 0)
+					(at -30.48 0 0)
 					(length 5.08)
 					(name "DC"
 						(effects
@@ -1438,7 +1831,7 @@
 					)
 				)
 				(pin input line
-					(at -20.32 -2.54 0)
+					(at -30.48 -2.54 0)
 					(length 5.08)
 					(name "SDI/MOSI"
 						(effects
@@ -1456,7 +1849,7 @@
 					)
 				)
 				(pin input line
-					(at -20.32 -5.08 0)
+					(at -30.48 -5.08 0)
 					(length 5.08)
 					(name "SCK"
 						(effects
@@ -1474,7 +1867,7 @@
 					)
 				)
 				(pin power_in line
-					(at -20.32 -7.62 0)
+					(at -30.48 -7.62 0)
 					(length 5.08)
 					(name "LED"
 						(effects
@@ -1492,7 +1885,7 @@
 					)
 				)
 				(pin output line
-					(at -20.32 -10.16 0)
+					(at -30.48 -10.16 0)
 					(length 5.08)
 					(name "SDO/MISO"
 						(effects
@@ -1510,7 +1903,7 @@
 					)
 				)
 				(pin bidirectional line
-					(at 20.32 10.16 180)
+					(at 30.48 10.16 180)
 					(length 5.08)
 					(name "T_CLK"
 						(effects
@@ -1528,7 +1921,7 @@
 					)
 				)
 				(pin input line
-					(at 20.32 7.62 180)
+					(at 30.48 7.62 180)
 					(length 5.08)
 					(name "T_CS"
 						(effects
@@ -1546,7 +1939,7 @@
 					)
 				)
 				(pin bidirectional line
-					(at 20.32 5.08 180)
+					(at 30.48 5.08 180)
 					(length 5.08)
 					(name "T_DIN"
 						(effects
@@ -1564,7 +1957,7 @@
 					)
 				)
 				(pin output line
-					(at 20.32 2.54 180)
+					(at 30.48 2.54 180)
 					(length 5.08)
 					(name "T_DO"
 						(effects
@@ -1582,7 +1975,7 @@
 					)
 				)
 				(pin input line
-					(at 20.32 0 180)
+					(at 30.48 0 180)
 					(length 5.08)
 					(name "T_IRQ"
 						(effects
@@ -1837,191 +2230,6 @@
 						)
 					)
 					(number "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "midi_controller:MIDI_Encoder_PEC11R"
-			(pin_names
-				(offset 1.016)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "ENC_MECH"
-				(at 0 10.16 0)
-				(effects
-					(font
-						(size 1.524 1.524)
-					)
-				)
-			)
-			(property "Value" "MIDI_Encoder_PEC11R"
-				(at 0 -10.16 0)
-				(effects
-					(font
-						(size 1.524 1.524)
-					)
-				)
-			)
-			(property "Footprint" "midi_controller:PEC11R4220FS0024"
-				(at 0 -12.7 0)
-				(effects
-					(font
-						(size 1.524 1.524)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-				(at 0 -15.24 0)
-				(effects
-					(font
-						(size 1.524 1.524)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "rotary encoder mechanical bourns PEC11R MIDI control"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "MIDI_Encoder_PEC11R_0_1"
-				(rectangle
-					(start -7.62 7.62)
-					(end 7.62 -7.62)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 3.81)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(text "ENC"
-					(at 0 0 0)
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(symbol "MIDI_Encoder_PEC11R_1_1"
-				(pin passive line
-					(at -12.7 2.54 0)
-					(length 5.08)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -12.7 0 0)
-					(length 5.08)
-					(name "C"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "C"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -12.7 -2.54 0)
-					(length 5.08)
-					(name "B"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "B"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 12.7 2.54 180)
-					(length 5.08)
-					(name "SW1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 12.7 -2.54 180)
-					(length 5.08)
-					(name "SW2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3566,172 +3774,158 @@
 			(embedded_fonts no)
 		)
 	)
-	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 265.43 241.3 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "0b1970fe-c67c-478c-94bd-40974f833367")
-		(property "Reference" "ENC_MECH7"
-			(at 265.43 228.6 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
+	(wire
+		(pts
+			(xy 16.51 86.36) (xy 16.51 92.71)
 		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 265.43 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
+		(stroke
+			(width 0)
+			(type default)
 		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 265.43 254 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 265.43 256.54 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 265.43 241.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "B"
-			(uuid "9c4d892d-1222-4e40-8389-e246d5ae0ae2")
-		)
-		(pin "A"
-			(uuid "945f87c8-dad7-4681-8f48-dd9d97a41d78")
-		)
-		(pin "C"
-			(uuid "3cc01fe7-4946-4660-91f4-04a5ebba81be")
-		)
-		(pin "1"
-			(uuid "b7e7ba5f-386e-478f-8cb2-c0c37f8f66bb")
-		)
-		(pin "2"
-			(uuid "364692ae-4d09-4368-8fb6-9ff7d5c3d102")
-		)
-		(instances
-			(project "midi_controller"
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH7")
-					(unit 1)
-				)
-			)
-		)
+		(uuid "03665bc2-9f06-4e8d-9e46-f381f5bc8314")
 	)
-	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 303.53 128.27 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "19955990-3b19-492b-ac60-37f60b297272")
-		(property "Reference" "ENC_MECH9"
-			(at 303.53 115.57 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
+	(wire
+		(pts
+			(xy 16.51 92.71) (xy 44.45 92.71)
 		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 303.53 118.11 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
+		(stroke
+			(width 0)
+			(type default)
 		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 303.53 140.97 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
+		(uuid "03bbffea-52cb-49ea-b5da-022c5cd398e8")
+	)
+	(bus
+		(pts
+			(xy 41.91 63.5) (xy 63.5 63.5)
 		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 303.53 143.51 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
+		(stroke
+			(width 0)
+			(type default)
 		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 303.53 128.27 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
+		(uuid "2e84d5a4-4c8e-43a7-a3e5-688d082afa4d")
+	)
+	(wire
+		(pts
+			(xy 43.18 81.28) (xy 64.77 81.28)
 		)
-		(pin "B"
-			(uuid "1f79a992-b3c7-4338-88fc-4029a4409d1a")
+		(stroke
+			(width 0)
+			(type default)
 		)
-		(pin "A"
-			(uuid "f5ba6c8e-cedc-4cfd-b7d1-897d71a1b624")
+		(uuid "3c455995-7b68-4bc3-b55c-7264de28a64a")
+	)
+	(bus
+		(pts
+			(xy 41.91 38.1) (xy 63.5 38.1)
 		)
-		(pin "C"
-			(uuid "53a33a5e-508c-42f4-bcb8-f7dc4eb5e69a")
+		(stroke
+			(width 0)
+			(type default)
 		)
-		(pin "1"
-			(uuid "e463986f-a74f-47f2-adf2-61fd346d259a")
+		(uuid "6b8bf14a-b867-4529-9616-56a29aae57cc")
+	)
+	(bus
+		(pts
+			(xy 41.91 50.8) (xy 63.5 50.8)
 		)
-		(pin "2"
-			(uuid "5df0e6ac-0077-42b5-9b2e-258a63f46e19")
+		(stroke
+			(width 0)
+			(type default)
 		)
-		(instances
-			(project "midi_controller"
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH9")
-					(unit 1)
-				)
-			)
+		(uuid "71f3ad80-b8d9-4b24-8d25-53e593ba65a8")
+	)
+	(bus
+		(pts
+			(xy 41.91 19.05) (xy 88.9 19.05)
 		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7f04d0c7-f365-46da-b6a9-274e6b21b859")
+	)
+	(bus
+		(pts
+			(xy 41.91 25.4) (xy 63.5 25.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7f391fa7-3929-4eec-ac87-cd9dc07621fe")
+	)
+	(wire
+		(pts
+			(xy 16.51 86.36) (xy 17.78 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c71d7d97-70bb-411a-b847-6b66bcfa433a")
+	)
+	(bus
+		(pts
+			(xy 41.91 57.15) (xy 63.5 57.15)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7992dc2-8ca6-48bf-8099-481011dfd635")
+	)
+	(wire
+		(pts
+			(xy 43.18 86.36) (xy 44.45 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d3614d05-2463-432f-9fcb-629f824a366d")
+	)
+	(wire
+		(pts
+			(xy 44.45 86.36) (xy 44.45 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e656da33-635b-4587-8918-817dbca3b18a")
+	)
+	(bus
+		(pts
+			(xy 41.91 44.45) (xy 63.5 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f145a98c-2397-4b7c-b5c5-efbff0bac6f8")
+	)
+	(bus
+		(pts
+			(xy 41.91 31.75) (xy 63.5 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f80021e3-55cc-4bf0-9334-b28f8df7e39f")
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x24_Socket")
-		(at 157.48 120.65 0)
+		(at 175.26 170.18 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "1f7984cf-eb8d-457a-99de-233075f40151")
 		(property "Reference" "J1"
-			(at 158.75 120.6499 0)
+			(at 180.848 206.248 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3740,7 +3934,7 @@
 			)
 		)
 		(property "Value" "Conn_01x24_Socket"
-			(at 158.75 123.1899 0)
+			(at 180.848 203.962 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3749,7 +3943,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 157.48 120.65 0)
+			(at 175.26 170.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3758,7 +3952,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 157.48 120.65 0)
+			(at 175.26 170.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3767,7 +3961,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x24, script generated"
-			(at 157.48 120.65 0)
+			(at 175.26 170.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3857,51 +4051,34 @@
 		)
 	)
 	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 189.23 218.44 0)
+		(lib_name "MIDI_Display_MSP2807_1")
+		(lib_id "midi_controller:MIDI_Display_MSP2807")
+		(at 222.25 200.66 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "2de6d212-e362-44f1-a3ae-d9bdd7f101b0")
-		(property "Reference" "ENC_MECH1"
-			(at 189.23 205.74 0)
+		(uuid "2e7ff320-5175-4212-b951-d6b8cbd6f939")
+		(property "Reference" "D2"
+			(at 222.25 180.34 0)
 			(effects
 				(font
-					(size 1.524 1.524)
+					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 189.23 208.28 0)
+		(property "Value" "MIDI_Display_MSP2807"
+			(at 222.25 182.88 0)
 			(effects
 				(font
-					(size 1.524 1.524)
+					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 189.23 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 189.23 233.68 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 189.23 218.44 0)
+		(property "Footprint" "midi_controller:MSP2807_ILI9341_Display"
+			(at 222.25 215.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3909,195 +4086,87 @@
 				(hide yes)
 			)
 		)
-		(pin "B"
-			(uuid "430eed31-cc87-446d-8ccf-74d7880f241f")
+		(property "Datasheet" "https://www.lcdwiki.com/2.8inch_SPI_Module_ILI9341_SKU:MSP2807"
+			(at 222.25 218.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
 		)
-		(pin "A"
-			(uuid "0e4224d9-ef0c-48f7-a771-9fc0ee529412")
+		(property "Description" "2.8 inch TFT LCD Display Module, ILI9341 driver, 320x240 resolution, SPI interface with touch"
+			(at 222.25 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
 		)
-		(pin "C"
-			(uuid "e51749d0-461c-4288-8e0b-43892362fa1f")
+		(pin "5"
+			(uuid "c9310148-348d-4248-8f70-e8b41766f306")
 		)
-		(pin "1"
-			(uuid "5f7adbf1-0047-494e-b405-c253b6d80e3b")
+		(pin "11"
+			(uuid "b80d3817-d41c-481f-ba93-7852958e60c5")
 		)
 		(pin "2"
-			(uuid "9e072495-f17b-4cc5-b40e-c23da284fbd4")
+			(uuid "35f38c10-a24a-4dc3-bb2b-d710320772f3")
+		)
+		(pin "9"
+			(uuid "de649a4b-59d3-4f0c-b76e-0010acce69da")
+		)
+		(pin "4"
+			(uuid "b3468674-2873-49d2-9b99-8e11e92c3fe1")
+		)
+		(pin "6"
+			(uuid "df36487d-7f31-4964-839a-6e4a27c9175e")
+		)
+		(pin "13"
+			(uuid "f89ad6cc-1c86-460c-9907-a801354e770e")
+		)
+		(pin "14"
+			(uuid "57fc4f33-2bfc-4b6d-9502-6b2c2fb3bebd")
+		)
+		(pin "8"
+			(uuid "39f29614-ad0b-4dd5-87a4-cbcdd95e0091")
+		)
+		(pin "7"
+			(uuid "a63fde1a-1b5e-4e67-8ea1-9f6a56c5f0c5")
+		)
+		(pin "3"
+			(uuid "f9a33174-455e-46e9-b004-5e09552a060c")
+		)
+		(pin "1"
+			(uuid "e1c7b26d-45d6-4a1b-926e-7d88bc2213f9")
+		)
+		(pin "12"
+			(uuid "bc9b89c3-1541-42b3-8cfc-081d23f8838c")
+		)
+		(pin "10"
+			(uuid "89fbebe1-0409-45a2-9271-43899028adf1")
 		)
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH1")
+					(reference "D2")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 303.53 218.44 0)
+		(lib_id "74xx:CD74HC4067M")
+		(at 110.49 38.1 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3ee2e204-4146-4fa8-aa4f-afa6046a50d9")
-		(property "Reference" "ENC_MECH4"
-			(at 303.53 205.74 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 303.53 208.28 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 303.53 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 303.53 233.68 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 303.53 218.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "B"
-			(uuid "0ad8e5a6-2506-4703-b164-b96d663cf89e")
-		)
-		(pin "A"
-			(uuid "afb0b15d-a49f-4dbd-bf96-601c105ecd0e")
-		)
-		(pin "C"
-			(uuid "e73f4cb1-1f67-4608-bd61-e1ed02b132a9")
-		)
-		(pin "1"
-			(uuid "31f60b70-44d1-4821-8b6c-b488d305d4a8")
-		)
-		(pin "2"
-			(uuid "3cf5190b-99cd-46f3-82ef-2fc329c2ffc8")
-		)
-		(instances
-			(project "midi_controller"
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 189.23 241.3 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "5c2362e3-6226-4686-83f4-641ba7bbf3f5")
-		(property "Reference" "ENC_MECH5"
-			(at 189.23 228.6 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 189.23 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 189.23 254 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 189.23 256.54 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 189.23 241.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "B"
-			(uuid "f23fd32a-21de-445d-a6a6-18343a381788")
-		)
-		(pin "A"
-			(uuid "7d001ca4-c31c-4f49-a22c-205c6f4a5364")
-		)
-		(pin "C"
-			(uuid "d69fadbf-3147-4979-a274-5d47ecb3265e")
-		)
-		(pin "1"
-			(uuid "c2856621-8902-4704-be41-43cffa65b34e")
-		)
-		(pin "2"
-			(uuid "1f737c46-b2a5-45c3-93ee-c5b94e73497e")
-		)
-		(instances
-			(project "midi_controller"
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 208.28 203.2 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "5dcc037f-8722-44db-8594-2342fec1407e")
-		(property "Reference" "R1"
-			(at 207.0099 200.66 0)
+		(uuid "3b3b5dfb-9c1e-48db-b247-fbaec2ab819a")
+		(property "Reference" "U1"
+			(at 108.3467 11.43 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4105,8 +4174,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
-			(at 209.5499 200.66 0)
+		(property "Value" "CD74HC4067M"
+			(at 108.3467 13.97 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4114,8 +4183,18 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P7.62mm_Horizontal"
-			(at 208.28 204.978 90)
+		(property "Footprint" "Package_SO:SSOP-24_5.3x8.2mm_P0.65mm"
+			(at 87.63 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.ti.com/lit/ds/symlink/cd74hc4067.pdf"
+			(at 119.38 16.51 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4123,8 +4202,8 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 208.28 203.2 0)
+		(property "Description" "High-Speed CMOS Logic 16-Channel Analog Multiplexer/Demultiplexer, SOIC-24"
+			(at 110.49 38.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4132,25 +4211,82 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Resistor"
-			(at 208.28 203.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
+		(pin "9"
+			(uuid "19d2cf39-ee81-417f-906f-c8668cf1c7f4")
 		)
-		(pin "1"
-			(uuid "ca67258d-2abf-4d06-a7b4-676db7717bb0")
+		(pin "17"
+			(uuid "a428def4-636f-446a-ae56-628df515dcf8")
 		)
 		(pin "2"
-			(uuid "4b639616-6fe5-44d3-91f4-c754a4e28666")
+			(uuid "ea9e4f60-baae-4776-a4ff-6024412e6655")
+		)
+		(pin "23"
+			(uuid "86f2f89b-d2cf-4f3e-b6ff-405020f7cec5")
+		)
+		(pin "22"
+			(uuid "2df11af7-e5b2-4052-8e52-5498bf552c3f")
+		)
+		(pin "11"
+			(uuid "9db28280-897a-4893-ab27-7a1c5ebc21b9")
+		)
+		(pin "16"
+			(uuid "8330be46-73cf-40fa-8e50-b55ebfd35297")
+		)
+		(pin "20"
+			(uuid "faa5e834-a27a-4d86-b8f6-dc66d4b801b6")
+		)
+		(pin "1"
+			(uuid "a5c748b3-1dd9-491f-98de-bedb41725fcc")
+		)
+		(pin "7"
+			(uuid "72f4f0d2-2507-40ff-b8b9-72d3a02c267c")
+		)
+		(pin "3"
+			(uuid "a9a6fede-ed83-4969-9f91-5ff9b67cb29e")
+		)
+		(pin "4"
+			(uuid "9ce95131-83a9-48b3-9d3d-b4df1e4a3c5e")
+		)
+		(pin "12"
+			(uuid "ba2da60a-99fa-4cb7-b8cf-01bd0dd42b0d")
+		)
+		(pin "21"
+			(uuid "07e2ad7d-5b81-4df9-9802-1e9a524ad472")
+		)
+		(pin "24"
+			(uuid "83c986f5-2117-4ec2-a8c5-f63c65a3c89a")
+		)
+		(pin "14"
+			(uuid "9277af96-7efd-498f-8aef-0e647978af7b")
+		)
+		(pin "15"
+			(uuid "c3e2b01f-e5ae-4f13-b3ae-427abbc8ac23")
+		)
+		(pin "13"
+			(uuid "34cc5655-f984-4769-8ad9-8cee6644ccd3")
+		)
+		(pin "18"
+			(uuid "aafe0f73-d85d-4369-b6d3-3cbebb83a0f2")
+		)
+		(pin "6"
+			(uuid "5545bde6-de80-4674-85eb-c18f6cdda953")
+		)
+		(pin "5"
+			(uuid "51aab9c7-ca3a-47c4-8b5c-c00eadd7acd7")
+		)
+		(pin "10"
+			(uuid "8ee995b9-e6a3-46e8-86f3-64589b101a38")
+		)
+		(pin "8"
+			(uuid "59bdda7a-7965-4140-b141-90df55d15c47")
+		)
+		(pin "19"
+			(uuid "d6f9d8d9-d4c7-4a16-a568-38d2630e83bd")
 		)
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "R1")
+					(reference "U1")
 					(unit 1)
 				)
 			)
@@ -4158,7 +4294,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 140.97 78.74 0)
+		(at 158.75 128.27 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4167,7 +4303,7 @@
 		(fields_autoplaced yes)
 		(uuid "5e99582b-f3fc-4cf6-996d-cfecd97f6f5b")
 		(property "Reference" "#PWR01"
-			(at 140.97 82.55 0)
+			(at 158.75 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4176,7 +4312,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 140.97 73.66 0)
+			(at 158.75 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4184,7 +4320,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 140.97 78.74 0)
+			(at 158.75 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4193,7 +4329,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 140.97 78.74 0)
+			(at 158.75 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4202,7 +4338,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
-			(at 140.97 78.74 0)
+			(at 158.75 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4224,15 +4360,15 @@
 	)
 	(symbol
 		(lib_id "midi_controller:MIDI_Teensy4.1")
-		(at 99.06 130.81 0)
+		(at 116.84 180.34 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
-		(on_board yes)
+		(on_board no)
 		(dnp no)
 		(uuid "5f4e9de9-d197-4276-87a1-bd606b93ce69")
 		(property "Reference" "MCU1"
-			(at 99.06 81.788 0)
+			(at 116.84 131.318 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4240,7 +4376,7 @@
 			)
 		)
 		(property "Value" "MIDI_Teensy4.1"
-			(at 99.06 84.328 0)
+			(at 116.84 133.858 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4248,7 +4384,7 @@
 			)
 		)
 		(property "Footprint" "midi_controller:Teensy41"
-			(at 98.806 151.638 0)
+			(at 116.586 201.168 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4257,7 +4393,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.pjrc.com/store/teensy41.html"
-			(at 98.298 76.2 0)
+			(at 116.078 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4265,7 +4401,7 @@
 			)
 		)
 		(property "Description" "Teensy 4.1 - ARM Cortex-M7 600MHz microcontroller for MIDI applications"
-			(at 99.314 79.248 0)
+			(at 117.094 128.778 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4483,343 +4619,8 @@
 		)
 	)
 	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 265.43 218.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "65e41e0e-b6be-4386-8eba-6d145087552c")
-		(property "Reference" "ENC_MECH3"
-			(at 265.43 205.74 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 265.43 208.28 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 265.43 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 265.43 233.68 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 265.43 218.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "B"
-			(uuid "9def0da8-8a5c-4eb0-8f57-b89966645ded")
-		)
-		(pin "A"
-			(uuid "dca207a8-3c78-4c26-bd88-ef8638664fec")
-		)
-		(pin "C"
-			(uuid "c3b79613-4dcb-4569-8370-a1f1e312acac")
-		)
-		(pin "1"
-			(uuid "a99284a6-5a51-4ce8-88e6-80d9fd4cf82d")
-		)
-		(pin "2"
-			(uuid "0e2cc861-8d87-4ea7-9a7b-e259beda091a")
-		)
-		(instances
-			(project "midi_controller"
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 303.53 241.3 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7fe67909-b0c2-400c-81e4-a29fdfec1548")
-		(property "Reference" "ENC_MECH8"
-			(at 303.53 228.6 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 303.53 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 303.53 254 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 303.53 256.54 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 303.53 241.3 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "B"
-			(uuid "4d700038-73f8-4579-a1a5-91002f08164b")
-		)
-		(pin "A"
-			(uuid "3abde89b-9824-4d20-a9f6-af5eb7bafc9d")
-		)
-		(pin "C"
-			(uuid "00fc2798-74a4-4e04-9efb-0974cdc5f4aa")
-		)
-		(pin "1"
-			(uuid "90a8e1d8-6a52-4460-8d59-1456caacf483")
-		)
-		(pin "2"
-			(uuid "1d34b2f6-8686-4d44-9a15-ad083c13f125")
-		)
-		(instances
-			(project "midi_controller"
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH8")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 227.33 218.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "96d595ff-ca2a-426a-adf7-603fbd77e732")
-		(property "Reference" "ENC_MECH2"
-			(at 227.33 205.74 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 227.33 208.28 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
-		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 227.33 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 227.33 233.68 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 227.33 218.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "B"
-			(uuid "996fd5cb-df77-46d2-a85c-c747296b37ee")
-		)
-		(pin "A"
-			(uuid "99a578a4-1664-4f41-b4e6-3a78f18f37c2")
-		)
-		(pin "C"
-			(uuid "8ea39706-2c25-4fdf-a0b6-793e149a5d84")
-		)
-		(pin "1"
-			(uuid "7fde1546-d6d8-4e86-91b8-cbedfbc6da4b")
-		)
-		(pin "2"
-			(uuid "f5c08430-d5a0-4066-914c-e936603ba7b4")
-		)
-		(instances
-			(project "midi_controller"
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "midi_controller:MIDI_Display_MSP2807")
-		(at 118.11 -17.78 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b45ee444-cd1c-4996-8b8f-523604a796f6")
-		(property "Reference" "D1"
-			(at 118.11 -36.83 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "MIDI_Display_MSP2807"
-			(at 118.11 -34.29 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "midi_controller:MSP2807_ILI9341_Display"
-			(at 118.11 -2.54 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.lcdwiki.com/2.8inch_SPI_Module_ILI9341_SKU:MSP2807"
-			(at 118.11 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "2.8 inch TFT LCD Display Module, ILI9341 driver, 320x240 resolution, SPI interface with touch"
-			(at 118.11 -17.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "5"
-			(uuid "d57518b6-d5ce-4bb6-88ab-dd16445420e1")
-		)
-		(pin "4"
-			(uuid "4c9411d2-7bea-4dc1-b168-e1a5aee216c4")
-		)
-		(pin "3"
-			(uuid "68f080f2-d4c7-4fc1-9454-05940fccaeee")
-		)
-		(pin "1"
-			(uuid "ea1eb34b-74c5-42e6-9f94-e6c5df2928a8")
-		)
-		(pin "2"
-			(uuid "6c2dd20a-b500-45a2-9bb6-f61b73893c73")
-		)
-		(pin "8"
-			(uuid "3c83e793-00e5-4521-8990-e5590cd96870")
-		)
-		(pin "14"
-			(uuid "707f8d77-b9a2-48b4-9f8d-af88832d3050")
-		)
-		(pin "13"
-			(uuid "a3e39f39-c90e-4b44-a9d0-1b7600b01e9d")
-		)
-		(pin "11"
-			(uuid "a16c43fa-355f-4841-8259-47c900616dc2")
-		)
-		(pin "12"
-			(uuid "4e79b916-5ec9-451b-9d61-9b2dc127c093")
-		)
-		(pin "7"
-			(uuid "8db09b95-c1f5-46e0-95d0-7ed036b33684")
-		)
-		(pin "6"
-			(uuid "020662d2-06d5-41b2-a6d9-ad6f6a89d6f0")
-		)
-		(pin "9"
-			(uuid "040d1373-38ff-443c-b1ed-5aa0439cada3")
-		)
-		(pin "10"
-			(uuid "85c2cdf0-5448-4aed-b349-31a40221badf")
-		)
-		(instances
-			(project ""
-				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "D1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "midi_controller:MIDI_Encoder_E38S6G5_Optical")
-		(at 303.53 182.88 0)
+		(at 339.09 181.61 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4828,7 +4629,7 @@
 		(fields_autoplaced yes)
 		(uuid "b932a609-2256-4b4e-a6d6-ae5cbe0d0af2")
 		(property "Reference" "ENC_OPT1"
-			(at 312.42 181.6099 0)
+			(at 347.98 180.3399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4837,7 +4638,7 @@
 			)
 		)
 		(property "Value" "MIDI_Encoder_E38S6G5_Optical"
-			(at 312.42 184.1499 0)
+			(at 347.98 182.8799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4846,7 +4647,7 @@
 			)
 		)
 		(property "Footprint" "midi_controller:E38S6G5_Optical_Encoder"
-			(at 303.53 193.04 0)
+			(at 339.09 191.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4855,7 +4656,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 303.53 195.58 0)
+			(at 339.09 194.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4864,7 +4665,7 @@
 			)
 		)
 		(property "Description" "E38S6G5 Series Optical Rotary Encoder, 600 pulses/revolution, Open Collector NPN output"
-			(at 303.53 182.88 0)
+			(at 339.09 181.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4898,32 +4699,33 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x24_Socket")
-		(at 45.72 123.19 180)
+		(at 58.42 170.18 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "d95113c8-df9c-4f95-adf3-2a5f956bfc09")
 		(property "Reference" "J2"
-			(at 46.355 87.63 0)
+			(at 58.42 207.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify right)
 			)
 		)
 		(property "Value" "Conn_01x24_Socket"
-			(at 46.355 90.17 0)
+			(at 58.42 204.47 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify right)
 			)
 		)
 		(property "Footprint" ""
-			(at 45.72 123.19 0)
+			(at 58.42 170.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4932,7 +4734,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 45.72 123.19 0)
+			(at 58.42 170.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4941,7 +4743,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x24, script generated"
-			(at 45.72 123.19 0)
+			(at 58.42 170.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4950,76 +4752,76 @@
 			)
 		)
 		(pin "7"
-			(uuid "81e12506-5717-46c0-9c91-919515033023")
+			(uuid "81e12506-5717-46c0-9c91-919515033024")
 		)
 		(pin "6"
-			(uuid "e005cda7-f33c-48ee-a563-4ff444e73d9d")
+			(uuid "e005cda7-f33c-48ee-a563-4ff444e73d9e")
 		)
 		(pin "18"
-			(uuid "841610bf-0bcb-4201-bf9e-eea8f94b08ee")
+			(uuid "841610bf-0bcb-4201-bf9e-eea8f94b08ef")
 		)
 		(pin "11"
-			(uuid "99a84f96-69d3-4b51-a83e-233d33120b55")
+			(uuid "99a84f96-69d3-4b51-a83e-233d33120b56")
 		)
 		(pin "15"
-			(uuid "a84c0ebf-ba83-4662-84df-e8354b3d6465")
+			(uuid "a84c0ebf-ba83-4662-84df-e8354b3d6466")
 		)
 		(pin "2"
-			(uuid "c4d0290c-15b2-49b0-9a73-e6c11bcfa3c9")
+			(uuid "c4d0290c-15b2-49b0-9a73-e6c11bcfa3ca")
 		)
 		(pin "16"
-			(uuid "94f67bd4-a384-4ab5-887e-a22d76f0c222")
+			(uuid "94f67bd4-a384-4ab5-887e-a22d76f0c223")
 		)
 		(pin "8"
-			(uuid "0c351e06-9d9b-4a5c-b006-07cec71af51f")
+			(uuid "0c351e06-9d9b-4a5c-b006-07cec71af520")
 		)
 		(pin "13"
-			(uuid "feda222f-f27e-4cfc-afd1-f77ef3511b43")
+			(uuid "feda222f-f27e-4cfc-afd1-f77ef3511b44")
 		)
 		(pin "12"
-			(uuid "a2da2dd7-9577-4424-9920-6d2c8c16807c")
+			(uuid "a2da2dd7-9577-4424-9920-6d2c8c16807d")
 		)
 		(pin "5"
-			(uuid "9be9b7fa-70f3-44ab-b28d-977e6d17052f")
+			(uuid "9be9b7fa-70f3-44ab-b28d-977e6d170530")
 		)
 		(pin "3"
-			(uuid "4b2f8c0d-ea79-4707-9405-241dc5afe520")
+			(uuid "4b2f8c0d-ea79-4707-9405-241dc5afe521")
 		)
 		(pin "24"
-			(uuid "7e5e2110-1795-4ab9-9923-214f131b9f5a")
+			(uuid "7e5e2110-1795-4ab9-9923-214f131b9f5b")
 		)
 		(pin "17"
-			(uuid "f8701ae9-d8ce-4b65-9609-20ea28bdaba2")
+			(uuid "f8701ae9-d8ce-4b65-9609-20ea28bdaba3")
 		)
 		(pin "14"
-			(uuid "58dcae96-2836-4eb2-a535-48818a529cae")
+			(uuid "58dcae96-2836-4eb2-a535-48818a529caf")
 		)
 		(pin "1"
-			(uuid "481f9f90-63ea-4d70-91db-1c91823cf8b1")
+			(uuid "481f9f90-63ea-4d70-91db-1c91823cf8b2")
 		)
 		(pin "4"
-			(uuid "d9199c3d-5cf1-4d1d-9dcb-def1b9c0e343")
+			(uuid "d9199c3d-5cf1-4d1d-9dcb-def1b9c0e344")
 		)
 		(pin "10"
-			(uuid "fbfb061f-ca28-4e0c-a751-6744e13775a1")
+			(uuid "fbfb061f-ca28-4e0c-a751-6744e13775a2")
 		)
 		(pin "23"
-			(uuid "67b97928-7e74-4071-8385-ddc42c38be2c")
+			(uuid "67b97928-7e74-4071-8385-ddc42c38be2d")
 		)
 		(pin "9"
-			(uuid "828ef886-b634-458d-8a56-b7c6e6d0d183")
+			(uuid "828ef886-b634-458d-8a56-b7c6e6d0d184")
 		)
 		(pin "20"
-			(uuid "db95afe3-116c-455e-b81c-cd911e195da4")
+			(uuid "db95afe3-116c-455e-b81c-cd911e195da5")
 		)
 		(pin "21"
-			(uuid "4df7916f-a4b9-4805-9552-6ad0371ac41d")
+			(uuid "4df7916f-a4b9-4805-9552-6ad0371ac41e")
 		)
 		(pin "22"
-			(uuid "c75d248a-d1c0-488b-9bea-c6a2371917dc")
+			(uuid "c75d248a-d1c0-488b-9bea-c6a2371917dd")
 		)
 		(pin "19"
-			(uuid "3874b026-3b40-46bb-af49-48fb8ad9fdb1")
+			(uuid "3874b026-3b40-46bb-af49-48fb8ad9fdb2")
 		)
 		(instances
 			(project ""
@@ -5030,79 +4832,226 @@
 			)
 		)
 	)
-	(symbol
-		(lib_id "midi_controller:MIDI_Encoder_PEC11R")
-		(at 227.33 241.3 0)
-		(unit 1)
+	(sheet
+		(at 13.97 15.24)
+		(size 27.94 54.61)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "fec8534c-02e8-4703-a15b-5e863214866f")
-		(property "Reference" "ENC_MECH6"
-			(at 227.33 228.6 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
+		(stroke
+			(width 0.1524)
+			(type solid)
 		)
-		(property "Value" "MIDI_Encoder_PEC11R"
-			(at 227.33 231.14 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-			)
+		(fill
+			(color 0 0 0 0.0000)
 		)
-		(property "Footprint" "midi_controller:PEC11R4220FS0024"
-			(at 227.33 254 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf"
-			(at 227.33 256.54 0)
-			(effects
-				(font
-					(size 1.524 1.524)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Bourns 24 Pulse Incremental Mechanical Rotary Encoder with Push Button for MIDI control"
-			(at 227.33 241.3 0)
+		(uuid "8b3bc88b-b526-44d8-9760-500b43fd5a71")
+		(property "Sheetname" "MIDI_Encoder_Matrix_2x4_with_push_buttons"
+			(at 13.97 14.5284 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
+				(justify left bottom)
 			)
 		)
-		(pin "B"
-			(uuid "1882ad44-bb0f-4538-b627-8d3077374339")
+		(property "Sheetfile" "encoders_2x4_with_push_buttons.kicad_sch"
+			(at 13.97 70.4346 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
 		)
-		(pin "A"
-			(uuid "564d160d-4de1-4075-b9a2-8ba06997283b")
+		(pin "GND" passive
+			(at 27.94 69.85 270)
+			(uuid "94e9880c-3311-4f6c-87fd-e45adf53dbb7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
 		)
-		(pin "C"
-			(uuid "f71d7c68-e90a-49a7-aecf-61f82c6960c0")
+		(pin "2x1{QUAD_A QUAD_B SW}" passive
+			(at 41.91 44.45 0)
+			(uuid "3a5609bc-f867-4f5c-8ad1-3060493b44cc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
 		)
-		(pin "1"
-			(uuid "c01d2324-d03c-4928-8b3d-484e6fbe7772")
+		(pin "2x2{QUAD_A QUAD_B SW}" passive
+			(at 41.91 50.8 0)
+			(uuid "01b8d09a-0d33-4ab7-9a0f-9050bea1c7b9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
 		)
-		(pin "2"
-			(uuid "ae09f0d3-1c39-45c2-82af-12452b5db381")
+		(pin "1x4{QUAD_A QUAD_B SW}" passive
+			(at 41.91 38.1 0)
+			(uuid "ce14079d-fd41-411f-905e-43c605271b14")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "2x4{QUAD_A QUAD_B SW}" passive
+			(at 41.91 63.5 0)
+			(uuid "ddccb4ef-e11f-486a-9714-fd29bd5a4240")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "2x3{QUAD_A QUAD_B SW}" passive
+			(at 41.91 57.15 0)
+			(uuid "2d17f48b-1140-4cfe-8624-33a0710c7071")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "1x3{QUAD_A QUAD_B SW}" passive
+			(at 41.91 31.75 0)
+			(uuid "f71d40e8-c0cf-40f1-99c6-898bf2c49d25")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "1x2{QUAD_A QUAD_B SW}" passive
+			(at 41.91 25.4 0)
+			(uuid "c5c06af1-0aa0-4d2c-a89f-05ffb23cfea3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "1x1{QUAD_A QUAD_B SW}" passive
+			(at 41.91 19.05 0)
+			(uuid "e48c3eeb-782c-4950-8b54-adee964a9757")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
 		)
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
-					(reference "ENC_MECH6")
-					(unit 1)
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 17.78 78.74)
+		(size 25.4 10.16)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "f2987add-55a5-4c89-9b33-db7ed86a6cdc")
+		(property "Sheetname" "Encoder with Push Button_Navigation"
+			(at 17.78 78.0284 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "encoder_with_push_button.kicad_sch"
+			(at 17.78 89.4846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "SW_A" passive
+			(at 43.18 81.28 0)
+			(uuid "97cf3cb6-6919-4950-a8c6-8dbbac26d729")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "QUAD_B" passive
+			(at 17.78 83.82 180)
+			(uuid "d9ff23f7-561a-4561-bbf8-7e5be929408a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "SW_GND" passive
+			(at 43.18 86.36 0)
+			(uuid "120d4820-0ecb-4e3d-a40a-69ad374a5730")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "QUAD_GND" passive
+			(at 17.78 86.36 180)
+			(uuid "55de8c85-2e21-4e13-8057-bfa43b3fb59e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "QUAD_A" passive
+			(at 17.78 81.28 180)
+			(uuid "f4824cc2-1219-430f-b86e-3b48c0c843e9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
+					(page "11")
 				)
 			)
 		)

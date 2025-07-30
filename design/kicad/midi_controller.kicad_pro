@@ -630,6 +630,46 @@
     [
       "9e44e663-00d0-4f33-bf1f-c4ad78deb554",
       "Root"
+    ],
+    [
+      "60e25267-b738-456c-86e0-26223ee5fe23",
+      "Encoder with Push Button_1x1"
+    ],
+    [
+      "8b3bc88b-b526-44d8-9760-500b43fd5a71",
+      "MIDI_Encoder_Matrix_2x4_with_push_buttons"
+    ],
+    [
+      "0ace1318-b253-4d85-b784-aa61ad0f89cd",
+      "Encoder with Push Button_1x2"
+    ],
+    [
+      "291f4e39-6718-4dda-83a6-20f8f943b75d",
+      "Encoder with Push Button_1x3"
+    ],
+    [
+      "3c9339b8-42f1-40cb-9183-aa88346af463",
+      "Encoder with Push Button_1x4"
+    ],
+    [
+      "4af660a9-1b0e-40bf-ba48-b976c7e464d4",
+      "Encoder with Push Button_2x1"
+    ],
+    [
+      "1413c73c-0ad0-4a10-833c-ff3e4825f086",
+      "Encoder with Push Button_2x2"
+    ],
+    [
+      "24f763b3-d9d2-44ca-b0de-e5bd6d783cf4",
+      "Encoder with Push Button_2x3"
+    ],
+    [
+      "761c51eb-8364-4d00-98cb-27a8734a6aa5",
+      "Encoder with Push Button_2x4"
+    ],
+    [
+      "f2987add-55a5-4c89-9b33-db7ed86a6cdc",
+      "Encoder with Push Button_Navigation"
     ]
   ],
   "text_variables": {}
