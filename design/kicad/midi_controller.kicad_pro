@@ -583,8 +583,8 @@
       "group_symbols": true,
       "include_excluded_from_bom": true,
       "name": "",
-      "sort_asc": true,
-      "sort_field": "Reference"
+      "sort_asc": false,
+      "sort_field": "${QUANTITY}"
     },
     "connection_grid_size": 50.0,
     "drawing": {
@@ -670,6 +670,10 @@
     [
       "f2987add-55a5-4c89-9b33-db7ed86a6cdc",
       "Encoder with Push Button_Navigation"
+    ],
+    [
+      "9031f441-b35d-4c72-b3de-1ac6f4fd634b",
+      "Buttons_Momentary"
     ]
   ],
   "text_variables": {}

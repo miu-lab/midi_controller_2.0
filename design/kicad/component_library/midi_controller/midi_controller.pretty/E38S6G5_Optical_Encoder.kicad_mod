@@ -1,76 +1,366 @@
-(footprint "E38S6G5_Optical_Encoder" (version 20211014) (generator "midi_controller")
-  (layer "F.Cu")
-  (tedit 61649768)
-  (attr through_hole)
-  (descr "E38S6G5 Series Optical Rotary Encoder, 38mm diameter, 600 pulses/revolution")
-  (tags "optical encoder rotary incremental 38mm E38S6G5 600ppr")
-  (fp_text reference "ENC**" (at 0 -23.0) (layer "F.SilkS")
-    (effects (font (size 1.2 1.2) (thickness 0.18)))
-  )
-  (fp_text value "E38S6G5_Optical_Encoder" (at 0 23.0) (layer "F.Fab")
-    (effects (font (size 1.0 1.0) (thickness 0.15)))
-  )
-  (fp_text user "E38S6G5" (at 0 -5.0) (layer "F.SilkS")
-    (effects (font (size 2.0 2.0) (thickness 0.3)))
-  )
-  (fp_text user "600 PPR" (at 0 -1.0) (layer "F.SilkS")
-    (effects (font (size 1.5 1.5) (thickness 0.22)))
-  )
-  (fp_text user "Optical" (at 0 3.0) (layer "F.SilkS")
-    (effects (font (size 1.2 1.2) (thickness 0.18)))
-  )
-  
-  (fp_circle (center 0 0) (end 19.0 0) (layer "F.Fab") (width 0.12))
-  (fp_circle (center 0 0) (end 19.2 0) (layer "F.SilkS") (width 0.12))
-  (fp_circle (center 0 0) (end 3.0 0) (layer "F.SilkS") (width 0.12))
-  (fp_circle (center 0 0) (end 10.0 0) (layer "F.SilkS") (width 0.12))
-  
-  (fp_circle (center -15.0 0) (end -13.0 0) (layer "F.SilkS") (width 0.12) (fill none))
-  (fp_circle (center 7.5 12.99) (end 9.5 12.99) (layer "F.SilkS") (width 0.12) (fill none))
-  (fp_circle (center 7.5 -12.99) (end 9.5 -12.99) (layer "F.SilkS") (width 0.12) (fill none))
-  
-  (fp_line (start -20.0 -20.0) (end 20.0 -20.0) (layer "F.CrtYd") (width 0.05))
-  (fp_line (start 20.0 -20.0) (end 20.0 20.0) (layer "F.CrtYd") (width 0.05))
-  (fp_line (start 20.0 20.0) (end -20.0 20.0) (layer "F.CrtYd") (width 0.05))
-  (fp_line (start -20.0 20.0) (end -20.0 -20.0) (layer "F.CrtYd") (width 0.05))
-  
-  (fp_rect (start -8.0 7.0) (end 8.0 20.0) (layer "F.SilkS") (width 0.12))
-  (fp_text user "CABLE" (at 0 13.5) (layer "F.SilkS")
-    (effects (font (size 1.0 1.0) (thickness 0.15)))
-  )
-  (fp_text user "1.5m" (at 0 15.5) (layer "F.SilkS")
-    (effects (font (size 0.8 0.8) (thickness 0.12)))
-  )
-  
-  (fp_text user "A" (at -2.5 11.0) (layer "F.SilkS")
-    (effects (font (size 0.8 0.8) (thickness 0.12)))
-  )
-  (fp_text user "B" (at -1.25 11.0) (layer "F.SilkS")
-    (effects (font (size 0.8 0.8) (thickness 0.12)))
-  )
-  (fp_text user "VCC" (at 0 11.0) (layer "F.SilkS")
-    (effects (font (size 0.8 0.8) (thickness 0.12)))
-  )
-  (fp_text user "0V" (at 1.25 11.0) (layer "F.SilkS")
-    (effects (font (size 0.8 0.8) (thickness 0.12)))
-  )
-  (fp_text user "GND" (at 2.5 11.0) (layer "F.SilkS")
-    (effects (font (size 0.8 0.8) (thickness 0.12)))
-  )
-  
-  (pad "A" thru_hole rect (at -2.5 17.5) (size 1.5 1.5) (drill 0.8) (layers *.Cu *.Mask))
-  (pad "B" thru_hole circle (at -1.25 17.5) (size 1.5 1.5) (drill 0.8) (layers *.Cu *.Mask))
-  (pad "VCC" thru_hole circle (at 0 17.5) (size 1.5 1.5) (drill 0.8) (layers *.Cu *.Mask))
-  (pad "0V" thru_hole circle (at 1.25 17.5) (size 1.5 1.5) (drill 0.8) (layers *.Cu *.Mask))
-  (pad "GND" thru_hole circle (at 2.5 17.5) (size 1.5 1.5) (drill 0.8) (layers *.Cu *.Mask))
-  
-  (pad "MH1" np_thru_hole circle (at -15.0 0) (size 4.2 4.2) (drill 4.0) (layers *.Cu *.Mask))
-  (pad "MH2" np_thru_hole circle (at 7.5 12.99) (size 4.2 4.2) (drill 4.0) (layers *.Cu *.Mask))
-  (pad "MH3" np_thru_hole circle (at 7.5 -12.99) (size 4.2 4.2) (drill 4.0) (layers *.Cu *.Mask))
-  
-  (model "${KIPRJMOD}/component_library/midi_controller/3d_models/E38S6G5_Optical_Encoder.step"
-    (offset (xyz 0 0 5))
-    (scale (xyz 1 1 1))
-    (rotate (xyz 0 0 0))
-  )
+(footprint "E38S6G5_Optical_Encoder"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "E38S6G5 Series Optical Rotary Encoder, 38mm diameter, 600 pulses/revolution")
+	(tags "optical encoder rotary incremental 38mm E38S6G5 600ppr")
+	(property "Reference" "ENC**"
+		(at 0 -23 0)
+		(layer "F.SilkS")
+		(uuid "f396af0c-0042-4e72-8dbc-d297cb25a7b7")
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.18)
+			)
+		)
+	)
+	(property "Value" "E38S6G5_Optical_Encoder"
+		(at 0 23 0)
+		(layer "F.Fab")
+		(uuid "e83bcd47-11fe-4b20-ba05-eb3955435a40")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "e399ee3e-db34-44c8-a404-aed600399974")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "e7740af8-3a80-442a-bfe5-66e5f026f084")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_rect
+		(start -8 7)
+		(end 8 20)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "33a1eaed-b89f-44dd-95ec-604e5cde7fb9")
+	)
+	(fp_circle
+		(center -15 0)
+		(end -13 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "9d029599-2c25-4020-a4c8-98e5f64652d4")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 3 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "e531c7bb-f42c-4b27-ada3-fe47a7d4b264")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 10 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "a54cee4e-d54a-4892-a6e9-0bdbfcc0a756")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 19.2 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "b9c7ca6b-f56e-49ee-82d6-940a8f048645")
+	)
+	(fp_circle
+		(center 7.5 -12.99)
+		(end 9.5 -12.99)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "d63912b7-0508-4ae1-b483-c65e8262273e")
+	)
+	(fp_circle
+		(center 7.5 12.99)
+		(end 9.5 12.99)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "d0aa627b-c607-47f0-9cb3-8480bc0e5ae3")
+	)
+	(fp_line
+		(start -20 -20)
+		(end 20 -20)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "049d38c2-1828-4bd0-ab79-b27eb84e6e17")
+	)
+	(fp_line
+		(start -20 20)
+		(end -20 -20)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "0bef535f-77e2-4dad-a355-d939a944c7a0")
+	)
+	(fp_line
+		(start 20 -20)
+		(end 20 20)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "d63b5ace-7542-4374-b182-3d3bef9f368d")
+	)
+	(fp_line
+		(start 20 20)
+		(end -20 20)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "569e682b-2cb8-4c58-b81a-d43bc502a638")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 19 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "cfe71478-41d0-40a9-a8ea-1b8dbab99122")
+	)
+	(fp_text user "600 PPR"
+		(at 0 -1 0)
+		(layer "F.SilkS")
+		(uuid "1201c34f-bf69-4bd4-9968-3b71c1b487da")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.22)
+			)
+		)
+	)
+	(fp_text user "CABLE"
+		(at 0 13.5 0)
+		(layer "F.SilkS")
+		(uuid "2907c7b2-4b97-4f26-bc96-bb0c8a2e7765")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_text user "VCC"
+		(at 0 11 0)
+		(layer "F.SilkS")
+		(uuid "650acb56-d213-4549-9732-f168bba4fae4")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(fp_text user "B"
+		(at -1.25 11 0)
+		(layer "F.SilkS")
+		(uuid "6bb787d0-dc05-454f-ae19-648548af2d90")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(fp_text user "Optical"
+		(at 0 3 0)
+		(layer "F.SilkS")
+		(uuid "7551fccc-bfa8-435b-84d2-bce7452cf5c2")
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.18)
+			)
+		)
+	)
+	(fp_text user "E38S6G5"
+		(at 0 -5 0)
+		(layer "F.SilkS")
+		(uuid "79c2e73a-fe8a-4ede-b7ca-3723bbae49c2")
+		(effects
+			(font
+				(size 2 2)
+				(thickness 0.3)
+			)
+		)
+	)
+	(fp_text user "GND"
+		(at 2.5 11 0)
+		(layer "F.SilkS")
+		(uuid "7f74a0e5-8a48-4acc-9204-e9889f71bdde")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(fp_text user "1.5m"
+		(at 0 15.5 0)
+		(layer "F.SilkS")
+		(uuid "876448d5-2065-4e51-9114-ce587571d5ef")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(fp_text user "0V"
+		(at 1.25 11 0)
+		(layer "F.SilkS")
+		(uuid "cceb417b-f5b6-4bb3-914d-1571ef0d11ef")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(fp_text user "A"
+		(at -2.5 11 0)
+		(layer "F.SilkS")
+		(uuid "d8f02392-1d30-4645-93cd-41a6e3981c77")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(pad "" np_thru_hole circle
+		(at -15 0)
+		(size 4.2 4.2)
+		(drill 4)
+		(layers "*.Cu" "*.Mask")
+		(uuid "c94d896c-a822-4d5b-b2ef-f40ed795a7b8")
+	)
+	(pad "" np_thru_hole circle
+		(at 7.5 -12.99)
+		(size 4.2 4.2)
+		(drill 4)
+		(layers "*.Cu" "*.Mask")
+		(uuid "e338e74a-249e-4045-b077-fe47d8fc42fc")
+	)
+	(pad "" np_thru_hole circle
+		(at 7.5 12.99)
+		(size 4.2 4.2)
+		(drill 4)
+		(layers "*.Cu" "*.Mask")
+		(uuid "ccae39a3-abde-4fcb-898c-9e1cdca63141")
+	)
+	(pad "0V" thru_hole circle
+		(at 1.25 17.5)
+		(size 1.5 1.5)
+		(drill 0.8)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "9bbf0e95-619d-4d53-9262-e95fd2516629")
+	)
+	(pad "A" thru_hole rect
+		(at -2.5 17.5)
+		(size 1.5 1.5)
+		(drill 0.8)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8e9342c6-94f7-4b4c-b0a2-0ce9f3a8fa1e")
+	)
+	(pad "B" thru_hole circle
+		(at -1.25 17.5)
+		(size 1.5 1.5)
+		(drill 0.8)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "23cf6acb-9317-4462-8ea8-b06c106822df")
+	)
+	(pad "GND" thru_hole circle
+		(at 2.5 17.5)
+		(size 1.5 1.5)
+		(drill 0.8)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "758efc18-8dbc-46d5-981e-ebad84d41639")
+	)
+	(pad "VCC" thru_hole circle
+		(at 0 17.5)
+		(size 1.5 1.5)
+		(drill 0.8)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "76fe9203-31ad-4976-bc4b-1327b74828bf")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/component_library/midi_controller/3d_models/E38S6G5_Optical_Encoder.step"
+		(offset
+			(xyz 0 0 5)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )
