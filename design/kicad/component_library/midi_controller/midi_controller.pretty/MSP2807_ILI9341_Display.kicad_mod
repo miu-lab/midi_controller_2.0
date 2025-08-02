@@ -8713,15 +8713,15 @@
 		)
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/component_library/midi_controller/3d_models/TFT_320x240_touch.step"
+	(model "${KIPRJMOD}/component_library/Display/MSP2807_ILI9341_320x240_2.8/SCREEN_ILI9341_2.8_ASSEMBLY.step"
 		(offset
-			(xyz 0 -40 3)
+			(xyz 0 46.25 10)
 		)
 		(scale
 			(xyz 1 1 1)
 		)
 		(rotate
-			(xyz 0 0 0)
+			(xyz -0 -0 -90)
 		)
 	)
 )
