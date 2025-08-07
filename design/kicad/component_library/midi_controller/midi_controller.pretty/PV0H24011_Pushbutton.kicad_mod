@@ -158,22 +158,6 @@
 			)
 		)
 	)
-	(pad "1" thru_hole rect
-		(at -8 0)
-		(size 1.8 2.5)
-		(drill 1)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(uuid "f4768cdb-7b1c-4e90-99a8-97d2db2d4766")
-	)
-	(pad "2" thru_hole circle
-		(at 8 0)
-		(size 1.8 1.8)
-		(drill 1)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(uuid "66bb7cfd-355f-47a2-99d8-e255e1f5eac5")
-	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/component_library/Buttons/PV0H240/PUSH_BUTTON_PV0H240xx.step"
 		(offset

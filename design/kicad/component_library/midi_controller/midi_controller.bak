@@ -519,14 +519,18 @@
 		(embedded_fonts no)
 	)
 	(symbol "MIDI_Encoder_E38S6G5_Optical"
+		(pin_numbers
+			(hide yes)
+		)
 		(pin_names
 			(offset 1.016)
+			(hide yes)
 		)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "ENC_OPT"
-			(at 0 15.24 0)
+			(at 0 27.432 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -534,7 +538,7 @@
 			)
 		)
 		(property "Value" "MIDI_Encoder_E38S6G5_Optical"
-			(at 0 12.7 0)
+			(at 0 24.892 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -542,7 +546,7 @@
 			)
 		)
 		(property "Footprint" "midi_controller:E38S6G5_Optical_Encoder"
-			(at 0 -10.16 0)
+			(at 0 -23.622 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -560,7 +564,7 @@
 			)
 		)
 		(property "Description" "E38S6G5 Series Optical Rotary Encoder, 600 pulses/revolution, Open Collector NPN output"
-			(at 0 0 0)
+			(at 0 -26.416 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -665,98 +669,6 @@
 				(effects
 					(font
 						(size 0.889 0.889)
-					)
-				)
-			)
-		)
-		(symbol "MIDI_Encoder_E38S6G5_Optical_1_1"
-			(pin output line
-				(at -12.7 5.08 0)
-				(length 5.08)
-				(name "A"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "A"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin output line
-				(at -12.7 2.54 0)
-				(length 5.08)
-				(name "B"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "B"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin power_in line
-				(at -12.7 -2.54 0)
-				(length 5.08)
-				(name "+VCC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "VCC"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin power_in line
-				(at -12.7 -5.08 0)
-				(length 5.08)
-				(name "0V"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "0V"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin power_in line
-				(at -12.7 -7.62 0)
-				(length 5.08)
-				(name "GND"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "GND"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
 					)
 				)
 			)
@@ -954,7 +866,7 @@
 		)
 		(exclude_from_sim no)
 		(in_bom yes)
-		(on_board yes)
+		(on_board no)
 		(property "Reference" "SW"
 			(at 0 7.62 0)
 			(effects

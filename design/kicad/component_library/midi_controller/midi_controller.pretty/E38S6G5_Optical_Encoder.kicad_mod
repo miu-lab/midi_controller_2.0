@@ -180,30 +180,8 @@
 		(layer "F.Fab")
 		(uuid "cfe71478-41d0-40a9-a8ea-1b8dbab99122")
 	)
-	(fp_text user "VCC"
-		(at 0 23.9032 0)
-		(layer "F.SilkS")
-		(uuid "650acb56-d213-4549-9732-f168bba4fae4")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.12)
-			)
-		)
-	)
-	(fp_text user "B"
-		(at -3.0988 23.8754 0)
-		(layer "F.SilkS")
-		(uuid "6bb787d0-dc05-454f-ae19-648548af2d90")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.12)
-			)
-		)
-	)
 	(fp_text user "Optical"
-		(at 0 -16.1036 0)
+		(at 0 23.5204 0)
 		(layer "F.SilkS")
 		(uuid "7551fccc-bfa8-435b-84d2-bce7452cf5c2")
 		(effects
@@ -214,46 +192,13 @@
 		)
 	)
 	(fp_text user "E38S6G5"
-		(at 0 -13.3604 0)
+		(at 0 26.2636 0)
 		(layer "F.SilkS")
 		(uuid "79c2e73a-fe8a-4ede-b7ca-3723bbae49c2")
 		(effects
 			(font
 				(size 1.5 1.5)
 				(thickness 0.125)
-			)
-		)
-	)
-	(fp_text user "GND"
-		(at 5.9436 23.876 0)
-		(layer "F.SilkS")
-		(uuid "7f74a0e5-8a48-4acc-9204-e9889f71bdde")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.12)
-			)
-		)
-	)
-	(fp_text user "0V"
-		(at 2.921 23.876 0)
-		(layer "F.SilkS")
-		(uuid "cceb417b-f5b6-4bb3-914d-1571ef0d11ef")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.12)
-			)
-		)
-	)
-	(fp_text user "A"
-		(at -6.223 23.8754 0)
-		(layer "F.SilkS")
-		(uuid "d8f02392-1d30-4645-93cd-41a6e3981c77")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.12)
 			)
 		)
 	)
@@ -277,46 +222,6 @@
 		(drill 4)
 		(layers "*.Cu" "*.Mask")
 		(uuid "ccae39a3-abde-4fcb-898c-9e1cdca63141")
-	)
-	(pad "0V" thru_hole circle
-		(at 2.9718 25.4)
-		(size 1.5 1.5)
-		(drill 0.8)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(uuid "9bbf0e95-619d-4d53-9262-e95fd2516629")
-	)
-	(pad "A" thru_hole rect
-		(at -6.1468 25.4254)
-		(size 1.5 1.5)
-		(drill 0.8)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(uuid "8e9342c6-94f7-4b4c-b0a2-0ce9f3a8fa1e")
-	)
-	(pad "B" thru_hole circle
-		(at -3.0988 25.4254)
-		(size 1.5 1.5)
-		(drill 0.8)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(uuid "23cf6acb-9317-4462-8ea8-b06c106822df")
-	)
-	(pad "GND" thru_hole circle
-		(at 5.9436 25.3746)
-		(size 1.5 1.5)
-		(drill 0.8)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(uuid "758efc18-8dbc-46d5-981e-ebad84d41639")
-	)
-	(pad "VCC" thru_hole circle
-		(at 0.0508 25.4)
-		(size 1.5 1.5)
-		(drill 0.8)
-		(layers "*.Cu" "*.Mask")
-		(remove_unused_layers no)
-		(uuid "76fe9203-31ad-4976-bc4b-1327b74828bf")
 	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/component_library/Encoders/Optical_E38S6G5/OPTICAL_ENCODER.step"

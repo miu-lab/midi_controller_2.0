@@ -526,6 +526,237 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector_Generic:Conn_01x05"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J7"
+				(at 2.54 1.2701 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Conn_01x05"
+				(at 2.54 -1.2699 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Connector_JST:JST_XH_B5B-XH-A_1x05_P2.50mm_Vertical"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x05_1_1"
+				(rectangle
+					(start -1.27 6.35)
+					(end 1.27 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 5.207)
+					(end 0 4.953)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -4.953)
+					(end 0 -5.207)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 5.08 0)
+					(length 3.81)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -5.08 0)
+					(length 3.81)
+					(name "0V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "midi_controller:MIDI_Display_MSP2807"
 			(pin_names
 				(offset 1.016)
@@ -1053,98 +1284,6 @@
 					(effects
 						(font
 							(size 0.889 0.889)
-						)
-					)
-				)
-			)
-			(symbol "MIDI_Encoder_E38S6G5_Optical_1_1"
-				(pin output line
-					(at -12.7 5.08 0)
-					(length 5.08)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at -12.7 2.54 0)
-					(length 5.08)
-					(name "B"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "B"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at -2.54 -12.7 90)
-					(length 5.08)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 0 12.7 270)
-					(length 5.08)
-					(name "+VCC"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "VCC"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 2.54 -12.7 90)
-					(length 5.08)
-					(name "0V"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "0V"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
 						)
 					)
 				)
@@ -2874,7 +3013,7 @@
 	)
 	(wire
 		(pts
-			(xy 314.96 146.05) (xy 314.96 158.75)
+			(xy 314.96 146.05) (xy 314.96 163.83)
 		)
 		(stroke
 			(width 0)
@@ -2964,7 +3103,7 @@
 	)
 	(wire
 		(pts
-			(xy 298.45 168.91) (xy 302.26 168.91)
+			(xy 298.45 168.91) (xy 318.77 168.91)
 		)
 		(stroke
 			(width 0)
@@ -3034,6 +3173,16 @@
 	)
 	(wire
 		(pts
+			(xy 312.42 171.45) (xy 312.42 191.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2a6dd391-dc53-4764-ab0b-4d17785f93e1")
+	)
+	(wire
+		(pts
 			(xy 214.63 220.98) (xy 288.29 220.98)
 		)
 		(stroke
@@ -3074,16 +3223,6 @@
 	)
 	(wire
 		(pts
-			(xy 312.42 184.15) (xy 312.42 191.77)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2c221845-147e-467c-adb2-ea8cc536f57a")
-	)
-	(wire
-		(pts
 			(xy 125.73 198.12) (xy 158.75 198.12)
 		)
 		(stroke
@@ -3114,7 +3253,7 @@
 	)
 	(wire
 		(pts
-			(xy 341.63 143.51) (xy 299.72 143.51)
+			(xy 361.95 143.51) (xy 299.72 143.51)
 		)
 		(stroke
 			(width 0)
@@ -3241,6 +3380,16 @@
 			(type default)
 		)
 		(uuid "431468a6-71bb-402f-96d9-7fa7a1f99011")
+	)
+	(wire
+		(pts
+			(xy 312.42 171.45) (xy 318.77 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4442c1e7-fde1-450a-b4a3-83aebb216b91")
 	)
 	(wire
 		(pts
@@ -3414,7 +3563,7 @@
 	)
 	(wire
 		(pts
-			(xy 302.26 166.37) (xy 295.91 166.37)
+			(xy 295.91 166.37) (xy 318.77 166.37)
 		)
 		(stroke
 			(width 0)
@@ -3444,7 +3593,7 @@
 	)
 	(wire
 		(pts
-			(xy 341.63 198.12) (xy 341.63 143.51)
+			(xy 361.95 198.12) (xy 361.95 143.51)
 		)
 		(stroke
 			(width 0)
@@ -3571,6 +3720,16 @@
 			(type default)
 		)
 		(uuid "72ec0db6-36a4-4bf5-9401-773612a81782")
+	)
+	(wire
+		(pts
+			(xy 317.5 173.99) (xy 318.77 173.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "745fcf8a-261e-4050-a465-4b988760ae53")
 	)
 	(wire
 		(pts
@@ -3714,6 +3873,16 @@
 	)
 	(wire
 		(pts
+			(xy 314.96 163.83) (xy 318.77 163.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "861a317d-8d3b-4dd7-a644-b35cfe4b1834")
+	)
+	(wire
+		(pts
 			(xy 153.67 152.4) (xy 233.68 152.4)
 		)
 		(stroke
@@ -3784,7 +3953,7 @@
 	)
 	(wire
 		(pts
-			(xy 314.96 198.12) (xy 341.63 198.12)
+			(xy 314.96 198.12) (xy 361.95 198.12)
 		)
 		(stroke
 			(width 0)
@@ -4014,16 +4183,6 @@
 	)
 	(wire
 		(pts
-			(xy 317.5 184.15) (xy 317.5 191.77)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bd1360dc-fcb8-4ab6-ad2d-307a6bf95b29")
-	)
-	(wire
-		(pts
 			(xy 138.43 182.88) (xy 158.75 182.88)
 		)
 		(stroke
@@ -4081,6 +4240,16 @@
 			(type default)
 		)
 		(uuid "c313a97a-f165-4e2c-8d90-ef9c204f777e")
+	)
+	(wire
+		(pts
+			(xy 317.5 173.99) (xy 317.5 191.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c435852b-c06d-4453-b722-05e5dfa80b13")
 	)
 	(wire
 		(pts
@@ -5154,16 +5323,16 @@
 	)
 	(symbol
 		(lib_id "midi_controller:MIDI_Encoder_E38S6G5_Optical")
-		(at 314.96 171.45 0)
+		(at 337.82 168.91 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
-		(on_board yes)
+		(on_board no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b932a609-2256-4b4e-a6d6-ae5cbe0d0af2")
 		(property "Reference" "ENC_OPT1"
-			(at 323.85 170.1799 0)
+			(at 346.71 167.6399 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5172,7 +5341,7 @@
 			)
 		)
 		(property "Value" "MIDI_Encoder_E38S6G5_Optical"
-			(at 323.85 172.7199 0)
+			(at 346.71 170.1799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5181,7 +5350,7 @@
 			)
 		)
 		(property "Footprint" "midi_controller:E38S6G5_Optical_Encoder"
-			(at 314.96 181.61 0)
+			(at 337.82 179.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5190,7 +5359,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 314.96 184.15 0)
+			(at 337.82 181.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5199,7 +5368,7 @@
 			)
 		)
 		(property "Description" "E38S6G5 Series Optical Rotary Encoder, 600 pulses/revolution, Open Collector NPN output"
-			(at 314.96 171.45 0)
+			(at 337.82 168.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5207,25 +5376,89 @@
 				(hide yes)
 			)
 		)
-		(pin "B"
-			(uuid "19f12af5-781f-4dfa-8df2-94531ee5a8b0")
-		)
-		(pin "0V"
-			(uuid "e53256c5-ad3c-471f-8df3-883983238e78")
-		)
-		(pin "VCC"
-			(uuid "0c16723a-5ae6-476e-9ea1-7269ec8db124")
-		)
-		(pin "GND"
-			(uuid "c98295fd-a9e7-4f52-959d-1f907ba5a6ad")
-		)
-		(pin "A"
-			(uuid "59b313fd-8e6b-4bfc-974e-eab7bb48b897")
-		)
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
 					(reference "ENC_OPT1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x05")
+		(at 323.85 168.91 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e217932e-edfc-4ceb-935a-95689a234db2")
+		(property "Reference" "J7"
+			(at 326.39 167.6399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x05"
+			(at 326.39 170.1799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_XH_B5B-XH-A_1x05_P2.50mm_Vertical"
+			(at 323.85 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 323.85 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 323.85 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "5"
+			(uuid "afdacc68-69c4-4ade-a476-3779ad590158")
+		)
+		(pin "2"
+			(uuid "29d5537f-4a94-4038-a3b1-4cb190fbd3de")
+		)
+		(pin "1"
+			(uuid "1b1cb1f0-daa2-40f7-a9bc-553cfbbc3f96")
+		)
+		(pin "3"
+			(uuid "3e3719b5-1561-4d46-ac61-01bdd58cc250")
+		)
+		(pin "4"
+			(uuid "604161b4-020f-4900-a2c3-7865fa4646ea")
+		)
+		(instances
+			(project ""
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554"
+					(reference "J7")
 					(unit 1)
 				)
 			)
