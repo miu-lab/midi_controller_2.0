@@ -182,7 +182,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 7")
                            .withDisplayOrder(7)
-                           .asButton(30, 30)
+                           .asButton(23, 30)
                            .asChildOf(77)
                            .withMidiNote(42, 0)
                            .build());
@@ -193,7 +193,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("MIDI")
                            .withDescription("Enc 8")
                            .withDisplayOrder(8)
-                           .asRotaryEncoder(28, 29, 24)
+                           .asRotaryEncoder(28, 23, 24)
                            .withStepPerDetent(true, 1)
                            .withMidiCC(8, 0, true)
                            .build());
@@ -204,7 +204,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 8")
                            .withDisplayOrder(8)
-                           .asButton(27, 30)
+                           .asButton(23, 30)
                            .asChildOf(78)
                            .withMidiNote(43, 0)
                            .build());

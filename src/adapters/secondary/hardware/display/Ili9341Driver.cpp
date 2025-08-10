@@ -46,7 +46,7 @@ Result<void> Ili9341Driver::initialize() {
 
     // Configuration des pins
     Serial.println("Ili9341Driver: Configuring pins...");
-    configurePins();
+    // configurePins();
 
     // Créer le driver ILI9341_T4
     tft_ = std::make_unique<ILI9341_T4::ILI9341Driver>(config_.cs_pin,

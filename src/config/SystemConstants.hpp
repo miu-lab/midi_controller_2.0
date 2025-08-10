@@ -145,7 +145,7 @@ namespace SystemConstants {
         constexpr size_t MAX_COMMAND_HISTORY = 10;
         
         // SPI configuration (utilisée par Display::)
-        constexpr uint32_t SPI_SPEED_DISPLAY = 40000000;   // 40MHz
+        constexpr uint32_t SPI_SPEED_DISPLAY = 40000000;  // 40MHz
     }
     
     // ====================
@@ -160,20 +160,20 @@ namespace SystemConstants {
         
         // Buffers hardware
         constexpr size_t FRAMEBUFFER_SIZE = SCREEN_WIDTH * SCREEN_HEIGHT;
-        constexpr size_t DIFFBUFFER_SIZE = 8192;
-        
+        constexpr size_t DIFFBUFFER_SIZE = 4096;
+
         // Buffers LVGL
-        constexpr size_t LVGL_BUFFER_LINES = 30;
+        constexpr size_t LVGL_BUFFER_LINES = 120;
         constexpr size_t LVGL_BUFFER_SIZE = SCREEN_WIDTH * LVGL_BUFFER_LINES;
         
         // Pins hardware ILI9341
-        constexpr uint8_t CS_PIN = 9;
-        constexpr uint8_t DC_PIN = 10;
-        constexpr uint8_t RST_PIN = 6;
-        constexpr uint8_t MOSI_PIN = 11;
-        constexpr uint8_t SCK_PIN = 13;
-        constexpr uint8_t MISO_PIN = 12;
-        
+        constexpr uint8_t CS_PIN = 30;
+        constexpr uint8_t DC_PIN = 0;
+        constexpr uint8_t RST_PIN = 29;
+        constexpr uint8_t MOSI_PIN = 26;
+        constexpr uint8_t SCK_PIN = 27;
+        constexpr uint8_t MISO_PIN = 1;
+
         // Communication SPI
         constexpr uint32_t SPI_SPEED = Hardware::SPI_SPEED_DISPLAY;
     }
@@ -193,39 +193,39 @@ namespace SystemConstants {
     
     namespace Performance {
         // Refresh rates (utilisées)
-        constexpr int DISPLAY_REFRESH_RATE_HZ = 120;
-        constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = (1000 / DISPLAY_REFRESH_RATE_HZ);
-        constexpr int VSYNC_SPACING = 2;
-        constexpr int DIFF_GAP = 4;
-        
-        // Timeouts d'exécution (utilisés)
-        constexpr unsigned long MAX_UPDATE_TIME_US = 30000;
-        constexpr unsigned long INPUT_TIME_INTERVAL = 2000;
-        constexpr unsigned long MIDI_TIME_INTERVAL = 3000;
-        constexpr unsigned long UI_TIME_INTERVAL = 16667;
-        
-        // Rate limiting (utilisées)
-        constexpr unsigned long DUPLICATE_CHECK_MS = 1.5;
-        constexpr unsigned long ENCODER_RATE_LIMIT_MS = 5;
-        constexpr bool PERFORMANCE_MODE_DEFAULT = true;
-        
-        // Tailles ETL (utilisées pour éviter allocations dynamiques)
-        constexpr size_t MAX_EVENT_SUBSCRIBERS = 32;
-        constexpr size_t MAX_MIDI_CALLBACKS = 24;
-        constexpr size_t MAX_MIDI_PENDING_PARAMS = 128;
-        constexpr size_t MAX_MIDI_MESSAGES_QUEUE = 256;
-        constexpr size_t MAX_CONTROL_DEFINITIONS = 64;
-        constexpr size_t MAX_MIDI_MAPPINGS = 128;
-        constexpr size_t MAX_NAVIGATION_ACTIONS = 32;
-        constexpr size_t MAX_UI_COMPONENTS = 16;
-        
-        // Pools d'objets (utilisés)
-        constexpr size_t EVENT_POOL_SIZE = 128;
-        constexpr size_t MIDI_EVENT_POOL_SIZE = 256;
-        constexpr size_t UI_EVENT_POOL_SIZE = 64;
-        
-        // Performances temps réel (utilisées)
-        constexpr unsigned long MAX_MIDI_LATENCY_US = 1000;
+    constexpr int DISPLAY_REFRESH_RATE_HZ = 120;
+    constexpr unsigned long DISPLAY_REFRESH_PERIOD_MS = (1000 / DISPLAY_REFRESH_RATE_HZ);
+    constexpr int VSYNC_SPACING = 2;
+    constexpr int DIFF_GAP = 8;
+
+    // Timeouts d'exécution (utilisés)
+    constexpr unsigned long MAX_UPDATE_TIME_US = 30000;
+    constexpr unsigned long INPUT_TIME_INTERVAL = 2000;
+    constexpr unsigned long MIDI_TIME_INTERVAL = 3000;
+    constexpr unsigned long UI_TIME_INTERVAL = 16667;
+
+    // Rate limiting (utilisées)
+    constexpr unsigned long DUPLICATE_CHECK_MS = 1.5;
+    constexpr unsigned long ENCODER_RATE_LIMIT_MS = 5;
+    constexpr bool PERFORMANCE_MODE_DEFAULT = true;
+
+    // Tailles ETL (utilisées pour éviter allocations dynamiques)
+    constexpr size_t MAX_EVENT_SUBSCRIBERS = 32;
+    constexpr size_t MAX_MIDI_CALLBACKS = 24;
+    constexpr size_t MAX_MIDI_PENDING_PARAMS = 128;
+    constexpr size_t MAX_MIDI_MESSAGES_QUEUE = 256;
+    constexpr size_t MAX_CONTROL_DEFINITIONS = 64;
+    constexpr size_t MAX_MIDI_MAPPINGS = 128;
+    constexpr size_t MAX_NAVIGATION_ACTIONS = 32;
+    constexpr size_t MAX_UI_COMPONENTS = 16;
+
+    // Pools d'objets (utilisés)
+    constexpr size_t EVENT_POOL_SIZE = 128;
+    constexpr size_t MIDI_EVENT_POOL_SIZE = 256;
+    constexpr size_t UI_EVENT_POOL_SIZE = 64;
+
+    // Performances temps réel (utilisées)
+    constexpr unsigned long MAX_MIDI_LATENCY_US = 1000;
     }
     
     // ====================
