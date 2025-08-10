@@ -495,7 +495,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "midi_controller.step",
       "svg": "",
       "vrml": ""
     },
