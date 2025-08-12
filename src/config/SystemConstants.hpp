@@ -167,7 +167,7 @@ namespace SystemConstants {
         constexpr size_t LVGL_BUFFER_SIZE = SCREEN_WIDTH * LVGL_BUFFER_LINES;
         
         // Pins hardware ILI9341
-        constexpr uint8_t CS_PIN = 30;
+        constexpr uint8_t CS_PIN = 28;
         constexpr uint8_t DC_PIN = 0;
         constexpr uint8_t RST_PIN = 29;
         constexpr uint8_t MOSI_PIN = 26;

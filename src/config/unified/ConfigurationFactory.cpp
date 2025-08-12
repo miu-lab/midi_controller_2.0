@@ -193,7 +193,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("MIDI")
                            .withDescription("Enc 8")
                            .withDisplayOrder(8)
-                           .asRotaryEncoder(28, 23, 24)
+                           .asRotaryEncoder(23, 23, 24)
                            .withStepPerDetent(true, 1)
                            .withMidiCC(8, 0, true)
                            .build());
