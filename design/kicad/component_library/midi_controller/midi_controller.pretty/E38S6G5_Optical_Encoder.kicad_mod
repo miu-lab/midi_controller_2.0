@@ -6,7 +6,7 @@
 	(descr "E38S6G5 Series Optical Rotary Encoder, 38mm diameter, 600 pulses/revolution")
 	(tags "optical encoder rotary incremental 38mm E38S6G5 600ppr")
 	(property "Reference" "ENC_OPT**"
-		(at 0 -23 0)
+		(at 0 -21.2 0)
 		(layer "F.SilkS")
 		(uuid "8687db6d-e99d-48df-b17b-dcec8f1bfc5b")
 		(effects
@@ -19,6 +19,7 @@
 	(property "Value" "E38S6G5_Optical_Encoder"
 		(at 0.0254 21.2598 0)
 		(layer "F.Fab")
+		(hide yes)
 		(uuid "95c7863d-f511-4887-85bb-ffc1bd5b9574")
 		(effects
 			(font
@@ -87,7 +88,7 @@
 	)
 	(fp_circle
 		(center 0 0)
-		(end 19.2 0)
+		(end 20 0)
 		(stroke
 			(width 0.12)
 			(type solid)
@@ -119,6 +120,17 @@
 		(uuid "d0aa627b-c607-47f0-9cb3-8480bc0e5ae3")
 	)
 	(fp_circle
+		(center -15 0)
+		(end -12.8 0)
+		(stroke
+			(width 0.2)
+			(type default)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "2d0bcf7d-8ef4-4311-824b-1e29336d5842")
+	)
+	(fp_circle
 		(center 0 0)
 		(end 19.5 0)
 		(stroke
@@ -128,6 +140,28 @@
 		(fill no)
 		(layer "Edge.Cuts")
 		(uuid "29f69bd8-0477-4bd8-a07e-1fc817c36d49")
+	)
+	(fp_circle
+		(center 7.5 -12.99)
+		(end 9.7 -12.99)
+		(stroke
+			(width 0.2)
+			(type default)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "1107a37d-84a5-4a06-9ad3-c6e409840e62")
+	)
+	(fp_circle
+		(center 7.5 12.99)
+		(end 9.7 12.99)
+		(stroke
+			(width 0.2)
+			(type default)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "6f517bdf-2cae-494f-9b02-8d6dc0d86b75")
 	)
 	(fp_line
 		(start -20 -20)
@@ -179,49 +213,6 @@
 		(fill no)
 		(layer "F.Fab")
 		(uuid "cfe71478-41d0-40a9-a8ea-1b8dbab99122")
-	)
-	(fp_text user "Optical"
-		(at 0 23.5204 0)
-		(layer "F.SilkS")
-		(uuid "7551fccc-bfa8-435b-84d2-bce7452cf5c2")
-		(effects
-			(font
-				(size 1.2 1.2)
-				(thickness 0.18)
-			)
-		)
-	)
-	(fp_text user "E38S6G5"
-		(at 0 26.2636 0)
-		(layer "F.SilkS")
-		(uuid "79c2e73a-fe8a-4ede-b7ca-3723bbae49c2")
-		(effects
-			(font
-				(size 1.5 1.5)
-				(thickness 0.125)
-			)
-		)
-	)
-	(pad "" np_thru_hole circle
-		(at -15 0)
-		(size 4.2 4.2)
-		(drill 4)
-		(layers "*.Cu" "*.Mask")
-		(uuid "c94d896c-a822-4d5b-b2ef-f40ed795a7b8")
-	)
-	(pad "" np_thru_hole circle
-		(at 7.5 -12.99)
-		(size 4.2 4.2)
-		(drill 4)
-		(layers "*.Cu" "*.Mask")
-		(uuid "e338e74a-249e-4045-b077-fe47d8fc42fc")
-	)
-	(pad "" np_thru_hole circle
-		(at 7.5 12.99)
-		(size 4.2 4.2)
-		(drill 4)
-		(layers "*.Cu" "*.Mask")
-		(uuid "ccae39a3-abde-4fcb-898c-9e1cdca63141")
 	)
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/component_library/Encoders/Optical_E38S6G5/OPTICAL_ENCODER.step"

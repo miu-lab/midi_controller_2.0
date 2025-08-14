@@ -36,7 +36,11 @@
       "mcp__kicad__analyze_schematic_connections",
       "mcp__kicad__identify_circuit_patterns",
       "mcp__kicad__analyze_project_circuit_patterns",
-      "mcp__kicad__validate_project"
+      "mcp__kicad__validate_project",
+      "mcp__kicad__list_projects",
+      "Bash(python:*)",
+      "Bash(kicad-cli pcb:*)",
+      "Bash(kicad-cli sch:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

@@ -508,12 +508,12 @@
 		(uuid "09274e73-5064-404c-a03f-5b5c33de79c5")
 	)
 	(fp_text user "MIMXRT1062"
-		(at -1.27 0 270)
+		(at -1.9 0 270)
 		(layer "F.SilkS")
 		(uuid "1add0312-9da8-4baf-ac43-5c983ea713b0")
 		(effects
 			(font
-				(size 0.7 0.7)
+				(size 1 1)
 				(thickness 0.15)
 			)
 		)
@@ -563,12 +563,12 @@
 		)
 	)
 	(fp_text user "DVJ6A"
-		(at -2.54 -0.18 270)
+		(at -3.83 0 270)
 		(layer "F.SilkS")
 		(uuid "f518f6d6-7a89-47dc-9c4c-d977a311346c")
 		(effects
 			(font
-				(size 0.7 0.7)
+				(size 1 1)
 				(thickness 0.15)
 			)
 		)
