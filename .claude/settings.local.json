@@ -22,8 +22,26 @@
       "Bash(pio device monitor:*)",
       "WebFetch(domain:docs.lvgl.io)",
       "Bash(sed:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "WebFetch(domain:github.com)",
+      "mcp__kicad__get_project_structure",
+      "mcp__kicad__generate_pcb_thumbnail",
+      "mcp__kicad__generate_project_thumbnail",
+      "mcp__kicad__run_drc_check",
+      "mcp__kicad__get_drc_history_tool",
+      "mcp__kicad__analyze_bom",
+      "mcp__kicad__export_bom_csv",
+      "mcp__kicad__extract_project_netlist",
+      "mcp__kicad__extract_schematic_netlist",
+      "mcp__kicad__analyze_schematic_connections",
+      "mcp__kicad__identify_circuit_patterns",
+      "mcp__kicad__analyze_project_circuit_patterns",
+      "mcp__kicad__validate_project"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "/home/simon/.claude"
+    ]
   }
 }
