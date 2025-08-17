@@ -40,7 +40,8 @@
       "mcp__kicad__list_projects",
       "Bash(python:*)",
       "Bash(kicad-cli pcb:*)",
-      "Bash(kicad-cli sch:*)"
+      "Bash(kicad-cli sch:*)",
+      "mcp__kicad__generate_validation_report"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

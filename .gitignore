@@ -5,3 +5,7 @@
 .vscode/ipch
 include/
 design/kicad/midi_controller-backups/
+design/kicad/midi_controller_thumbnail.svg
+design/kicad/midi_controller.kicad_pcb.zip
+design/kicad/midi_controller_bom.csv
+design/kicad/~midi_controller.kicad_sch.lck
