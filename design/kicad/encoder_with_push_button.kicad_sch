@@ -483,26 +483,6 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 76.2) (xy 87.63 76.2)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1d61cbd7-f383-40dc-a6a0-51afb62c74ce")
-	)
-	(wire
-		(pts
-			(xy 115.57 78.74) (xy 118.11 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "27ccb775-f0ce-4711-80d4-23490bbd30b7")
-	)
-	(wire
-		(pts
 			(xy 74.93 91.44) (xy 86.36 78.74)
 		)
 		(stroke
@@ -550,6 +530,16 @@
 			(type default)
 		)
 		(uuid "469b0255-e40d-4490-8d59-4b61306fad3d")
+	)
+	(wire
+		(pts
+			(xy 115.57 78.74) (xy 116.84 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "60b88eae-787c-42c8-81c3-ce9f9bcf3f56")
 	)
 	(wire
 		(pts
@@ -623,6 +613,16 @@
 	)
 	(wire
 		(pts
+			(xy 86.36 76.2) (xy 87.63 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cb574768-c8ac-450a-b305-5d70f67a9a63")
+	)
+	(wire
+		(pts
 			(xy 86.36 78.74) (xy 87.63 78.74)
 		)
 		(stroke
@@ -640,6 +640,50 @@
 			(type default)
 		)
 		(uuid "fd5db792-8dbf-4901-90e2-517e233381f5")
+	)
+	(global_label "GND"
+		(shape input)
+		(at 116.84 78.74 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "2ca8f147-7bb3-420b-ae64-aed4b4d90e06")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 123.6957 78.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 86.36 76.2 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "2f35b3bc-e266-4d97-9f0b-4b2468580b5d")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 79.5043 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
 	)
 	(global_label "GND"
 		(shape input)
@@ -728,28 +772,6 @@
 			(justify right)
 		)
 		(uuid "11a05208-0796-4c70-ae05-7dcd3b358054")
-	)
-	(hierarchical_label "QUAD_GND"
-		(shape passive)
-		(at 50.8 76.2 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "85f34cf3-4348-4d5c-91ba-e47e04561e8e")
-	)
-	(hierarchical_label "SW_GND"
-		(shape passive)
-		(at 118.11 78.74 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "9fffc400-03a2-4f04-9c9d-d93d1d111d7f")
 	)
 	(hierarchical_label "SW_A"
 		(shape passive)

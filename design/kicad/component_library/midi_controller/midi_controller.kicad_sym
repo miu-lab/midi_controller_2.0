@@ -1998,7 +1998,7 @@
 					)
 				)
 			)
-			(pin power_out line
+			(pin power_in line
 				(at 27.94 25.4 180)
 				(length 5.08)
 				(name "VIN"
