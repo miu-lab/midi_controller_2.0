@@ -170,6 +170,258 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "PESD5V0L1BA_115:PESD5V0L1BA,115"
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 15.24 8.89 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "PESD5V0L1BA,115"
+				(at 15.24 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "KiCad:SOD2512X110N"
+				(at 15.24 -93.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf"
+				(at 15.24 -193.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+					(hide yes)
+				)
+			)
+			(property "Description" "PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Height" "1.1"
+				(at 15.24 -393.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+					(hide yes)
+				)
+			)
+			(property "Mouser Part Number" "771-PESD5V0L1BA-T/R"
+				(at 15.24 -493.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+					(hide yes)
+				)
+			)
+			(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Nexperia/PESD5V0L1BA115?qs=LOCUfHb8d9v8%252BjxBle%252BzgQ%3D%3D"
+				(at 15.24 -593.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+					(hide yes)
+				)
+			)
+			(property "Manufacturer_Name" "Nexperia"
+				(at 15.24 -693.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+					(hide yes)
+				)
+			)
+			(property "Manufacturer_Part_Number" "PESD5V0L1BA,115"
+				(at 15.24 -793.65 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+					(hide yes)
+				)
+			)
+			(symbol "PESD5V0L1BA,115_1_1"
+				(polyline
+					(pts
+						(xy 5.08 2.54) (xy 5.08 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 5.08 2.54) (xy 10.16 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 0) (xy 5.08 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 0) (xy 15.24 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 -4.572) (xy 9.144 -5.08)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 10.16 -4.572) (xy 10.16 4.572)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 11.176 5.08) (xy 10.16 4.572)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 15.24 2.54) (xy 10.16 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 15.24 2.54) (xy 15.24 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 0 0 0)
+					(length 5.08)
+					(name "K1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 20.32 0 180)
+					(length 5.08)
+					(name "K2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "midi_controller:MIDI_Switch_Pushbutton_PV0H24011"
 			(pin_names
 				(offset 1.016)
@@ -318,29 +570,45 @@
 			(embedded_fonts no)
 		)
 	)
-	(wire
-		(pts
-			(xy 38.1 104.14) (xy 38.1 97.79)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "17e5724e-623d-4f39-98e3-e38d1defaf8d")
+	(junction
+		(at 91.44 140.97)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "37006d46-fd14-4ecf-b07b-0114b6a3ada6")
+	)
+	(junction
+		(at 38.1 80.01)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "3eb5df67-3fa2-4523-ae6c-28040e854150")
+	)
+	(junction
+		(at 38.1 115.57)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "48820220-e0a2-4b93-822e-f196b7adc9e3")
+	)
+	(junction
+		(at 38.1 44.45)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "61335d76-430b-4fb2-9b09-b10ecce3b4a1")
+	)
+	(junction
+		(at 167.64 140.97)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a40bd500-73ca-4ba1-af26-7e869a869c28")
+	)
+	(junction
+		(at 129.54 140.97)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ffaada53-44e0-447e-8055-f443db6538d4")
 	)
 	(wire
 		(pts
-			(xy 35.56 90.17) (xy 46.99 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1bad9501-3a8b-487c-b226-1ae47d226579")
-	)
-	(wire
-		(pts
-			(xy 86.36 115.57) (xy 88.9 115.57)
+			(xy 95.25 189.23) (xy 97.79 189.23)
 		)
 		(stroke
 			(width 0)
@@ -350,7 +618,27 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 106.68) (xy 46.99 106.68)
+			(xy 38.1 78.74) (xy 38.1 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2749b53d-d228-43fc-9d05-e4734a9ba840")
+	)
+	(wire
+		(pts
+			(xy 167.64 140.97) (xy 167.64 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2a8b4b96-f604-450c-b389-b30f6c5468f4")
+	)
+	(wire
+		(pts
+			(xy 30.48 115.57) (xy 38.1 115.57)
 		)
 		(stroke
 			(width 0)
@@ -360,7 +648,27 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 101.6) (xy 35.56 101.6)
+			(xy 38.1 114.3) (xy 38.1 115.57)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2de0d99b-f8c6-4e46-a813-f7b6dcfe79dc")
+	)
+	(wire
+		(pts
+			(xy 90.17 140.97) (xy 91.44 140.97)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "306d1d38-6607-4e61-878b-e33aa0281470")
+	)
+	(wire
+		(pts
+			(xy 29.21 44.45) (xy 38.1 44.45)
 		)
 		(stroke
 			(width 0)
@@ -370,27 +678,27 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 133.35) (xy 46.99 133.35)
+			(xy 106.68 140.97) (xy 107.95 140.97)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "4370913f-bc3b-433a-8c01-1853455caba3")
+		(uuid "3a75313c-6437-4258-89dd-b1fddf9ccddd")
 	)
 	(wire
 		(pts
-			(xy 35.56 101.6) (xy 35.56 90.17)
+			(xy 38.1 44.45) (xy 45.72 44.45)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "4e094d8f-1169-4530-89f3-d37d35999925")
+		(uuid "3e6ee090-4f9a-4e22-a785-f403ff008e3a")
 	)
 	(wire
 		(pts
-			(xy 30.48 120.65) (xy 38.1 120.65)
+			(xy 167.64 148.59) (xy 167.64 140.97)
 		)
 		(stroke
 			(width 0)
@@ -400,7 +708,7 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 118.11) (xy 40.64 118.11)
+			(xy 129.54 148.59) (xy 129.54 140.97)
 		)
 		(stroke
 			(width 0)
@@ -410,27 +718,67 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 97.79) (xy 46.99 97.79)
+			(xy 128.27 140.97) (xy 129.54 140.97)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "918ec75e-133d-448d-b1b1-17a20b7de17b")
+		(uuid "77552b9c-25d4-4fec-aea6-9d5c0641c19b")
 	)
 	(wire
 		(pts
-			(xy 38.1 120.65) (xy 38.1 133.35)
+			(xy 38.1 21.59) (xy 38.1 22.86)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "9635abe0-ec4f-4a94-be37-1215baeab6fb")
+		(uuid "88118194-f1a5-4902-8ef2-a703d009f6ee")
 	)
 	(wire
 		(pts
-			(xy 30.48 115.57) (xy 46.99 115.57)
+			(xy 38.1 43.18) (xy 38.1 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8f97f402-4b06-452d-b41e-3977b77d2606")
+	)
+	(wire
+		(pts
+			(xy 91.44 140.97) (xy 91.44 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9156de8b-087f-49dd-8e87-2c72f29af54c")
+	)
+	(wire
+		(pts
+			(xy 38.1 80.01) (xy 46.99 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "98c12b1a-9071-4068-9789-67f57bfc6a4a")
+	)
+	(wire
+		(pts
+			(xy 144.78 140.97) (xy 146.05 140.97)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "991fb152-a875-40fe-b73a-e12b80263a22")
+	)
+	(wire
+		(pts
+			(xy 91.44 148.59) (xy 91.44 140.97)
 		)
 		(stroke
 			(width 0)
@@ -440,17 +788,57 @@
 	)
 	(wire
 		(pts
-			(xy 40.64 124.46) (xy 46.99 124.46)
+			(xy 129.54 140.97) (xy 129.54 132.08)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "ac2a3082-0115-4bd5-af18-00674307d978")
+		(uuid "b2aa79fa-3cff-4e8e-90ef-51e29a233942")
 	)
 	(wire
 		(pts
-			(xy 30.48 104.14) (xy 38.1 104.14)
+			(xy 68.58 140.97) (xy 69.85 140.97)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b8c1072c-8574-4350-9a52-08395c6beddb")
+	)
+	(wire
+		(pts
+			(xy 38.1 57.15) (xy 38.1 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b974312d-8189-4e83-a0a7-1138fe32987e")
+	)
+	(wire
+		(pts
+			(xy 38.1 92.71) (xy 38.1 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7b1e7ed-a432-4b6f-b349-8ae7c7991324")
+	)
+	(wire
+		(pts
+			(xy 166.37 140.97) (xy 167.64 140.97)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf8fee91-17fa-4fdb-beb7-34df518ec573")
+	)
+	(wire
+		(pts
+			(xy 30.48 80.01) (xy 38.1 80.01)
 		)
 		(stroke
 			(width 0)
@@ -460,17 +848,17 @@
 	)
 	(wire
 		(pts
-			(xy 40.64 118.11) (xy 40.64 124.46)
+			(xy 38.1 115.57) (xy 46.99 115.57)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f3ff7df1-0a3e-43cb-b27f-7cded7c72075")
+		(uuid "de67a5a3-2fd3-4916-948a-b65880199294")
 	)
 	(global_label "GND"
 		(shape input)
-		(at 46.99 100.33 180)
+		(at 46.99 82.55 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -480,7 +868,73 @@
 		)
 		(uuid "22fb9151-9053-4b9b-bcbf-4f3fea63bf56")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.1343 100.33 0)
+			(at 40.1343 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 144.78 140.97 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "293cc4a2-fef9-4319-9a88-b1d8a8af2efa")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 137.9243 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 93.98 132.08 270)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "31ba4b58-b5a9-471d-a641-413e7c237dee")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 93.98 138.9357 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 45.72 46.99 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "3ac85b24-4b2f-4132-815e-ae0dd2442629")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 38.8643 46.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -500,7 +954,7 @@
 			)
 			(justify right)
 		)
-		(uuid "31ba4b58-b5a9-471d-a641-413e7c237dee")
+		(uuid "4645b6ae-a776-4530-b2e3-a52e31808ae0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 40.1343 118.11 0)
 			(effects
@@ -514,51 +968,7 @@
 	)
 	(global_label "GND"
 		(shape input)
-		(at 46.99 92.71 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "3ac85b24-4b2f-4132-815e-ae0dd2442629")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.1343 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "GND"
-		(shape input)
-		(at 46.99 109.22 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "4645b6ae-a776-4530-b2e3-a52e31808ae0")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.1343 109.22 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "GND"
-		(shape input)
-		(at 46.99 127 180)
+		(at 132.08 132.08 270)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -568,7 +978,7 @@
 		)
 		(uuid "536b59c1-3dc2-427b-ae79-02447d50fc96")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.1343 127 0)
+			(at 132.08 138.9357 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -580,7 +990,29 @@
 	)
 	(global_label "GND"
 		(shape input)
-		(at 86.36 115.57 180)
+		(at 106.68 140.97 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "69381393-27f8-4e47-bd81-394cef7d3ec2")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 99.8243 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 95.25 189.23 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -590,7 +1022,7 @@
 		)
 		(uuid "72f14979-b175-4236-a895-7847d517c56b")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 79.5043 115.57 0)
+			(at 88.3943 189.23 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -602,7 +1034,29 @@
 	)
 	(global_label "GND"
 		(shape input)
-		(at 46.99 135.89 180)
+		(at 38.1 21.59 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "78098349-3fa5-467c-bf3b-9000400b4cda")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 38.1 14.7343 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 170.18 132.08 270)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -612,7 +1066,7 @@
 		)
 		(uuid "e62dc6ba-289d-46f0-bc7b-1b6568198cc3")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 40.1343 135.89 0)
+			(at 170.18 138.9357 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -622,9 +1076,75 @@
 			)
 		)
 	)
+	(global_label "GND"
+		(shape input)
+		(at 68.58 140.97 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "eb0f36d2-3599-4fea-95e6-63b43abe5f1d")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 61.7243 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 38.1 57.15 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f5705ffa-aa18-4787-9463-14291db1f4d1")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 38.1 50.2943 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 38.1 92.71 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fb43ce21-0d73-485e-b34f-1933cecb4092")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 38.1 85.8543 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
 	(hierarchical_label "BUTTON_PUSH_MOM_02"
 		(shape passive)
-		(at 30.48 104.14 180)
+		(at 30.48 80.01 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -635,7 +1155,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_01"
 		(shape passive)
-		(at 30.48 101.6 180)
+		(at 29.21 44.45 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -646,7 +1166,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_05"
 		(shape passive)
-		(at 30.48 118.11 180)
+		(at 129.54 148.59 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -657,7 +1177,7 @@
 	)
 	(hierarchical_label "GND"
 		(shape passive)
-		(at 88.9 115.57 0)
+		(at 97.79 189.23 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -668,7 +1188,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_06"
 		(shape passive)
-		(at 30.48 120.65 180)
+		(at 167.64 148.59 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -679,7 +1199,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_03"
 		(shape passive)
-		(at 30.48 106.68 180)
+		(at 30.48 115.57 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -690,7 +1210,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_04"
 		(shape passive)
-		(at 30.48 115.57 180)
+		(at 91.44 148.59 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -763,7 +1283,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x02_Socket")
-		(at 52.07 90.17 0)
+		(at 50.8 44.45 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -771,8 +1291,8 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0bc18c05-6d85-4dd2-91df-d9ecdd80ea47")
-		(property "Reference" "J1"
-			(at 53.34 90.1699 0)
+		(property "Reference" "J2"
+			(at 52.07 44.4499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -781,7 +1301,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 53.34 92.7099 0)
+			(at 52.07 46.9899 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -790,7 +1310,7 @@
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
-			(at 52.07 90.17 0)
+			(at 50.8 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -799,7 +1319,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 52.07 90.17 0)
+			(at 50.8 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -808,7 +1328,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 52.07 90.17 0)
+			(at 50.8 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -825,7 +1345,251 @@
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J1")
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "PESD5V0L1BA_115:PESD5V0L1BA,115")
+		(at 128.27 140.97 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0d651f98-208d-46dc-a8aa-d748f9550a18")
+		(property "Reference" "D35"
+			(at 116.8399 134.62 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "PESD5V0L1BA,115"
+			(at 119.3799 134.62 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "KiCad:SOD2512X110N"
+			(at 113.03 47.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf"
+			(at 113.03 -52.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Description" "PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323"
+			(at 128.27 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "1.1"
+			(at 113.03 -252.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "771-PESD5V0L1BA-T/R"
+			(at 113.03 -352.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Nexperia/PESD5V0L1BA115?qs=LOCUfHb8d9v8%252BjxBle%252BzgQ%3D%3D"
+			(at 113.03 -452.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Nexperia"
+			(at 113.03 -552.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "PESD5V0L1BA,115"
+			(at 113.03 -652.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "32e72325-fc87-4a3b-9236-008f65ab18b5")
+		)
+		(pin "2"
+			(uuid "c1c5301e-8e43-4d3f-945b-218ca6d0517b")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "D35")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "PESD5V0L1BA_115:PESD5V0L1BA,115")
+		(at 38.1 78.74 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0f16ea55-5c12-45af-81a5-d23a4efa06ef")
+		(property "Reference" "D32"
+			(at 44.45 67.3099 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "PESD5V0L1BA,115"
+			(at 44.45 69.8499 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "KiCad:SOD2512X110N"
+			(at 131.75 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf"
+			(at 231.75 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Description" "PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323"
+			(at 38.1 78.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "1.1"
+			(at 431.75 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "771-PESD5V0L1BA-T/R"
+			(at 531.75 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Nexperia/PESD5V0L1BA115?qs=LOCUfHb8d9v8%252BjxBle%252BzgQ%3D%3D"
+			(at 631.75 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Nexperia"
+			(at 731.75 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "PESD5V0L1BA,115"
+			(at 831.75 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3a5c2874-164c-424b-885a-e47d73b3aa69")
+		)
+		(pin "2"
+			(uuid "58fec9ee-dcd7-4ff2-9955-6d7a2ec17156")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "D32")
 					(unit 1)
 				)
 			)
@@ -894,7 +1658,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x02_Socket")
-		(at 52.07 133.35 0)
+		(at 167.64 127 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -902,8 +1666,8 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "17f3d4ad-4b25-4b27-ada2-1a30a64bd8a4")
-		(property "Reference" "J6"
-			(at 53.34 133.3499 0)
+		(property "Reference" "J7"
+			(at 167.6399 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -912,7 +1676,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 53.34 135.8899 0)
+			(at 170.1799 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -921,7 +1685,7 @@
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
-			(at 52.07 133.35 0)
+			(at 167.64 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -930,7 +1694,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 52.07 133.35 0)
+			(at 167.64 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -939,7 +1703,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 52.07 133.35 0)
+			(at 167.64 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -956,7 +1720,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J6")
+					(reference "J7")
 					(unit 1)
 				)
 			)
@@ -1026,7 +1790,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x02_Socket")
-		(at 52.07 115.57 0)
+		(at 91.44 127 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1034,8 +1798,8 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "250eac71-c803-4f38-9afc-03a8163f045c")
-		(property "Reference" "J4"
-			(at 53.34 115.5699 0)
+		(property "Reference" "J5"
+			(at 91.4399 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1044,7 +1808,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 53.34 118.1099 0)
+			(at 93.9799 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1053,7 +1817,7 @@
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
-			(at 52.07 115.57 0)
+			(at 91.44 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1062,7 +1826,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 52.07 115.57 0)
+			(at 91.44 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1071,7 +1835,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 52.07 115.57 0)
+			(at 91.44 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1088,7 +1852,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J4")
+					(reference "J5")
 					(unit 1)
 				)
 			)
@@ -1096,7 +1860,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x02_Socket")
-		(at 52.07 124.46 0)
+		(at 129.54 127 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1104,8 +1868,8 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "376d84c2-5c33-41f7-bcf9-82b36077b4d7")
-		(property "Reference" "J5"
-			(at 53.34 124.4599 0)
+		(property "Reference" "J6"
+			(at 129.5399 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1114,7 +1878,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 53.34 126.9999 0)
+			(at 132.0799 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1123,7 +1887,7 @@
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
-			(at 52.07 124.46 0)
+			(at 129.54 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1132,7 +1896,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 52.07 124.46 0)
+			(at 129.54 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1141,7 +1905,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 52.07 124.46 0)
+			(at 129.54 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1158,7 +1922,129 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J5")
+					(reference "J6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "PESD5V0L1BA_115:PESD5V0L1BA,115")
+		(at 38.1 43.18 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3e23f7c0-ca3c-4734-8512-ba41c766ee39")
+		(property "Reference" "D31"
+			(at 44.45 31.7499 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "PESD5V0L1BA,115"
+			(at 44.45 34.2899 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "KiCad:SOD2512X110N"
+			(at 131.75 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf"
+			(at 231.75 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Description" "PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323"
+			(at 38.1 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "1.1"
+			(at 431.75 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "771-PESD5V0L1BA-T/R"
+			(at 531.75 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Nexperia/PESD5V0L1BA115?qs=LOCUfHb8d9v8%252BjxBle%252BzgQ%3D%3D"
+			(at 631.75 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Nexperia"
+			(at 731.75 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "PESD5V0L1BA,115"
+			(at 831.75 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "12e98537-695f-47cd-a873-5f8ab230b5da")
+		)
+		(pin "2"
+			(uuid "66a94909-96d3-4960-99b1-c9204070398a")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "D31")
 					(unit 1)
 				)
 			)
@@ -1166,7 +2052,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x02_Socket")
-		(at 52.07 97.79 0)
+		(at 52.07 80.01 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1174,8 +2060,8 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6c80c473-b211-42a6-990c-00ee2c3badf9")
-		(property "Reference" "J2"
-			(at 53.34 97.7899 0)
+		(property "Reference" "J3"
+			(at 53.34 80.0099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1184,7 +2070,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 53.34 100.3299 0)
+			(at 53.34 82.5499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1193,7 +2079,7 @@
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
-			(at 52.07 97.79 0)
+			(at 52.07 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1202,7 +2088,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 52.07 97.79 0)
+			(at 52.07 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1211,7 +2097,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 52.07 97.79 0)
+			(at 52.07 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1228,7 +2114,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J2")
+					(reference "J3")
 					(unit 1)
 				)
 			)
@@ -1297,8 +2183,130 @@
 		)
 	)
 	(symbol
+		(lib_id "PESD5V0L1BA_115:PESD5V0L1BA,115")
+		(at 90.17 140.97 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9917210e-e765-4bc9-ac15-979458f9c2aa")
+		(property "Reference" "D34"
+			(at 78.7399 134.62 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "PESD5V0L1BA,115"
+			(at 81.2799 134.62 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "KiCad:SOD2512X110N"
+			(at 74.93 47.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf"
+			(at 74.93 -52.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Description" "PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323"
+			(at 90.17 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "1.1"
+			(at 74.93 -252.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "771-PESD5V0L1BA-T/R"
+			(at 74.93 -352.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Nexperia/PESD5V0L1BA115?qs=LOCUfHb8d9v8%252BjxBle%252BzgQ%3D%3D"
+			(at 74.93 -452.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Nexperia"
+			(at 74.93 -552.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "PESD5V0L1BA,115"
+			(at 74.93 -652.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fe02b0f5-d22a-4b91-8dc5-8b8cefd54c3c")
+		)
+		(pin "2"
+			(uuid "e4b4a2b8-1544-4d9b-8cd9-58d3ea647bc4")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "D34")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector:Conn_01x02_Socket")
-		(at 52.07 106.68 0)
+		(at 52.07 115.57 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1306,8 +2314,8 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ab87eaaf-b2aa-48d5-b7e4-1cb2993791b8")
-		(property "Reference" "J3"
-			(at 53.34 106.6799 0)
+		(property "Reference" "J4"
+			(at 53.34 115.5699 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1316,7 +2324,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 53.34 109.2199 0)
+			(at 53.34 118.1099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1325,7 +2333,7 @@
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
-			(at 52.07 106.68 0)
+			(at 52.07 115.57 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1334,7 +2342,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 52.07 106.68 0)
+			(at 52.07 115.57 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1343,7 +2351,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated"
-			(at 52.07 106.68 0)
+			(at 52.07 115.57 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1360,7 +2368,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J3")
+					(reference "J4")
 					(unit 1)
 				)
 			)
@@ -1429,6 +2437,128 @@
 		)
 	)
 	(symbol
+		(lib_id "PESD5V0L1BA_115:PESD5V0L1BA,115")
+		(at 166.37 140.97 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c5ab5529-c9b0-4269-bf64-a5e33e8a7a26")
+		(property "Reference" "D36"
+			(at 154.9399 134.62 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "PESD5V0L1BA,115"
+			(at 157.4799 134.62 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "KiCad:SOD2512X110N"
+			(at 151.13 47.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf"
+			(at 151.13 -52.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Description" "PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323"
+			(at 166.37 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "1.1"
+			(at 151.13 -252.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "771-PESD5V0L1BA-T/R"
+			(at 151.13 -352.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Nexperia/PESD5V0L1BA115?qs=LOCUfHb8d9v8%252BjxBle%252BzgQ%3D%3D"
+			(at 151.13 -452.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Nexperia"
+			(at 151.13 -552.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "PESD5V0L1BA,115"
+			(at 151.13 -652.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5b6f6be0-c743-4c14-bf5f-64b418c285d3")
+		)
+		(pin "2"
+			(uuid "c85f2cbb-e90c-4d68-8cbb-b5bff7f45bb1")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "D36")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "midi_controller:MIDI_Switch_Pushbutton_PV0H24011")
 		(at 78.74 60.96 0)
 		(unit 1)
@@ -1485,6 +2615,128 @@
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
 					(reference "SW2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "PESD5V0L1BA_115:PESD5V0L1BA,115")
+		(at 38.1 114.3 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f9826b8c-bb6b-492c-af0c-2a7db602d5bb")
+		(property "Reference" "D33"
+			(at 44.45 102.8699 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "PESD5V0L1BA,115"
+			(at 44.45 105.4099 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "KiCad:SOD2512X110N"
+			(at 131.75 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf"
+			(at 231.75 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Description" "PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323"
+			(at 38.1 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Height" "1.1"
+			(at 431.75 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Part Number" "771-PESD5V0L1BA-T/R"
+			(at 531.75 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Nexperia/PESD5V0L1BA115?qs=LOCUfHb8d9v8%252BjxBle%252BzgQ%3D%3D"
+			(at 631.75 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Name" "Nexperia"
+			(at 731.75 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer_Part_Number" "PESD5V0L1BA,115"
+			(at 831.75 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "66862256-0cc6-4799-bb2b-9694ea5af2c2")
+		)
+		(pin "2"
+			(uuid "8df80de5-b6e5-41a3-8b2c-9659c29457bc")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "D33")
 					(unit 1)
 				)
 			)

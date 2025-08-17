@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP PESD5V0L1BA,115
+D PESD5V0L1BA - Low capacitance bidirectional ESD protection diode in SOD323
+K
+F https://assets.nexperia.com/documents/data-sheet/PESDXL1BA_SER.pdf
+$ENDCMP
+#
+#End Doc Library

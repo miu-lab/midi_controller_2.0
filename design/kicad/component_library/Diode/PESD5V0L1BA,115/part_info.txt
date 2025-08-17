@@ -1,0 +1,9 @@
+Manufacturer=Nexperia
+PartNumber=PESD5V0L1BA,115
+PartCategory=Diode ESD (Bi-directional)
+PackageCategory=Small Outline Diode
+PinCount=2
+Version=2.1
+Released=2020-12-11 13:35:47
+Downloaded=2025-08-17 11:23:24
+3D=Y

@@ -3,4 +3,5 @@
   (lib (name "midi_controller")(type "KiCad")(uri "${KIPRJMOD}/component_library/midi_controller/midi_controller.pretty")(options "")(descr "Unified MIDI Controller Footprint Library"))
   (lib (name "Electrosmith_Boards")(type "Eagle")(uri "${KIPRJMOD}/component_library/Microcontrollers/Electrosmith/Electrosmith_Boards.lbr")(options "")(descr ""))
   (lib (name "teensy")(type "Eagle")(uri "${KIPRJMOD}/component_library/Microcontrollers/Teensy/teensy.lbr")(options "")(descr ""))
+  (lib (name "KiCad")(type "KiCad")(uri "${KIPRJMOD}/component_library/Diode/PESD5V0L1BA,115/KiCad")(options "")(descr ""))
 )
