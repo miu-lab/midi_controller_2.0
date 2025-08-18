@@ -794,7 +794,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "5c54fec2-8b74-4c20-aa1b-db24ed47df70")
-		(property "Reference" "D7"
+		(property "Reference" "D3"
 			(at 69.85 48.2599 90)
 			(effects
 				(font
@@ -900,39 +900,39 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/f2987add-55a5-4c89-9b33-db7ed86a6cdc"
-					(reference "D31")
+					(reference "D27")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/0ace1318-b253-4d85-b784-aa61ad0f89cd"
-					(reference "D10")
+					(reference "D6")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/1413c73c-0ad0-4a10-833c-ff3e4825f086"
-					(reference "D22")
+					(reference "D18")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/24f763b3-d9d2-44ca-b0de-e5bd6d783cf4"
-					(reference "D25")
+					(reference "D21")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/291f4e39-6718-4dda-83a6-20f8f943b75d"
-					(reference "D13")
+					(reference "D9")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/3c9339b8-42f1-40cb-9183-aa88346af463"
-					(reference "D16")
+					(reference "D12")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/4af660a9-1b0e-40bf-ba48-b976c7e464d4"
-					(reference "D19")
+					(reference "D15")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/60e25267-b738-456c-86e0-26223ee5fe23"
-					(reference "D7")
+					(reference "D3")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/761c51eb-8364-4d00-98cb-27a8734a6aa5"
-					(reference "D28")
+					(reference "D24")
 					(unit 1)
 				)
 			)
@@ -948,7 +948,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "60d27b5e-ed2b-480d-8203-f66e07ed8439")
-		(property "Reference" "D8"
+		(property "Reference" "D4"
 			(at 69.85 101.5999 90)
 			(effects
 				(font
@@ -1054,39 +1054,39 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/f2987add-55a5-4c89-9b33-db7ed86a6cdc"
-					(reference "D32")
+					(reference "D28")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/0ace1318-b253-4d85-b784-aa61ad0f89cd"
-					(reference "D11")
+					(reference "D7")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/1413c73c-0ad0-4a10-833c-ff3e4825f086"
-					(reference "D23")
+					(reference "D19")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/24f763b3-d9d2-44ca-b0de-e5bd6d783cf4"
-					(reference "D26")
+					(reference "D22")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/291f4e39-6718-4dda-83a6-20f8f943b75d"
-					(reference "D14")
+					(reference "D10")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/3c9339b8-42f1-40cb-9183-aa88346af463"
-					(reference "D17")
+					(reference "D13")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/4af660a9-1b0e-40bf-ba48-b976c7e464d4"
-					(reference "D20")
+					(reference "D16")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/60e25267-b738-456c-86e0-26223ee5fe23"
-					(reference "D8")
+					(reference "D4")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/761c51eb-8364-4d00-98cb-27a8734a6aa5"
-					(reference "D29")
+					(reference "D25")
 					(unit 1)
 				)
 			)
@@ -1102,7 +1102,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "67587dd2-db97-4f72-bb9e-562c3234ac6b")
-		(property "Reference" "D9"
+		(property "Reference" "D5"
 			(at 123.19 60.9599 90)
 			(effects
 				(font
@@ -1208,39 +1208,39 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/f2987add-55a5-4c89-9b33-db7ed86a6cdc"
-					(reference "D33")
+					(reference "D29")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/0ace1318-b253-4d85-b784-aa61ad0f89cd"
-					(reference "D12")
+					(reference "D8")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/1413c73c-0ad0-4a10-833c-ff3e4825f086"
-					(reference "D24")
+					(reference "D20")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/24f763b3-d9d2-44ca-b0de-e5bd6d783cf4"
-					(reference "D27")
+					(reference "D23")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/291f4e39-6718-4dda-83a6-20f8f943b75d"
-					(reference "D15")
+					(reference "D11")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/3c9339b8-42f1-40cb-9183-aa88346af463"
-					(reference "D18")
+					(reference "D14")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/4af660a9-1b0e-40bf-ba48-b976c7e464d4"
-					(reference "D21")
+					(reference "D17")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/60e25267-b738-456c-86e0-26223ee5fe23"
-					(reference "D9")
+					(reference "D5")
 					(unit 1)
 				)
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71/761c51eb-8364-4d00-98cb-27a8734a6aa5"
-					(reference "D30")
+					(reference "D26")
 					(unit 1)
 				)
 			)

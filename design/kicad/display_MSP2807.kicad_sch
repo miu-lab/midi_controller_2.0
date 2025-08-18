@@ -1068,7 +1068,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3f51ef14-b78a-4bc4-ac2f-56b0af913562")
-		(property "Reference" "C9"
+		(property "Reference" "C10"
 			(at 172.72 67.3162 0)
 			(effects
 				(font
@@ -1171,7 +1171,7 @@
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/b074c366-2f0b-4fcc-8b9f-7590ca8943b4"
-					(reference "C9")
+					(reference "C10")
 					(unit 1)
 				)
 			)
@@ -1187,7 +1187,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "9fa95bc1-80d1-47ab-8085-6318759dd73a")
-		(property "Reference" "D40"
+		(property "Reference" "D36"
 			(at 121.92 68.58 0)
 			(effects
 				(font
@@ -1275,7 +1275,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/b074c366-2f0b-4fcc-8b9f-7590ca8943b4"
-					(reference "D40")
+					(reference "D36")
 					(unit 1)
 				)
 			)
@@ -1291,7 +1291,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ec6917cf-d256-49c5-b1eb-31eab24479a2")
-		(property "Reference" "C8"
+		(property "Reference" "C9"
 			(at 163.83 67.3099 0)
 			(effects
 				(font
@@ -1345,7 +1345,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/b074c366-2f0b-4fcc-8b9f-7590ca8943b4"
-					(reference "C8")
+					(reference "C9")
 					(unit 1)
 				)
 			)
