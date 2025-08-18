@@ -516,8 +516,6 @@
       "/Buttons_Momentary/BUTTON_PUSH_MOM_05": "rgb(160, 58, 255)",
       "/Buttons_Momentary/BUTTON_PUSH_MOM_06": "rgb(160, 58, 255)",
       "/COM": "rgb(255, 202, 137)",
-      "/CS": "rgb(161, 255, 242)",
-      "/DC": "rgb(139, 202, 255)",
       "/ENC_A_OPT": "rgb(255, 166, 226)",
       "/ENC_B_OPT": "rgb(175, 255, 175)",
       "/Encoder with Push Button_Navigation/QUAD_A": "rgb(255, 166, 226)",
@@ -547,14 +545,10 @@
       "/MIDI_Encoder_Matrix_2x4_with_push_buttons/2x4.QUAD_A": "rgb(255, 166, 226)",
       "/MIDI_Encoder_Matrix_2x4_with_push_buttons/2x4.QUAD_B": "rgb(148, 167, 255)",
       "/MIDI_Encoder_Matrix_2x4_with_push_buttons/2x4_SW_A": "rgb(160, 58, 255)",
-      "/MISO": "rgb(117, 255, 110)",
-      "/MOSI": "rgb(255, 165, 238)",
-      "/RST": "rgb(48, 48, 48)",
       "/S0": "rgb(22, 22, 7)",
       "/S1": "rgb(61, 62, 20)",
       "/S2": "rgb(93, 95, 31)",
       "/S3": "rgb(138, 140, 45)",
-      "/SCK": "rgb(92, 92, 92)",
       "COM": "rgb(255, 202, 137)",
       "ENC_A_NAV": "rgb(255, 166, 226)",
       "ENC_A_OPT": "rgb(255, 166, 226)",
@@ -781,7 +775,7 @@
     ],
     [
       "60e25267-b738-456c-86e0-26223ee5fe23",
-      "Encoder with Push Button_1x1"
+      "Encoder_with_Push_Button_1x1"
     ],
     [
       "8b3bc88b-b526-44d8-9760-500b43fd5a71",
@@ -789,35 +783,35 @@
     ],
     [
       "0ace1318-b253-4d85-b784-aa61ad0f89cd",
-      "Encoder with Push Button_1x2"
+      "Encoder_with_Push_Button_1x2"
     ],
     [
       "291f4e39-6718-4dda-83a6-20f8f943b75d",
-      "Encoder with Push Button_1x3"
+      "Encoder_with_Push_Button_1x3"
     ],
     [
       "3c9339b8-42f1-40cb-9183-aa88346af463",
-      "Encoder with Push Button_1x4"
+      "Encoder_with_Push_Button_1x4"
     ],
     [
       "4af660a9-1b0e-40bf-ba48-b976c7e464d4",
-      "Encoder with Push Button_2x1"
+      "Encoder_with_Push_Button_2x1"
     ],
     [
       "1413c73c-0ad0-4a10-833c-ff3e4825f086",
-      "Encoder with Push Button_2x2"
+      "Encoder_with_Push_Button_2x2"
     ],
     [
       "24f763b3-d9d2-44ca-b0de-e5bd6d783cf4",
-      "Encoder with Push Button_2x3"
+      "Encoder_with_Push_Button_2x3"
     ],
     [
       "761c51eb-8364-4d00-98cb-27a8734a6aa5",
-      "Encoder with Push Button_2x4"
+      "Encoder_with_Push_Button_2x4"
     ],
     [
       "f2987add-55a5-4c89-9b33-db7ed86a6cdc",
-      "Encoder with Push Button_Navigation"
+      "Encoder_with_Push_Button_Navigation"
     ],
     [
       "9031f441-b35d-4c72-b3de-1ac6f4fd634b",
@@ -826,6 +820,10 @@
     [
       "b074c366-2f0b-4fcc-8b9f-7590ca8943b4",
       "Display MSP2807"
+    ],
+    [
+      "3ca90eb8-5cff-4e06-9871-fcb1ae67d879",
+      "Multiplexer_CD74HC4067M"
     ]
   ],
   "text_variables": {}
