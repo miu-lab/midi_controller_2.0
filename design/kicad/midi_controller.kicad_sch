@@ -6553,7 +6553,7 @@
 			)
 		)
 		(property "Sheetfile" "encoders_2x4_with_push_buttons.kicad_sch"
-			(at 272.288 163.83 0)
+			(at 272.542 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6754,7 +6754,7 @@
 			)
 		)
 		(property "Sheetfile" "buttons_momentary.kicad_sch"
-			(at 305.562 199.39 0)
+			(at 305.816 199.39 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6976,7 +6976,7 @@
 			)
 		)
 		(property "Sheetfile" "encoder_with_push_button.kicad_sch"
-			(at 104.648 164.846 0)
+			(at 104.394 164.846 0)
 			(effects
 				(font
 					(size 1.27 1.27)

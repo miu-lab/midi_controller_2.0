@@ -42,7 +42,8 @@
       "Bash(kicad-cli pcb:*)",
       "Bash(kicad-cli sch:*)",
       "mcp__kicad__generate_validation_report",
-      "Bash(kicad-cli:*)"
+      "Bash(kicad-cli:*)",
+      "WebSearch"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
