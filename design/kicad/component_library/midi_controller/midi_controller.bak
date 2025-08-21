@@ -1980,7 +1980,7 @@
 			)
 		)
 		(symbol "MIDI_Teensy4.1_1_0"
-			(pin power_out line
+			(pin passive line
 				(at -27.94 -10.16 0)
 				(length 5.08)
 				(name "3V3"
