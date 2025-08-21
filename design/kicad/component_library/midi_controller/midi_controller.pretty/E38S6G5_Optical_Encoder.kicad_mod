@@ -184,7 +184,7 @@
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/component_library/Encoders/Optical_E38S6G5/OPTICAL_ENCODER.step"
 		(offset
-			(xyz 0 0 7)
+			(xyz 0 0 6)
 		)
 		(scale
 			(xyz 1 1 1)

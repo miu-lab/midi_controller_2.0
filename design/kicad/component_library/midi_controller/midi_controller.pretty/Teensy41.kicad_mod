@@ -960,7 +960,7 @@
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/component_library/Microcontrollers/Teensy/Teensy 4.1.STEP"
 		(offset
-			(xyz 0 0 0)
+			(xyz 0 0 11)
 		)
 		(scale
 			(xyz 1 1 1)

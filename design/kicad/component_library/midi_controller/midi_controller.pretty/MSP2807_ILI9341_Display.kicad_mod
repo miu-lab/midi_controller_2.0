@@ -67,7 +67,7 @@
 	)
 	(fp_circle
 		(center -22 -81)
-		(end -20.5 -81)
+		(end -20.2 -81)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -78,7 +78,7 @@
 	)
 	(fp_circle
 		(center -22 -4.92)
-		(end -20.5 -4.92)
+		(end -20.2 -4.92)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -89,7 +89,7 @@
 	)
 	(fp_circle
 		(center 22 -81)
-		(end 23.5 -81)
+		(end 23.8 -81)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -100,7 +100,7 @@
 	)
 	(fp_circle
 		(center 22 -4.92)
-		(end 23.5 -4.92)
+		(end 23.8 -4.92)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -7315,6 +7315,50 @@
 		(layer "Dwgs.User")
 		(uuid "1d64cc20-ad07-40d1-8fb8-b3c930eee74e")
 	)
+	(fp_circle
+		(center -22 -81)
+		(end -20.5 -81)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "935a973c-bf1b-47b6-8c4a-5ac29a3dfe98")
+	)
+	(fp_circle
+		(center -22 -4.92)
+		(end -20.5 -4.92)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "9b179d4b-f866-4a38-b4a1-fbe0b2f2be34")
+	)
+	(fp_circle
+		(center 22 -81)
+		(end 23.5 -81)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "9f26e70f-2f02-48d0-ae76-d891bb4220f7")
+	)
+	(fp_circle
+		(center 22 -4.92)
+		(end 23.5 -4.92)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "61b7825b-6572-4232-a8c4-219be50fdc66")
+	)
 	(pad "1" thru_hole roundrect
 		(at -16.51 0)
 		(size 2 2)
@@ -7774,7 +7818,7 @@
 	(embedded_fonts no)
 	(model "${KIPRJMOD}/component_library/Display/MSP2807_ILI9341_320x240_2.8/SCREEN_ILI9341_2.8_ASSEMBLY.step"
 		(offset
-			(xyz 0 46.25 10)
+			(xyz 0 46.25 11)
 		)
 		(scale
 			(xyz 1 1 1)
