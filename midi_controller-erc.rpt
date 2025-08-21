@@ -1,0 +1,82 @@
+Rapport ERC (2025-08-21T11:06:43+0200, Encodage UTF8)
+
+***** Feuille /
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_1x1/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_1x2/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_1x3/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_1x4/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_2x1/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_2x2/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_2x3/
+
+***** Feuille /MIDI_Encoder_Matrix_2x4_with_push_buttons/Encoder_with_Push_Button_2x4/
+
+***** Feuille /Encoder_with_Push_Button_Navigation/
+
+***** Feuille /Buttons_Momentary/
+
+***** Feuille /Display MSP2807/
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 72.39 mm): Symbol DISP1 Pin 1 [VCC, Power input, Line]
+[power_pin_not_driven]: Pin entrée de puissance pilotée par aucune pin sortie de puissance
+    ; error
+    @(125.73 mm, 72.39 mm): Symbol DISP1 Pin 1 [VCC, Power input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 74.93 mm): Symbol DISP1 Pin 2 [GND, Power input, Line]
+[power_pin_not_driven]: Pin entrée de puissance pilotée par aucune pin sortie de puissance
+    ; error
+    @(125.73 mm, 74.93 mm): Symbol DISP1 Pin 2 [GND, Power input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 77.47 mm): Symbol DISP1 Pin 3 [CS, Input, Line]
+[pin_not_driven]: Pin en entrée pilotée par aucune pin en sortie pour la piloter
+    ; error
+    @(125.73 mm, 77.47 mm): Symbol DISP1 Pin 3 [CS, Input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 80.01 mm): Symbol DISP1 Pin 4 [RST, Input, Line]
+[pin_not_driven]: Pin en entrée pilotée par aucune pin en sortie pour la piloter
+    ; error
+    @(125.73 mm, 80.01 mm): Symbol DISP1 Pin 4 [RST, Input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 82.55 mm): Symbol DISP1 Pin 5 [DC, Input, Line]
+[pin_not_driven]: Pin en entrée pilotée par aucune pin en sortie pour la piloter
+    ; error
+    @(125.73 mm, 82.55 mm): Symbol DISP1 Pin 5 [DC, Input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 85.09 mm): Symbol DISP1 Pin 6 [SDI/MOSI, Input, Line]
+[pin_not_driven]: Pin en entrée pilotée par aucune pin en sortie pour la piloter
+    ; error
+    @(125.73 mm, 85.09 mm): Symbol DISP1 Pin 6 [SDI/MOSI, Input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 87.63 mm): Symbol DISP1 Pin 7 [SCK, Input, Line]
+[pin_not_driven]: Pin en entrée pilotée par aucune pin en sortie pour la piloter
+    ; error
+    @(125.73 mm, 87.63 mm): Symbol DISP1 Pin 7 [SCK, Input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 90.17 mm): Symbol DISP1 Pin 8 [LED, Input, Line]
+[pin_not_driven]: Pin en entrée pilotée par aucune pin en sortie pour la piloter
+    ; error
+    @(125.73 mm, 90.17 mm): Symbol DISP1 Pin 8 [LED, Input, Line]
+[pin_not_connected]: Pin non connectée
+    ; error
+    @(125.73 mm, 92.71 mm): Symbol DISP1 Pin 9 [SDO/MISO, Output, Line]
+
+***** Feuille /Multiplexer_CD74HC4067M/
+
+** messages ERC: 17  Erreurs 17  Avertissements 0

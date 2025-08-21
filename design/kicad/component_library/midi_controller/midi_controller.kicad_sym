@@ -145,7 +145,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(property "Reference" "D"
+		(property "Reference" "DISP"
 			(at 0 24.13 0)
 			(effects
 				(font

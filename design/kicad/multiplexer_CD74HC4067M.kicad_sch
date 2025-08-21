@@ -2202,7 +2202,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "6e626320-1a5d-43dc-91ee-c9925210c228")
-		(property "Reference" "D40"
+		(property "Reference" "D39"
 			(at 71.12 167.6399 90)
 			(effects
 				(font
@@ -2308,7 +2308,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/3ca90eb8-5cff-4e06-9871-fcb1ae67d879"
-					(reference "D40")
+					(reference "D39")
 					(unit 1)
 				)
 			)
@@ -2391,7 +2391,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "78a8fb9a-e62b-4247-905d-d6be14613f71")
-		(property "Reference" "D38"
+		(property "Reference" "D37"
 			(at 71.12 91.4399 90)
 			(effects
 				(font
@@ -2497,7 +2497,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/3ca90eb8-5cff-4e06-9871-fcb1ae67d879"
-					(reference "D38")
+					(reference "D37")
 					(unit 1)
 				)
 			)
@@ -2513,7 +2513,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "800d2e16-55c7-4fbb-98bc-c4b8861f1998")
-		(property "Reference" "D39"
+		(property "Reference" "D38"
 			(at 71.12 129.5399 90)
 			(effects
 				(font
@@ -2619,7 +2619,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/3ca90eb8-5cff-4e06-9871-fcb1ae67d879"
-					(reference "D39")
+					(reference "D38")
 					(unit 1)
 				)
 			)
@@ -2635,7 +2635,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "8ecebf07-80a3-458e-a6cc-5815d4e0f321")
-		(property "Reference" "D37"
+		(property "Reference" "D36"
 			(at 71.12 53.3399 90)
 			(effects
 				(font
@@ -2741,7 +2741,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/3ca90eb8-5cff-4e06-9871-fcb1ae67d879"
-					(reference "D37")
+					(reference "D36")
 					(unit 1)
 				)
 			)

@@ -389,7 +389,7 @@
 					)
 				)
 			)
-			(pin power_in line
+			(pin input line
 				(at -30.48 -1.27 0)
 				(length 5.08)
 				(name "LED"
