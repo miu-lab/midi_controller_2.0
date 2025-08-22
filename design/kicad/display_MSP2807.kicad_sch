@@ -144,195 +144,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "PCM_4ms_Capacitor:10uF_0805_16V_lowESR"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0.254)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "C"
-				(at 1.905 1.27 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "10uF_0805_16V_lowESR"
-				(at 0 3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Footprint" "4ms_Capacitor:C_0805"
-				(at -2.54 -5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "10uF, Min. 16V, ESR<=20mΩ@1MHz, 0805, MLCC"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Specifications" "10uF, Min. 16V, ESR<=20mΩ@1MHz, 0805, MLCC"
-				(at -2.54 -7.874 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer" "Taiyo Yuden"
-				(at -2.54 -9.398 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Part Number" "EMK212ABJ106KG-T"
-				(at -2.54 -10.922 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Display" "10uF/16V/20mΩ"
-				(at 1.905 -1.27 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "JLCPCB ID" "C190442"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "10uF 0805 16V Low ESR 20mΩ 20mOhm"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "C_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "10uF_0805_16V_lowESR_0_1"
-				(polyline
-					(pts
-						(xy -1.524 0.508) (xy 1.524 0.508)
-					)
-					(stroke
-						(width 0.3048)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.524 -0.508) (xy 1.524 -0.508)
-					)
-					(stroke
-						(width 0.3302)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "10uF_0805_16V_lowESR_1_1"
-				(pin passive line
-					(at 0 2.54 270)
-					(length 2.032)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -2.54 90)
-					(length 2.032)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "midi_controller:MIDI_Display_MSP2807"
 			(pin_names
 				(offset 1.016)
@@ -715,22 +526,22 @@
 		)
 	)
 	(junction
+		(at 171.45 62.23)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1511e3ba-7dec-4fa6-928f-34adb3932e87")
+	)
+	(junction
 		(at 160.02 62.23)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "17887a48-7f6f-48be-a333-af77bd7e3c2e")
 	)
 	(junction
-		(at 170.18 62.23)
+		(at 171.45 74.93)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "431aac18-dc1f-46b3-b00b-29f625d8b502")
-	)
-	(junction
-		(at 170.18 74.93)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "8bc8a5fe-4d33-45cc-b06d-0e1701243e1e")
+		(uuid "900a455b-ddea-4738-9718-456cc8b9bc8c")
 	)
 	(junction
 		(at 160.02 74.93)
@@ -760,13 +571,23 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 74.93) (xy 170.18 74.93)
+			(xy 160.02 74.93) (xy 171.45 74.93)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "0a65d74f-6951-45d0-b8f0-e5175f37698b")
+	)
+	(wire
+		(pts
+			(xy 171.45 62.23) (xy 180.34 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0ce1ea12-d9a0-4ab8-84de-757c24ab52f4")
 	)
 	(wire
 		(pts
@@ -777,16 +598,6 @@
 			(type default)
 		)
 		(uuid "12768978-6d0d-4243-a7c6-715a93b0c55e")
-	)
-	(wire
-		(pts
-			(xy 160.02 62.23) (xy 170.18 62.23)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1afd7efc-bbea-4a4e-a1f4-732c151c9d93")
 	)
 	(wire
 		(pts
@@ -810,6 +621,16 @@
 	)
 	(wire
 		(pts
+			(xy 171.45 74.93) (xy 180.34 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "59063890-263b-4a2a-9dc3-06aa3ec593b4")
+	)
+	(wire
+		(pts
 			(xy 125.73 92.71) (xy 180.34 92.71)
 		)
 		(stroke
@@ -830,23 +651,13 @@
 	)
 	(wire
 		(pts
-			(xy 125.73 72.39) (xy 154.94 72.39)
+			(xy 125.73 72.39) (xy 148.59 72.39)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "60e979c2-0356-4a60-8fea-e08514368df6")
-	)
-	(wire
-		(pts
-			(xy 170.18 62.23) (xy 170.18 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6746be62-c7ba-44e4-ba83-85e4119bb7b6")
 	)
 	(wire
 		(pts
@@ -860,16 +671,6 @@
 	)
 	(wire
 		(pts
-			(xy 170.18 74.93) (xy 180.34 74.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "89017487-3955-4bc1-9a15-bf4cf4e6b492")
-	)
-	(wire
-		(pts
 			(xy 125.73 80.01) (xy 180.34 80.01)
 		)
 		(stroke
@@ -877,6 +678,16 @@
 			(type default)
 		)
 		(uuid "8b9d91fc-65d7-4c20-affb-25bd0033b252")
+	)
+	(wire
+		(pts
+			(xy 171.45 62.23) (xy 171.45 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c93b78f-3e3c-47aa-abeb-ae1e7298e260")
 	)
 	(wire
 		(pts
@@ -890,7 +701,7 @@
 	)
 	(wire
 		(pts
-			(xy 170.18 62.23) (xy 180.34 62.23)
+			(xy 160.02 62.23) (xy 171.45 62.23)
 		)
 		(stroke
 			(width 0)
@@ -910,7 +721,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 62.23) (xy 160.02 62.23)
+			(xy 148.59 62.23) (xy 160.02 62.23)
 		)
 		(stroke
 			(width 0)
@@ -920,23 +731,23 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 62.23) (xy 154.94 72.39)
+			(xy 171.45 72.39) (xy 171.45 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf6497e7-4655-40a6-ac5d-c7ceba79501c")
+	)
+	(wire
+		(pts
+			(xy 148.59 62.23) (xy 148.59 72.39)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "e6e030f2-015f-41c2-a779-570ef38c1163")
-	)
-	(wire
-		(pts
-			(xy 170.18 71.12) (xy 170.18 74.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f1967038-51d6-4e73-9ae1-6ddc9b3dc2f2")
 	)
 	(wire
 		(pts
@@ -1059,8 +870,8 @@
 		(uuid "edbcceb6-9379-41c2-b074-02143686ea06")
 	)
 	(symbol
-		(lib_id "PCM_4ms_Capacitor:10uF_0805_16V_lowESR")
-		(at 170.18 68.58 0)
+		(lib_id "Device:C")
+		(at 171.45 68.58 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1069,7 +880,7 @@
 		(fields_autoplaced yes)
 		(uuid "3f51ef14-b78a-4bc4-ac2f-56b0af913562")
 		(property "Reference" "C41"
-			(at 172.72 67.3162 0)
+			(at 175.26 67.3099 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1077,75 +888,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "10uF_0805_16V_lowESR"
-			(at 170.18 64.77 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "4ms_Capacitor:C_0805"
-			(at 167.64 73.66 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 170.18 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "10uF, Min. 16V, ESR<=20mΩ@1MHz, 0805, MLCC"
-			(at 170.18 68.58 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Specifications" "10uF, Min. 16V, ESR<=20mΩ@1MHz, 0805, MLCC"
-			(at 167.64 76.454 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Taiyo Yuden"
-			(at 167.64 77.978 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Part Number" "EMK212ABJ106KG-T"
-			(at 167.64 79.502 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Display" "10uF/16V/20mΩ"
-			(at 172.72 69.8562 0)
+		(property "Value" "10u"
+			(at 175.26 69.8499 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1153,8 +897,26 @@
 				(justify left)
 			)
 		)
-		(property "JLCPCB ID" "C190442"
-			(at 170.18 68.58 0)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 172.4152 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 171.45 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 171.45 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
