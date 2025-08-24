@@ -43,7 +43,8 @@
       "Bash(kicad-cli sch:*)",
       "mcp__kicad__generate_validation_report",
       "Bash(kicad-cli:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
