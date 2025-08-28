@@ -1182,7 +1182,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "4")
 				)
@@ -1254,7 +1254,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "8")
 				)
@@ -1326,7 +1326,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "9")
 				)
@@ -1398,7 +1398,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "5")
 				)
@@ -1470,7 +1470,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "6")
 				)
@@ -1542,7 +1542,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "7")
 				)
@@ -1614,7 +1614,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "2")
 				)
@@ -1686,7 +1686,7 @@
 			)
 		)
 		(instances
-			(project "midi_controller"
+			(project "midi_controller-rounded"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/8b3bc88b-b526-44d8-9760-500b43fd5a71"
 					(page "10")
 				)

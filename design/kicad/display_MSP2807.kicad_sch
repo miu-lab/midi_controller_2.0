@@ -879,7 +879,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3f51ef14-b78a-4bc4-ac2f-56b0af913562")
-		(property "Reference" "C41"
+		(property "Reference" "C29"
 			(at 175.26 67.3099 0)
 			(effects
 				(font
@@ -924,6 +924,60 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C1713"
+			(at 175.26 67.3099 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Display" "10u"
+			(at 171.45 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLCPCB ID" "C1713"
+			(at 171.45 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Manufacturer" "Taiyo Yuden"
+			(at 171.45 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Part Number" "EMK212ABJ106KG-T"
+			(at 171.45 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Specifications" "10uF, Min. 16V, ESR<=20mΩ@1MHz, 0805, MLCC"
+			(at 171.45 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "e5b93be3-cf87-4d6c-995d-90377b1867af")
 		)
@@ -933,7 +987,7 @@
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/b074c366-2f0b-4fcc-8b9f-7590ca8943b4"
-					(reference "C41")
+					(reference "C29")
 					(unit 1)
 				)
 			)
@@ -945,7 +999,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(uuid "9fa95bc1-80d1-47ab-8085-6318759dd73a")
@@ -1053,7 +1107,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ec6917cf-d256-49c5-b1eb-31eab24479a2")
-		(property "Reference" "C40"
+		(property "Reference" "C28"
 			(at 163.83 67.3099 0)
 			(effects
 				(font
@@ -1098,6 +1152,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C1711"
+			(at 163.83 67.3099 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "1df4f21e-3743-42a3-942c-b58d54f34371")
 		)
@@ -1107,7 +1170,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/b074c366-2f0b-4fcc-8b9f-7590ca8943b4"
-					(reference "C40")
+					(reference "C28")
 					(unit 1)
 				)
 			)

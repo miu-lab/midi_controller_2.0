@@ -1181,7 +1181,7 @@
 		(at 109.22 41.91 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
@@ -1248,7 +1248,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0bc18c05-6d85-4dd2-91df-d9ecdd80ea47")
-		(property "Reference" "J2"
+		(property "Reference" "J3"
 			(at 82.55 53.3399 0)
 			(effects
 				(font
@@ -1293,6 +1293,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2908600"
+			(at 82.55 53.3399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "28115c55-27aa-4ea7-b248-cdf9bd23268a")
 		)
@@ -1302,7 +1311,7 @@
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J2")
+					(reference "J3")
 					(unit 1)
 				)
 			)
@@ -1318,7 +1327,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0d651f98-208d-46dc-a8aa-d748f9550a18")
-		(property "Reference" "D34"
+		(property "Reference" "D27"
 			(at 181.6099 114.3 90)
 			(effects
 				(font
@@ -1415,6 +1424,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C85380"
+			(at 181.6099 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "32e72325-fc87-4a3b-9236-008f65ab18b5")
 		)
@@ -1424,7 +1442,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D34")
+					(reference "D27")
 					(unit 1)
 				)
 			)
@@ -1440,7 +1458,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0f16ea55-5c12-45af-81a5-d23a4efa06ef")
-		(property "Reference" "D31"
+		(property "Reference" "D29"
 			(at 74.93 76.1999 90)
 			(effects
 				(font
@@ -1537,6 +1555,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C85380"
+			(at 74.93 76.1999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "3a5c2874-164c-424b-885a-e47d73b3aa69")
 		)
@@ -1546,7 +1573,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D31")
+					(reference "D29")
 					(unit 1)
 				)
 			)
@@ -1557,11 +1584,11 @@
 		(at 157.48 77.47 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(uuid "144b1f20-963e-49ac-a215-0dc66d455e43")
-		(property "Reference" "SW4"
+		(property "Reference" "SW5"
 			(at 157.48 67.31 0)
 			(effects
 				(font
@@ -1607,7 +1634,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "SW4")
+					(reference "SW5")
 					(unit 1)
 				)
 			)
@@ -1623,7 +1650,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "17f3d4ad-4b25-4b27-ada2-1a30a64bd8a4")
-		(property "Reference" "J7"
+		(property "Reference" "J9"
 			(at 232.4099 105.41 0)
 			(effects
 				(font
@@ -1668,6 +1695,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2908600"
+			(at 232.4099 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "8a857eba-20c0-4022-beee-7acbb8b321f5")
 		)
@@ -1677,7 +1713,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J7")
+					(reference "J9")
 					(unit 1)
 				)
 			)
@@ -1688,12 +1724,12 @@
 		(at 109.22 113.03 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "18505768-063b-434f-bb8b-9b13e71566ec")
-		(property "Reference" "SW3"
+		(property "Reference" "SW2"
 			(at 109.22 102.87 0)
 			(effects
 				(font
@@ -1739,7 +1775,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "SW3")
+					(reference "SW2")
 					(unit 1)
 				)
 			)
@@ -1755,7 +1791,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "250eac71-c803-4f38-9afc-03a8163f045c")
-		(property "Reference" "J5"
+		(property "Reference" "J7"
 			(at 156.2099 105.41 0)
 			(effects
 				(font
@@ -1800,6 +1836,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2908600"
+			(at 156.2099 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "1acccd8f-941a-485c-8f15-789d01653433")
 		)
@@ -1809,7 +1854,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J5")
+					(reference "J7")
 					(unit 1)
 				)
 			)
@@ -1825,7 +1870,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "376d84c2-5c33-41f7-bcf9-82b36077b4d7")
-		(property "Reference" "J6"
+		(property "Reference" "J8"
 			(at 194.3099 105.41 0)
 			(effects
 				(font
@@ -1870,6 +1915,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2908600"
+			(at 194.3099 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "1dd94128-62e9-409d-968a-2c401fda0059")
 		)
@@ -1879,7 +1933,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J6")
+					(reference "J8")
 					(unit 1)
 				)
 			)
@@ -1895,7 +1949,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3e23f7c0-ca3c-4734-8512-ba41c766ee39")
-		(property "Reference" "D30"
+		(property "Reference" "D28"
 			(at 74.93 40.6399 90)
 			(effects
 				(font
@@ -1992,6 +2046,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C85380"
+			(at 74.93 40.6399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "12e98537-695f-47cd-a873-5f8ab230b5da")
 		)
@@ -2001,7 +2064,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D30")
+					(reference "D28")
 					(unit 1)
 				)
 			)
@@ -2017,7 +2080,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6c80c473-b211-42a6-990c-00ee2c3badf9")
-		(property "Reference" "J3"
+		(property "Reference" "J2"
 			(at 83.82 88.8999 0)
 			(effects
 				(font
@@ -2062,6 +2125,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2908600"
+			(at 83.82 88.8999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "1dec0d06-68bd-450d-a5f1-225937f44f76")
 		)
@@ -2071,7 +2143,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J3")
+					(reference "J2")
 					(unit 1)
 				)
 			)
@@ -2082,7 +2154,7 @@
 		(at 233.68 77.47 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
@@ -2149,7 +2221,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9917210e-e765-4bc9-ac15-979458f9c2aa")
-		(property "Reference" "D33"
+		(property "Reference" "D30"
 			(at 143.5099 114.3 90)
 			(effects
 				(font
@@ -2246,6 +2318,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C85380"
+			(at 143.5099 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "fe02b0f5-d22a-4b91-8dc5-8b8cefd54c3c")
 		)
@@ -2255,7 +2336,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D33")
+					(reference "D30")
 					(unit 1)
 				)
 			)
@@ -2271,7 +2352,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ab87eaaf-b2aa-48d5-b7e4-1cb2993791b8")
-		(property "Reference" "J4"
+		(property "Reference" "J5"
 			(at 83.82 124.4599 0)
 			(effects
 				(font
@@ -2316,6 +2397,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C2908600"
+			(at 83.82 124.4599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "be1d3ad8-8cf6-43d1-9a28-9ea193f6c219")
 		)
@@ -2325,7 +2415,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J4")
+					(reference "J5")
 					(unit 1)
 				)
 			)
@@ -2336,12 +2426,12 @@
 		(at 195.58 77.47 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "bede4f19-b350-4c87-ae94-4d6604bb1c3e")
-		(property "Reference" "SW5"
+		(property "Reference" "SW3"
 			(at 195.58 67.31 0)
 			(effects
 				(font
@@ -2387,7 +2477,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "SW5")
+					(reference "SW3")
 					(unit 1)
 				)
 			)
@@ -2403,7 +2493,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c5ab5529-c9b0-4269-bf64-a5e33e8a7a26")
-		(property "Reference" "D35"
+		(property "Reference" "D26"
 			(at 219.7099 114.3 90)
 			(effects
 				(font
@@ -2500,6 +2590,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C85380"
+			(at 219.7099 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "5b6f6be0-c743-4c14-bf5f-64b418c285d3")
 		)
@@ -2509,7 +2608,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D35")
+					(reference "D26")
 					(unit 1)
 				)
 			)
@@ -2520,12 +2619,12 @@
 		(at 109.22 77.47 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c9247a51-370d-478c-b3dc-f29f0b3aea04")
-		(property "Reference" "SW2"
+		(property "Reference" "SW4"
 			(at 109.22 67.31 0)
 			(effects
 				(font
@@ -2571,7 +2670,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "SW2")
+					(reference "SW4")
 					(unit 1)
 				)
 			)
@@ -2587,7 +2686,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f9826b8c-bb6b-492c-af0c-2a7db602d5bb")
-		(property "Reference" "D32"
+		(property "Reference" "D31"
 			(at 74.93 111.7599 90)
 			(effects
 				(font
@@ -2684,6 +2783,15 @@
 				(hide yes)
 			)
 		)
+		(property "LCSC" "C85380"
+			(at 74.93 111.7599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "66862256-0cc6-4799-bb2b-9694ea5af2c2")
 		)
@@ -2693,7 +2801,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D32")
+					(reference "D31")
 					(unit 1)
 				)
 			)
