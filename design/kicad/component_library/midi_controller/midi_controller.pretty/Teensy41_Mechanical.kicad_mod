@@ -1,0 +1,109 @@
+(footprint "Teensy41_Mechanical"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 -10.16 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "4de1373e-5fa5-412e-8657-6b0e6d5fdff3")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Teensy 4.1"
+		(at 0 10.16 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "ca776167-092f-4817-994b-2ea3b7c5673e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0e3663e0-efa4-4fb9-a856-67f2af7ddbf7")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "1a95fa81-0d15-4a68-8640-4322f086be7e")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_line
+		(start -25.4 3.81)
+		(end -25.4 -3.81)
+		(stroke
+			(width 0.16)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "f14dab40-1e2f-4970-ae2a-8b3464037246")
+	)
+	(fp_line
+		(start 29.21 -5.08)
+		(end 29.21 5.08)
+		(stroke
+			(width 0.16)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "5aa8c2be-3d10-4fb6-aeae-83f6e06bd34e")
+	)
+	(fp_text user "USB"
+		(at -26.67 0 270)
+		(layer "F.SilkS")
+		(uuid "35bf63db-080a-44e6-98ce-0c378e3af15b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.16)
+			)
+		)
+	)
+	(fp_text user "Micro SD"
+		(at 24.13 0 0)
+		(layer "F.SilkS")
+		(uuid "689cf1c2-8734-4e5a-8a6d-0cdd049f96ad")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.16)
+			)
+		)
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/component_library/Microcontrollers/Teensy/Teensy_4.1_Male_Headers/Teensy_4.1_Male_Headers_.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -0 -0 -90)
+		)
+	)
+)

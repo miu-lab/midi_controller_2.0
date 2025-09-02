@@ -18059,7 +18059,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Teensy_Library:Teensy41"
 			(at -10.16 10.16 0)
 			(effects
 				(font
@@ -18068,7 +18068,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.pjrc.com/store/teensy41.html"
 			(at -10.16 10.16 0)
 			(effects
 				(font

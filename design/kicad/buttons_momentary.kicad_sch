@@ -5,171 +5,6 @@
 	(uuid "511d6db9-7b67-439b-8823-71c269451ded")
 	(paper "A4")
 	(lib_symbols
-		(symbol "Connector:Conn_01x02_Socket"
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "J"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Conn_01x02_Socket"
-				(at 0 -5.08 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Generic connector, single row, 01x02, script generated"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_locked" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "connector"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_1x??_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "Conn_01x02_Socket_1_1"
-				(polyline
-					(pts
-						(xy -1.27 0) (xy -0.508 0)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 -2.54) (xy -0.508 -2.54)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 -0.508)
-					(mid -0.5058 0)
-					(end 0 0.508)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 0 -3.048)
-					(mid -0.5058 -2.54)
-					(end 0 -2.032)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pin_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -2.54 0)
-					(length 3.81)
-					(name "Pin_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "PESD5V0L1BA_115:PESD5V0L1BA,115"
 			(pin_names
 				(hide yes)
@@ -422,6 +257,154 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "midi_controller:Conn_01x02_Socket"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x02_Socket"
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x02, script generated"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x02_Socket_1_1"
+				(polyline
+					(pts
+						(xy -1.27 0) (xy -0.508 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -2.54) (xy -0.508 -2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -0.508)
+					(mid -0.5058 0)
+					(end 0 0.508)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -3.048)
+					(mid -0.5058 -2.54)
+					(end 0 -2.032)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "midi_controller:MIDI_Switch_Pushbutton_PV0H24011"
 			(pin_names
 				(offset 1.016)
@@ -569,6 +552,131 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "midi_controller:TestPoint"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.762)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "TP"
+				(at 0 6.858 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TestPoint"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "midi_controller:TestPoint_Pad_1.0x1.0mm"
+				(at 5.08 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 5.08 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "test point"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "test point tp"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Pin* Test*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "TestPoint_0_1"
+				(circle
+					(center 0 3.302)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "TestPoint_1_1"
+				(pin passive line
+					(at 0 0 90)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(junction
+		(at 53.34 53.34)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "02aa2376-30e5-44cf-8d7a-e313515c158a")
+	)
+	(junction
+		(at 194.31 132.08)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "3232efde-603f-4027-98b2-62e67e52e733")
+	)
+	(junction
+		(at 53.34 88.9)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "34c3f179-2664-49e2-a5bd-eedd6a82cd2c")
 	)
 	(junction
 		(at 156.21 120.65)
@@ -581,6 +689,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "3eb5df67-3fa2-4523-ae6c-28040e854150")
+	)
+	(junction
+		(at 232.41 132.08)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "436188e1-e392-4b4f-b1a8-a860c074e4f3")
 	)
 	(junction
 		(at 68.58 124.46)
@@ -601,10 +715,42 @@
 		(uuid "a40bd500-73ca-4ba1-af26-7e869a869c28")
 	)
 	(junction
+		(at 53.34 124.46)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "cc9db529-8f14-412e-99db-cd6593607a9f")
+	)
+	(junction
+		(at 156.21 132.08)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "fbe96f18-2d20-4653-8706-6c72c9cee32e")
+	)
+	(junction
 		(at 194.31 120.65)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ffaada53-44e0-447e-8055-f443db6538d4")
+	)
+	(wire
+		(pts
+			(xy 53.34 124.46) (xy 68.58 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "151d74d9-6719-4409-b057-9ac0b1bb79d9")
+	)
+	(wire
+		(pts
+			(xy 185.42 132.08) (xy 194.31 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1ae335cd-e7a5-48fe-9387-7a396b4f2e4b")
 	)
 	(wire
 		(pts
@@ -628,7 +774,7 @@
 	)
 	(wire
 		(pts
-			(xy 60.96 124.46) (xy 68.58 124.46)
+			(xy 40.64 124.46) (xy 53.34 124.46)
 		)
 		(stroke
 			(width 0)
@@ -658,7 +804,7 @@
 	)
 	(wire
 		(pts
-			(xy 59.69 53.34) (xy 68.58 53.34)
+			(xy 39.37 53.34) (xy 53.34 53.34)
 		)
 		(stroke
 			(width 0)
@@ -688,7 +834,17 @@
 	)
 	(wire
 		(pts
-			(xy 232.41 128.27) (xy 232.41 120.65)
+			(xy 147.32 132.08) (xy 156.21 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4e9d796e-5636-41ce-a6dd-e40293424a31")
+	)
+	(wire
+		(pts
+			(xy 232.41 142.24) (xy 232.41 132.08)
 		)
 		(stroke
 			(width 0)
@@ -698,7 +854,17 @@
 	)
 	(wire
 		(pts
-			(xy 194.31 128.27) (xy 194.31 120.65)
+			(xy 156.21 132.08) (xy 156.21 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "620cc6f3-8c14-4c59-8e23-90d2de8ec954")
+	)
+	(wire
+		(pts
+			(xy 194.31 142.24) (xy 194.31 132.08)
 		)
 		(stroke
 			(width 0)
@@ -715,6 +881,16 @@
 			(type default)
 		)
 		(uuid "77552b9c-25d4-4fec-aea6-9d5c0641c19b")
+	)
+	(wire
+		(pts
+			(xy 53.34 53.34) (xy 68.58 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "81b03dd1-a4d9-423d-80ad-64a2788aa8c0")
 	)
 	(wire
 		(pts
@@ -735,6 +911,16 @@
 			(type default)
 		)
 		(uuid "8f97f402-4b06-452d-b41e-3977b77d2606")
+	)
+	(wire
+		(pts
+			(xy 194.31 132.08) (xy 194.31 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8fe40601-a4d4-4dbe-8d6f-7a6464f1e0f2")
 	)
 	(wire
 		(pts
@@ -768,7 +954,7 @@
 	)
 	(wire
 		(pts
-			(xy 156.21 128.27) (xy 156.21 120.65)
+			(xy 156.21 142.24) (xy 156.21 132.08)
 		)
 		(stroke
 			(width 0)
@@ -808,6 +994,16 @@
 	)
 	(wire
 		(pts
+			(xy 53.34 88.9) (xy 68.58 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "be0977ed-ad11-427d-8964-11b7d8091037")
+	)
+	(wire
+		(pts
 			(xy 68.58 101.6) (xy 68.58 102.87)
 		)
 		(stroke
@@ -815,6 +1011,16 @@
 			(type default)
 		)
 		(uuid "c7b1e7ed-a432-4b6f-b349-8ae7c7991324")
+	)
+	(wire
+		(pts
+			(xy 223.52 132.08) (xy 232.41 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cc95bdc1-d8be-4a13-a7a6-8315bf098520")
 	)
 	(wire
 		(pts
@@ -828,7 +1034,7 @@
 	)
 	(wire
 		(pts
-			(xy 60.96 88.9) (xy 68.58 88.9)
+			(xy 40.64 88.9) (xy 53.34 88.9)
 		)
 		(stroke
 			(width 0)
@@ -845,6 +1051,16 @@
 			(type default)
 		)
 		(uuid "de67a5a3-2fd3-4916-948a-b65880199294")
+	)
+	(wire
+		(pts
+			(xy 232.41 132.08) (xy 232.41 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f7569b09-4f46-4274-93ba-c1340c85beb5")
 	)
 	(global_label "GND"
 		(shape input)
@@ -1112,7 +1328,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_02"
 		(shape passive)
-		(at 60.96 88.9 180)
+		(at 40.64 88.9 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1123,7 +1339,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_01"
 		(shape passive)
-		(at 59.69 53.34 180)
+		(at 39.37 53.34 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1134,7 +1350,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_05"
 		(shape passive)
-		(at 194.31 128.27 270)
+		(at 194.31 142.24 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1145,7 +1361,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_06"
 		(shape passive)
-		(at 232.41 128.27 270)
+		(at 232.41 142.24 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1156,7 +1372,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_03"
 		(shape passive)
-		(at 60.96 124.46 180)
+		(at 40.64 124.46 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1167,7 +1383,7 @@
 	)
 	(hierarchical_label "BUTTON_PUSH_MOM_04"
 		(shape passive)
-		(at 156.21 128.27 270)
+		(at 156.21 142.24 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1239,7 +1455,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x02_Socket")
+		(lib_id "midi_controller:Conn_01x02_Socket")
 		(at 81.28 53.34 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -1248,7 +1464,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0bc18c05-6d85-4dd2-91df-d9ecdd80ea47")
-		(property "Reference" "J3"
+		(property "Reference" "J5"
 			(at 82.55 53.3399 0)
 			(effects
 				(font
@@ -1266,7 +1482,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+		(property "Footprint" "midi_controller:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_JLC_Constraints"
 			(at 81.28 53.34 0)
 			(effects
 				(font
@@ -1311,7 +1527,7 @@
 		(instances
 			(project ""
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J3")
+					(reference "J5")
 					(unit 1)
 				)
 			)
@@ -1327,7 +1543,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "0d651f98-208d-46dc-a8aa-d748f9550a18")
-		(property "Reference" "D27"
+		(property "Reference" "D24"
 			(at 181.6099 114.3 90)
 			(effects
 				(font
@@ -1442,7 +1658,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D27")
+					(reference "D24")
 					(unit 1)
 				)
 			)
@@ -1580,6 +1796,74 @@
 		)
 	)
 	(symbol
+		(lib_id "midi_controller:TestPoint")
+		(at 53.34 88.9 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "12f638f4-738c-4360-9d70-0ef64aceb1ee")
+		(property "Reference" "TP1"
+			(at 55.88 84.3279 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 55.88 86.8679 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "midi_controller:TestPoint_Pad_1.0x1.0mm"
+			(at 48.26 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 48.26 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 53.34 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b3e1206b-b63c-4147-8f7d-428c50573608")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "TP1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "midi_controller:MIDI_Switch_Pushbutton_PV0H24011")
 		(at 157.48 77.47 0)
 		(unit 1)
@@ -1641,7 +1925,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x02_Socket")
+		(lib_id "midi_controller:Conn_01x02_Socket")
 		(at 232.41 106.68 90)
 		(unit 1)
 		(exclude_from_sim no)
@@ -1650,25 +1934,25 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "17f3d4ad-4b25-4b27-ada2-1a30a64bd8a4")
-		(property "Reference" "J9"
-			(at 232.4099 105.41 0)
+		(property "Reference" "J11"
+			(at 236.22 106.0449 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 234.9499 105.41 0)
+			(at 236.22 108.5849 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+		(property "Footprint" "midi_controller:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_JLC_Constraints"
 			(at 232.41 106.68 0)
 			(effects
 				(font
@@ -1713,7 +1997,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J9")
+					(reference "J11")
 					(unit 1)
 				)
 			)
@@ -1782,7 +2066,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x02_Socket")
+		(lib_id "midi_controller:Conn_01x02_Socket")
 		(at 156.21 106.68 90)
 		(unit 1)
 		(exclude_from_sim no)
@@ -1791,25 +2075,25 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "250eac71-c803-4f38-9afc-03a8163f045c")
-		(property "Reference" "J7"
-			(at 156.2099 105.41 0)
+		(property "Reference" "J9"
+			(at 160.02 106.0449 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 158.7499 105.41 0)
+			(at 160.02 108.5849 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+		(property "Footprint" "midi_controller:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_JLC_Constraints"
 			(at 156.21 106.68 0)
 			(effects
 				(font
@@ -1854,14 +2138,14 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J7")
+					(reference "J9")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x02_Socket")
+		(lib_id "midi_controller:Conn_01x02_Socket")
 		(at 194.31 106.68 90)
 		(unit 1)
 		(exclude_from_sim no)
@@ -1870,25 +2154,25 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "376d84c2-5c33-41f7-bcf9-82b36077b4d7")
-		(property "Reference" "J8"
-			(at 194.3099 105.41 0)
+		(property "Reference" "J10"
+			(at 198.12 106.0449 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Value" "Conn_01x02_Socket"
-			(at 196.8499 105.41 0)
+			(at 198.12 108.5849 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+		(property "Footprint" "midi_controller:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_JLC_Constraints"
 			(at 194.31 106.68 0)
 			(effects
 				(font
@@ -1933,7 +2217,75 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J8")
+					(reference "J10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "midi_controller:TestPoint")
+		(at 53.34 53.34 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3e002964-07b7-4801-958f-1206d996c878")
+		(property "Reference" "TP2"
+			(at 55.88 48.7679 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 55.88 51.3079 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "midi_controller:TestPoint_Pad_1.0x1.0mm"
+			(at 48.26 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 48.26 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 53.34 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "44220ace-36a4-4b02-92d7-8f5477c2f171")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "TP2")
 					(unit 1)
 				)
 			)
@@ -1949,7 +2301,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3e23f7c0-ca3c-4734-8512-ba41c766ee39")
-		(property "Reference" "D28"
+		(property "Reference" "D26"
 			(at 74.93 40.6399 90)
 			(effects
 				(font
@@ -2064,14 +2416,212 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D28")
+					(reference "D26")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x02_Socket")
+		(lib_id "midi_controller:TestPoint")
+		(at 53.34 124.46 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "41a4708c-2b71-4f36-b0fc-8b9148482773")
+		(property "Reference" "TP3"
+			(at 55.88 119.8879 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 55.88 122.4279 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "midi_controller:TestPoint_Pad_1.0x1.0mm"
+			(at 48.26 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 48.26 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 53.34 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b4299a17-c024-4036-9b93-0d0f6600e8aa")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "TP3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "midi_controller:TestPoint")
+		(at 223.52 132.08 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "62c03890-00b4-4cae-a24e-18849f8d96b0")
+		(property "Reference" "TP4"
+			(at 220.218 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 220.218 129.54 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "midi_controller:TestPoint_Pad_1.0x1.0mm"
+			(at 223.52 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 223.52 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 223.52 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "61df4557-aac6-4481-9589-65e101e08009")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "TP4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "midi_controller:TestPoint")
+		(at 185.42 132.08 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6319452a-7e90-4f0d-a935-92a8d89b3194")
+		(property "Reference" "TP5"
+			(at 182.118 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 182.118 129.54 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "midi_controller:TestPoint_Pad_1.0x1.0mm"
+			(at 185.42 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 185.42 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 185.42 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1dde8bc6-22f8-4f51-bca5-1fab8adb034d")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "TP5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "midi_controller:Conn_01x02_Socket")
 		(at 82.55 88.9 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -2080,7 +2630,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "6c80c473-b211-42a6-990c-00ee2c3badf9")
-		(property "Reference" "J2"
+		(property "Reference" "J4"
 			(at 83.82 88.8999 0)
 			(effects
 				(font
@@ -2098,7 +2648,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+		(property "Footprint" "midi_controller:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_JLC_Constraints"
 			(at 82.55 88.9 0)
 			(effects
 				(font
@@ -2143,7 +2693,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J2")
+					(reference "J4")
 					(unit 1)
 				)
 			)
@@ -2212,6 +2762,71 @@
 		)
 	)
 	(symbol
+		(lib_id "midi_controller:TestPoint")
+		(at 147.32 132.08 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8c03f0ae-2b88-4cea-a916-b53a35d95bf0")
+		(property "Reference" "TP6"
+			(at 144.018 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 144.018 129.54 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "midi_controller:TestPoint_Pad_1.0x1.0mm"
+			(at 147.32 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 147.32 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "test point"
+			(at 147.32 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bab26622-32c0-4739-9287-acda3a19d60e")
+		)
+		(instances
+			(project "midi_controller"
+				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
+					(reference "TP6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "PESD5V0L1BA_115:PESD5V0L1BA,115")
 		(at 154.94 120.65 180)
 		(unit 1)
@@ -2221,7 +2836,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9917210e-e765-4bc9-ac15-979458f9c2aa")
-		(property "Reference" "D30"
+		(property "Reference" "D27"
 			(at 143.5099 114.3 90)
 			(effects
 				(font
@@ -2336,14 +2951,14 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D30")
+					(reference "D27")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x02_Socket")
+		(lib_id "midi_controller:Conn_01x02_Socket")
 		(at 82.55 124.46 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -2352,7 +2967,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "ab87eaaf-b2aa-48d5-b7e4-1cb2993791b8")
-		(property "Reference" "J5"
+		(property "Reference" "J7"
 			(at 83.82 124.4599 0)
 			(effects
 				(font
@@ -2370,7 +2985,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+		(property "Footprint" "midi_controller:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_JLC_Constraints"
 			(at 82.55 124.46 0)
 			(effects
 				(font
@@ -2415,7 +3030,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "J5")
+					(reference "J7")
 					(unit 1)
 				)
 			)
@@ -2493,7 +3108,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c5ab5529-c9b0-4269-bf64-a5e33e8a7a26")
-		(property "Reference" "D26"
+		(property "Reference" "D25"
 			(at 219.7099 114.3 90)
 			(effects
 				(font
@@ -2608,7 +3223,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D26")
+					(reference "D25")
 					(unit 1)
 				)
 			)
@@ -2686,7 +3301,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "f9826b8c-bb6b-492c-af0c-2a7db602d5bb")
-		(property "Reference" "D31"
+		(property "Reference" "D28"
 			(at 74.93 111.7599 90)
 			(effects
 				(font
@@ -2801,7 +3416,7 @@
 		(instances
 			(project "midi_controller"
 				(path "/9e44e663-00d0-4f33-bf1f-c4ad78deb554/9031f441-b35d-4c72-b3de-1ac6f4fd634b"
-					(reference "D31")
+					(reference "D28")
 					(unit 1)
 				)
 			)

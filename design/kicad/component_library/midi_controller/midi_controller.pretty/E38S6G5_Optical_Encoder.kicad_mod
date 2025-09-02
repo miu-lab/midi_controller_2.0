@@ -57,7 +57,7 @@
 		(center -15 0)
 		(end -13 0)
 		(stroke
-			(width 0.12)
+			(width 0.16)
 			(type solid)
 		)
 		(fill no)
@@ -68,7 +68,7 @@
 		(center 0 0)
 		(end 3 0)
 		(stroke
-			(width 0.12)
+			(width 0.16)
 			(type solid)
 		)
 		(fill no)
@@ -79,7 +79,7 @@
 		(center 0 0)
 		(end 10 0)
 		(stroke
-			(width 0.12)
+			(width 0.16)
 			(type solid)
 		)
 		(fill no)
@@ -90,7 +90,7 @@
 		(center 0 0)
 		(end 20 0)
 		(stroke
-			(width 0.12)
+			(width 0.16)
 			(type solid)
 		)
 		(fill no)
@@ -101,7 +101,7 @@
 		(center 7.5 -12.99)
 		(end 9.5 -12.99)
 		(stroke
-			(width 0.12)
+			(width 0.16)
 			(type solid)
 		)
 		(fill no)
@@ -112,7 +112,7 @@
 		(center 7.5 12.99)
 		(end 9.5 12.99)
 		(stroke
-			(width 0.12)
+			(width 0.16)
 			(type solid)
 		)
 		(fill no)

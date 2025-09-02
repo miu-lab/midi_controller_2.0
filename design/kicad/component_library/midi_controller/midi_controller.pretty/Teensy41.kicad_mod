@@ -958,15 +958,15 @@
 		(uuid "08b97318-3eee-459c-820f-380389ee1b71")
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/component_library/Microcontrollers/Teensy/Teensy 4.1.STEP"
+	(model "${KIPRJMOD}/component_library/Microcontrollers/Teensy/Teensy_4.1_Male_Headers/Teensy_4.1_Male_Headers_.step"
 		(offset
-			(xyz 0 0 11)
+			(xyz 0 0 0)
 		)
 		(scale
 			(xyz 1 1 1)
 		)
 		(rotate
-			(xyz -90 -0 90)
+			(xyz -0 -0 -90)
 		)
 	)
 )
