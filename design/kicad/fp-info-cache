@@ -1,4 +1,4 @@
-26667915352645950
+26683731525399107
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -106848,6 +106848,34 @@ optical encoder rotary incremental 38mm E38S6G5 600ppr
 0
 0
 midi_controller
+Fuse_0805_2012Metric
+Fuse SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator
+fuse
+0
+2
+2
+midi_controller
+JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical_JLC_Constraints
+JST XH series connector, B2B-XH-A (http://www.jst-mfg.com/product/pdf/eng/eXH.pdf), generated with kicad-footprint-generator
+connector JST XH vertical
+0
+2
+2
+midi_controller
+JST_XH_B5B-XH-A_1x05_P2.50mm_Vertical
+JST XH series connector, B5B-XH-A (http://www.jst-mfg.com/product/pdf/eng/eXH.pdf), generated with kicad-footprint-generator
+connector JST XH vertical
+0
+5
+5
+midi_controller
+Jack_3.5mm_CUI_SJ1-3533NG_Horizontal
+TRS 3.5mm, horizontal, through-hole, https://www.cui.com/product/resource/sj1-353xng.pdf
+TRS audio jack stereo horizontal
+0
+3
+3
+midi_controller
 MSP2807_ILI9341_Display
 MSP2807 2.8 inch TFT LCD Display Module, ILI9341, 320x240, SPI Interface with Touch
 TFT LCD display ILI9341 MSP2807 2.8inch SPI touch
@@ -106869,6 +106897,27 @@ pushbutton momentary SPST E-Switch PV0H24011 12mm mounting hole IP67
 0
 0
 midi_controller
+PinSocket_1x24_P2.54mm_Vertical
+Through hole straight socket strip, 1x24, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
+Through hole socket strip THT 1x24 2.54mm single row
+0
+24
+24
+midi_controller
+SOIC-24W_7.5x15.4mm_P1.27mm
+SOIC, 24 Pin (JEDEC MS-013AD, https://www.analog.com/media/en/package-pcb-resources/package/pkg_pdf/soic_wide-rw/RW_24.pdf), generated with kicad-footprint-generator ipc_gullwing_generator.py
+SOIC SO
+0
+24
+24
+midi_controller
+SOP-8_6.605x9.655mm_P2.54mm
+SOP, 8 Pin (https://www.onsemi.com/pdf/datasheet/hcpl2631m-d.pdf), generated with kicad-footprint-generator ipc_gullwing_generator.py
+SOP SO
+0
+8
+8
+midi_controller
 SW_PUSH_6mm
 tactile push button, 6x6mm e.g. SPST-NO Top Actuated Surface mount
 tact sw push 6mm
@@ -106889,6 +106938,20 @@ Teensy41
 0
 48
 48
+midi_controller
+Teensy41_Mechanical
+
+
+0
+0
+0
+midi_controller
+TestPoint_Pad_1.0x1.0mm
+SMD rectangular pad as test Point, square 1.0mm side length
+test point SMD pad rectangle square
+0
+1
+1
 teensy
 TEENSY36
 
