@@ -2,8 +2,11 @@
     // See http://go.microsoft.com/fwlink/?LinkId=827846
     // for the documentation about the extensions.json format
     "recommendations": [
+        "anthropic.claude-code",
+        "danielmeza.kicad-syntax-highlighter",
         "ms-vscode.cpptools",
-        "platformio.platformio-ide"
+        "platformio.platformio-ide",
+        "vscjava.vscode-java-pack"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"
