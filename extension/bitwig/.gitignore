@@ -1,53 +1,10 @@
-# Build directories
-build/
+# Maven
 target/
-dist/
-out/
-bin/
 
-# IDE files
+# API Bitwig (téléchargée séparément)
+api/
+
+# IDE
 .idea/
 *.iml
 .vscode/
-.settings/
-.project
-.classpath
-
-# OS files
-.DS_Store
-Thumbs.db
-*.swp
-*~
-
-# Java files
-*.class
-*.jar
-!lib/bitwig-extension-api.jar
-
-# Maven
-dependency-reduced-pom.xml
-pom.xml.versionsBackup
-
-# Gradle
-.gradle/
-gradle/
-gradlew
-gradlew.bat
-
-# Logs
-*.log
-logs/
-
-# Temporary files
-*.tmp
-*.bak
-*.backup
-
-# Documentation build
-docs/_build/
-docs/.doctrees/
-
-# Personal notes
-TODO.txt
-NOTES.md
-personal/

@@ -4,5 +4,9 @@
     "editor.formatOnSaveMode": "modifications",
     "editor.defaultFormatter": "ms-vscode.cpptools",
     "C_Cpp.clang_format_sortIncludes": true,
-    "C_Cpp.formatting": "default"
+    "C_Cpp.formatting": "default",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.referencedLibraries": [
+        "extension/bitwig/api/**/*.jar"
+    ]
 }
