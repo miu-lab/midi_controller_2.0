@@ -3,6 +3,7 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+.claude
 include/
 design/kicad/midi_controller-backups/
 design/kicad/midi_controller_thumbnail.svg
