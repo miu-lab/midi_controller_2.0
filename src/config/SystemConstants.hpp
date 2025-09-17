@@ -179,9 +179,31 @@ namespace SystemConstants {
     }
     
     // ====================
+    // MULTIPLEXER
+    // ====================
+
+    namespace Multiplexer {
+        // Pins pour 74HC4067 (16 canaux) - Configuration PCB actuelle
+        constexpr uint8_t S0_PIN = 3;      // Bit 0 de sélection
+        constexpr uint8_t S1_PIN = 2;      // Bit 1 de sélection
+        constexpr uint8_t S2_PIN = 5;      // Bit 2 de sélection
+        constexpr uint8_t S3_PIN = 6;      // Bit 3 de sélection
+        constexpr uint8_t SIGNAL_PIN = 4;  // COM - Signal analogique/digital
+
+        // Note: Pas de pin ENABLE utilisée (toujours actif)
+
+        // Configuration
+        constexpr uint8_t MAX_CHANNELS = 16;
+        constexpr uint16_t SWITCH_DELAY_US = 10; // Délai après changement de canal
+
+        // État par défaut
+        constexpr bool DEFAULT_ENABLED = true;
+    }
+
+    // ====================
     // INPUT
     // ====================
-    
+
     namespace Input {
         // Configuration encodeurs (utilisée)
         constexpr float DEFAULT_ENCODER_SENSITIVITY = 1.0f;
