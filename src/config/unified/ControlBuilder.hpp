@@ -98,6 +98,21 @@ public:
         return *this;
     }
 
+    // Surcharge pour GpioPin complet (permet de spécifier MUX ou MCU)
+    ControlBuilder& asButton(const GpioPin& pin, uint16_t debounceMs = 30,
+                             ButtonMode mode = ButtonMode::MOMENTARY) {
+        control_.hardware.type = InputType::BUTTON;
+
+        control_.hardware.config = ControlDefinition::ButtonConfig();
+        auto& btn = std::get<ControlDefinition::ButtonConfig>(control_.hardware.config);
+        btn.pin = pin;
+        btn.activeLow = true;
+        btn.mode = mode;
+        btn.debounceMs = debounceMs;
+
+        return *this;
+    }
+
     ControlBuilder& withLongPress(uint16_t ms = 1000) {
         if (std::holds_alternative<ControlDefinition::ButtonConfig>(control_.hardware.config)) {
             auto& btn = std::get<ControlDefinition::ButtonConfig>(control_.hardware.config);
@@ -161,7 +176,7 @@ public:
 
     // === MÉTHODES HELPER POUR ACTIONS COURANTES ===
 
-    ControlBuilder& asHomeButton() {
+    ControlBuilder& asMenuButton() {
         return withNavigation(NavigationAction::HOME, MappingControlType::BUTTON);
     }
 
