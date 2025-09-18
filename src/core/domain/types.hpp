@@ -90,17 +90,77 @@ enum class MappingRole {
  * @brief Configuration sécurisée d'une broche GPIO
  */
 struct GpioPin {
-    uint8_t pin;
+    /**
+     * @brief Source de la pin
+     */
+    enum class Source {
+        MCU,  ///< Pin Teensy directe
+        MUX   ///< Pin via multiplexeur CD74HC4067
+    };
+
+    Source source = Source::MCU;
+    uint8_t pin = 0;  ///< Numéro de pin (Teensy) ou canal (Mux 0-15)
     PinMode mode = PinMode::PULLUP;
 
     /**
+     * @brief Constructeur par défaut
+     */
+    constexpr GpioPin() = default;
+
+    /**
+     * @brief Constructeur pour pin Teensy directe (rétrocompatibilité)
+     */
+    constexpr GpioPin(uint8_t pinNum, PinMode pinMode = PinMode::PULLUP)
+        : source(Source::MCU), pin(pinNum), mode(pinMode) {}
+
+    /**
+     * @brief Constructeur complet avec source explicite
+     */
+    constexpr GpioPin(Source src, uint8_t pinNum, PinMode pinMode = PinMode::PULLUP)
+        : source(src), pin(pinNum), mode(pinMode) {}
+
+    /**
+     * @brief Vérifie si la pin est multiplexée
+     */
+    constexpr bool isMultiplexed() const {
+        return source == Source::MUX;
+    }
+
+    /**
+     * @brief Obtient le canal du multiplexeur (si applicable)
+     */
+    constexpr uint8_t getMuxChannel() const {
+        return isMultiplexed() ? pin : 0xFF;
+    }
+
+    /**
      * @brief Vérifie la validité de la configuration
-     * @return true si la broche est valide pour Teensy 4.1
      */
     constexpr bool isValid() const {
-        return pin <= 99;            // Teensy 4.1 max pins
+        if (source == Source::MUX) {
+            return pin <= 15;  // Mux a 16 canaux (0-15)
+        }
+        return pin <= 99;  // Teensy 4.1 max pins
     }
 };
+
+// =====================================================
+// HELPER FUNCTIONS POUR CRÉATION DE PINS
+// =====================================================
+
+/**
+ * @brief Créer une pin MCU/Teensy directe (fonction helper globale)
+ */
+inline constexpr GpioPin mcuPin(uint8_t pinNum, PinMode mode = PinMode::PULLUP) {
+    return GpioPin(GpioPin::Source::MCU, pinNum, mode);
+}
+
+/**
+ * @brief Créer une pin multiplexée (fonction helper globale)
+ */
+inline constexpr GpioPin muxPin(uint8_t channel, PinMode mode = PinMode::PULLUP) {
+    return GpioPin(GpioPin::Source::MUX, channel, mode);
+}
 
 // =====================================================
 // ÉVÉNEMENTS

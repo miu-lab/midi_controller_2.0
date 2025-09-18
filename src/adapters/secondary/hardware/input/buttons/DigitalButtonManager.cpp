@@ -1,5 +1,6 @@
 // adapters/secondary/hardware/input/buttons/DigitalButtonManager.cpp
 #include "adapters/secondary/hardware/input/buttons/DigitalButtonManager.hpp"
+#include "adapters/secondary/hardware/input/buttons/ButtonFactory.hpp"
 
 #include <Arduino.h>
 
@@ -8,9 +9,16 @@ DigitalButtonManager::DigitalButtonManager(const std::vector<ButtonConfig>& conf
     buttons_.reserve(configs.size());
 
     for (const auto& cfg : configs) {
-        // Crée un Button à partir de ButtonConfig
-        ownedButtons_.emplace_back(std::make_unique<DigitalButton>(cfg));
-        buttons_.push_back(ownedButtons_.back().get());
+        // Utiliser la factory pour créer le bouton unifié avec la bonne stratégie
+        auto button = ButtonFactory::createButton(cfg);
+
+        if (button) {
+            buttons_.push_back(button.get());
+            ownedButtons_.push_back(std::move(button));
+        } else {
+            Serial.print("[DigitalButtonManager] ERROR: Failed to create button ");
+            Serial.println(cfg.id);
+        }
     }
 }
 
@@ -28,14 +36,14 @@ const std::vector<ButtonPort*>& DigitalButtonManager::getButtons() const {
 
 void DigitalButtonManager::resetAllToggleStates() {
     for (auto& btn : ownedButtons_) {
-        btn->resetState();
+        btn->resetState();  // Méthode directe sur UnifiedButton
     }
 }
 
 void DigitalButtonManager::resetToggleState(ButtonId buttonId) {
     for (auto& btn : ownedButtons_) {
         if (btn->getId() == buttonId) {
-            btn->resetState();
+            btn->resetState();  // Méthode directe sur UnifiedButton
             break;
         }
     }

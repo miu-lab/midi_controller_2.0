@@ -9,25 +9,58 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
 
     // === BOUTONS STANDALONE (Navigation) ===
 
-    // Bouton Menu avec long press
+    // Bouton Menu avec long press (sur MUX canal 0)
     config->addControl(ControlBuilder(51, "home_button")
                            .withLabel("Home")
                            .inGroup("Navigation")
                            .withDescription("Bouton Home")
-                           .asButton(32)
+                           .asButton(muxPin(9))
                            .withLongPress(1000)
                            .asHomeButton()
                            .withDisplayOrder(1)
                            .build());
 
-    // Bouton OK/Validation
+    // Bouton OK/Validation (sur MUX canal 1)
     config->addControl(ControlBuilder(52, "back_button")
                            .withLabel("Back")
                            .inGroup("Navigation")
                            .withDescription("Bouton Retour")
-                           .asButton(31)
+                           .asButton(muxPin(10))
                            .asBackButton()
                            .withDisplayOrder(2)
+                           .build());
+
+    // Nouveaux boutons de navigation sur MUX
+    config->addControl(ControlBuilder(53, "nav_button_3")
+                           .withLabel("Nav 3")
+                           .inGroup("Navigation")
+                           .withDescription("Bouton Navigation 3")
+                           .asButton(muxPin(11))
+                           .withDisplayOrder(3)
+                           .build());
+
+    config->addControl(ControlBuilder(54, "nav_button_4")
+                           .withLabel("Nav 4")
+                           .inGroup("Navigation")
+                           .withDescription("Bouton Navigation 4")
+                           .asButton(muxPin(12))
+                           .withDisplayOrder(4)
+                           .build());
+
+    config->addControl(ControlBuilder(55, "nav_button_5")
+                           .withLabel("Nav 5")
+                           .inGroup("Navigation")
+                           .withDescription("Bouton Navigation 5")
+                           .asButton(muxPin(13))
+                           .withDisplayOrder(5)
+                           .build());
+
+    config->addControl(ControlBuilder(56, "nav_button_6")
+                           .withLabel("Nav 6")
+                           .inGroup("Navigation")
+                           .withDescription("Bouton Navigation 6")
+                           .asButton(muxPin(14))
+                           .withDisplayOrder(6)
                            .build());
 
     // === ENCODEURS MIDI (Groupe: MIDI) ===
@@ -43,13 +76,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(1, 0, true)  // Encodeur -> CC 1
                            .build());
 
-    // Encodeur 1 (partie bouton)
+    // Encodeur 1 (partie bouton sur MUX canal 8)
     config->addControl(ControlBuilder(1071, "encoder_1x1_button")
                            .withLabel("Enc 1x1 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 1x1")
                            .withDisplayOrder(1)
-                           .asButton(21, 30)
+                           .asButton(muxPin(7), 30)
                            .asChildOf(71)
                            .withMidiNote(36, 0)  // Bouton -> Note 36
                            .build());
@@ -65,13 +98,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(2, 0, true)  // CC 2
                            .build());
 
-    // Encodeur 2 (partie bouton)
+    // Encodeur 2 (partie bouton sur MUX canal 9)
     config->addControl(ControlBuilder(1072, "encoder_1x2_button")
                            .withLabel("Enc 1x2 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 1x2")
                            .withDisplayOrder(2)
-                           .asButton(18, 30)
+                           .asButton(muxPin(4), 30)
                            .asChildOf(72)
                            .withMidiNote(37, 0)  // Note 37
                            .build());
@@ -87,13 +120,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(3, 0, true)
                            .build());
 
-    // Encodeur 3 (partie bouton)
+    // Encodeur 3 (partie bouton sur MUX canal 10)
     config->addControl(ControlBuilder(1073, "encoder_1x3_button")
                            .withLabel("Enc 1x3 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 1x3")
                            .withDisplayOrder(3)
-                           .asButton(15, 30)
+                           .asButton(muxPin(2), 30)
                            .asChildOf(73)
                            .withMidiNote(38, 0)
                            .build());
@@ -110,13 +143,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(4, 0, true)
                            .build());
 
-    // Encodeur 4 (partie bouton)
+    // Encodeur 4 (partie bouton sur MUX canal 11)
     config->addControl(ControlBuilder(1074, "encoder_1x4_button")
                            .withLabel("Enc 1x4 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 1x4")
                            .withDisplayOrder(4)
-                           .asButton(41, 30)
+                           .asButton(muxPin(0), 30)
                            .asChildOf(74)
                            .withMidiNote(39, 0)
                            .build());
@@ -132,13 +165,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(5, 0, true)
                            .build());
 
-    // Encodeur 5 (partie bouton)
+    // Encodeur 5 (partie bouton sur MUX canal 12)
     config->addControl(ControlBuilder(1075, "encoder_2x1_button")
                            .withLabel("Enc 2x1 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 2x1")
                            .withDisplayOrder(5)
-                           .asButton(38, 30)
+                           .asButton(muxPin(6), 30)
                            .asChildOf(75)
                            .withMidiNote(40, 0)
                            .build());
@@ -154,13 +187,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(6, 0, true)
                            .build());
 
-    // Encodeur 6 (partie bouton)
+    // Encodeur 6 (partie bouton sur MUX canal 13)
     config->addControl(ControlBuilder(1076, "encoder_2x2_button")
                            .withLabel("Enc 2x2 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 2x2")
                            .withDisplayOrder(6)
-                           .asButton(35, 30)
+                           .asButton(muxPin(5), 30)
                            .asChildOf(76)
                            .withMidiNote(41, 0)
                            .build());
@@ -176,13 +209,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(7, 0, true)
                            .build());
 
-    // Encodeur 7 (partie bouton)
+    // Encodeur 7 (partie bouton sur MUX canal 14)
     config->addControl(ControlBuilder(1077, "encoder_2x3_button")
                            .withLabel("Enc 2x3 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 2x3")
                            .withDisplayOrder(7)
-                           .asButton(23, 30)
+                           .asButton(muxPin(3), 30)
                            .asChildOf(77)
                            .withMidiNote(42, 0)
                            .build());
@@ -198,13 +231,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .withMidiCC(8, 0, true)
                            .build());
 
-    // Encodeur 8 (partie bouton)
+    // Encodeur 8 (partie bouton sur MUX canal 15)
     config->addControl(ControlBuilder(1078, "encoder_2x4_button")
                            .withLabel("Enc 2x4 Btn")
                            .inGroup("MIDI")
                            .withDescription("Bouton Encodeur 2x4")
                            .withDisplayOrder(8)
-                           .asButton(23, 30)
+                           .asButton(muxPin(1), 30)
                            .asChildOf(78)
                            .withMidiNote(43, 0)
                            .build());
@@ -229,7 +262,7 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
                            .inGroup("Navigation")
                            .withDescription("Bouton Navigation")
                            .withDisplayOrder(9)
-                           .asButton(32, 30)
+                           .asButton(mcuPin(32), 30)
                            .asChildOf(79)
                            .asItemValidator()
                            .build());

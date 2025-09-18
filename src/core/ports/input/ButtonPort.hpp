@@ -30,4 +30,10 @@ public:
      * @return ID du bouton
      */
     virtual InputId getId() const = 0;
+
+    /**
+     * @brief Réinitialise l'état du bouton (pour les boutons en mode toggle)
+     * Implémentation par défaut vide pour compatibilité
+     */
+    virtual void resetState() {}
 };

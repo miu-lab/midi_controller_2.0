@@ -4,7 +4,7 @@
 #include <unordered_set>
 
 UnifiedConfiguration::UnifiedConfiguration() {
-    // === OPTIMISATIONS MÉMOIRE TEENSY 4.1 ===
+    // === OPTIMISATIONS MÉMOIRE MCU 4.1 ===
     controls_.reserve(20);  // Pré-allocation pour éviter réallocations
     idIndex_.reserve(25);   // IDs + boutons d'encodeurs
     // Utilisation estimée: ~3-4KB au lieu de 8-12KB avec réallocations

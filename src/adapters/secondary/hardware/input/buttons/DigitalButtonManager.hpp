@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "adapters/secondary/hardware/input/buttons/ButtonConfig.hpp"
-#include "adapters/secondary/hardware/input/buttons/DigitalButton.hpp"
+#include "adapters/secondary/hardware/input/buttons/UnifiedButton.hpp"
 #include "core/ports/input/ButtonPort.hpp"
 
 /**
@@ -32,6 +32,6 @@ public:
     void resetToggleState(ButtonId buttonId);  // Réinitialiser un bouton toggle spécifique
 
 private:
-    std::vector<std::unique_ptr<DigitalButton>> ownedButtons_;  // possession des boutons
+    std::vector<std::unique_ptr<UnifiedButton>> ownedButtons_;  // possession des boutons unifiés
     std::vector<ButtonPort*> buttons_;                          // pointeurs pour use-cases
 };
