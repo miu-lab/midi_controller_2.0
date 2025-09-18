@@ -33,9 +33,7 @@ private:
     // État du bouton
     bool pressed_;           // État logique du bouton
     bool toggleState_;       // État pour mode toggle
-    bool lastRawState_;      // Dernier état brut lu
-    unsigned long lastDebounceTime_;  // Temps du dernier changement
-    bool stableState_;       // État stable après debounce
+    bool lastState_;         // Dernier état stable
 
     /**
      * @brief Lit l'état brut de la pin et applique la logique active-low

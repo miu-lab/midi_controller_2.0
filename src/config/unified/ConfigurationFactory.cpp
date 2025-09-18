@@ -10,13 +10,13 @@ std::unique_ptr<UnifiedConfiguration> ConfigurationFactory::createDefaultConfigu
     // === BOUTONS STANDALONE (Navigation) ===
 
     // Bouton Menu avec long press (sur MUX canal 0)
-    config->addControl(ControlBuilder(51, "home_button")
-                           .withLabel("Home")
+    config->addControl(ControlBuilder(51, "menu_button")
+                           .withLabel("Menu")
                            .inGroup("Navigation")
-                           .withDescription("Bouton Home")
+                           .withDescription("Bouton Menu")
                            .asButton(muxPin(9))
                            .withLongPress(1000)
-                           .asHomeButton()
+                           .asMenuButton()
                            .withDisplayOrder(1)
                            .build());
 

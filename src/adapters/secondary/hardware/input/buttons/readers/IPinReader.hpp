@@ -21,4 +21,10 @@ public:
      * Appelé une seule fois lors de la création du bouton
      */
     virtual void initialize() {}
+
+    /**
+     * @brief Met à jour l'état interne (pour debounce par exemple)
+     * Appelé à chaque cycle de lecture
+     */
+    virtual void update() {}
 };

@@ -176,7 +176,7 @@ public:
 
     // === MÉTHODES HELPER POUR ACTIONS COURANTES ===
 
-    ControlBuilder& asHomeButton() {
+    ControlBuilder& asMenuButton() {
         return withNavigation(NavigationAction::HOME, MappingControlType::BUTTON);
     }
 
