@@ -20,11 +20,16 @@ std::unique_ptr<UnifiedButton> ButtonFactory::createButton(const ButtonConfig& c
 std::unique_ptr<IPinReader> ButtonFactory::createPinReader(const GpioPin& gpio) {
     switch (gpio.source) {
         case GpioPin::Source::MCU:
-            // Pin directe sur le MCU
+            // Pin directe sur le MCU Teensy 4.1
+            if (gpio.pin > 41) {  // Teensy 4.1 a jusqu'à 42 pins numériques
+                Serial.print("[ButtonFactory] ERROR: Invalid MCU pin ");
+                Serial.println(gpio.pin);
+                return nullptr;
+            }
             return std::make_unique<DirectPinReader>(gpio.pin, gpio.mode);
 
         case GpioPin::Source::MUX:
-            // Pin via multiplexeur
+            // Pin via multiplexeur CD74HC4067
             if (gpio.pin > 15) {
                 Serial.print("[ButtonFactory] ERROR: Invalid MUX channel ");
                 Serial.println(gpio.pin);
