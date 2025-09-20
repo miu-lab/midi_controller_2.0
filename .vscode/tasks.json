@@ -2,28 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Format C/C++ Code",
+            "label": "Download Bitwig API",
             "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "${workspaceFolder}\\format-all.ps1"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
+            "command": "${workspaceFolder}/extension/bitwig/download-api.sh",
+            "windows": {
+                "command": "${workspaceFolder}\\extension\\bitwig\\download-api.bat"
             },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "problemMatcher": []
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/extension/bitwig"
+            }
         }
     ]
 }
