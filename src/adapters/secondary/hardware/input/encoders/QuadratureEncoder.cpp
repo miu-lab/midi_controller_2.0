@@ -82,6 +82,9 @@ int8_t QuadratureEncoder::readDelta() {
                     : (normalizedDelta < INT8_MIN) ? INT8_MIN
                                                    : static_cast<int8_t>(normalizedDelta);
 
+    // Inverser le sens des encodeurs
+    result = -result;
+
     absolutePosition_ += result;
     return result;
 }
